@@ -7,6 +7,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CompetitorCalendar } from "@/components/competitors/CompetitorCalendar";
+import { useToast } from "@/components/ui/Toast";
 
 export default function CompetitorDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
@@ -15,6 +16,7 @@ export default function CompetitorDetailPage(props: { params: Promise<{ id: stri
 
     const [savedHooks, setSavedHooks] = useState<string[]>([]);
     const [savedStructures, setSavedStructures] = useState<string[]>([]);
+    const { showToast } = useToast();
 
     if (!competitor) {
         notFound();
@@ -23,8 +25,10 @@ export default function CompetitorDetailPage(props: { params: Promise<{ id: stri
     const handleSave = (id: string, type: 'hook' | 'structure') => {
         if (type === 'hook') {
             setSavedHooks(prev => [...prev, id]);
+            showToast("Hook saved to Library!", "success");
         } else {
             setSavedStructures(prev => [...prev, id]);
+            showToast("Script Structure saved to Library!", "success");
         }
     };
 

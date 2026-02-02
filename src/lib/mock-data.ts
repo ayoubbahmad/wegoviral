@@ -1,6 +1,7 @@
 import { Hook, ScriptTemplate } from "@/types/library";
 import { Competitor, CompetitorPost } from "@/types/competitor";
 import { Follower } from "@/types/community";
+import { PerformancePost, PostingTimeAnalysis } from "@/types/performance";
 
 export const MOCK_HOOKS: Hook[] = [
     {
@@ -171,4 +172,52 @@ export const MOCK_COMMUNITY: Follower[] = [
         segment: "Regular",
         lastInteractionDate: "2023-10-22T11:00:00Z",
     },
+];
+
+export const MOCK_PERFORMANCE_POSTS: PerformancePost[] = [
+    {
+        id: "201",
+        thumbnailUrl: "https://placehold.co/400x600/18181b/fafafa?text=Top+Reel",
+        caption: "So many people get this wrong...",
+        postedAt: "2023-10-24T18:00:00Z",
+        type: "Reel",
+        metrics: { likes: 2500, comments: 120, saves: 450, shares: 320, reach: 45000 },
+        engagementScore: 9.8,
+    },
+    {
+        id: "202",
+        thumbnailUrl: "https://placehold.co/400x400/18181b/fafafa?text=Carousel",
+        caption: "5 Tools I use daily.",
+        postedAt: "2023-10-22T14:00:00Z",
+        type: "Carousel",
+        metrics: { likes: 1800, comments: 85, saves: 890, shares: 150, reach: 32000 },
+        engagementScore: 8.5,
+    },
+    {
+        id: "203",
+        thumbnailUrl: "https://placehold.co/400x500/18181b/fafafa?text=Static",
+        caption: "Monday Motivation.",
+        postedAt: "2023-10-18T09:00:00Z",
+        type: "Static",
+        metrics: { likes: 900, comments: 30, saves: 20, shares: 10, reach: 12000 },
+        engagementScore: 4.2,
+    },
+];
+
+export const MOCK_POSTING_TIMES: PostingTimeAnalysis[] = [
+    { dayFormatted: "Mon", hour: 9, score: 6 },
+    { dayFormatted: "Mon", hour: 12, score: 4 },
+    { dayFormatted: "Mon", hour: 18, score: 8 },
+    { dayFormatted: "Tue", hour: 9, score: 5 },
+    { dayFormatted: "Tue", hour: 12, score: 7 },
+    { dayFormatted: "Tue", hour: 18, score: 10 }, // Best time
+    { dayFormatted: "Wed", hour: 9, score: 5 },
+    { dayFormatted: "Wed", hour: 12, score: 6 },
+    { dayFormatted: "Wed", hour: 18, score: 8 },
+    { dayFormatted: "Thu", hour: 9, score: 4 },
+    { dayFormatted: "Thu", hour: 11, score: 9 },
+    { dayFormatted: "Thu", hour: 18, score: 7 },
+    { dayFormatted: "Fri", hour: 9, score: 3 },
+    { dayFormatted: "Fri", hour: 12, score: 5 },
+    { dayFormatted: "Fri", hour: 17, score: 6 },
 ];

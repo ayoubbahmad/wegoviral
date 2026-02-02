@@ -2,7 +2,7 @@
 
 import { Follower } from "@/types/community";
 import { LoyaltyBadge } from "./LoyaltyBadge";
-import { Heart, MessageCircle, Send } from "lucide-react";
+import { Heart, MessageCircle, Send, ExternalLink } from "lucide-react";
 
 interface FollowerListProps {
     followers: Follower[];
@@ -27,6 +27,15 @@ export function FollowerList({ followers }: FollowerListProps) {
                             <div>
                                 <h3 className="font-semibold text-sm">{follower.fullName}</h3>
                                 <p className="text-xs text-muted-foreground">@{follower.username}</p>
+                                <a
+                                    href={`https://instagram.com/${follower.username}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 mt-0.5"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    Open IG <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
                             </div>
                             <LoyaltyBadge segment={follower.segment} />
                         </div>

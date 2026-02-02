@@ -3,18 +3,33 @@
 import { useState } from "react";
 import { MOCK_COMMUNITY } from "@/lib/mock-data";
 import { FollowerList } from "@/components/community/FollowerList";
-import { Users, UserCheck, UserPlus } from "lucide-react";
+import { Users, UserCheck, UserPlus, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function CommunityPage() {
-    const [filter, setFilter] = useState<"All" | "VIP" | "New">("All");
+    const [filter, setFilter] = useState<"All" | "VIP" | "New" | "TopLikers">("All");
 
-    const filteredFollowers = MOCK_COMMUNITY.filter(f => {
-        if (filter === "All") return true;
-        if (filter === "VIP") return f.segment === "VIP" || f.segment === "Superfan";
-        if (filter === "New") return f.segment === "New";
-        return true;
-    });
+    const getFilteredAndSortedFollowers = () => {
+        let result = [...MOCK_COMMUNITY];
+
+        // Filter
+        if (filter === "VIP") {
+            result = result.filter(f => f.segment === "VIP" || f.segment === "Superfan");
+        } else if (filter === "New") {
+            result = result.filter(f => f.segment === "New");
+        }
+
+        // Sort
+        if (filter === "TopLikers") {
+            result.sort((a, b) => b.stats.likes - a.stats.likes);
+        } else {
+            // Default sort (e.g. by join date or generic) - keep mock order for now which implies generic list
+        }
+
+        return result;
+    };
+
+    const displayedFollowers = getFilteredAndSortedFollowers();
 
     return (
         <div className="space-y-8">
@@ -60,25 +75,31 @@ export default function CommunityPage() {
             </div>
 
             {/* Filters */}
-            <div className="flex gap-2 border-b border-border pb-4">
-                {["All", "VIP", "New"].map((f) => (
+            <div className="flex gap-2 border-b border-border pb-4 overflow-x-auto">
+                {[
+                    { id: "All", label: "All Members", icon: Users },
+                    { id: "VIP", label: "Loyal & VIP", icon: UserCheck },
+                    { id: "TopLikers", label: "Top Likers", icon: ThumbsUp },
+                    { id: "New", label: "New Faces", icon: UserPlus },
+                ].map((f) => (
                     <button
-                        key={f}
-                        onClick={() => setFilter(f as any)}
+                        key={f.id}
+                        onClick={() => setFilter(f.id as any)}
                         className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                            filter === f
+                            "px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap",
+                            filter === f.id
                                 ? "bg-secondary text-foreground"
                                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                         )}
                     >
-                        {f === "VIP" ? "Loyal & VIP" : f === "New" ? "New Faces" : "All Members"}
+                        <f.icon className="w-4 h-4" />
+                        {f.label}
                     </button>
                 ))}
             </div>
 
             {/* List */}
-            <FollowerList followers={filteredFollowers} />
+            <FollowerList followers={displayedFollowers} />
         </div>
     );
 }

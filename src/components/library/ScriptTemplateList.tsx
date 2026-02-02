@@ -2,18 +2,30 @@
 
 import { ScriptTemplate } from "@/types/library";
 import { FileText, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ScriptTemplateListProps {
     scripts: ScriptTemplate[];
 }
 
 export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    const handleCopy = (id: string, structure: any[]) => {
+        const text = structure.map(s => `${s.step}: ${s.description}`).join('\n');
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
     return (
         <div className="space-y-4">
             {scripts.map((script) => (
                 <div
                     key={script.id}
                     className="group flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-secondary/20 transition-all cursor-pointer"
+                    onClick={() => handleCopy(script.id, script.structure)}
                 >
                     <div className="p-3 bg-secondary rounded-lg">
                         <FileText className="w-6 h-6 text-foreground" />
@@ -36,9 +48,16 @@ export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
                         </div>
                     </div>
 
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg">
-                            Use Template
+                    <div className={cn("transition-opacity", copiedId === script.id ? "opacity-100" : "opacity-0 group-hover:opacity-100")}>
+                        <button
+                            className={cn(
+                                "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                                copiedId === script.id
+                                    ? "bg-green-500 text-white"
+                                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                        >
+                            {copiedId === script.id ? "Copied!" : "Use Template"}
                         </button>
                     </div>
                 </div>

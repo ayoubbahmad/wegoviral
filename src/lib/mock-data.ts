@@ -1,5 +1,6 @@
 import { Hook, ScriptTemplate } from "@/types/library";
 import { Competitor, CompetitorPost } from "@/types/competitor";
+import { Follower } from "@/types/community";
 
 export const MOCK_HOOKS: Hook[] = [
     {
@@ -124,3 +125,50 @@ export const MOCK_COMPETITOR_POSTS: Record<string, CompetitorPost[]> = {
         }
     ]
 };
+
+export const MOCK_COMMUNITY: Follower[] = [
+    {
+        id: "101",
+        username: "loyal_fan_1",
+        fullName: "Jessica Smith",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica",
+        joinDate: "2023-01-15T10:00:00Z",
+        stats: { likes: 145, comments: 32, storyReplies: 12 },
+        loyaltyScore: 95,
+        segment: "VIP",
+        lastInteractionDate: "2023-10-26T10:00:00Z",
+    },
+    {
+        id: "102",
+        username: "super_dave",
+        fullName: "Dave Brown",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dave",
+        joinDate: "2023-03-20T10:00:00Z",
+        stats: { likes: 89, comments: 15, storyReplies: 5 },
+        loyaltyScore: 82,
+        segment: "Superfan",
+        lastInteractionDate: "2023-10-25T14:30:00Z",
+    },
+    {
+        id: "103",
+        username: "newbie_sarah",
+        fullName: "Sarah Jones",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=SarahJ",
+        joinDate: "2023-10-20T10:00:00Z",
+        stats: { likes: 3, comments: 1, storyReplies: 0 },
+        loyaltyScore: 15,
+        segment: "New",
+        lastInteractionDate: "2023-10-24T09:15:00Z",
+    },
+    {
+        id: "104",
+        username: "mark_design",
+        fullName: "Mark Design",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mark",
+        joinDate: "2023-05-12T10:00:00Z",
+        stats: { likes: 56, comments: 4, storyReplies: 1 },
+        loyaltyScore: 60,
+        segment: "Regular",
+        lastInteractionDate: "2023-10-22T11:00:00Z",
+    },
+];

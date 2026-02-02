@@ -56,6 +56,13 @@ export function HookCard({ hook }: HookCardProps) {
                     <Copy className={cn("w-4 h-4", copied && "text-green-500")} />
                 </button>
             </div>
+
+            {(hook.usageCount || 0) > 0 && (
+                <div className="pt-3 mt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Used {hook.usageCount} time{hook.usageCount !== 1 ? 's' : ''}</span>
+                    {hook.lastUsed && <span>Last: {new Date(hook.lastUsed).toLocaleDateString()}</span>}
+                </div>
+            )}
         </div>
     );
 }

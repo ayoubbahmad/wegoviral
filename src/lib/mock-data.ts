@@ -30,6 +30,8 @@ export const MOCK_HOOKS: Hook[] = [
         topic: "Business",
         addedAt: "2023-10-24T09:15:00Z",
         performanceRating: 5,
+        lastUsed: "2023-10-30T10:00:00Z",
+        usageCount: 3,
     },
 ];
 
@@ -138,6 +140,7 @@ export const MOCK_COMMUNITY: Follower[] = [
         loyaltyScore: 95,
         segment: "VIP",
         lastInteractionDate: "2023-10-26T10:00:00Z",
+        sampleComments: ["This is exactly what I needed!", "Loved the editing on this one 🔥", "Can you do a part 2?"],
     },
     {
         id: "102",
@@ -149,6 +152,7 @@ export const MOCK_COMMUNITY: Follower[] = [
         loyaltyScore: 82,
         segment: "Superfan",
         lastInteractionDate: "2023-10-25T14:30:00Z",
+        sampleComments: ["First!", "Great insights as always."],
     },
     {
         id: "103",

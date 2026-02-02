@@ -17,4 +17,5 @@ export interface Follower {
     loyaltyScore: number; // 0-100 calculated score
     segment: Segment;
     lastInteractionDate: string;
+    sampleComments?: string[];
 }

@@ -2,19 +2,31 @@
 
 import { use, useState } from "react";
 import { MOCK_COMPETITORS, MOCK_COMPETITOR_POSTS } from "@/lib/mock-data";
-import { ArrowLeft, ExternalLink, Heart, MessageCircle, PlayCircle, TrendingUp, Zap } from "lucide-react";
+import { ArrowLeft, ExternalLink, Heart, MessageCircle, PlayCircle, TrendingUp, Zap, Plus, Check } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CompetitorCalendar } from "@/components/competitors/CompetitorCalendar";
 
 export default function CompetitorDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
     const competitor = MOCK_COMPETITORS.find(c => c.id === params.id);
     const posts = MOCK_COMPETITOR_POSTS[params.id] || [];
 
+    const [savedHooks, setSavedHooks] = useState<string[]>([]);
+    const [savedStructures, setSavedStructures] = useState<string[]>([]);
+
     if (!competitor) {
         notFound();
     }
+
+    const handleSave = (id: string, type: 'hook' | 'structure') => {
+        if (type === 'hook') {
+            setSavedHooks(prev => [...prev, id]);
+        } else {
+            setSavedStructures(prev => [...prev, id]);
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -67,80 +79,130 @@ export default function CompetitorDetailPage(props: { params: Promise<{ id: stri
                 </div>
             </div>
 
-            {/* Content Analysis */}
-            <div>
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="p-1.5 bg-purple-500/10 rounded-lg">
-                        <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Main Content: Calendar + Posts */}
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Content Analysis */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-6">
+                            <div className="p-1.5 bg-purple-500/10 rounded-lg">
+                                <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                            </div>
+                            <h2 className="text-xl font-bold">Viral Hits & Analysis</h2>
+                        </div>
+
+                        {posts.length > 0 ? (
+                            <div className="grid gap-6">
+                                {posts.map(post => (
+                                    <div key={post.id} className="flex flex-col lg:flex-row gap-6 p-5 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+                                        {/* Thumbnail / Visual */}
+                                        <div className="relative w-full lg:w-48 aspect-[4/5] bg-secondary rounded-xl overflow-hidden shrink-0 group">
+                                            <img src={post.thumbnailUrl} alt="Post thumbnail" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                            {post.isViral && (
+                                                <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold uppercase rounded shadow-sm flex items-center gap-1">
+                                                    <TrendingUp className="w-3 h-3" /> Viral
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <PlayCircle className="w-10 h-10 text-white drop-shadow-lg" />
+                                            </div>
+                                        </div>
+
+                                        {/* Content Data */}
+                                        <div className="flex-1 space-y-4">
+                                            <div className="flex justify-between items-start">
+                                                <p className="font-medium text-lg leading-snug line-clamp-2 pr-4">{post.captionExcerpt}</p>
+                                                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                                    {new Date(post.postedAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                <span className="flex items-center gap-1"><Heart className="w-4 h-4" /> {post.metrics.likes.toLocaleString()}</span>
+                                                <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> {post.metrics.comments.toLocaleString()}</span>
+                                            </div>
+
+                                            {/* Analysis Card */}
+                                            {post.analysis && (
+                                                <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 space-y-3">
+                                                    <div className="grid md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Hook Strategy</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex-1 flex items-center gap-2">
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                                                    {post.analysis.hook}
+                                                                </p>
+                                                                <button
+                                                                    onClick={() => handleSave(post.id, 'hook')}
+                                                                    disabled={savedHooks.includes(post.id)}
+                                                                    className={cn(
+                                                                        "p-2 rounded-lg border transition-all",
+                                                                        savedHooks.includes(post.id)
+                                                                            ? "bg-green-500/10 border-green-500/20 text-green-600"
+                                                                            : "bg-background border-border hover:bg-secondary text-muted-foreground hover:text-foreground"
+                                                                    )}
+                                                                    title="Save Hook to Library"
+                                                                >
+                                                                    {savedHooks.includes(post.id) ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Structure</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex-1 flex items-center gap-2">
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                                                                    {post.analysis.structure}
+                                                                </p>
+                                                                <button
+                                                                    onClick={() => handleSave(post.id, 'structure')}
+                                                                    disabled={savedStructures.includes(post.id)}
+                                                                    className={cn(
+                                                                        "p-2 rounded-lg border transition-all",
+                                                                        savedStructures.includes(post.id)
+                                                                            ? "bg-green-500/10 border-green-500/20 text-green-600"
+                                                                            : "bg-background border-border hover:bg-secondary text-muted-foreground hover:text-foreground"
+                                                                    )}
+                                                                    title="Save Structure to Library"
+                                                                >
+                                                                    {savedStructures.includes(post.id) ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="pt-2">
+                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Why it worked</span>
+                                                        <p className="text-sm text-muted-foreground italic">"{post.analysis.notes}"</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 rounded-xl border border-dashed border-border bg-secondary/10">
+                                <p className="text-muted-foreground">No posts tracked for this competitor yet.</p>
+                            </div>
+                        )}
                     </div>
-                    <h2 className="text-xl font-bold">Viral Hits & Analysis</h2>
                 </div>
 
-                {posts.length > 0 ? (
-                    <div className="grid gap-6">
-                        {posts.map(post => (
-                            <div key={post.id} className="flex flex-col lg:flex-row gap-6 p-5 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-                                {/* Thumbnail / Visual */}
-                                <div className="relative w-full lg:w-48 aspect-[4/5] bg-secondary rounded-xl overflow-hidden shrink-0 group">
-                                    <img src={post.thumbnailUrl} alt="Post thumbnail" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                                    {post.isViral && (
-                                        <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold uppercase rounded shadow-sm flex items-center gap-1">
-                                            <TrendingUp className="w-3 h-3" /> Viral
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <PlayCircle className="w-10 h-10 text-white drop-shadow-lg" />
-                                    </div>
-                                </div>
+                {/* Sidebar Area: Calendar */}
+                <div className="space-y-6">
+                    <CompetitorCalendar posts={posts} />
 
-                                {/* Content Data */}
-                                <div className="flex-1 space-y-4">
-                                    <div className="flex justify-between items-start">
-                                        <p className="font-medium text-lg leading-snug line-clamp-2 pr-4">{post.captionExcerpt}</p>
-                                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                            {new Date(post.postedAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                        <span className="flex items-center gap-1"><Heart className="w-4 h-4" /> {post.metrics.likes.toLocaleString()}</span>
-                                        <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> {post.metrics.comments.toLocaleString()}</span>
-                                    </div>
-
-                                    {/* Analysis Card */}
-                                    {post.analysis && (
-                                        <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 space-y-3">
-                                            <div className="grid md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Hook Strategy</span>
-                                                    <p className="text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                                        {post.analysis.hook}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Structure</span>
-                                                    <p className="text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                                                        {post.analysis.structure}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="pt-2">
-                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">Why it worked</span>
-                                                <p className="text-sm text-muted-foreground italic">"{post.analysis.notes}"</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                    {/* Quick Actions (Future) */}
+                    <div className="p-6 rounded-xl bg-gradient-to-br from-indigo-500/5 to-purple-500/5 border border-indigo-500/10">
+                        <h3 className="font-semibold text-sm mb-2">💡 Analysis Tips</h3>
+                        <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
+                            <li>Look for patterns in successful hooks.</li>
+                            <li>Check if they post more frequently on weekends.</li>
+                            <li>Note the editing pace of viral clips.</li>
+                        </ul>
                     </div>
-                ) : (
-                    <div className="text-center py-12 rounded-xl border border-dashed border-border bg-secondary/10">
-                        <p className="text-muted-foreground">No posts tracked for this competitor yet.</p>
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     );

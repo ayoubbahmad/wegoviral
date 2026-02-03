@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Mail, User as UserIcon, Camera } from "lucide-react";
 
 export default function ProfilePage() {
-    const { user, login } = useAuth();
+    const { user, login, instagramConnected, connectInstagram, disconnectInstagram } = useAuth();
 
     if (!user) {
         return (
@@ -56,6 +56,23 @@ export default function ProfilePage() {
                                 <span className="font-medium">{user.email}</span>
                             </div>
                         </div>
+
+                        {instagramConnected && (
+                            <div className="grid grid-cols-3 gap-3 pt-2">
+                                <div className="p-3 bg-secondary/20 rounded-lg border border-border text-center">
+                                    <span className="block text-xl font-bold">12.5k</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Followers</span>
+                                </div>
+                                <div className="p-3 bg-secondary/20 rounded-lg border border-border text-center">
+                                    <span className="block text-xl font-bold">4.2%</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Eng. Rate</span>
+                                </div>
+                                <div className="p-3 bg-secondary/20 rounded-lg border border-border text-center">
+                                    <span className="block text-xl font-bold">892</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Avg Likes</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

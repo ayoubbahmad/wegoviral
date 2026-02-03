@@ -76,14 +76,17 @@ export async function deleteHook(id: string) {
 // Helper function to ensure user exists
 async function ensureUserExists() {
     const existingUser = await prisma.userProfile.findUnique({
-        where: { clerkId: MOCK_USER_ID },
+        where: { id: MOCK_USER_ID },
     });
 
     if (!existingUser) {
         await prisma.userProfile.create({
             data: {
-                clerkId: MOCK_USER_ID,
+                id: MOCK_USER_ID,
                 email: 'mock@example.com',
+                username: 'demo_creator',
+                passwordHash: 'dummy_hash',
+                name: 'Demo Creator',
             },
         });
     }

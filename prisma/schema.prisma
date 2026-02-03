@@ -6,18 +6,22 @@ datasource db {
   provider = "postgresql"
 }
 
-// -- User Data (Synced with Clerk) --
+// -- User Data (Custom Auth) --
 model UserProfile {
-  id        String   @id @default(uuid())
-  clerkId   String   @unique
-  email     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  name         String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   
   // Relations
-  hooks       Hook[]
-  competitors Competitor[]
+  hooks          Hook[]
+  competitors    Competitor[]
   socialAccounts SocialAccount[]
+  scriptTemplates ScriptTemplate[]
 }
 
 // -- Library (Hooks & Scripts) --
@@ -39,8 +43,28 @@ model Hook {
   socialAccountId   String?
   socialAccount     SocialAccount? @relation(fields: [socialAccountId], references: [id])
   
+  // Relations
+  scriptTemplates   ScriptTemplate[]
+  userPosts         UserPost[]
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model ScriptTemplate {
+  id        String   @id @default(uuid())
+  title     String
+  content   Json     // Structure details (array of steps)
+  category  String
+  
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id])
+  
+  hookId    String?
+  hook      Hook?       @relation(fields: [hookId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // -- Competitor Tracking --
@@ -88,6 +112,58 @@ model CompetitorPost {
   createdAt      DateTime @default(now())
 }
 
+// -- My Performance --
+model UserPost {
+  id              String   @id @default(uuid())
+  externalId      String?  // Platform ID
+  thumbnailUrl    String?
+  caption         String?
+  postedAt        DateTime
+  
+  metrics         Json     // { likes: number, comments: number, views: number, etc. }
+  
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  
+  hookId          String?
+  hook            Hook?    @relation(fields: [hookId], references: [id])
+  
+  createdAt       DateTime @default(now())
+}
+
+// -- Community & Followers --
+model Follower {
+  id              String   @id @default(uuid())
+  handle          String
+  name            String?
+  avatarUrl       String?
+  segment         String   // VIP, Superfan, New, etc.
+  
+  stats           Json     // { totalLikes: number, totalComments: number, lastActive: DateTime }
+  
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  
+  interactions    Interaction[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([socialAccountId, handle])
+}
+
+model Interaction {
+  id          String   @id @default(uuid())
+  followerId  String
+  follower    Follower @relation(fields: [followerId], references: [id], onDelete: Cascade)
+  
+  type        String   // LIKE, COMMENT, STORY_REPLY
+  content     String?  // Comment text
+  timestamp   DateTime @default(now())
+  
+  createdAt   DateTime @default(now())
+}
+
 // -- Social Account Management --
 model SocialAccount {
   id          String   @id @default(uuid())
@@ -111,6 +187,8 @@ model SocialAccount {
   // Relations
   hooks       Hook[]
   competitors Competitor[]
+  userPosts   UserPost[]
+  followers   Follower[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

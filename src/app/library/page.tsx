@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useHooks } from "@/hooks/useHooks";
-import { MOCK_SCRIPTS } from "@/lib/mock-data";
+import { useScripts } from "@/hooks/useScripts";
 import { HookCard } from "@/components/library/HookCard";
 import { ScriptTemplateList } from "@/components/library/ScriptTemplateList";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { AddNewItem } from "@/components/library/AddNewItem";
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
     const { hooks, addHook } = useHooks();
+    const { scripts, addScript } = useScripts();
 
     return (
         <div className="space-y-8">
@@ -19,7 +20,7 @@ export default function LibraryPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Library</h1>
                     <p className="text-muted-foreground mt-2">Manage your creative assets, hooks, and script structures.</p>
                 </div>
-                <AddNewItem onAddHook={addHook} />
+                <AddNewItem onAddHook={addHook} onAddScript={addScript} />
             </div>
 
             <div className="border-b border-border">
@@ -59,7 +60,7 @@ export default function LibraryPage() {
                         ))}
                     </div>
                 ) : (
-                    <ScriptTemplateList scripts={MOCK_SCRIPTS} />
+                    <ScriptTemplateList scripts={scripts as any} />
                 )}
             </div>
         </div>

@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { MOCK_COMMUNITY } from "@/lib/mock-data";
+import { useCommunity } from "@/hooks/useCommunity";
 import { FollowerList } from "@/components/community/FollowerList";
 import { Users, UserCheck, UserPlus, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MOCK_COMMUNITY } from "@/lib/mock-data";
 
 export default function CommunityPage() {
+    const { followers, summary, isLoading } = useCommunity();
     const [filter, setFilter] = useState<"All" | "VIP" | "New" | "TopLikers">("All");
 
+    // Fallback to mock data if no followers yet to show the UI value
+    const dataToUse = (followers && followers.length > 0) ? followers : MOCK_COMMUNITY;
+
     const getFilteredAndSortedFollowers = () => {
-        let result = [...MOCK_COMMUNITY];
+        let result = [...dataToUse];
 
         // Filter
         if (filter === "VIP") {
@@ -22,8 +27,6 @@ export default function CommunityPage() {
         // Sort
         if (filter === "TopLikers") {
             result.sort((a, b) => b.stats.likes - a.stats.likes);
-        } else {
-            // Default sort (e.g. by join date or generic) - keep mock order for now which implies generic list
         }
 
         return result;
@@ -47,8 +50,8 @@ export default function CommunityPage() {
                         </div>
                         <span className="text-sm font-medium text-muted-foreground">Total Community</span>
                     </div>
-                    <span className="text-2xl font-bold">12,345</span>
-                    <span className="text-xs text-green-500 ml-2 font-medium">+12% this month</span>
+                    <span className="text-2xl font-bold">{summary.total || "12,345"}</span>
+                    {!summary.total && <span className="text-xs text-green-500 ml-2 font-medium">+12% this month</span>}
                 </div>
 
                 <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
@@ -58,7 +61,7 @@ export default function CommunityPage() {
                         </div>
                         <span className="text-sm font-medium text-muted-foreground">Loyal Fans (VIP)</span>
                     </div>
-                    <span className="text-2xl font-bold">482</span>
+                    <span className="text-2xl font-bold">{summary.vips || "482"}</span>
                     <p className="text-xs text-muted-foreground mt-1">Fans with highly consistent engagement.</p>
                 </div>
 
@@ -69,7 +72,7 @@ export default function CommunityPage() {
                         </div>
                         <span className="text-sm font-medium text-muted-foreground">New Faces</span>
                     </div>
-                    <span className="text-2xl font-bold">145</span>
+                    <span className="text-2xl font-bold">{summary.newThisMonth || "145"}</span>
                     <p className="text-xs text-muted-foreground mt-1">Joined in the last 30 days.</p>
                 </div>
             </div>
@@ -99,7 +102,11 @@ export default function CommunityPage() {
             </div>
 
             {/* List */}
-            <FollowerList followers={displayedFollowers} />
+            {isLoading ? (
+                <div className="p-12 text-center text-muted-foreground">Loading community data...</div>
+            ) : (
+                <FollowerList followers={displayedFollowers} />
+            )}
         </div>
     );
 }

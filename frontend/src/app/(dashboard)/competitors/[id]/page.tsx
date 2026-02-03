@@ -1,8 +1,9 @@
 "use client";
 
-import { use, useState } from "react";
-import { MOCK_COMPETITORS, MOCK_COMPETITOR_POSTS } from "@/lib/mock-data";
-import { ArrowLeft, ExternalLink, Heart, MessageCircle, PlayCircle, TrendingUp, Zap, Plus, Check } from "lucide-react";
+import { use, useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api-client";
+import { Competitor, CompetitorPost } from "@/types/competitor";
+import { ArrowLeft, ExternalLink, Heart, MessageCircle, PlayCircle, TrendingUp, Zap, Plus, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -11,16 +12,31 @@ import { useToast } from "@/components/ui/Toast";
 
 export default function CompetitorDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
-    const competitor = MOCK_COMPETITORS.find(c => c.id === params.id);
-    const posts = MOCK_COMPETITOR_POSTS[params.id] || [];
+    const [competitor, setCompetitor] = useState<Competitor | null>(null);
+    const [posts, setPosts] = useState<CompetitorPost[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [savedHooks, setSavedHooks] = useState<string[]>([]);
     const [savedStructures, setSavedStructures] = useState<string[]>([]);
     const { showToast } = useToast();
 
-    if (!competitor) {
-        notFound();
-    }
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                const data = await apiFetch(`/competitors/${params.id}`);
+                setCompetitor(data);
+                setPosts(data.posts || []);
+            } catch (err: any) {
+                console.error("Error fetching competitor:", err);
+                setError(err.message || "Failed to load competitor");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [params.id]);
 
     const handleSave = (id: string, type: 'hook' | 'structure') => {
         if (type === 'hook') {
@@ -31,6 +47,34 @@ export default function CompetitorDetailPage(props: { params: Promise<{ id: stri
             showToast("Script Structure saved to Library!", "success");
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-muted-foreground animate-pulse">Analyzing competitor data...</p>
+            </div>
+        );
+    }
+
+    if (error || !competitor) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 text-center">
+                <div className="p-4 bg-red-500/10 rounded-full">
+                    <Zap className="w-12 h-12 text-red-500" />
+                </div>
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Access Denied or Not Found</h2>
+                    <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+                        This competitor doesn't exist or you don't have permission to view it.
+                    </p>
+                </div>
+                <Link href="/competitors" className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity">
+                    Return to List
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">

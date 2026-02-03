@@ -1,6 +1,31 @@
 import { Response } from 'express';
 import { prisma } from '../lib/prisma';
 
+export const getCompetitor = async (req: any, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const competitor = await prisma.competitor.findFirst({
+            where: { id, userId: req.user.id },
+            include: {
+                posts: {
+                    orderBy: { postedAt: 'desc' }
+                }
+            }
+        });
+
+        if (!competitor) {
+            return res.status(404).json({ error: 'Competitor not found' });
+        }
+
+        res.json({
+            ...competitor,
+            isFollowing: true,
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch competitor' });
+    }
+};
+
 export const getCompetitors = async (req: any, res: Response) => {
     try {
         const competitors = await prisma.competitor.findMany({

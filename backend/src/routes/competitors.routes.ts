@@ -8,6 +8,7 @@ const router = Router();
 router.use(protect);
 
 router.get('/', competitorsController.getCompetitors);
+router.get('/:id', competitorsController.getCompetitor);
 router.post('/', competitorsController.createCompetitor);
 router.patch('/:id', competitorsController.updateCompetitor);
 router.delete('/:id', competitorsController.deleteCompetitor);

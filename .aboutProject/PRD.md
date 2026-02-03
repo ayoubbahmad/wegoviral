@@ -183,7 +183,22 @@ This product is built first for internal use, then evolved into a public SaaS.
 
 ---
 
-### 5.5 Insight → Content Workflow
+### 5.5 Challenges (Gamification)
+
+**Key Features (V1.5):**
+
+* **Content Challenges**: 
+  * "7-Day Reel Sprint"
+  * "Community Engagement Surge"
+* **Progress Tracking**:
+  * Streak counting
+  * Milestone badges
+* **Rewards (Self-Managed)**:
+  * Define personal rewards for completing challenges.
+
+---
+
+### 5.6 Insight → Content Workflow
 
 **Flexible Entry Points:**
 A content workflow can start from:

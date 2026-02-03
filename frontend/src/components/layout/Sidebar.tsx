@@ -8,6 +8,7 @@ import {
     Users,
     Target,
     Library,
+    Trophy,
     Settings,
     Zap,
     LogOut
@@ -22,6 +23,7 @@ const navItems = [
     { name: "Community", href: "/community", icon: Users },
     { name: "Competitors", href: "/competitors", icon: Target },
     { name: "Library", href: "/library", icon: Library },
+    { name: "Challenges", href: "/challenges", icon: Trophy },
 ];
 
 export function Sidebar() {

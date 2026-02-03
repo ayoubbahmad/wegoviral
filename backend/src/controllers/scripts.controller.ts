@@ -18,16 +18,27 @@ export const getScripts = async (req: any, res: Response) => {
 
 export const createScript = async (req: any, res: Response) => {
     try {
-        const data = req.body;
+        const { title, content, category, socialAccountId } = req.body;
+
+        if (!title || !content) {
+            return res.status(400).json({ error: 'Title and content structure are required' });
+        }
+
         const script = await prisma.scriptTemplate.create({
             data: {
-                ...data,
+                title,
+                content,
+                category: category || 'General',
                 userId: req.user.id,
             },
         });
-        res.status(201).json(script);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create script' });
+        res.status(201).json({
+            ...script,
+            createdAt: script.createdAt.toISOString(),
+        });
+    } catch (error: any) {
+        console.error('Create Script Error:', error);
+        res.status(500).json({ error: 'Failed to create script', details: error.message });
     }
 };
 

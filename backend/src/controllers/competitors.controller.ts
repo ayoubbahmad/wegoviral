@@ -18,16 +18,31 @@ export const getCompetitors = async (req: any, res: Response) => {
 
 export const createCompetitor = async (req: any, res: Response) => {
     try {
-        const data = req.body;
+        const { handle, name, avatarUrl, bio, tags, stats, socialAccountId } = req.body;
+
+        if (!handle || !name) {
+            return res.status(400).json({ error: 'Handle and name are required' });
+        }
+
         const competitor = await prisma.competitor.create({
             data: {
-                ...data,
+                handle,
+                name,
+                avatarUrl: avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
+                bio,
+                tags: tags || [],
+                stats: stats || {},
                 userId: req.user.id,
+                socialAccountId
             },
         });
         res.status(201).json(competitor);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create competitor' });
+    } catch (error: any) {
+        console.error('Create Competitor Error:', error);
+        res.status(500).json({
+            error: 'Failed to create competitor',
+            details: error.message
+        });
     }
 };
 

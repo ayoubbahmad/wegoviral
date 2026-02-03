@@ -1,14 +1,27 @@
 "use client";
 
 import { Competitor } from "@/types/competitor";
-import { Users, Activity, TrendingUp } from "lucide-react";
+import { Trash2, Users, Activity, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface CompetitorCardProps {
     competitor: Competitor;
+    onDelete?: (id: string) => void;
 }
 
-export function CompetitorCard({ competitor }: CompetitorCardProps) {
+export function CompetitorCard({ competitor, onDelete }: CompetitorCardProps) {
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm(`Are you sure you want to stop tracking ${competitor.handle}?`)) {
+            setIsDeleting(true);
+            await onDelete?.(competitor.id);
+            setIsDeleting(false);
+        }
+    };
     return (
         <Link
             href={`/competitors/${competitor.id}`}
@@ -27,11 +40,20 @@ export function CompetitorCard({ competitor }: CompetitorCardProps) {
                     </div>
                 </div>
 
-                {competitor.isFollowing && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/20">
-                        Tracking
-                    </span>
-                )}
+                <div className="flex items-center gap-2">
+                    {competitor.isFollowing && (
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/20">
+                            Tracking
+                        </span>
+                    )}
+                    <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
+                    >
+                        <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                </div>
             </div>
 
             <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px]">

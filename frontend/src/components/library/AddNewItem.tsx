@@ -7,8 +7,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Hook } from "@/types/library";
 
 interface AddNewItemProps {
-    onAddHook?: (hook: any) => void;
-    onAddScript?: (script: any) => void;
+    onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
+    onAddScript?: (script: any) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
@@ -28,33 +28,38 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
         setScriptSteps([...scriptSteps, { step: "New Step", description: "" }]);
     };
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
+        let result;
         if (type === "hook") {
-            if (onAddHook) {
-                onAddHook({
-                    content: hookContent,
-                    type: hookType,
-                    emotion: hookEmotion,
-                    topic: "General",
-                });
-            }
+            result = await onAddHook?.({
+                content: hookContent,
+                type: hookType,
+                emotion: hookEmotion,
+                topic: "General",
+            });
         } else {
-            if (onAddScript) {
-                onAddScript({
-                    title: scriptTitle,
-                    category: scriptCategory,
-                    content: scriptSteps,
-                });
-            }
+            result = await onAddScript?.({
+                title: scriptTitle,
+                category: scriptCategory,
+                content: scriptSteps,
+            });
         }
 
-        setIsOpen(false);
-        // Reset states
-        setHookContent("");
-        setScriptTitle("");
-        setScriptSteps([{ step: "Hook", description: "" }]);
+        if (result?.success) {
+            setIsOpen(false);
+            // Reset states
+            setHookContent("");
+            setScriptTitle("");
+            setScriptSteps([{ step: "Hook", description: "" }]);
+        } else {
+            alert(result?.error || "Failed to save item");
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -201,9 +206,10 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
                         <div className="pt-4 sticky bottom-0 bg-background pb-2">
                             <button
                                 type="submit"
-                                className="w-full py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90"
+                                disabled={isLoading}
+                                className="w-full py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
                             >
-                                {type === "hook" ? "Save Hook" : "Save Script Template"}
+                                {isLoading ? "Saving..." : (type === "hook" ? "Save Hook" : "Save Script Template")}
                             </button>
                         </div>
                     </form>

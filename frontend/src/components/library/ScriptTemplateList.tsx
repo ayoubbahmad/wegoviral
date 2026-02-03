@@ -1,22 +1,34 @@
 "use client";
 
 import { ScriptTemplate } from "@/types/library";
-import { FileText, ChevronRight } from "lucide-react";
+import { FileText, ChevronRight, Trash2, Edit2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface ScriptTemplateListProps {
     scripts: ScriptTemplate[];
+    onDelete?: (id: string) => void;
+    onUpdate?: (id: string, updates: Partial<ScriptTemplate>) => void;
 }
 
-export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
+export function ScriptTemplateList({ scripts, onDelete, onUpdate }: ScriptTemplateListProps) {
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
     const handleCopy = (id: string, structure: any[]) => {
         const text = structure.map(s => `${s.step}: ${s.description}`).join('\n');
         navigator.clipboard.writeText(text);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleDelete = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (confirm("Are you sure you want to delete this script template?")) {
+            setIsDeleting(id);
+            await onDelete?.(id);
+            setIsDeleting(null);
+        }
     };
 
     return (
@@ -48,8 +60,12 @@ export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
                         </div>
                     </div>
 
-                    <div className={cn("transition-opacity", copiedId === script.id ? "opacity-100" : "opacity-0 group-hover:opacity-100")}>
+                    <div className={cn("flex items-center gap-2 transition-opacity", copiedId === script.id ? "opacity-100" : "opacity-0 group-hover:opacity-100")}>
                         <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(script.id, script.content);
+                            }}
                             className={cn(
                                 "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
                                 copiedId === script.id
@@ -58,6 +74,14 @@ export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
                             )}
                         >
                             {copiedId === script.id ? "Copied!" : "Use Template"}
+                        </button>
+                        <button
+                            onClick={(e) => handleDelete(e, script.id)}
+                            disabled={isDeleting === script.id}
+                            className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
+                            title="Delete template"
+                        >
+                            <Trash2 className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

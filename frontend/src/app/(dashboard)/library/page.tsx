@@ -10,8 +10,8 @@ import { AddNewItem } from "@/components/library/AddNewItem";
 
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
-    const { hooks, addHook } = useHooks();
-    const { scripts, addScript } = useScripts();
+    const { hooks, addHook, removeHook, updateHook } = useHooks();
+    const { scripts, addScript, removeScript, updateScript } = useScripts();
 
     return (
         <div className="space-y-8">
@@ -56,11 +56,20 @@ export default function LibraryPage() {
                 {activeTab === "hooks" ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {hooks.map((hook) => (
-                            <HookCard key={hook.id} hook={hook} />
+                            <HookCard
+                                key={hook.id}
+                                hook={hook}
+                                onDelete={removeHook}
+                                onUpdate={updateHook}
+                            />
                         ))}
                     </div>
                 ) : (
-                    <ScriptTemplateList scripts={scripts as any} />
+                    <ScriptTemplateList
+                        scripts={scripts as any}
+                        onDelete={removeScript}
+                        onUpdate={updateScript}
+                    />
                 )}
             </div>
         </div>

@@ -1,21 +1,32 @@
 "use client";
 
 import { Hook } from "@/types/library";
-import { Copy, Star, Tag } from "lucide-react";
+import { Edit2, Trash2, Copy, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 interface HookCardProps {
     hook: Hook;
+    onDelete?: (id: string) => void;
+    onUpdate?: (id: string, updates: Partial<Hook>) => void;
 }
 
-export function HookCard({ hook }: HookCardProps) {
+export function HookCard({ hook, onDelete, onUpdate }: HookCardProps) {
     const [copied, setCopied] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(hook.content);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleDelete = async () => {
+        if (confirm("Are you sure you want to delete this hook?")) {
+            setIsDeleting(true);
+            await onDelete?.(hook.id);
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -48,13 +59,23 @@ export function HookCard({ hook }: HookCardProps) {
 
             <div className="flex items-center justify-between mt-auto">
                 <span className="text-xs text-muted-foreground">{hook.topic}</span>
-                <button
-                    onClick={copyToClipboard}
-                    className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-                    title="Copy content"
-                >
-                    <Copy className={cn("w-4 h-4", copied && "text-green-500")} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={copyToClipboard}
+                        className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                        title="Copy content"
+                    >
+                        <Copy className={cn("w-4 h-4", copied && "text-green-500")} />
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
+                        title="Delete hook"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
             </div>
 
             {(hook.usageCount || 0) > 0 && (

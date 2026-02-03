@@ -10,7 +10,7 @@ import { Competitor } from "@/types/competitor";
 interface AddCompetitorModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onAdd?: (competitor: Competitor) => void;
+    onAdd?: (competitor: any) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function AddCompetitorModal({ isOpen, onClose, onAdd }: AddCompetitorModalProps) {
@@ -19,34 +19,33 @@ export function AddCompetitorModal({ isOpen, onClose, onAdd }: AddCompetitorModa
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        // Simulate API delay
-        setTimeout(() => {
-            if (onAdd) {
-                onAdd({
-                    id: crypto.randomUUID(),
-                    name: name,
-                    handle: handle.startsWith('@') ? handle : `@${handle}`,
-                    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
-                    bio: "New competitor added via Creator OS",
-                    tags: ["New"],
-                    stats: {
-                        followers: "10K",
-                        avgLikes: "500",
-                        engagementRate: "5%"
-                    },
-                    isFollowing: true
-                });
-            }
+        const result = await onAdd?.({
+            name: name,
+            handle: handle.startsWith('@') ? handle : `@${handle}`,
+            avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
+            bio: "New competitor added via Creator OS",
+            tags: ["New"],
+            stats: {
+                followers: "10K",
+                avgLikes: "500",
+                engagementRate: "5%"
+            },
+            isFollowing: true
+        } as any); // Using 'as any' to match the provided instruction, though a more specific type would be better.
+
+        if (result?.success) {
             showToast(`Competitor @${handle} added successfully!`, "success");
-            setLoading(false);
             setHandle("");
             setName("");
             onClose();
-        }, 800);
+        } else {
+            showToast(result?.error || "Failed to add competitor", "error");
+        }
+        setLoading(false);
     };
 
     return (

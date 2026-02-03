@@ -19,16 +19,31 @@ export const getHooks = async (req: any, res: Response) => {
 
 export const createHook = async (req: any, res: Response) => {
     try {
-        const data = req.body;
+        const { content, type, emotion, topic, performanceRating, socialAccountId } = req.body;
+
+        if (!content || !type) {
+            return res.status(400).json({ error: 'Content and type are required' });
+        }
+
         const hook = await prisma.hook.create({
             data: {
-                ...data,
+                content,
+                type,
+                emotion: emotion || 'Neutral',
+                topic: topic || 'General',
+                performanceRating: performanceRating || 0,
                 userId: req.user.id,
+                socialAccountId
             },
         });
-        res.status(201).json(hook);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create hook' });
+        res.status(201).json({
+            ...hook,
+            addedAt: hook.createdAt.toISOString(),
+            lastUsed: hook.lastUsed?.toISOString(),
+        });
+    } catch (error: any) {
+        console.error('Create Hook Error:', error);
+        res.status(500).json({ error: 'Failed to create hook', details: error.message });
     }
 };
 

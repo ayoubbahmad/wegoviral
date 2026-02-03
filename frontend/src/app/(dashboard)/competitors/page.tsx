@@ -8,7 +8,7 @@ import { AddCompetitorModal } from "@/components/competitors/AddCompetitorModal"
 
 export default function CompetitorsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { competitors, addCompetitor } = useCompetitors();
+    const { competitors, addCompetitor, removeCompetitor, updateCompetitor } = useCompetitors();
 
     return (
         <div className="space-y-8">
@@ -43,7 +43,11 @@ export default function CompetitorsPage() {
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {competitors.map((competitor) => (
-                    <CompetitorCard key={competitor.id} competitor={competitor} />
+                    <CompetitorCard
+                        key={competitor.id}
+                        competitor={competitor}
+                        onDelete={removeCompetitor}
+                    />
                 ))}
             </div>
         </div>

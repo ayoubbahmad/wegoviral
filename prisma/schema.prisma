@@ -17,6 +17,7 @@ model UserProfile {
   // Relations
   hooks       Hook[]
   competitors Competitor[]
+  socialAccounts SocialAccount[]
 }
 
 // -- Library (Hooks & Scripts) --
@@ -34,6 +35,9 @@ model Hook {
   
   userId            String
   user              UserProfile @relation(fields: [userId], references: [id])
+  
+  socialAccountId   String?
+  socialAccount     SocialAccount? @relation(fields: [socialAccountId], references: [id])
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -53,6 +57,9 @@ model Competitor {
   
   userId    String
   user      UserProfile @relation(fields: [userId], references: [id])
+  
+  socialAccountId String?
+  socialAccount   SocialAccount? @relation(fields: [socialAccountId], references: [id])
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,4 +86,34 @@ model CompetitorPost {
   analysis       Json?    // { hook: string, structure: string, notes: string }
   
   createdAt      DateTime @default(now())
+}
+
+// -- Social Account Management --
+model SocialAccount {
+  id          String   @id @default(uuid())
+  userId      String
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  platform    String   // 'instagram', 'tiktok', 'youtube', etc.
+  username    String
+  accountId   String   // Platform-specific ID
+  avatarUrl   String?
+  
+  // OAuth / API Credentials
+  accessToken String?  // Store encrypted in production
+  refreshToken String?
+  tokenExpiry DateTime?
+  
+  // Account Status
+  isActive    Boolean  @default(false) // Currently selected account
+  isConnected Boolean  @default(true)  // Connection is valid
+  
+  // Relations
+  hooks       Hook[]
+  competitors Competitor[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, platform, accountId]) // One user can't connect same account twice
 }

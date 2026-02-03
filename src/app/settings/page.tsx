@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Mail, User as UserIcon, Camera } from "lucide-react";
 
 export default function ProfilePage() {
-    const { user, login, instagramConnected, connectInstagram, disconnectInstagram } = useAuth();
+    const { user, login, activeSocialAccount } = useAuth();
 
     if (!user) {
         return (
@@ -57,7 +57,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        {instagramConnected && (
+                        {activeSocialAccount && (
                             <div className="grid grid-cols-3 gap-3 pt-2">
                                 <div className="p-3 bg-secondary/20 rounded-lg border border-border text-center">
                                     <span className="block text-xl font-bold">12.5k</span>
@@ -80,20 +80,9 @@ export default function ProfilePage() {
             <div className="p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl">
                 <h2 className="text-lg font-semibold mb-6">Connected Accounts</h2>
 
-                <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/20">
-                    <div className="flex items-center gap-4">
-                        <div className="p-2 bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-500 rounded-lg">
-                            <Camera className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <p className="font-medium">Instagram</p>
-                            <p className="text-xs text-muted-foreground">Connect to analyze your posts</p>
-                        </div>
-                    </div>
-
-                    <button className="px-4 py-2 text-sm font-medium bg-secondary hover:bg-secondary/80 rounded-lg transition-colors border border-border">
-                        Connect
-                    </button>
+                {/* This will be replaced with Phase 4.3 UI Components */}
+                <div className="text-sm text-muted-foreground text-center py-8">
+                    Social account management UI coming in Phase 4.3
                 </div>
             </div>
         </div>

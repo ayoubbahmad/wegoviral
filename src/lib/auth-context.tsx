@@ -10,14 +10,22 @@ interface User {
     avatarUrl: string;
 }
 
+interface SocialAccount {
+    id: string;
+    platform: string;
+    username: string;
+    avatarUrl?: string;
+    isActive: boolean;
+}
+
 export interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     login: () => void;
     logout: () => void;
-    instagramConnected?: boolean;
-    connectInstagram?: () => void;
-    disconnectInstagram?: () => void;
+    activeSocialAccount: SocialAccount | null;
+    socialAccounts: SocialAccount[];
+    switchAccount: (accountId: string) => void;
 }
 
 const MOCK_USER: User = {
@@ -32,30 +40,36 @@ const defaultContext: AuthContextType = {
     isLoading: false,
     login: () => { },
     logout: () => { },
-    instagramConnected: false,
-    connectInstagram: () => { },
-    disconnectInstagram: () => { }
+    activeSocialAccount: null,
+    socialAccounts: [],
+    switchAccount: () => { },
 };
 
 const AuthContext = createContext<AuthContextType>(defaultContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [instagramConnected, setInstagramConnected] = useState(false);
+    const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [activeSocialAccount, setActiveSocialAccount] = useState<SocialAccount | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-        // Check local storage on mount
+        // Load user and social accounts from localStorage
         const storedUser = localStorage.getItem("mock_auth_user");
-        const storedInsta = localStorage.getItem("mock_insta_connected");
+        const storedAccounts = localStorage.getItem("mock_social_accounts");
 
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
-        if (storedInsta === "true") {
-            setInstagramConnected(true);
+
+        if (storedAccounts) {
+            const accounts = JSON.parse(storedAccounts);
+            setSocialAccounts(accounts);
+            const active = accounts.find((acc: SocialAccount) => acc.isActive);
+            setActiveSocialAccount(active || null);
         }
+
         setIsLoading(false);
     }, []);
 
@@ -67,20 +81,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         setUser(null);
-        setInstagramConnected(false);
+        setSocialAccounts([]);
+        setActiveSocialAccount(null);
         localStorage.removeItem("mock_auth_user");
-        localStorage.removeItem("mock_insta_connected");
+        localStorage.removeItem("mock_social_accounts");
         router.push("/login");
     };
 
-    const connectInstagram = () => {
-        setInstagramConnected(true);
-        localStorage.setItem("mock_insta_connected", "true");
-    };
+    const switchAccount = (accountId: string) => {
+        const updatedAccounts = socialAccounts.map(acc => ({
+            ...acc,
+            isActive: acc.id === accountId
+        }));
 
-    const disconnectInstagram = () => {
-        setInstagramConnected(false);
-        localStorage.setItem("mock_insta_connected", "false");
+        setSocialAccounts(updatedAccounts);
+        const newActive = updatedAccounts.find(acc => acc.id === accountId);
+        setActiveSocialAccount(newActive || null);
+        localStorage.setItem("mock_social_accounts", JSON.stringify(updatedAccounts));
     };
 
     return (
@@ -89,9 +106,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isLoading,
             login,
             logout,
-            instagramConnected,
-            connectInstagram,
-            disconnectInstagram
+            activeSocialAccount,
+            socialAccounts,
+            switchAccount
         }}>
             {children}
         </AuthContext.Provider>

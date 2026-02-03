@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
 
 export default function PerformancePage() {
-    const { instagramConnected } = useAuth();
+    const { activeSocialAccount } = useAuth();
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
@@ -29,7 +29,7 @@ export default function PerformancePage() {
                         </div>
                     </div>
 
-                    {instagramConnected ? (
+                    {activeSocialAccount ? (
                         <PostingTimeHeatmap data={MOCK_POSTING_TIMES} />
                     ) : (
                         <div className="relative">
@@ -38,7 +38,7 @@ export default function PerformancePage() {
                             </div>
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                                 <div className="p-3 bg-background/80 backdrop-blur-md rounded-xl border border-border shadow-lg max-w-sm">
-                                    <h3 className="font-semibold mb-1">Connect Instagram</h3>
+                                    <h3 className="font-semibold mb-1">Connect Social Account</h3>
                                     <p className="text-xs text-muted-foreground mb-3">
                                         Connect your account to analyze your specific audience activity and find your best posting times.
                                     </p>

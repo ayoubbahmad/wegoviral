@@ -16,12 +16,8 @@ export interface Hook {
 
 export interface ScriptTemplate {
     id: string;
-    name: string;
-    category: "Educational" | "Entertainment" | "Sales" | "Storytelling";
-    structure: {
-        step: string;
-        description: string;
-        durationEstimate?: string;
-    }[];
-    exampleUrl?: string;
+    title: string;
+    category: string;
+    content: any; // Using any for Json structure flexibility
+    createdAt: string;
 }

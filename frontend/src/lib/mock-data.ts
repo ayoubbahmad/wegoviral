@@ -38,25 +38,27 @@ export const MOCK_HOOKS: Hook[] = [
 export const MOCK_SCRIPTS: ScriptTemplate[] = [
     {
         id: "1",
-        name: "The Myth-Buster",
+        title: "The Myth-Buster",
         category: "Educational",
-        structure: [
+        content: [
             { step: "Hook", description: "State a common belief that is wrong." },
             { step: "The Truth", description: "Reveal the counter-intuitive reality." },
             { step: "Evidence", description: "Show why the old belief fails." },
             { step: "CTA", description: "Follow for more truth bombs." },
         ],
+        createdAt: "2023-10-26T10:00:00Z",
     },
     {
         id: "2",
-        name: "Day in the Life",
+        title: "Day in the Life",
         category: "Storytelling",
-        structure: [
+        content: [
             { step: "Opener", description: "Wake up / Start of day shot." },
             { step: "Highlight", description: "Show the most interesting task." },
             { step: "Struggle", description: "Show a relatable problem engaged with." },
             { step: "Resolution", description: "Wrapping up the day." },
         ],
+        createdAt: "2023-10-25T10:00:00Z",
     },
 ];
 

@@ -25,7 +25,7 @@ export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
                 <div
                     key={script.id}
                     className="group flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-secondary/20 transition-all cursor-pointer"
-                    onClick={() => handleCopy(script.id, script.structure)}
+                    onClick={() => handleCopy(script.id, script.content)}
                 >
                     <div className="p-3 bg-secondary rounded-lg">
                         <FileText className="w-6 h-6 text-foreground" />
@@ -33,16 +33,16 @@ export function ScriptTemplateList({ scripts }: ScriptTemplateListProps) {
 
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-semibold text-lg">{script.name}</h3>
+                            <h3 className="font-semibold text-lg">{script.title}</h3>
                             <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground border border-border">
                                 {script.category}
                             </span>
                         </div>
                         <div className="text-sm text-muted-foreground flex gap-2 overflow-x-auto pb-1">
-                            {script.structure.map((step, i) => (
+                            {script.content.map((step: any, i: number) => (
                                 <span key={i} className="flex items-center whitespace-nowrap">
                                     {step.step}
-                                    {i < script.structure.length - 1 && <ChevronRight className="w-3 h-3 mx-1 opacity-50" />}
+                                    {i < script.content.length - 1 && <ChevronRight className="w-3 h-3 mx-1 opacity-50" />}
                                 </span>
                             ))}
                         </div>

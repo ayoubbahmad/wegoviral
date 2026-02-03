@@ -196,6 +196,9 @@ This product is built first for internal use, then evolved into a public SaaS.
 * **Competition & Leaderboards**:
   * Compare consistency and performance metrics with friends.
   * Global and private leaderboards (Planned for V1.8).
+* **Flexible Victory Logic**:
+  * **Single Winner**: Competitive mode where only the top performer wins (e.g., highest engagement).
+  * **Multi-Winner**: Collaborative or milestone-based mode where everyone who completes the task wins (e.g., "Post 5 times in 5 days").
 * **Rewards & Milestones**:
   * Earn badges for winning against friends.
   * Unlock premium themes/access upon challenge completion.

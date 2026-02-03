@@ -24,7 +24,7 @@ export default function ChallengesPage() {
                 {[
                     { icon: Zap, label: "Custom Challenges", desc: "Design your own rules, duration, and goals." },
                     { icon: Users, label: "Invite Friends", desc: "Compete with other creators and sync progress." },
-                    { icon: Target, label: "Live Leaderboards", desc: "See who's dominating the content game." },
+                    { icon: Target, label: "Flexible Wins", desc: "Win solo, lead a group, or be the one and only winner." },
                 ].map((item, i) => (
                     <div key={i} className="p-4 rounded-xl border border-border bg-card/50 backdrop-blur-sm space-y-2">
                         <item.icon className="w-5 h-5 text-primary mx-auto" />

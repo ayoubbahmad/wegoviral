@@ -3,30 +3,46 @@ import { Link, useLocation } from 'react-router-dom';
 export default function DashboardLayout({ children }) {
   const location = useLocation();
   
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: '📊' },
-    { name: 'Watchlists', path: '/dashboard/watchlists', icon: '👀' },
-    { name: 'Video Analysis', path: '/dashboard/analysis', icon: '📉' },
-    { name: 'Script Writer', path: '/dashboard/writer', icon: '✍️' },
-    { name: 'The Vault', path: '/dashboard/vault', icon: '🔒' },
+  const topNavItems = [
+    { name: 'Home', path: '/dashboard', icon: '🏠' },
+    { name: 'Channels', path: '/dashboard/channels', icon: '👥' },
+    { name: 'Videos', path: '/dashboard/videos', icon: '🎥' },
+    { name: 'Scripts', path: '/dashboard/writer', icon: '📝' },
+    { name: 'Projects', path: '/dashboard/projects', icon: '📁' },
+    { name: 'Vault', path: '/dashboard/vault', icon: '🧊' },
+    { name: 'Exports', path: '/dashboard/exports', icon: '📤' },
+    { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
+  ];
+
+  const bottomNavItems = [
+    { name: 'Changelog', path: '#', icon: '📓' },
+    { name: 'Share feedback', path: '#', icon: '📣' },
+    { name: 'Get support', path: '#', icon: '❓' },
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#000000', color: '#fff' }}>
       {/* Sidebar */}
       <aside style={{ 
-        width: '240px', 
-        borderRight: '1px solid var(--border-color)', 
+        width: '260px', 
+        borderRight: '1px solid #1A1A1A', 
         position: 'fixed', 
         height: '100vh', 
-        padding: '1.5rem',
-        background: 'var(--surface-color)'
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '1.5rem 1rem',
+        background: '#0B0B0B'
       }}>
-        <div className="mb-8 font-bold text-xl px-2">Sandcastles.ai</div>
+        {/* Logo Area */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', padding: '0 0.5rem' }}>
+          <div className="font-bold text-lg">Sandcastles</div>
+          <button style={{ color: 'var(--text-secondary)', padding: '4px' }}>{'<'}</button>
+        </div>
         
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+        {/* Top Nav */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
+          {topNavItems.map((item) => {
+            const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/dashboard');
             return (
               <Link 
                 key={item.path} 
@@ -35,48 +51,71 @@ export default function DashboardLayout({ children }) {
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: '0.75rem',
-                  padding: '0.75rem 1rem',
+                  padding: '0.5rem 0.75rem',
                   borderRadius: '8px',
-                  background: isActive ? 'var(--surface-hover)' : 'transparent',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  background: isActive ? '#1F1F1F' : 'transparent',
+                  color: isActive ? '#fff' : '#A1A1AA',
                   fontWeight: isActive ? '500' : '400',
-                  border: isActive ? '1px solid var(--border-color)' : '1px solid transparent'
+                  fontSize: '0.9rem',
+                  transition: 'background 0.2s, color 0.2s'
                 }}
               >
-                <span>{item.icon}</span>
+                <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
                 {item.name}
               </Link>
             )
           })}
         </nav>
 
-        <div style={{ position: 'absolute', bottom: '1.5rem', left: '1.5rem', right: '1.5rem' }}>
-          <div style={{ 
-            padding: '1rem', 
-            background: 'rgba(255,255,255,0.03)', 
-            borderRadius: '8px',
-            border: '1px solid var(--border-color)',
-            fontSize: '0.875rem'
+        {/* Bottom Nav */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', borderTop: '1px solid #1A1A1A', paddingTop: '1rem' }}>
+          {bottomNavItems.map((item) => (
+            <a 
+              key={item.name} 
+              href={item.path} 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.75rem',
+                padding: '0.5rem 0.75rem',
+                borderRadius: '8px',
+                color: '#A1A1AA',
+                fontSize: '0.9rem',
+                textDecoration: 'none'
+              }}
+            >
+              <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+              {item.name}
+            </a>
+          ))}
+          <button style={{ 
+             display: 'flex', 
+             alignItems: 'center', 
+             gap: '0.75rem',
+             padding: '0.5rem 0.75rem',
+             borderRadius: '8px',
+             color: '#EF4444', 
+             fontSize: '0.9rem',
+             background: 'transparent',
+             border: 'none',
+             cursor: 'pointer',
+             textAlign: 'left',
+             width: '100%'
           }}>
-            <div className="text-secondary mb-2">Credits</div>
-            <div className="font-bold text-xl mb-1">85 <span className="text-sm font-normal text-secondary">/ 100</span></div>
-            <div style={{ height: '4px', background: '#333', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ width: '85%', height: '100%', background: 'var(--accent-color)' }}></div>
-            </div>
-          </div>
-        </div>
+            <span style={{ fontSize: '1.1rem' }}>🚪</span>
+            Sign out
+          </button>
+        </nav>
       </aside>
 
       {/* Main Content */}
-      <main style={{ marginLeft: '240px', flex: 1, padding: '2rem' }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-          <h1 className="text-2xl font-bold">
-            {navItems.find(i => i.path === location.pathname)?.name || 'Dashboard'}
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button className="btn btn-outline" style={{ fontSize: '0.875rem' }}>Feedback</button>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#333' }}></div>
+      <main style={{ marginLeft: '260px', flex: 1, padding: '2rem' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#A1A1AA' }}>
+             <span style={{ fontSize: '1.2rem' }}>▦</span>
+             <span style={{ fontSize: '0.9rem' }}>app.sandcastles.ai</span>
           </div>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#333', border: '1px solid #555' }}></div>
         </header>
 
         {children}

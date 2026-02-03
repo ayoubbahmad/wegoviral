@@ -1,12 +1,12 @@
 :root {
-  --bg-color: #050505;
-  --surface-color: #121212;
-  --surface-hover: #1E1E1E;
+  --bg-color: #000000;
+  --surface-color: #0B0B0B;
+  --surface-hover: #1F1F1F;
   --primary-color: #ffffff;
-  --accent-color: #8b5cf6; /* A nice purple fit for creator tools */
+  --accent-color: #8b5cf6; 
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
-  --border-color: #27272a;
+  --border-color: #1A1A1A;
 
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;

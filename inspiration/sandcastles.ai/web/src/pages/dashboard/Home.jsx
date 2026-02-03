@@ -1,82 +1,101 @@
-import DashboardLayout from '../components/dashboard/DashboardLayout'
+import { Link } from 'react-router-dom';
+import DashboardLayout from '../../components/dashboard/DashboardLayout';
 
 export default function DashboardHome() {
+  const actions = [
+    { 
+      title: "Track your favorite channels", 
+      subtitle: "To learn from their success.", 
+      icon: "👥", 
+      color: "#3B82F6", // Blue
+      bg: "rgba(59, 130, 246, 0.1)",
+      link: "/dashboard/channels"
+    },
+    { 
+      title: "Discover viral videos", 
+      subtitle: "And extract winning patterns.", 
+      icon: "🎥", 
+      color: "#10B981", // Green
+      bg: "rgba(16, 185, 129, 0.1)",
+      link: "/dashboard/videos"
+    },
+    { 
+      title: "Write winning scripts", 
+      subtitle: "Using proven hooks and styles.", 
+      icon: "✍️", 
+      color: "#8B5CF6", // Purple
+      bg: "rgba(139, 92, 246, 0.1)",
+      link: "/dashboard/writer"
+    }
+  ];
+
   return (
     <DashboardLayout>
-      {/* Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
-        gap: '1.5rem',
-        marginBottom: '3rem' 
-      }}>
-        {[
-          { label: 'Outliers Found', val: '12', change: '+2 today' },
-          { label: 'Scripts Generated', val: '5', change: '' },
-          { label: 'Watchlist Growth', val: '+24%', change: 'Last 7 days' },
-        ].map((stat, i) => (
-          <div key={i} style={{ 
-            padding: '1.5rem', 
-            background: 'var(--surface-color)', 
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px' 
-          }}>
-            <div className="text-secondary text-sm mb-2">{stat.label}</div>
-            <div className="text-3xl font-bold">{stat.val}</div>
-            {stat.change && <div className="text-xs text-accent mt-1" style={{ color: 'var(--accent-color)' }}>{stat.change}</div>}
-          </div>
-        ))}
-      </div>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', paddingTop: '4rem' }}>
+        <div className="mb-2 text-secondary" style={{ fontSize: '1.1rem', fontWeight: '500' }}>👋 Hello, Creator</div>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '4rem', letterSpacing: '-0.02em' }}>
+          What do you want to do today?
+        </h1>
 
-      {/* Recent Activity */}
-      <h2 className="text-xl mb-4">Recent Outliers</h2>
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-        gap: '1.5rem' 
-      }}>
-        {[1, 2, 3].map((_, i) => (
-          <div key={i} style={{ 
-            aspectRatio: '9/16', 
-            background: 'var(--surface-color)', 
-            border: '1px solid var(--border-color)',
-            borderRadius: '12px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-             <div style={{ 
-               position: 'absolute', 
-               top: '1rem', 
-               right: '1rem', 
-               background: 'rgba(5,5,5,0.8)', 
-               padding: '0.25rem 0.75rem', 
-               borderRadius: '99px', 
-               fontSize: '0.75rem',
-               border: '1px solid rgba(255,255,255,0.1)'
-             }}>
-               10x Outlier
-             </div>
-             <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', padding: '1.5rem', background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
-               <div className="text-sm font-bold mb-1">How to scale 0-10k...</div>
-               <div className="text-xs text-secondary">Alex Hormozi • 2.4M Views</div>
-             </div>
-          </div>
-        ))}
-        
         <div style={{ 
-           aspectRatio: '9/16', 
-           border: '2px dashed var(--border-color)', 
-           borderRadius: '12px',
-           display: 'flex',
-           alignItems: 'center',
-           justifyContent: 'center',
-           color: 'var(--text-secondary)',
-           flexDirection: 'column',
-           gap: '0.5rem',
-           cursor: 'pointer'
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: '1.5rem' 
         }}>
-          <span style={{ fontSize: '2rem' }}>+</span>
-          <span>Find New Outliers</span>
+          {actions.map((action, i) => (
+            <Link 
+              key={i} 
+              to={action.link}
+              style={{ 
+                background: '#0B0B0B', 
+                border: '1px solid #1A1A1A', 
+                borderRadius: '16px', 
+                padding: '2.5rem 2rem', 
+                textAlign: 'left',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                textDecoration: 'none',
+                color: 'inherit',
+                transition: 'transform 0.2s, border-color 0.2s',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.borderColor = '#333';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.borderColor = '#1A1A1A';
+              }}
+            >
+              <div style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px', 
+                background: action.bg, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+                color: action.color,
+                marginBottom: '0.5rem'
+              }}>
+                {action.icon}
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>{action.title}</h3>
+                <p style={{ color: '#A1A1AA', fontSize: '0.95rem', lineHeight: '1.5' }}>{action.subtitle}</p>
+              </div>
+              <div style={{ 
+                position: 'absolute', 
+                bottom: '2.5rem', 
+                right: '2rem', 
+                fontSize: '1.25rem', 
+                color: '#333' 
+              }}>→</div>
+            </Link>
+          ))}
         </div>
       </div>
     </DashboardLayout>

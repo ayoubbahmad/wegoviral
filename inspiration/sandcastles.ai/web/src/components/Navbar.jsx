@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Navbar() {
   return (
     <nav className="navbar" style={{ 
@@ -12,17 +14,17 @@ export default function Navbar() {
       zIndex: 50
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="logo" style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.03em' }}>
+        <Link to="/" className="logo" style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.03em', color: 'inherit' }}>
           Sandcastles.ai
-        </div>
+        </Link>
         <div className="links" style={{ display: 'flex', gap: '2rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
           <a href="#features" style={{ color: 'inherit' }}>Features</a>
           <a href="#how-it-works" style={{ color: 'inherit' }}>How it works</a>
           <a href="#pricing" style={{ color: 'inherit' }}>Pricing</a>
         </div>
         <div className="actions" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <a href="#" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Log in</a>
-          <a href="#" className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '0.5rem 1.25rem' }}>Start Free Trial</a>
+          <Link to="/login" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Log in</Link>
+          <Link to="/trial" className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '0.5rem 1.25rem', color: 'black' }}>Start Free Trial</Link>
         </div>
       </div>
     </nav>

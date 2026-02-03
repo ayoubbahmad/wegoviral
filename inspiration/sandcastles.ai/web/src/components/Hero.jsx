@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Hero() {
   return (
     <section className="section" style={{ textAlign: 'center', padding: '10rem 0 4rem' }}>
@@ -27,7 +29,7 @@ export default function Hero() {
           Stop guessing. Use data to find out what works and AI to remix it. The unfair advantage for modern creators.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '5rem' }}>
-          <a href="#" className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>Start 7-Day Free Trial</a>
+          <Link to="/trial" className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem', color: 'black' }}>Start 7-Day Free Trial</Link>
           <a href="#features" className="btn btn-outline" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>See Features</a>
         </div>
         

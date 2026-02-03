@@ -1,13 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "./api-client";
 
 interface User {
     id: string;
     name: string;
+    username: string;
     email: string;
-    avatarUrl: string;
+    avatarUrl?: string;
 }
 
 interface SocialAccount {
@@ -21,24 +23,19 @@ interface SocialAccount {
 export interface AuthContextType {
     user: User | null;
     isLoading: boolean;
-    login: () => void;
+    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    register: (email: string, username: string, password: string, name?: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
     activeSocialAccount: SocialAccount | null;
     socialAccounts: SocialAccount[];
     switchAccount: (accountId: string) => void;
 }
 
-const MOCK_USER: User = {
-    id: "mock-user-1",
-    name: "Demo Creator",
-    email: "creator@example.com",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Demo",
-};
-
 const defaultContext: AuthContextType = {
     user: null,
-    isLoading: false,
-    login: () => { },
+    isLoading: true,
+    login: async () => ({ success: false }),
+    register: async () => ({ success: false }),
     logout: () => { },
     activeSocialAccount: null,
     socialAccounts: [],
@@ -54,37 +51,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
-    useEffect(() => {
-        // Load user and social accounts from localStorage
-        const storedUser = localStorage.getItem("mock_auth_user");
-        const storedAccounts = localStorage.getItem("mock_social_accounts");
-
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+    const fetchUser = useCallback(async () => {
+        const token = localStorage.getItem("creator_os_token");
+        if (!token) {
+            setIsLoading(false);
+            return;
         }
 
-        if (storedAccounts) {
-            const accounts = JSON.parse(storedAccounts);
-            setSocialAccounts(accounts);
-            const active = accounts.find((acc: SocialAccount) => acc.isActive);
-            setActiveSocialAccount(active || null);
-        }
+        try {
+            const data = await apiFetch("/auth/me");
+            setUser(data.user);
 
-        setIsLoading(false);
+            // Mock social accounts migration - for now we still handle it in local storage
+            // In a real app, these would come from the backend linked to the user
+            const storedAccounts = localStorage.getItem(`social_accounts_${data.user.id}`);
+            if (storedAccounts) {
+                const accounts = JSON.parse(storedAccounts);
+                setSocialAccounts(accounts);
+                const active = accounts.find((acc: SocialAccount) => acc.isActive);
+                setActiveSocialAccount(active || null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user:", error);
+            localStorage.removeItem("creator_os_token");
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
-    const login = () => {
-        setUser(MOCK_USER);
-        localStorage.setItem("mock_auth_user", JSON.stringify(MOCK_USER));
-        router.push("/");
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
+
+    const login = async (email: string, password: string) => {
+        try {
+            const data = await apiFetch("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({ email, password }),
+            });
+
+            localStorage.setItem("creator_os_token", data.token);
+            setUser(data.user);
+            router.push("/performance"); // Redirect to dashboard
+            return { success: true };
+        } catch (error: any) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const register = async (email: string, username: string, password: string, name?: string) => {
+        try {
+            const data = await apiFetch("/auth/register", {
+                method: "POST",
+                body: JSON.stringify({ email, username, password, name }),
+            });
+
+            localStorage.setItem("creator_os_token", data.token);
+            setUser(data.user);
+            router.push("/performance"); // Redirect to dashboard
+            return { success: true };
+        } catch (error: any) {
+            return { success: false, error: error.message };
+        }
     };
 
     const logout = () => {
         setUser(null);
         setSocialAccounts([]);
         setActiveSocialAccount(null);
-        localStorage.removeItem("mock_auth_user");
-        localStorage.removeItem("mock_social_accounts");
+        localStorage.removeItem("creator_os_token");
         router.push("/login");
     };
 
@@ -97,7 +132,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSocialAccounts(updatedAccounts);
         const newActive = updatedAccounts.find(acc => acc.id === accountId);
         setActiveSocialAccount(newActive || null);
-        localStorage.setItem("mock_social_accounts", JSON.stringify(updatedAccounts));
+        if (user) {
+            localStorage.setItem(`social_accounts_${user.id}`, JSON.stringify(updatedAccounts));
+        }
     };
 
     return (
@@ -105,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             user,
             isLoading,
             login,
+            register,
             logout,
             activeSocialAccount,
             socialAccounts,

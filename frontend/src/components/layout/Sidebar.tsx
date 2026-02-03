@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
-    { name: "Overview", href: "/", icon: LayoutDashboard },
+    { name: "Overview", href: "/overview", icon: LayoutDashboard },
     { name: "Performance", href: "/performance", icon: BarChart2 },
     { name: "Community", href: "/community", icon: Users },
     { name: "Competitors", href: "/competitors", icon: Target },
@@ -70,10 +70,10 @@ export function Sidebar() {
             </nav>
 
             <div className="absolute bottom-4 left-0 right-0 px-4 space-y-2">
-                {user ? (
+                {user && (
                     <div className="p-3 rounded-xl bg-secondary/50 border border-border flex items-center gap-3">
                         <img
-                            src={user.avatarUrl}
+                            src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                             alt={user.name}
                             className="w-10 h-10 rounded-full border border-border"
                         />
@@ -89,13 +89,6 @@ export function Sidebar() {
                             <LogOut className="w-4 h-4" />
                         </button>
                     </div>
-                ) : (
-                    <Link
-                        href="/login"
-                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
-                    >
-                        Sign In
-                    </Link>
                 )}
 
                 <Link

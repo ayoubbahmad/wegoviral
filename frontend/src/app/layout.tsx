@@ -30,11 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <ToastProvider>
-          <DashboardLayout>
+        <AuthProvider>
+          <ToastProvider>
             {children}
-          </DashboardLayout>
-        </ToastProvider>
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

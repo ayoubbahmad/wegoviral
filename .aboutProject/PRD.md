@@ -183,18 +183,22 @@ This product is built first for internal use, then evolved into a public SaaS.
 
 ---
 
-### 5.5 Challenges (Gamification)
+### 5.5 Challenges (Gamification & Social)
 
 **Key Features (V1.5):**
 
-* **Content Challenges**: 
-  * "7-Day Reel Sprint"
-  * "Community Engagement Surge"
-* **Progress Tracking**:
-  * Streak counting
-  * Milestone badges
-* **Rewards (Self-Managed)**:
-  * Define personal rewards for completing challenges.
+* **Customizable Challenges**: 
+  * Create your own challenge rules (e.g., "Post 3 Reels with specific hooks").
+  * Set personal duration and difficulty.
+* **Social Participation**:
+  * Invite friends to join your challenge via unique link.
+  * Real-time progress sync with participants.
+* **Competition & Leaderboards**:
+  * Compare consistency and performance metrics with friends.
+  * Global and private leaderboards (Planned for V1.8).
+* **Rewards & Milestones**:
+  * Earn badges for winning against friends.
+  * Unlock premium themes/access upon challenge completion.
 
 ---
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Trophy, Zap, Star, Target } from "lucide-react";
+import { Trophy, Zap, Star, Target, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function ChallengesPage() {
@@ -22,9 +22,9 @@ export default function ChallengesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl px-4">
                 {[
-                    { icon: Zap, label: "7-Day Sprints", desc: "Short bursts of high-intensity creation." },
-                    { icon: Target, label: "Growth Quests", desc: "Strategic missions to boost reach." },
-                    { icon: Star, label: "Milestones", desc: "Earn badges for your consistency." },
+                    { icon: Zap, label: "Custom Challenges", desc: "Design your own rules, duration, and goals." },
+                    { icon: Users, label: "Invite Friends", desc: "Compete with other creators and sync progress." },
+                    { icon: Target, label: "Live Leaderboards", desc: "See who's dominating the content game." },
                 ].map((item, i) => (
                     <div key={i} className="p-4 rounded-xl border border-border bg-card/50 backdrop-blur-sm space-y-2">
                         <item.icon className="w-5 h-5 text-primary mx-auto" />

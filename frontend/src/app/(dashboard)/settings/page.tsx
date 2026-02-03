@@ -4,21 +4,9 @@ import { useAuth } from "@/lib/auth-context";
 import { Mail, User as UserIcon, Camera } from "lucide-react";
 
 export default function ProfilePage() {
-    const { user, login, activeSocialAccount } = useAuth();
+    const { user, activeSocialAccount } = useAuth();
 
-    if (!user) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
-                <h2 className="text-xl font-bold">Sign in to view your profile</h2>
-                <button
-                    onClick={login}
-                    className="px-6 py-2 bg-primary text-primary-foreground rounded-lg"
-                >
-                    Sign In
-                </button>
-            </div>
-        );
-    }
+    if (!user) return null;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -31,7 +19,7 @@ export default function ProfilePage() {
                 <div className="flex flex-col items-center sm:flex-row gap-6">
                     <div className="relative group cursor-pointer">
                         <img
-                            src={user.avatarUrl}
+                            src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                             alt={user.name}
                             className="w-24 h-24 rounded-full border-4 border-background shadow-lg"
                         />

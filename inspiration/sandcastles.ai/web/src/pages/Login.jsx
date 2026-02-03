@@ -25,7 +25,15 @@ export default function Login() {
           <p className="text-secondary text-sm">Sign in to your account</p>
         </div>
 
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log('Login');
+          
+          // Navigate to dashboard
+          window.location.href = '/dashboard';
+        }}
+        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div>
             <label className="text-sm text-secondary mb-2" style={{ display: 'block' }}>Email</label>
             <input type="email" placeholder="you@example.com" style={{ 

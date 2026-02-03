@@ -1,46 +1,46 @@
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { Users, Video, PenTool, ArrowRight } from 'lucide-react';
 
 export default function DashboardHome() {
   const actions = [
     { 
-      title: "Track your favorite channels", 
-      subtitle: "To learn from their success.", 
-      icon: "👥", 
+      title: "Track Channels", 
+      icon: Users, 
       color: "#3B82F6", // Blue
       bg: "rgba(59, 130, 246, 0.1)",
       link: "/dashboard/channels"
     },
     { 
-      title: "Discover viral videos", 
-      subtitle: "And extract winning patterns.", 
-      icon: "🎥", 
+      title: "Discover Videos", 
+      icon: Video, 
       color: "#10B981", // Green
       bg: "rgba(16, 185, 129, 0.1)",
       link: "/dashboard/videos"
     },
     { 
-      title: "Write winning scripts", 
-      subtitle: "Using proven hooks and styles.", 
-      icon: "✍️", 
-      color: "#8B5CF6", // Purple
-      bg: "rgba(139, 92, 246, 0.1)",
+      title: "Write Scripts", 
+      icon: PenTool, 
+      color: "#A855F7", // Purple
+      bg: "rgba(168, 85, 247, 0.1)",
       link: "/dashboard/writer"
     }
   ];
 
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', paddingTop: '4rem' }}>
-        <div className="mb-2 text-secondary" style={{ fontSize: '1.1rem', fontWeight: '500' }}>👋 Hello, Creator</div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '4rem', letterSpacing: '-0.02em' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', paddingTop: '8vh' }}>
+        <div className="mb-2 text-secondary" style={{ fontSize: '1.1rem', fontWeight: '500', color: '#A1A1AA', marginBottom: '0.5rem' }}>👋 Hello, Creator</div>
+        <h1 style={{ fontSize: '3rem', fontWeight: '700', marginBottom: '4rem', letterSpacing: '-0.03em', lineHeight: '1.1' }}>
           What do you want to do today?
         </h1>
 
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '1.5rem' 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: '1.5rem',
+          maxWidth: '900px',
+          margin: '0 auto'
         }}>
           {actions.map((action, i) => (
             <Link 
@@ -49,51 +49,50 @@ export default function DashboardHome() {
               style={{ 
                 background: '#0B0B0B', 
                 border: '1px solid #1A1A1A', 
-                borderRadius: '16px', 
-                padding: '2.5rem 2rem', 
+                borderRadius: '20px', 
+                padding: '2rem', 
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1rem',
+                justifyContent: 'space-between',
+                height: '220px',
                 textDecoration: 'none',
                 color: 'inherit',
-                transition: 'transform 0.2s, border-color 0.2s',
-                position: 'relative'
+                transition: 'all 0.2s',
+                position: 'relative',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = '#333';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.borderColor = '#27272A';
+                e.currentTarget.style.background = '#121212';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.borderColor = '#1A1A1A';
+                e.currentTarget.style.background = '#0B0B0B';
               }}
             >
               <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                borderRadius: '12px', 
+                width: '56px', 
+                height: '56px', 
+                borderRadius: '16px', 
                 background: action.bg, 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                fontSize: '1.5rem',
                 color: action.color,
-                marginBottom: '0.5rem'
+                marginBottom: '1rem'
               }}>
-                {action.icon}
+                <action.icon size={28} />
               </div>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>{action.title}</h3>
-                <p style={{ color: '#A1A1AA', fontSize: '0.95rem', lineHeight: '1.5' }}>{action.subtitle}</p>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '600', letterSpacing: '-0.02em', margin: 0 }}>{action.title}</h3>
+                <div style={{ color: '#52525B' }}>
+                   <ArrowRight size={24} />
+                </div>
               </div>
-              <div style={{ 
-                position: 'absolute', 
-                bottom: '2.5rem', 
-                right: '2rem', 
-                fontSize: '1.25rem', 
-                color: '#333' 
-              }}>→</div>
             </Link>
           ))}
         </div>

@@ -54,8 +54,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    /* zinc-950 */
+    --background: #000000;
+    /* Pitch Black */
     --foreground: #fafafa;
     /* zinc-50 */
     --card: #09090b;

@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -- User Data (Synced with Clerk) --
+model UserProfile {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  hooks       Hook[]
+  competitors Competitor[]
+}
+
+// -- Library (Hooks & Scripts) --
+model Hook {
+  id                String   @id @default(uuid())
+  content           String
+  type              String   // Verbal, Visual
+  emotion           String
+  topic             String
+  performanceRating Int?     // 1-5
+  
+  // Usage Tracking
+  usageCount        Int      @default(0)
+  lastUsed          DateTime?
+  
+  userId            String
+  user              UserProfile @relation(fields: [userId], references: [id])
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// -- Competitor Tracking --
+model Competitor {
+  id        String   @id @default(uuid())
+  handle    String
+  name      String
+  avatarUrl String
+  bio       String?
+  tags      String[]
+  
+  // Snapshots of their stats
+  stats     Json     // { followers: string, avgLikes: string, engagementRate: string }
+  
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts     CompetitorPost[]
+  
+  @@unique([userId, handle]) // User can't track same competitor twice
+}
+
+// -- Viral Posts Analysis --
+model CompetitorPost {
+  id             String   @id @default(uuid())
+  competitorId   String
+  competitor     Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  
+  thumbnailUrl   String
+  captionExcerpt String
+  postedAt       DateTime
+  
+  metrics        Json     // { likes: number, comments: number }
+  isViral        Boolean  @default(false)
+  
+  // Analysis Data
+  analysis       Json?    // { hook: string, structure: string, notes: string }
+  
+  createdAt      DateTime @default(now())
+}

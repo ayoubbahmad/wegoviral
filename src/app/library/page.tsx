@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { MOCK_HOOKS, MOCK_SCRIPTS } from "@/lib/mock-data";
+import { useHooks } from "@/hooks/useHooks";
+import { MOCK_SCRIPTS } from "@/lib/mock-data";
 import { HookCard } from "@/components/library/HookCard";
 import { ScriptTemplateList } from "@/components/library/ScriptTemplateList";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
-
 import { AddNewItem } from "@/components/library/AddNewItem";
 
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
+    const { hooks, addHook } = useHooks();
 
     return (
         <div className="space-y-8">
@@ -19,7 +19,7 @@ export default function LibraryPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Library</h1>
                     <p className="text-muted-foreground mt-2">Manage your creative assets, hooks, and script structures.</p>
                 </div>
-                <AddNewItem />
+                <AddNewItem onAddHook={addHook} />
             </div>
 
             <div className="border-b border-border">
@@ -54,7 +54,7 @@ export default function LibraryPage() {
             <div className="min-h-[400px]">
                 {activeTab === "hooks" ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {MOCK_HOOKS.map((hook) => (
+                        {hooks.map((hook) => (
                             <HookCard key={hook.id} hook={hook} />
                         ))}
                     </div>

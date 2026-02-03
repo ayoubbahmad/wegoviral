@@ -5,12 +5,15 @@ import { useToast } from "@/components/ui/Toast";
 import { useState } from "react";
 import { AtSign, User } from "lucide-react";
 
+import { Competitor } from "@/types/competitor";
+
 interface AddCompetitorModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onAdd?: (competitor: Competitor) => void;
 }
 
-export function AddCompetitorModal({ isOpen, onClose }: AddCompetitorModalProps) {
+export function AddCompetitorModal({ isOpen, onClose, onAdd }: AddCompetitorModalProps) {
     const { showToast } = useToast();
     const [handle, setHandle] = useState("");
     const [name, setName] = useState("");
@@ -20,14 +23,30 @@ export function AddCompetitorModal({ isOpen, onClose }: AddCompetitorModalProps)
         e.preventDefault();
         setLoading(true);
 
-        // Mock API call
+        // Simulate API delay
         setTimeout(() => {
+            if (onAdd) {
+                onAdd({
+                    id: crypto.randomUUID(),
+                    name: name,
+                    handle: handle.startsWith('@') ? handle : `@${handle}`,
+                    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
+                    bio: "New competitor added via Creator OS",
+                    tags: ["New"],
+                    stats: {
+                        followers: "10K",
+                        avgLikes: "500",
+                        engagementRate: "5%"
+                    },
+                    isFollowing: true
+                });
+            }
             showToast(`Competitor @${handle} added successfully!`, "success");
             setLoading(false);
             setHandle("");
             setName("");
             onClose();
-        }, 1000);
+        }, 800);
     };
 
     return (

@@ -9,10 +9,12 @@ import {
     Target,
     Library,
     Settings,
-    Zap
+    Zap,
+    LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
     { name: "Overview", href: "/", icon: LayoutDashboard },
@@ -24,6 +26,7 @@ const navItems = [
 
 export function Sidebar() {
     const pathname = usePathname();
+    const { user, logout } = useAuth();
 
     return (
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl transition-all">
@@ -66,7 +69,35 @@ export function Sidebar() {
                 })}
             </nav>
 
-            <div className="absolute bottom-4 left-0 right-0 px-4">
+            <div className="absolute bottom-4 left-0 right-0 px-4 space-y-2">
+                {user ? (
+                    <div className="p-3 rounded-xl bg-secondary/50 border border-border flex items-center gap-3">
+                        <img
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            className="w-10 h-10 rounded-full border border-border"
+                        />
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold truncate">{user.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                        </div>
+                        <button
+                            onClick={logout}
+                            className="p-1.5 rounded-lg hover:bg-background text-muted-foreground hover:text-foreground transition-colors"
+                            title="Sign Out"
+                        >
+                            <LogOut className="w-4 h-4" />
+                        </button>
+                    </div>
+                ) : (
+                    <Link
+                        href="/login"
+                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                        Sign In
+                    </Link>
+                )}
+
                 <Link
                     href="/settings"
                     className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"

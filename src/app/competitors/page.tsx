@@ -1,6 +1,6 @@
 "use client";
 
-import { MOCK_COMPETITORS } from "@/lib/mock-data";
+import { useCompetitors } from "@/hooks/useCompetitors";
 import { CompetitorCard } from "@/components/competitors/CompetitorCard";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { AddCompetitorModal } from "@/components/competitors/AddCompetitorModal"
 
 export default function CompetitorsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { competitors, addCompetitor } = useCompetitors();
 
     return (
         <div className="space-y-8">
@@ -25,7 +26,11 @@ export default function CompetitorsPage() {
                 </button>
             </div>
 
-            <AddCompetitorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <AddCompetitorModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAdd={addCompetitor}
+            />
 
             <div className="flex items-center gap-2 p-3 bg-card border border-border rounded-xl shadow-sm max-w-md">
                 <Search className="w-4 h-4 text-muted-foreground" />
@@ -37,7 +42,7 @@ export default function CompetitorsPage() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {MOCK_COMPETITORS.map((competitor) => (
+                {competitors.map((competitor) => (
                     <CompetitorCard key={competitor.id} competitor={competitor} />
                 ))}
             </div>

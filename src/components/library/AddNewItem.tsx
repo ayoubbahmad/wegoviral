@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 
-export function AddNewItem() {
+import { Hook } from "@/types/library";
+
+interface AddNewItemProps {
+    onAddHook?: (hook: Hook) => void;
+}
+
+export function AddNewItem({ onAddHook }: AddNewItemProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [type, setType] = useState<"hook" | "script">("hook");
 
@@ -67,7 +73,29 @@ export function AddNewItem() {
                                 </div>
                             </div>
                             <div className="pt-2">
-                                <button type="submit" className="w-full py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90">
+                                <button
+                                    type="submit"
+                                    className="w-full py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (onAddHook) {
+                                            const textarea = document.querySelector('textarea');
+                                            const typeSelect = document.querySelectorAll('select')[0];
+                                            const emotionSelect = document.querySelectorAll('select')[1];
+
+                                            onAddHook({
+                                                id: crypto.randomUUID(),
+                                                content: textarea?.value || "",
+                                                type: typeSelect?.value as any || "Verbal",
+                                                emotion: emotionSelect?.value as any || "Curiosity",
+                                                topic: "General",
+                                                addedAt: new Date().toISOString()
+                                                // performanceRating, userId etc are optional or not needed for mock
+                                            } as Hook);
+                                        }
+                                        setIsOpen(false);
+                                    }}
+                                >
                                     Save Hook
                                 </button>
                             </div>

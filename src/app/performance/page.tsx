@@ -4,8 +4,11 @@ import { MOCK_PERFORMANCE_POSTS, MOCK_POSTING_TIMES } from "@/lib/mock-data";
 import { PostingTimeHeatmap } from "@/components/performance/PostingTimeHeatmap";
 import { TopPostsGrid } from "@/components/performance/TopPostsGrid";
 import { Clock, TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import Link from "next/link";
 
 export default function PerformancePage() {
+    const { instagramConnected } = useAuth();
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
@@ -15,7 +18,7 @@ export default function PerformancePage() {
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Heatmap Section */}
-                <div className="lg:col-span-2 p-6 rounded-2xl bg-card border border-border shadow-sm">
+                <div className="lg:col-span-2 p-6 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-2 mb-6">
                         <div className="p-1.5 bg-blue-500/10 rounded-lg">
                             <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -25,7 +28,30 @@ export default function PerformancePage() {
                             <p className="text-xs text-muted-foreground">Based on historical engagement rates.</p>
                         </div>
                     </div>
-                    <PostingTimeHeatmap data={MOCK_POSTING_TIMES} />
+
+                    {instagramConnected ? (
+                        <PostingTimeHeatmap data={MOCK_POSTING_TIMES} />
+                    ) : (
+                        <div className="relative">
+                            <div className="filter blur-md opacity-40 select-none pointer-events-none">
+                                <PostingTimeHeatmap data={MOCK_POSTING_TIMES} />
+                            </div>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                                <div className="p-3 bg-background/80 backdrop-blur-md rounded-xl border border-border shadow-lg max-w-sm">
+                                    <h3 className="font-semibold mb-1">Connect Instagram</h3>
+                                    <p className="text-xs text-muted-foreground mb-3">
+                                        Connect your account to analyze your specific audience activity and find your best posting times.
+                                    </p>
+                                    <Link
+                                        href="/settings"
+                                        className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all"
+                                    >
+                                        Connect Now
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Quick Stats or Insight */}

@@ -47,10 +47,24 @@ export function useScripts() {
         }
     };
 
+    const updateScript = async (id: string, updates: Partial<ScriptTemplate>) => {
+        try {
+            const updatedScript = await apiFetch(`/scripts/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(updates),
+            });
+            setScripts(prev => prev.map(s => s.id === id ? updatedScript : s));
+            return { success: true, script: updatedScript };
+        } catch (error) {
+            return { success: false, error: 'Failed to update script template' };
+        }
+    };
+
     return {
         scripts,
         isLoading,
         addScript,
+        updateScript,
         removeScript,
         refresh
     };

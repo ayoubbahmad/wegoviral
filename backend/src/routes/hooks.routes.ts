@@ -9,6 +9,7 @@ router.use(protect);
 
 router.get('/', hooksController.getHooks);
 router.post('/', hooksController.createHook);
+router.patch('/:id', hooksController.updateHook);
 router.delete('/:id', hooksController.deleteHook);
 
 export default router;

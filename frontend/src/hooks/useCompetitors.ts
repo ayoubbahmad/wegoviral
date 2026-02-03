@@ -47,10 +47,24 @@ export function useCompetitors() {
         }
     };
 
+    const updateCompetitor = async (id: string, updates: Partial<Competitor>) => {
+        try {
+            const updatedComp = await apiFetch(`/competitors/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(updates),
+            });
+            setCompetitors(prev => prev.map(c => c.id === id ? updatedComp : c));
+            return { success: true, competitor: updatedComp };
+        } catch (error) {
+            return { success: false, error: 'Failed to update competitor' };
+        }
+    };
+
     return {
         competitors,
         isLoading,
         addCompetitor,
+        updateCompetitor,
         removeCompetitor,
         refresh
     };

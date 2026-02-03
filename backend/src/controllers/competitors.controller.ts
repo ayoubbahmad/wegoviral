@@ -31,6 +31,30 @@ export const createCompetitor = async (req: any, res: Response) => {
     }
 };
 
+export const updateCompetitor = async (req: any, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const data = req.body;
+
+        // Ensure user owns the competitor
+        const competitor = await prisma.competitor.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!competitor) {
+            return res.status(404).json({ error: 'Competitor not found' });
+        }
+
+        const updatedComp = await prisma.competitor.update({
+            where: { id },
+            data,
+        });
+        res.json(updatedComp);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update competitor' });
+    }
+};
+
 export const deleteCompetitor = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;

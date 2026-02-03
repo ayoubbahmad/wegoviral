@@ -31,6 +31,30 @@ export const createScript = async (req: any, res: Response) => {
     }
 };
 
+export const updateScript = async (req: any, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const data = req.body;
+
+        // Ensure user owns the script
+        const script = await prisma.scriptTemplate.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!script) {
+            return res.status(404).json({ error: 'Script not found' });
+        }
+
+        const updatedScript = await prisma.scriptTemplate.update({
+            where: { id },
+            data,
+        });
+        res.json(updatedScript);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update script template' });
+    }
+};
+
 export const deleteScript = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;

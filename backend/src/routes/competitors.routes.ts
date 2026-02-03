@@ -9,6 +9,7 @@ router.use(protect);
 
 router.get('/', competitorsController.getCompetitors);
 router.post('/', competitorsController.createCompetitor);
+router.patch('/:id', competitorsController.updateCompetitor);
 router.delete('/:id', competitorsController.deleteCompetitor);
 
 export default router;

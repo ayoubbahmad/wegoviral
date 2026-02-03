@@ -32,6 +32,30 @@ export const createHook = async (req: any, res: Response) => {
     }
 };
 
+export const updateHook = async (req: any, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const data = req.body;
+
+        // Ensure user owns the hook
+        const hook = await prisma.hook.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!hook) {
+            return res.status(404).json({ error: 'Hook not found' });
+        }
+
+        const updatedHook = await prisma.hook.update({
+            where: { id },
+            data,
+        });
+        res.json(updatedHook);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update hook' });
+    }
+};
+
 export const deleteHook = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;

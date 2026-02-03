@@ -47,10 +47,24 @@ export function useHooks() {
         }
     };
 
+    const updateHook = async (id: string, updates: Partial<Hook>) => {
+        try {
+            const updatedHook = await apiFetch(`/hooks/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(updates),
+            });
+            setHooks(prev => prev.map(h => h.id === id ? updatedHook : h));
+            return { success: true, hook: updatedHook };
+        } catch (error) {
+            return { success: false, error: 'Failed to update hook' };
+        }
+    };
+
     return {
         hooks,
         isLoading,
         addHook,
+        updateHook,
         removeHook,
         refresh
     };

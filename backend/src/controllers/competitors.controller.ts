@@ -1,31 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../lib/prisma';
 
-const MOCK_USER_ID = 'mock-user-1';
-
-async function ensureUserExists() {
-    const existingUser = await prisma.userProfile.findUnique({
-        where: { id: MOCK_USER_ID },
-    });
-
-    if (!existingUser) {
-        await prisma.userProfile.create({
-            data: {
-                id: MOCK_USER_ID,
-                email: 'mock@example.com',
-                username: 'demo_creator',
-                passwordHash: 'dummy_hash',
-                name: 'Demo Creator',
-            },
-        });
-    }
-}
-
-export const getCompetitors = async (req: Request, res: Response) => {
+export const getCompetitors = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const competitors = await prisma.competitor.findMany({
-            where: { userId: MOCK_USER_ID },
+            where: { userId: req.user.id },
             orderBy: { createdAt: 'desc' },
         });
         res.json(competitors.map(comp => ({
@@ -37,14 +16,13 @@ export const getCompetitors = async (req: Request, res: Response) => {
     }
 };
 
-export const createCompetitor = async (req: Request, res: Response) => {
+export const createCompetitor = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const data = req.body;
         const competitor = await prisma.competitor.create({
             data: {
                 ...data,
-                userId: MOCK_USER_ID,
+                userId: req.user.id,
             },
         });
         res.status(201).json(competitor);
@@ -53,9 +31,19 @@ export const createCompetitor = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteCompetitor = async (req: Request, res: Response) => {
+export const deleteCompetitor = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;
+
+        // Ensure user owns the competitor
+        const competitor = await prisma.competitor.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!competitor) {
+            return res.status(404).json({ error: 'Competitor not found' });
+        }
+
         await prisma.competitor.delete({
             where: { id },
         });

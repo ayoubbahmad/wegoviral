@@ -41,6 +41,18 @@ export const register = async (req: Request, res: Response) => {
                 username,
                 passwordHash,
                 name: name || username,
+                socialAccounts: {
+                    create: {
+                        platform: 'Instagram',
+                        username: username,
+                        accountId: `mock-${username}-IG`,
+                        isActive: true,
+                        isConnected: true
+                    }
+                }
+            },
+            include: {
+                socialAccounts: true
             }
         });
 
@@ -53,12 +65,21 @@ export const register = async (req: Request, res: Response) => {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                name: user.name
+                name: user.name,
+                socialAccounts: user.socialAccounts
             }
         });
-    } catch (error) {
-        console.error('Register error:', error);
-        res.status(500).json({ error: 'Failed to register user' });
+    } catch (error: any) {
+        console.error('Register detailed error:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code, // Prisma error codes
+            meta: error.meta
+        });
+        res.status(500).json({
+            error: 'Failed to register user',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
@@ -71,7 +92,8 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const user = await prisma.userProfile.findUnique({
-            where: { email }
+            where: { email },
+            include: { socialAccounts: true }
         });
 
         if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
@@ -87,20 +109,28 @@ export const login = async (req: Request, res: Response) => {
                 id: user.id,
                 email: user.email,
                 username: user.username,
-                name: user.name
+                name: user.name,
+                socialAccounts: user.socialAccounts
             }
         });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ error: 'Failed to login' });
+    } catch (error: any) {
+        console.error('Login detailed error:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
+        res.status(500).json({
+            error: 'Failed to login',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
 export const getMe = async (req: any, res: Response) => {
     try {
-        // req.user will be attached by auth middleware
         const user = await prisma.userProfile.findUnique({
-            where: { id: req.user.id }
+            where: { id: req.user.id },
+            include: { socialAccounts: true }
         });
 
         if (!user) {
@@ -114,7 +144,8 @@ export const getMe = async (req: any, res: Response) => {
                 email: user.email,
                 username: user.username,
                 name: user.name,
-                avatarUrl: user.avatarUrl
+                avatarUrl: user.avatarUrl,
+                socialAccounts: user.socialAccounts
             }
         });
     } catch (error) {

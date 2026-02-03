@@ -1,32 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../lib/prisma';
 
-const MOCK_USER_ID = 'mock-user-1';
-
-// Helper function to ensure user exists
-async function ensureUserExists() {
-    const existingUser = await prisma.userProfile.findUnique({
-        where: { id: MOCK_USER_ID },
-    });
-
-    if (!existingUser) {
-        await prisma.userProfile.create({
-            data: {
-                id: MOCK_USER_ID,
-                email: 'mock@example.com',
-                username: 'demo_creator',
-                passwordHash: 'dummy_hash',
-                name: 'Demo Creator',
-            },
-        });
-    }
-}
-
-export const getHooks = async (req: Request, res: Response) => {
+export const getHooks = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const hooks = await prisma.hook.findMany({
-            where: { userId: MOCK_USER_ID },
+            where: { userId: req.user.id },
             orderBy: { createdAt: 'desc' },
         });
         res.json(hooks.map(hook => ({
@@ -39,14 +17,13 @@ export const getHooks = async (req: Request, res: Response) => {
     }
 };
 
-export const createHook = async (req: Request, res: Response) => {
+export const createHook = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const data = req.body;
         const hook = await prisma.hook.create({
             data: {
                 ...data,
-                userId: MOCK_USER_ID,
+                userId: req.user.id,
             },
         });
         res.status(201).json(hook);
@@ -55,9 +32,19 @@ export const createHook = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteHook = async (req: Request, res: Response) => {
+export const deleteHook = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;
+
+        // Ensure user owns the hook
+        const hook = await prisma.hook.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!hook) {
+            return res.status(404).json({ error: 'Hook not found' });
+        }
+
         await prisma.hook.delete({
             where: { id },
         });

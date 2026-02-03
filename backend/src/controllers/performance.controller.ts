@@ -1,10 +1,19 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../lib/prisma';
 
-export const getUserPosts = async (req: Request, res: Response) => {
+export const getUserPosts = async (req: any, res: Response) => {
     try {
         const { socialAccountId } = req.query;
         if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
+
+        // Ensure user owns this social account
+        const account = await prisma.socialAccount.findFirst({
+            where: { id: String(socialAccountId), userId: req.user.id }
+        });
+
+        if (!account) {
+            return res.status(403).json({ error: 'Unauthorized access to this social account' });
+        }
 
         const posts = await prisma.userPost.findMany({
             where: { socialAccountId: String(socialAccountId) },
@@ -21,8 +30,20 @@ export const getUserPosts = async (req: Request, res: Response) => {
     }
 };
 
-export const getPerformanceInsights = async (req: Request, res: Response) => {
+export const getPerformanceInsights = async (req: any, res: Response) => {
     try {
+        const { socialAccountId } = req.query;
+        if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
+
+        // Ensure user owns this social account
+        const account = await prisma.socialAccount.findFirst({
+            where: { id: String(socialAccountId), userId: req.user.id }
+        });
+
+        if (!account) {
+            return res.status(403).json({ error: 'Unauthorized access to this social account' });
+        }
+
         // Mocking for now as in the original server action
         res.json({
             bestTime: "Tuesday at 6 PM",

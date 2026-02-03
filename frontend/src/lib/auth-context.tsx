@@ -10,6 +10,7 @@ interface User {
     username: string;
     email: string;
     avatarUrl?: string;
+    socialAccounts?: SocialAccount[];
 }
 
 interface SocialAccount {
@@ -60,16 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         try {
             const data = await apiFetch("/auth/me");
-            setUser(data.user);
+            const user = data.user;
+            setUser(user);
 
-            // Mock social accounts migration - for now we still handle it in local storage
-            // In a real app, these would come from the backend linked to the user
-            const storedAccounts = localStorage.getItem(`social_accounts_${data.user.id}`);
-            if (storedAccounts) {
-                const accounts = JSON.parse(storedAccounts);
-                setSocialAccounts(accounts);
-                const active = accounts.find((acc: SocialAccount) => acc.isActive);
-                setActiveSocialAccount(active || null);
+            if (user.socialAccounts && user.socialAccounts.length > 0) {
+                setSocialAccounts(user.socialAccounts);
+                const active = user.socialAccounts.find((acc: SocialAccount) => acc.isActive) || user.socialAccounts[0];
+                setActiveSocialAccount(active);
             }
         } catch (error) {
             console.error("Failed to fetch user:", error);
@@ -91,8 +89,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
 
             localStorage.setItem("creator_os_token", data.token);
-            setUser(data.user);
-            router.push("/performance"); // Redirect to dashboard
+            const user = data.user;
+            setUser(user);
+
+            if (user.socialAccounts && user.socialAccounts.length > 0) {
+                setSocialAccounts(user.socialAccounts);
+                const active = user.socialAccounts.find((acc: any) => acc.isActive) || user.socialAccounts[0];
+                setActiveSocialAccount(active);
+            }
+
+            router.push("/overview");
             return { success: true };
         } catch (error: any) {
             return { success: false, error: error.message };
@@ -107,8 +113,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
 
             localStorage.setItem("creator_os_token", data.token);
-            setUser(data.user);
-            router.push("/performance"); // Redirect to dashboard
+            const user = data.user;
+            setUser(user);
+
+            if (user.socialAccounts && user.socialAccounts.length > 0) {
+                setSocialAccounts(user.socialAccounts);
+                const active = user.socialAccounts.find((acc: any) => acc.isActive) || user.socialAccounts[0];
+                setActiveSocialAccount(active);
+            }
+
+            router.push("/overview");
             return { success: true };
         } catch (error: any) {
             return { success: false, error: error.message };

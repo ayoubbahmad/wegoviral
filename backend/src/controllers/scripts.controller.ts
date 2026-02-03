@@ -1,31 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../lib/prisma';
 
-const MOCK_USER_ID = 'mock-user-1';
-
-async function ensureUserExists() {
-    const existingUser = await prisma.userProfile.findUnique({
-        where: { id: MOCK_USER_ID },
-    });
-
-    if (!existingUser) {
-        await prisma.userProfile.create({
-            data: {
-                id: MOCK_USER_ID,
-                email: 'mock@example.com',
-                username: 'demo_creator',
-                passwordHash: 'dummy_hash',
-                name: 'Demo Creator',
-            },
-        });
-    }
-}
-
-export const getScripts = async (req: Request, res: Response) => {
+export const getScripts = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const scripts = await prisma.scriptTemplate.findMany({
-            where: { userId: MOCK_USER_ID },
+            where: { userId: req.user.id },
             orderBy: { createdAt: 'desc' },
         });
         res.json(scripts.map(s => ({
@@ -37,14 +16,13 @@ export const getScripts = async (req: Request, res: Response) => {
     }
 };
 
-export const createScript = async (req: Request, res: Response) => {
+export const createScript = async (req: any, res: Response) => {
     try {
-        await ensureUserExists();
         const data = req.body;
         const script = await prisma.scriptTemplate.create({
             data: {
                 ...data,
-                userId: MOCK_USER_ID,
+                userId: req.user.id,
             },
         });
         res.status(201).json(script);
@@ -53,9 +31,19 @@ export const createScript = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteScript = async (req: Request, res: Response) => {
+export const deleteScript = async (req: any, res: Response) => {
     try {
         const id = req.params.id as string;
+
+        // Ensure user owns the script
+        const script = await prisma.scriptTemplate.findFirst({
+            where: { id, userId: req.user.id }
+        });
+
+        if (!script) {
+            return res.status(404).json({ error: 'Script not found' });
+        }
+
         await prisma.scriptTemplate.delete({
             where: { id },
         });

@@ -87,120 +87,95 @@ export default function BuildWatchlist() {
           border: '1px solid #1A1A1A', 
           borderRadius: '16px', 
           padding: '1.5rem',
-          marginBottom: '1.5rem'
+          marginBottom: '1.5rem',
+          position: 'relative'
         }}>
-          <textarea 
-            placeholder="Describe the content you want to make"
-            style={{ 
-              width: '100%', 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#fff', 
-              fontSize: '1rem', 
-              minHeight: '120px', 
-              outline: 'none',
-              resize: 'none',
-              marginBottom: '1.5rem'
-            }}
-          />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: '0.75rem', position: 'relative' }}>
-              <span style={{ color: '#52525B', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
-              
-              {/* Niche Dropdown */}
-              <div style={{ position: 'relative' }}>
-                <button 
-                  onClick={() => setShowNicheDropdown(!showNicheDropdown)}
-                  style={{ 
-                    background: '#1A1A1A', border: '1px solid #27272A', borderRadius: '8px', padding: '0.4rem 0.75rem', 
-                    color: '#A1A1AA', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' 
-                  }}
-                >
-                  Niche <ChevronDown size={14} />
+          {activeTab === 'niche' && (
+            <>
+              <textarea 
+                placeholder="Describe the content you want to make"
+                style={{ 
+                  width: '100%', 
+                  background: 'transparent', 
+                  border: 'none', 
+                  color: '#fff', 
+                  fontSize: '1rem', 
+                  minHeight: '120px', 
+                  outline: 'none',
+                  resize: 'none',
+                  marginBottom: '1.5rem'
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <span style={{ color: '#52525B', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
+                  <Dropdown label="Niche" options={niches} isOpen={showNicheDropdown} setIsOpen={setShowNicheDropdown} />
+                  <Dropdown label="Platform" options={platforms} isOpen={showPlatformDropdown} setIsOpen={setShowPlatformDropdown} isPlatform />
+                  <Dropdown label="Account size" options={sizes} isOpen={showSizeDropdown} setIsOpen={setShowSizeDropdown} isSize />
+                </div>
+                <button style={actionButtonStyle}>
+                  Search <span style={{ opacity: 0.6 }}>↵</span>
                 </button>
-                {showNicheDropdown && (
-                  <div style={{ 
-                    position: 'absolute', top: '110%', left: 0, width: '240px', maxHeight: '300px', overflowY: 'auto',
-                    background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
-                  }}>
-                    {niches.map(n => (
-                      <div key={n} style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: '#A1A1AA', cursor: 'pointer', borderRadius: '6px' }} 
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#121212'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        {n}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
+            </>
+          )}
 
-              {/* Platform Dropdown */}
-              <div style={{ position: 'relative' }}>
-                <button 
-                  onClick={() => setShowPlatformDropdown(!showPlatformDropdown)}
-                  style={{ 
-                    background: '#1A1A1A', border: '1px solid #27272A', borderRadius: '8px', padding: '0.4rem 0.75rem', 
-                    color: '#A1A1AA', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' 
-                  }}
-                >
-                  Platform <ChevronDown size={14} />
-                </button>
-                {showPlatformDropdown && (
-                  <div style={{ 
-                    position: 'absolute', top: '110%', left: 0, width: '160px',
-                    background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
-                  }}>
-                    {platforms.map(p => (
-                      <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.75rem', fontSize: '0.85rem', color: '#fff', cursor: 'pointer', borderRadius: '6px' }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#121212'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <div style={{ width: '18px', height: '18px', borderRadius: '4px', background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>{p.icon}</div>
-                        {p.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {activeTab === 'similar' && (
+            <>
+              <div style={{ 
+                background: '#141414', 
+                border: '1px solid #27272A', 
+                borderRadius: '10px', 
+                padding: '0.75rem 1rem', 
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <input 
+                  type="text" 
+                  placeholder="Search for a channel by handle" 
+                  style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', width: '100%' }}
+                />
+                <ChevronDown size={18} color="#52525B" />
               </div>
-
-              {/* Account Size Dropdown */}
-              <div style={{ position: 'relative' }}>
-                <button 
-                  onClick={() => setShowSizeDropdown(!showSizeDropdown)}
-                  style={{ 
-                    background: '#1A1A1A', border: '1px solid #27272A', borderRadius: '8px', padding: '0.4rem 0.75rem', 
-                    color: '#A1A1AA', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' 
-                  }}
-                >
-                  Account size <ChevronDown size={14} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <span style={{ color: '#52525B', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
+                  <Dropdown label="Niche" options={niches} isOpen={showNicheDropdown} setIsOpen={setShowNicheDropdown} />
+                  <Dropdown label="Platform" options={platforms} isOpen={showPlatformDropdown} setIsOpen={setShowPlatformDropdown} isPlatform />
+                  <Dropdown label="Account size" options={sizes} isOpen={showSizeDropdown} setIsOpen={setShowSizeDropdown} isSize />
+                </div>
+                <button style={actionButtonStyle}>
+                  Discover <span style={{ opacity: 0.6 }}>↵</span>
                 </button>
-                {showSizeDropdown && (
-                  <div style={{ 
-                    position: 'absolute', top: '110%', left: 0, width: '220px',
-                    background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
-                  }}>
-                    {sizes.map(s => (
-                      <div key={s.label} style={{ padding: '0.6rem 0.75rem', cursor: 'pointer', borderRadius: '6px' }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#121212'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <div style={{ fontSize: '0.85rem', color: '#fff' }}>{s.label} <span style={{ color: '#52525B', fontSize: '0.8rem', marginLeft: '4px' }}>{s.desc}</span></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'manual' && (
+            <div style={{ position: 'relative' }}>
+              <textarea 
+                placeholder="Enter a comma-separated list of channel URLs"
+                style={{ 
+                  width: '100%', 
+                  background: 'transparent', 
+                  border: 'none', 
+                  color: '#fff', 
+                  fontSize: '1rem', 
+                  minHeight: '120px', 
+                  outline: 'none',
+                  resize: 'none',
+                  marginBottom: '1rem'
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button style={actionButtonStyle}>
+                  Parse <span style={{ opacity: 0.6 }}>↵</span>
+                </button>
               </div>
             </div>
-
-            <button style={{ 
-              background: '#2563EB', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', 
-              fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' 
-            }}>
-              Search <span style={{ opacity: 0.6 }}>↵</span>
-            </button>
-          </div>
+          )}
         </div>
 
         {/* Suggested vs Included */}

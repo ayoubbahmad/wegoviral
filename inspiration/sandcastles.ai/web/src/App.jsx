@@ -19,6 +19,7 @@ import Exports from './pages/dashboard/Exports'
 import Settings from './pages/dashboard/Settings'
 import BuildWatchlist from './pages/dashboard/BuildWatchlist'
 import ChannelVideos from './pages/dashboard/ChannelVideos'
+import SubmitChannels from './pages/dashboard/SubmitChannels'
 
 function LandingPage() {
   return (
@@ -53,6 +54,7 @@ function App() {
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/dashboard/build-watchlist" element={<BuildWatchlist />} />
         <Route path="/dashboard/channel-videos" element={<ChannelVideos />} />
+        <Route path="/dashboard/submit-channels" element={<SubmitChannels />} />
       </Routes>
     </Router>
   )

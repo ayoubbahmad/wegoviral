@@ -69,20 +69,24 @@ export default function Channels() {
               <Search size={16} />
               Search and filter
             </button>
-            <button style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem', 
-              background: '#0B0B0B', 
-              border: '1px solid #1A1A1A',
-              color: '#A1A1AA', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '99px',
-              fontSize: '0.875rem'
-            }}>
+            <Link 
+              to="/dashboard/submit-channels"
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                background: '#0B0B0B', 
+                border: '1px solid #1A1A1A',
+                color: '#A1A1AA', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '99px',
+                fontSize: '0.875rem',
+                textDecoration: 'none'
+              }}
+            >
               <Plus size={16} />
               Add new channels
-            </button>
+            </Link>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>

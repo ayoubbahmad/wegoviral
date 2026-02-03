@@ -8,6 +8,10 @@ import Footer from './components/Footer'
 import Login from './pages/Login'
 import Trial from './pages/Trial'
 
+import DashboardHome from './pages/dashboard/Home'
+import Analysis from './pages/dashboard/Analysis'
+import Writer from './pages/dashboard/Writer'
+
 function LandingPage() {
   return (
     <>
@@ -30,6 +34,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/trial" element={<Trial />} />
+        <Route path="/dashboard" element={<DashboardHome />} />
+        <Route path="/dashboard/analysis" element={<Analysis />} />
+        <Route path="/dashboard/writer" element={<Writer />} />
       </Routes>
     </Router>
   )

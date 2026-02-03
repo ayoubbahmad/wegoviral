@@ -2,6 +2,49 @@ import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { Sparkles, Users, Paperclip, Search, ChevronDown, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 
+const actionButtonStyle = {
+  background: '#2563EB', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', 
+  fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem',
+  border: 'none', cursor: 'pointer'
+};
+
+const Dropdown = ({ label, options, isOpen, setIsOpen, isPlatform, isSize }) => (
+  <div style={{ position: 'relative' }}>
+    <button 
+      onClick={() => setIsOpen(!isOpen)}
+      style={{ 
+        background: '#1A1A1A', border: '1px solid #27272A', borderRadius: '8px', padding: '0.4rem 0.75rem', 
+        color: '#A1A1AA', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'
+      }}
+    >
+      {label} <ChevronDown size={14} />
+    </button>
+    {isOpen && (
+      <div style={{ 
+        position: 'absolute', top: '110%', left: 0, width: isSize ? '220px' : isPlatform ? '160px' : '240px', 
+        maxHeight: '300px', overflowY: 'auto',
+        background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
+      }}>
+        {options.map((opt, i) => (
+          <div key={i} style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: isPlatform || isSize ? '#fff' : '#A1A1AA', cursor: 'pointer', borderRadius: '6px' }} 
+            onMouseEnter={(e) => e.currentTarget.style.background = '#121212'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            {isPlatform ? (
+               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                 <div style={{ width: '18px', height: '18px', borderRadius: '4px', background: opt.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>{opt.icon}</div>
+                 {opt.name}
+               </div>
+            ) : isSize ? (
+               <div>{opt.label} <span style={{ color: '#52525B', fontSize: '0.8rem', marginLeft: '4px' }}>{opt.desc}</span></div>
+            ) : opt}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 export default function BuildWatchlist() {
   const [activeTab, setActiveTab] = useState('niche');
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);

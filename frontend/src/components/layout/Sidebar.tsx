@@ -14,7 +14,8 @@ import {
     LogOut,
     Video,
     FileText,
-    FolderOpen
+    FolderOpen,
+    Paintbrush
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -30,6 +31,7 @@ const navItems = [
     { name: "Competitors", href: "/competitors", icon: Target },
     { name: "Library", href: "/library", icon: Library },
     { name: "Challenges", href: "/challenges", icon: Trophy },
+    { name: "Design System", href: "/design-system", icon: Paintbrush },
 ];
 
 export function Sidebar() {

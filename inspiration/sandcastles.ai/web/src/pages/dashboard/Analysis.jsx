@@ -10,6 +10,7 @@ import {
 export default function Analysis() {
   const [activeActionModal, setActiveActionModal] = useState(null); // 'remix', 'project', 'vault', 'prompt'
   const [promptGenerated, setPromptGenerated] = useState(false);
+  const [activeStep, setActiveStep] = useState('actions');
 
   const sections = [
     { id: 'actions', name: 'Actions', icon: Zap },
@@ -22,7 +23,11 @@ export default function Analysis() {
   ];
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveStep(id);
+    }
   };
 
   const cardStyle = {
@@ -111,29 +116,36 @@ export default function Analysis() {
             {/* Jump Navigation */}
             <div style={{ 
               display: 'flex', 
-              alignItems: 'center', 
+              justifyContent: 'center', 
               gap: '1rem', 
-              marginBottom: '2rem',
-              color: '#52525B',
-              fontSize: '0.85rem'
+              marginBottom: '3rem', 
+              position: 'sticky', 
+              top: '2rem', 
+              zIndex: 10,
+              background: 'rgba(0,0,0,0.8)',
+              padding: '0.75rem',
+              borderRadius: '12px',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid #1A1A1A'
             }}>
-              <span>Jump to:</span>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                {sections.map(s => (
-                  <button 
-                    key={s.id}
-                    onClick={() => scrollToSection(s.id)}
-                    style={{ 
-                      display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid #1A1A1A', 
-                      background: '#0B0B0B', color: '#A1A1AA', padding: '0.4rem 0.75rem', borderRadius: '8px',
-                      fontSize: '0.75rem', cursor: 'pointer'
-                    }}
-                  >
-                    <s.icon size={12} />
-                    {s.name}
-                  </button>
-                ))}
-              </div>
+              <span style={{ color: '#52525B', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}>Jump to:</span>
+              {sections.map(s => (
+                <button 
+                  key={s.id}
+                  onClick={() => scrollToSection(s.id)}
+                  style={{ 
+                    display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', 
+                    background: activeStep === s.id ? '#1A1A1A' : 'transparent', 
+                    color: activeStep === s.id ? '#fff' : '#52525B', 
+                    padding: '0.4rem 0.75rem', borderRadius: '8px',
+                    fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <s.icon size={14} />
+                  {s.name}
+                </button>
+              ))}
             </div>
 
             {/* Actions Section */}

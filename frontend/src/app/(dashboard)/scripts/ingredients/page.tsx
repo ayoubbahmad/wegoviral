@@ -75,10 +75,8 @@ export default function ScriptingIngredientsPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Writer
       </Link>
 
-      <div className="space-y-4">
-        <h1 className="text-4xl font-black tracking-tighter text-foreground uppercase italic underline decoration-primary/50 underline-offset-8">
-          The 7 Core Variables
-        </h1>
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold tracking-tight">The 7 Core Variables</h1>
         <p className="text-muted-foreground text-lg font-medium">
           Master these 7 ingredients to create viral scripts every single time.
         </p>
@@ -96,7 +94,7 @@ export default function ScriptingIngredientsPage() {
             <div className="space-y-1 pt-1">
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">Variable 0{index + 1}</span>
-                <h2 className="text-xl font-black uppercase tracking-tight text-foreground">{ingredient.name}</h2>
+                <h2 className="text-lg font-bold text-foreground">{ingredient.name}</h2>
               </div>
               <p className="text-muted-foreground font-medium leading-relaxed">
                 {ingredient.description}

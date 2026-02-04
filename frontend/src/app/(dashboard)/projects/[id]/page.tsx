@@ -87,10 +87,10 @@ export default function ProjectDetailsPage() {
                 </Link>
                 
                 <div className="flex items-end justify-between">
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         <div className="flex items-center gap-3">
                             <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">Project</span>
-                            <h1 className="text-4xl font-black tracking-tighter text-foreground uppercase italic">{projectName}</h1>
+                            <h1 className="text-3xl font-bold tracking-tight">{projectName}</h1>
                         </div>
                         <p className="text-muted-foreground font-medium flex items-center gap-2">
                             {MOCK_PROJECT_VIDEOS.length} videos saved in this project

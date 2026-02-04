@@ -25,20 +25,11 @@ export function DesignSystemShowcase() {
     return (
         <div className="space-y-12">
             {/* Intro */}
-            <div className="relative p-12 rounded-[3.5rem] bg-primary text-primary-foreground overflow-hidden shadow-2xl shadow-primary/20">
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-white/10 rounded-full blur-[100px]" />
-                <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]" />
-                
-                <div className="relative z-10 max-w-2xl space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em]">
-                        <Sparkles className="w-3.5 h-3.5" /> Identity System
-                    </div>
-                    <h1 className="text-6xl font-black tracking-tighter uppercase italic leading-none">CreatorOS Design System</h1>
-                    <p className="text-primary-foreground/70 text-lg font-medium leading-relaxed">
-                        A premium, high-contrast design language built for the next generation of social strategy. 
-                        Glassmorphism, deep depth, and bold typography.
-                    </p>
-                </div>
+            <div className="space-y-1">
+                <h1 className="text-3xl font-bold tracking-tight">Design System</h1>
+                <p className="text-muted-foreground">
+                    Our consolidated design language for CreatorOS. Consistently premium, high-contrast, and glassmorphic.
+                </p>
             </div>
 
             {/* Navigation */}

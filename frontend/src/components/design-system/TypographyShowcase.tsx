@@ -7,16 +7,16 @@ export function TypographyShowcase() {
                 <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.3em]">Headings</p>
                 <div className="space-y-8">
                     <div className="space-y-2">
-                        <h1 className="text-5xl font-black tracking-tighter text-foreground uppercase italic">Headline Display</h1>
-                        <p className="text-xs text-muted-foreground font-mono">text-5xl font-black tracking-tighter uppercase italic</p>
+                        <h1 className="text-4xl font-bold tracking-tight text-foreground">Page Headline</h1>
+                        <p className="text-xs text-muted-foreground font-mono">text-4xl font-bold tracking-tight</p>
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Section Heading</h2>
-                        <p className="text-xs text-muted-foreground font-mono">text-3xl font-black tracking-tight uppercase italic</p>
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground">Section Heading</h2>
+                        <p className="text-xs text-muted-foreground font-mono">text-2xl font-bold tracking-tight</p>
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-foreground">Sub-heading Content</h3>
-                        <p className="text-xs text-muted-foreground font-mono">text-xl font-bold text-foreground</p>
+                        <h3 className="text-lg font-bold text-foreground">Module Header</h3>
+                        <p className="text-xs text-muted-foreground font-mono">text-lg font-bold text-foreground</p>
                     </div>
                 </div>
             </div>

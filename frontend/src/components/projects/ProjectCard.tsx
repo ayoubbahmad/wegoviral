@@ -35,7 +35,7 @@ export function ProjectCard({ id, name, items, lastModified }: ProjectCardProps)
       </div>
 
       <div className="space-y-3">
-        <h3 className="text-lg font-black tracking-tight text-foreground group-hover:text-primary transition-colors truncate">
+        <h3 className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors truncate">
           {name}
         </h3>
         <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">

@@ -119,9 +119,9 @@ export function ScriptWizard() {
   return (
     <div className="max-w-[1000px] mx-auto space-y-12 pb-32">
       <div className="flex items-end justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-black tracking-tight text-foreground">Write a Script</h1>
-          <p className="text-muted-foreground font-medium">Create high-performing video scripts with AI.</p>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">Scripts</h1>
+          <p className="text-muted-foreground">Create high-performing video scripts with AI.</p>
         </div>
         <Link 
           href="/scripts/ingredients" 

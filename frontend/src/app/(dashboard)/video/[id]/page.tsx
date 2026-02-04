@@ -3,8 +3,21 @@
 import { useParams } from "next/navigation";
 import { VideoPlayer } from "@/components/video-analysis/VideoPlayer";
 import { VideoMetrics } from "@/components/video-analysis/VideoMetrics";
-import { AnalysisActions } from "@/components/video-analysis/AnalysisActions";
-import { FileText, AlignLeft, Info, BarChart2, Hash, Type } from "lucide-react";
+import { AnalysisModals } from "@/components/video-analysis/AnalysisModals";
+import { AnalysisDetails } from "@/components/video-analysis/AnalysisDetails";
+import { 
+    FileText, 
+    AlignLeft, 
+    Zap, 
+    BarChart2, 
+    Hash, 
+    Type, 
+    Anchor, 
+    Layout, 
+    Palette,
+    ArrowUpRight,
+    Play
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mock data for the specific video
@@ -15,123 +28,124 @@ const MOCK_VIDEO_DATA = {
     channelName: "@zack.chug",
     channelAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=zack",
     publishedAt: "11mo ago",
-    thumbnailUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=800&q=80", // Using a workout/health like image
+    thumbnailUrl: "https://images.unsplash.com/photo-1541534741688-6078c65b5a33?w=800&q=400",
     description: "Fast for 30 Days during Ramadan ? Fasting isn't just about skipping meals—it rewires your metabolism, burns fat, and optimizes your body for peak health. Here's what happens when you fast daily for 12 hours over 30 days: ⏳ First Few Days (Days 1-3): 🔹 Blood sugar stabilizes – No more energy crashes. 🔹 Glycogen stores deplete – Your body starts burning stored energy. 🔹 Insulin drops – Fat becomes more accessible as a fuel source. 🔹 Hunger hormones adjust ...",
     transcript: "It happens when you fast for 30 days during Ramadan.\n\nThe changes are shocking but beneficial.\n\nIn the first few days your blood sugar drops because there's no more glucose spike and this lowers your insulin and makes fat more accessible to be burned.\n\nNow after one week, autophagy kicks in where damaged cells are repaired and removed.",
-    hashtags: ["#shorts", "#ramadan", "#fasting", "#health"]
 };
 
 // Jump links configuration
 const JUMP_LINKS = [
-    { label: "Actions", id: "actions", icon: ZapIcon },
+    { label: "Actions", id: "actions", icon: Zap },
     { label: "Metrics", id: "metrics", icon: BarChart2 },
     { label: "Description", id: "description", icon: AlignLeft },
     { label: "Transcript", id: "transcript", icon: FileText },
-    { label: "Hook", id: "hook", icon: Hash }, // Placeholder icon
-    { label: "Structure", id: "structure", icon: Type }, // Placeholder
-    { label: "Style", id: "style", icon: Info }, // Placeholder
+    { label: "Hook", id: "hook", icon: Anchor },
+    { label: "Structure", id: "structure", icon: Layout },
+    { label: "Style", id: "style", icon: Palette },
 ];
-
-function ZapIcon({ className }: { className?: string }) {
-    return (
-        <svg
-            className={className}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-    );
-}
-
 
 export default function VideoAnalysisPage() {
     const params = useParams();
-    // In a real app, fetch data based on params.id
+
+    const scrollToSection = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 pb-20">
-            {/* Header / Title Section */}
-            <div>
-                 <h1 className="text-xl font-bold leading-tight">{MOCK_VIDEO_DATA.title}</h1>
-                 <div className="flex items-center gap-2 mt-2">
-                    <span className="text-sm font-medium text-muted-foreground">{MOCK_VIDEO_DATA.channelName}</span>
-                    <img src={MOCK_VIDEO_DATA.channelAvatar} alt="Channel" className="w-5 h-5 rounded-full" />
-                    <span className="text-sm text-muted-foreground ml-auto">{MOCK_VIDEO_DATA.publishedAt}</span>
-                 </div>
+        <div className="max-w-[1400px] mx-auto space-y-8 pb-32 pt-4">
+            {/* Header Content Area */}
+            <div className="flex flex-col gap-4">
+                <h1 className="text-2xl font-black leading-tight tracking-tight text-foreground max-w-4xl">
+                    {MOCK_VIDEO_DATA.fullTitle}
+                </h1>
+                <div className="flex items-center gap-4">
+                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/50 group cursor-pointer hover:border-primary/50 transition-colors">
+                      <img src={MOCK_VIDEO_DATA.channelAvatar} alt="Channel" className="w-5 h-5 rounded-full border border-border/50" />
+                      <span className="text-sm font-bold text-foreground truncate">{MOCK_VIDEO_DATA.channelName}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
+                   </div>
+                   <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest text-[10px]">{MOCK_VIDEO_DATA.publishedAt}</span>
+                </div>
             </div>
 
-            <div className="grid lg:grid-cols-[350px_1fr] gap-8">
-                {/* Left Column: Video Player */}
-                <div className="w-full">
+            <div className="grid lg:grid-cols-[380px_1fr] gap-12 items-start">
+                {/* Left Column: Video Sticky Preview */}
+                <div className="sticky top-8 space-y-6">
                     <VideoPlayer thumbnailUrl={MOCK_VIDEO_DATA.thumbnailUrl} />
                 </div>
 
-                {/* Right Column: Analysis Content */}
-                <div className="space-y-8">
-                    {/* Jump Links */}
-                    <div className="flex flex-wrap gap-2 border-b border-border pb-4">
-                        <span className="text-sm text-muted-foreground mr-2 py-1">Jump to:</span>
+                {/* Right Column: Deep Analysis Content */}
+                <div className="space-y-12">
+                    {/* Jump Navigation */}
+                    <div className="p-1.5 rounded-2xl bg-card border border-border/50 flex flex-wrap gap-1 shadow-sm">
                         {JUMP_LINKS.map(link => (
-                            <button key={link.id} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/30 hover:bg-secondary text-xs font-medium transition-colors text-muted-foreground hover:text-foreground">
-                                <link.icon className="w-3 h-3" />
-                                {link.label}
+                            <button 
+                                key={link.id} 
+                                onClick={() => scrollToSection(link.id)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-secondary/80 text-xs font-black transition-all text-muted-foreground hover:text-foreground active:scale-95 translate-y-0 hover:-translate-y-0.5"
+                            >
+                                <link.icon className="w-3.5 h-3.5" />
+                                <span className="uppercase tracking-wider">{link.label}</span>
                             </button>
                         ))}
                     </div>
 
                     {/* Actions Section */}
-                    <div id="actions">
-                        <AnalysisActions />
-                    </div>
+                    <section id="actions">
+                        <AnalysisModals />
+                    </section>
 
                     {/* Metrics Section */}
-                    <div id="metrics" className="space-y-3">
-                        <div className="flex items-center gap-2">
-                             <BarChart2 className="w-5 h-5 text-blue-500" />
-                             <h3 className="font-semibold text-lg text-blue-500">Metrics</h3>
+                    <section id="metrics" className="space-y-6">
+                        <div className="flex items-center gap-2 text-primary">
+                             <BarChart2 className="w-5 h-5 shadow-sm" />
+                             <h3 className="font-bold text-xl tracking-tight uppercase">Performance Metrics</h3>
                         </div>
                         <VideoMetrics />
-                    </div>
+                    </section>
 
                     {/* Description Section */}
-                    <div id="description" className="p-4 rounded-xl border border-border bg-card space-y-3">
-                         <div className="flex items-center gap-2">
-                             <AlignLeft className="w-5 h-5 text-blue-500" />
-                             <h3 className="font-semibold text-lg text-blue-500">Description</h3>
+                    <section id="description" className="p-8 rounded-3xl border border-border bg-card/30 relative overflow-hidden group">
+                         <div className="flex items-center gap-2 mb-6 text-blue-500">
+                             <AlignLeft className="w-5 h-5" />
+                             <h3 className="font-bold text-xl tracking-tight uppercase">Description</h3>
                         </div>
-                        <p className="text-sm leading-relaxed text-muted-foreground">{MOCK_VIDEO_DATA.description}</p>
-                        <button className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2">
-                            Show more
+                        <p className="text-sm leading-[1.8] text-muted-foreground font-medium whitespace-pre-wrap">
+                            {MOCK_VIDEO_DATA.description}
+                        </p>
+                        <button className="mt-6 flex items-center gap-2 p-2 px-4 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
+                            Show full description
+                            <ArrowUpRight className="w-3 h-3" />
                         </button>
-                    </div>
+                    </section>
                     
-                     {/* Transcript Section */}
-                    <div id="transcript" className="p-4 rounded-xl border border-border bg-card space-y-3">
-                         <div className="flex items-center justify-between">
-                             <div className="flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-blue-500" />
-                                <h3 className="font-semibold text-lg text-blue-500">Transcript</h3>
+                    {/* Transcript Section */}
+                    <section id="transcript" className="p-8 rounded-3xl border border-border bg-card/30 space-y-6">
+                         <div className="flex items-center justify-between border-b border-border/50 pb-6">
+                             <div className="flex items-center gap-2 text-purple-500">
+                                <FileText className="w-5 h-5" />
+                                <h3 className="font-bold text-xl tracking-tight uppercase">Transcript</h3>
                              </div>
-                             <div className="flex items-center gap-2 text-muted-foreground">
-                                 <span className="text-xs">127 words</span>
+                             <div className="flex items-center gap-4">
+                                 <span className="text-[10px] font-black text-muted-foreground uppercase bg-secondary/50 px-3 py-1 rounded-full">127 words</span>
+                                 <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-all">
+                                    <FileText className="w-4 h-4" />
+                                 </button>
                              </div>
                         </div>
-                        <div className="space-y-4 mt-2">
+                        <div className="space-y-6 mt-4 max-w-2xl">
                             {MOCK_VIDEO_DATA.transcript.split('\n\n').map((paragraph, i) => (
-                                <p key={i} className="text-sm leading-relaxed text-muted-foreground">
+                                <p key={i} className="text-sm leading-[2] text-muted-foreground font-medium border-l-2 border-purple-500/20 pl-6 py-1">
                                     {paragraph}
                                 </p>
                             ))}
                         </div>
-                    </div>
+                    </section>
+
+                    {/* Deep Analysis Details (Hook, Structure, Style) */}
+                    <section id="hook" className="pt-8">
+                         <AnalysisDetails />
+                    </section>
 
                 </div>
             </div>

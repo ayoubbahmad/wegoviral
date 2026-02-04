@@ -1,6 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { VideoCard, Video } from "@/components/videos/VideoCard";
+import { VideoTable } from "@/components/videos/VideoTable";
+import { 
+    Search, 
+    LayoutGrid, 
+    Table2, 
+    ChevronDown, 
+    ArrowUpDown, 
+    Clock, 
+    RotateCcw,
+    Filter
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const MOCK_VIDEOS: Video[] = [
     {
@@ -14,7 +27,7 @@ const MOCK_VIDEOS: Video[] = [
         likes: "12K",
         platform: "youtube",
         metrics: {
-            outlierScore: "1x",
+            outlierScore: "1.4x",
             views: "106K",
             engagementRate: "6%",
         },
@@ -62,7 +75,7 @@ const MOCK_VIDEOS: Video[] = [
         likes: "1.2K",
         platform: "tiktok",
         metrics: {
-            outlierScore: "1.9x",
+            outlierScore: "4.8x",
             views: "51K",
             engagementRate: "1%",
         },
@@ -73,7 +86,7 @@ const MOCK_VIDEOS: Video[] = [
         thumbnailUrl: "https://images.unsplash.com/photo-1596707328675-d14457224855?w=800&q=80",
         channelName: "sapiscience",
         channelAvatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=sapi",
-        publishedAt: "1w ago",
+        publishedAt: "3d ago",
         views: "164K",
         likes: "12K",
         platform: "tiktok",
@@ -83,72 +96,89 @@ const MOCK_VIDEOS: Video[] = [
             engagementRate: "9%",
         },
     },
-    {
-        id: "6",
-        title: "TRY THIS",
-        thumbnailUrl: "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=800&q=80",
-        channelName: "creative_daily",
-        channelAvatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=creative",
-        publishedAt: "5d ago",
-        views: "809K",
-        likes: "55K",
-        platform: "instagram",
-        metrics: {
-            outlierScore: "1.2x",
-            views: "809K",
-            engagementRate: "5%",
-        },
-    },
-    {
-        id: "7",
-        title: "Hidden Features in iOS 18",
-        thumbnailUrl: "https://images.unsplash.com/photo-1621360841012-3f822a96b607?w=800&q=80",
-        channelName: "tech_insider",
-        channelAvatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=tech",
-        publishedAt: "3d ago",
-        views: "2.1M",
-        likes: "120K",
-        platform: "youtube",
-        metrics: {
-            outlierScore: "2.4x",
-            views: "2.1M",
-            engagementRate: "8%",
-        },
-    },
-    {
-        id: "8",
-        title: "My Morning Routine 2026",
-        thumbnailUrl: "https://images.unsplash.com/photo-1579737996766-02e20ec42ef3?w=800&q=80",
-        channelName: "lifestyle_hub",
-        channelAvatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=life",
-        publishedAt: "2d ago",
-        views: "450K",
-        likes: "32K",
-        platform: "instagram",
-        metrics: {
-            outlierScore: "1.5x",
-            views: "450K",
-            engagementRate: "4%",
-        },
-    },
 ];
 
 export default function VideosPage() {
+    const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                     {/* Breadcrumb style header if desired, or simplified */}
-                    <h1 className="text-2xl font-bold tracking-tight">Videos</h1>
-                    <p className="text-muted-foreground text-sm">Analyze top performing videos in your niche.</p>
+        <div className="space-y-8 pb-12">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Videos</h1>
+                <p className="text-muted-foreground mt-2">Discover what's gone viral in your niche, and why it worked.</p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                {/* Search Bar */}
+                <div className="relative w-full max-w-xl group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                        <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder="Search for videos by topic..."
+                        className="w-full h-11 pl-11 pr-20 rounded-xl bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm"
+                    />
+                    <button className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn">
+                        Go
+                        <span className="text-[10px] opacity-50 group-hover/btn:translate-x-0.5 transition-transform">↵</span>
+                    </button>
+                </div>
+
+                {/* View Controls */}
+                <div className="flex items-center gap-2">
+                    <div className="flex p-1 bg-card border border-border/50 rounded-xl">
+                        <button 
+                            onClick={() => setViewMode("table")}
+                            className={cn(
+                                "p-2 rounded-lg transition-all",
+                                viewMode === "table" ? "bg-primary/10 text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                            )}
+                            title="Table View"
+                        >
+                            <Table2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                            onClick={() => setViewMode("cards")}
+                            className={cn(
+                                "p-2 rounded-lg transition-all",
+                                viewMode === "cards" ? "bg-primary/10 text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                            )}
+                            title="Grid View"
+                        >
+                            <LayoutGrid className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <button className="h-11 px-4 rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all flex items-center gap-2 text-sm font-medium">
+                        <ArrowUpDown className="w-4 h-4" />
+                        Sort
+                    </button>
+                    
+                    <button className="h-11 px-4 rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all flex items-center gap-2 text-sm font-medium">
+                        <Filter className="w-4 h-4" />
+                        Filters
+                    </button>
+
+                    <button className="h-11 w-11 flex items-center justify-center rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground transition-all">
+                        <Clock className="w-4 h-4" />
+                    </button>
+
+                    <button className="h-11 w-11 flex items-center justify-center rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground transition-all">
+                        <RotateCcw className="w-4 h-4" />
+                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {MOCK_VIDEOS.map((video) => (
-                    <VideoCard key={video.id} video={video} />
-                ))}
-            </div>
+            {viewMode === "cards" ? (
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                    {MOCK_VIDEOS.map((video) => (
+                        <VideoCard key={video.id} video={video} />
+                    ))}
+                </div>
+            ) : (
+                <VideoTable videos={MOCK_VIDEOS} />
+            )}
         </div>
     );
 }

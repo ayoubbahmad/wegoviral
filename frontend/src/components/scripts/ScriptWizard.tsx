@@ -117,7 +117,7 @@ export function ScriptWizard() {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto space-y-12 pb-32">
+    <div className="space-y-12 pb-32">
       <div className="flex items-end justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Scripts</h1>

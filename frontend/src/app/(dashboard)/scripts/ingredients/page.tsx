@@ -67,7 +67,7 @@ const INGREDIENTS = [
 
 export default function ScriptingIngredientsPage() {
   return (
-    <div className="max-w-[800px] mx-auto space-y-12 pb-32 pt-8">
+    <div className="space-y-12 pb-32 pt-8">
       <Link 
         href="/scripts" 
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all"

@@ -76,7 +76,7 @@ export default function ProjectDetailsPage() {
     const projectName = PROJECT_MAP[id] || 'Unnamed Project';
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-32 pt-4">
+        <div className="space-y-10 pb-32">
             {/* Header / Breadcrumbs */}
             <div className="space-y-6">
                 <Link 

@@ -12,7 +12,7 @@ const MOCK_PROJECTS = [
 
 export default function ProjectsPage() {
     return (
-        <div className="max-w-[1400px] mx-auto space-y-12 pb-32 pt-4">
+        <div className="space-y-12 pb-32">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>

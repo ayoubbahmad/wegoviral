@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 // Types
 type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
@@ -117,9 +118,17 @@ export function ScriptWizard() {
 
   return (
     <div className="max-w-[1000px] mx-auto space-y-12 pb-32">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-tight text-foreground">Write a Script</h1>
-        <p className="text-muted-foreground font-medium">Create high-performing video scripts with AI.</p>
+      <div className="flex items-end justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-black tracking-tight text-foreground">Write a Script</h1>
+          <p className="text-muted-foreground font-medium">Create high-performing video scripts with AI.</p>
+        </div>
+        <Link 
+          href="/scripts/ingredients" 
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all mb-1"
+        >
+          <Sparkles className="w-3.5 h-3.5" /> View 7 Core Variables
+        </Link>
       </div>
 
       {/* Sticky Jump Navigation */}
@@ -168,9 +177,14 @@ export function ScriptWizard() {
           />
           
           <div className="flex items-center justify-between">
-            <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-              How to write the best prompt <ExternalLink className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-6">
+              <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+                How to write the best prompt <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+              {/* <Link href="/scripts/ingredients" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-pink-500 transition-colors">
+                The 7 Core Variables <Sparkles className="w-3.5 h-3.5" />
+              </Link> */}
+            </div>
             
             <div className="flex items-center gap-6">
               <span className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">Next step: Research</span>

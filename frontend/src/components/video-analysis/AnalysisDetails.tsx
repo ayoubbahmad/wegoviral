@@ -1,4 +1,4 @@
-import { Anchor, Layout, Palette, ChevronDown } from "lucide-react";
+import { Anchor, Layout, Palette } from "lucide-react";
 
 interface AnalysisItemProps {
   title: string;
@@ -11,32 +11,31 @@ interface AnalysisItemProps {
 
 function AnalysisCard({ title, type, description, bullets, icon: Icon, iconColor }: AnalysisItemProps) {
   return (
-    <div className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-all">
+    <div className="p-8 rounded-3xl bg-card/30 border border-border shadow-sm hover:border-primary/50 transition-all">
       <div className="flex items-center gap-2 mb-6">
         <Icon className={`w-5 h-5 ${iconColor}`} />
-        <h3 className={`text-lg font-bold ${iconColor}`}>{title} Analysis</h3>
+        <h3 className={`text-xl font-bold tracking-tight uppercase ${iconColor}`}>{title} Analysis</h3>
       </div>
 
       <div className="space-y-6">
         <div>
-          <div className="text-xs font-bold text-foreground mb-1 uppercase tracking-wider opacity-60">Type</div>
-          <div className="text-sm font-semibold">{type}</div>
+          <div className="text-xs font-black text-foreground mb-2 uppercase tracking-widest opacity-60">Type</div>
+          <div className="text-sm font-bold bg-secondary/50 inline-block px-3 py-1 rounded-full">{type}</div>
         </div>
 
         <div>
-          <div className="text-xs font-bold text-foreground mb-1 uppercase tracking-wider opacity-60">Description</div>
-          <p className="text-sm leading-relaxed text-muted-foreground font-medium">{description}</p>
+          <div className="text-xs font-black text-foreground mb-2 uppercase tracking-widest opacity-60">Description</div>
+          <p className="text-sm leading-[1.8] text-muted-foreground font-medium">{description}</p>
         </div>
 
         {bullets && (
           <div>
-            <div className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider opacity-60">
+            <div className="text-xs font-black text-foreground mb-3 uppercase tracking-widest opacity-60">
               {title === "Style" ? "Attributes" : "Frameworks"}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {bullets.map((bullet, i) => (
-                <div key={i} className="flex gap-2 text-sm text-muted-foreground">
-                  <span className="text-primary font-bold">•</span>
+                <div key={i} className="flex gap-3 text-sm text-muted-foreground border-l-2 border-primary/20 pl-4 py-1">
                   <span className="font-medium">{bullet}</span>
                 </div>
               ))}
@@ -48,47 +47,52 @@ function AnalysisCard({ title, type, description, bullets, icon: Icon, iconColor
   );
 }
 
-export function AnalysisDetails() {
-  return (
-    <div className="grid gap-6 md:grid-cols-3">
-      <AnalysisCard 
-        id="hook"
-        title="Hook"
-        icon={Anchor}
-        iconColor="text-blue-500"
-        type="Secret Reveal"
-        description="Suggests unknown insight or future implication that the viewer doesn't know but would inform what is happening. Teases a feeling that the speaker knows something the viewer doesn't."
-        bullets={[
-          '"X is going to change Y"',
-          '"Nobody is aware that X is happening, but I think it might change Y"'
-        ]}
-      />
-      <AnalysisCard 
-        id="structure"
-        title="Structure"
-        icon={Layout}
-        iconColor="text-purple-500"
-        type="Breakdown"
-        description="Explains the foundational principles and building blocks of a topic. Useful for identifying and investigating the core elements of a larger topic."
-        bullets={[
-            "Foundational principles",
-            "Identifies core elements",
-            "Investigative approach"
-        ]}
-      />
-      <AnalysisCard 
-        id="style"
-        title="Style"
-        icon={Palette}
-        iconColor="text-amber-500"
-        type="Educational/Instructive"
-        description="Professional and authoritative delivery designed to foster trust and establish expertise in a specific niche."
-        bullets={[
-            "Tone: High energy and enthusiasm",
-            "Voice: Confident and commanding",
-            "Pacing: Rapid-fire delivery"
-        ]}
-      />
-    </div>
-  );
+export function HookAnalysis() {
+    return (
+        <AnalysisCard 
+            title="Hook"
+            icon={Anchor}
+            iconColor="text-blue-500"
+            type="Secret Reveal"
+            description="Suggests unknown insight or future implication that the viewer doesn't know but would inform what is happening. Teases a feeling that the speaker knows something the viewer doesn't."
+            bullets={[
+            '"X is going to change Y"',
+            '"Nobody is aware that X is happening, but I think it might change Y"'
+            ]}
+        />
+    );
+}
+
+export function StructureAnalysis() {
+    return (
+        <AnalysisCard 
+            title="Structure"
+            icon={Layout}
+            iconColor="text-purple-500"
+            type="Breakdown"
+            description="Explains the foundational principles and building blocks of a topic. Useful for identifying and investigating the core elements of a larger topic."
+            bullets={[
+                "Foundational principles",
+                "Identifies core elements",
+                "Investigative approach"
+            ]}
+        />
+    );
+}
+
+export function StyleAnalysis() {
+    return (
+        <AnalysisCard 
+            title="Style"
+            icon={Palette}
+            iconColor="text-amber-500"
+            type="Educational/Instructive"
+            description="Professional and authoritative delivery designed to foster trust and establish expertise in a specific niche."
+            bullets={[
+                "Tone: High energy and enthusiasm",
+                "Voice: Confident and commanding",
+                "Pacing: Rapid-fire delivery"
+            ]}
+        />
+    );
 }

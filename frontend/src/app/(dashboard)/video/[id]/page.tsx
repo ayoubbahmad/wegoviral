@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { VideoPlayer } from "@/components/video-analysis/VideoPlayer";
 import { VideoMetrics } from "@/components/video-analysis/VideoMetrics";
 import { AnalysisModals } from "@/components/video-analysis/AnalysisModals";
-import { AnalysisDetails } from "@/components/video-analysis/AnalysisDetails";
+import { HookAnalysis, StructureAnalysis, StyleAnalysis } from "@/components/video-analysis/AnalysisDetails";
 import { 
     FileText, 
     AlignLeft, 
@@ -97,9 +97,9 @@ export default function VideoAnalysisPage() {
                     </section>
 
                     {/* Metrics Section */}
-                    <section id="metrics" className="space-y-6">
-                        <div className="flex items-center gap-2 text-primary">
-                             <BarChart2 className="w-5 h-5 shadow-sm" />
+                    <section id="metrics" className="p-8 rounded-3xl border border-border bg-card/30 space-y-6">
+                        <div className="flex items-center gap-2 text-blue-500">
+                             <BarChart2 className="w-5 h-5" />
                              <h3 className="font-bold text-xl tracking-tight uppercase">Performance Metrics</h3>
                         </div>
                         <VideoMetrics />
@@ -143,9 +143,17 @@ export default function VideoAnalysisPage() {
                         </div>
                     </section>
 
-                    {/* Deep Analysis Details (Hook, Structure, Style) */}
-                    <section id="hook" className="pt-8">
-                         <AnalysisDetails />
+                    {/* Deep Analysis Details */}
+                    <section id="hook">
+                         <HookAnalysis />
+                    </section>
+
+                    <section id="structure">
+                         <StructureAnalysis />
+                    </section>
+
+                    <section id="style">
+                         <StyleAnalysis />
                     </section>
 
                 </div>

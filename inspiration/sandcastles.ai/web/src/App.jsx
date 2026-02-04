@@ -21,6 +21,10 @@ import BuildWatchlist from './pages/dashboard/BuildWatchlist'
 import ChannelVideos from './pages/dashboard/ChannelVideos'
 import SubmitChannels from './pages/dashboard/SubmitChannels'
 import WriterCopy from './pages/dashboard/WriterCopy';
+import Watchlists from './pages/dashboard/Watchlists';
+import WatchlistDetails from './pages/dashboard/WatchlistDetails';
+import WriterEnhanced from './pages/dashboard/WriterEnhanced';
+import ScriptingIngredients from './pages/dashboard/ScriptingIngredients';
 
 function LandingPage() {
   return (
@@ -57,6 +61,10 @@ function App() {
         <Route path="/dashboard/build-watchlist" element={<BuildWatchlist />} />
         <Route path="/dashboard/channel-videos" element={<ChannelVideos />} />
         <Route path="/dashboard/submit-channels" element={<SubmitChannels />} />
+        <Route path="/dashboard/watchlists" element={<Watchlists />} />
+        <Route path="/dashboard/watchlists/:id" element={<WatchlistDetails />} />
+        <Route path="/dashboard/writer-enhanced" element={<WriterEnhanced />} />
+        <Route path="/dashboard/scripting-ingredients" element={<ScriptingIngredients />} />
       </Routes>
     </Router>
   )

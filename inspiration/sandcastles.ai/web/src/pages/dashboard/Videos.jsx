@@ -3,13 +3,17 @@ import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { 
   Search, ChevronDown, ArrowUpDown, LayoutGrid, 
   Clock, RotateCcw, Table2, Play, Zap, Eye, 
-  TrendingUp, Calendar, MoreHorizontal
+  TrendingUp, Calendar, MoreHorizontal, Filter, X,
+  Bookmark, Share2, Copy
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Videos() {
   const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
   const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedWatchlist, setSelectedWatchlist] = useState(null);
 
   const videoData = [
     { 
@@ -185,8 +189,66 @@ export default function Videos() {
 
             <button style={menuButtonStyle}><Clock size={18} /></button>
             <button style={menuButtonStyle}><RotateCcw size={18} /></button>
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              style={{ ...menuButtonStyle, background: showFilters ? '#1E3A8A' : '#0B0B0B', color: showFilters ? '#3B82F6' : '#52525B', borderColor: showFilters ? '#1E3A8A' : '#1A1A1A' }}
+            >
+              <Filter size={18} />
+            </button>
           </div>
         </div>
+
+        {/* Filters Section */}
+        {showFilters && (
+          <div style={{ marginTop: '1rem', padding: '1rem', background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.85rem', color: '#71717A', fontWeight: '600' }}>Saved filters:</span>
+              <button 
+                onClick={() => setSelectedWatchlist('Tech')}
+                style={{ 
+                  padding: '0.4rem 0.75rem', 
+                  background: selectedWatchlist === 'Tech' ? '#2563EB' : '#141414', 
+                  border: '1px solid #27272A', 
+                  borderRadius: '8px', 
+                  color: '#fff', 
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                Tech {selectedWatchlist === 'Tech' && <X size={12} onClick={(e) => { e.stopPropagation(); setSelectedWatchlist(null); }} />}
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Channel <ChevronDown size={12} />
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Posted date <ChevronDown size={12} />
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Platform <ChevronDown size={12} />
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Outlier score <ChevronDown size={12} />
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Views <ChevronDown size={12} />
+              </button>
+              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+                Engagement rate <ChevronDown size={12} />
+              </button>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+                <button style={{ padding: '0.4rem 0.75rem', background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
+                  Clear
+                </button>
+                <button style={{ padding: '0.4rem 0.75rem', background: '#2563EB', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {viewMode === 'cards' ? (
@@ -283,9 +345,9 @@ export default function Videos() {
               {videoData.map((video, i) => (
                 <tr 
                   key={video.id} 
-                  style={{ borderBottom: i === videoData.length - 1 ? 'none' : '1px solid #1A1A1A', cursor: 'pointer' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#121212'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  style={{ borderBottom: i === videoData.length - 1 ? 'none' : '1px solid #1A1A1A', cursor: 'pointer', position: 'relative' }}
+                  onMouseEnter={() => setHoveredRow(video.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
                 >
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <Link to="/dashboard/analysis" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -308,7 +370,36 @@ export default function Videos() {
                   </td>
                   <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>{video.views}</td>
                   <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>{video.engagement}</td>
-                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#71717A' }}>{video.time}</td>
+                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#71717A', position: 'relative' }}>
+                    {video.time}
+                    {hoveredRow === video.id && (
+                      <div style={{ 
+                        position: 'absolute', 
+                        right: '1.5rem', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        display: 'flex', 
+                        gap: '0.5rem',
+                        background: '#0B0B0B',
+                        padding: '0.5rem',
+                        borderRadius: '8px',
+                        border: '1px solid #1A1A1A'
+                      }}>
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Bookmark">
+                          <Bookmark size={16} />
+                        </button>
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Copy">
+                          <Copy size={16} />
+                        </button>
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Share">
+                          <Share2 size={16} />
+                        </button>
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="More">
+                          <MoreHorizontal size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

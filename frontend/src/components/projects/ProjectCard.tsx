@@ -2,18 +2,21 @@
 
 import { Folder, MoreHorizontal, FileText, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 interface ProjectCardProps {
+  id: string;
   name: string;
   items: number;
   lastModified: string;
-  onClick?: () => void;
 }
 
-export function ProjectCard({ name, items, lastModified, onClick }: ProjectCardProps) {
+export function ProjectCard({ id, name, items, lastModified }: ProjectCardProps) {
+  const router = useRouter();
+  
   return (
     <div 
-      onClick={onClick}
+      onClick={() => router.push(`/projects/${id}`)}
       className={cn(
         "group flex flex-col justify-between p-6 h-[200px] rounded-3xl border border-border/50 bg-card/30",
         "hover:bg-card/50 hover:border-border hover:shadow-2xl hover:shadow-primary/5 transition-all cursor-pointer active:scale-[0.98]"

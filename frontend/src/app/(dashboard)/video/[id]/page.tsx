@@ -138,9 +138,9 @@ export default function VideoAnalysisPage() {
             {/* Jump Navigation */}
             <div className='sticky top-8 z-20 flex justify-center'>
               <div className='flex items-center gap-3 px-4 py-3 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50'>
-                <span className='text-xs font-black text-muted-foreground shrink-0 uppercase tracking-widest'>
+                {/* <span className='text-xs font-black text-muted-foreground shrink-0 uppercase tracking-widest'>
                   Jump to:
-                </span>
+                </span> */}
                 <div
                   className='flex items-center gap-2 overflow-x-auto hide-scrollbar'
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}

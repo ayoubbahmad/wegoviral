@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
-    { name: "Overview", href: "/overview", icon: LayoutDashboard },
+    { name: "Home", href: "/home", icon: LayoutDashboard },
     { name: "Performance", href: "/performance", icon: BarChart2 },
     { name: "Community", href: "/community", icon: Users },
     { name: "Competitors", href: "/competitors", icon: Target },

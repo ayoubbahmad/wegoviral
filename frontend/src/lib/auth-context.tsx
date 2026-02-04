@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setActiveSocialAccount(active);
             }
 
-            router.push("/overview");
+            router.push("/home");
             return { success: true };
         } catch (error: any) {
             return { success: false, error: error.message };
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setActiveSocialAccount(active);
             }
 
-            router.push("/overview");
+            router.push("/home");
             return { success: true };
         } catch (error: any) {
             return { success: false, error: error.message };

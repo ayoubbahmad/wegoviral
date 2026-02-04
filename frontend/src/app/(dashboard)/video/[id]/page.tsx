@@ -75,17 +75,18 @@ export default function VideoAnalysisPage() {
                 </div>
 
                 {/* Right Column: Deep Analysis Content */}
-                <div className="space-y-12">
+                <div className="space-y-12 min-w-0">
                     {/* Jump Navigation */}
-                    <div className="p-1.5 rounded-2xl bg-card border border-border/50 flex flex-wrap gap-1 shadow-sm">
+                    <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm -mx-4 px-4 py-4 border-b border-border/50 overflow-x-auto flex items-center gap-2 no-scrollbar">
+                        <span className="text-sm font-bold text-muted-foreground mr-2 shrink-0">Jump to:</span>
                         {JUMP_LINKS.map(link => (
                             <button 
                                 key={link.id} 
                                 onClick={() => scrollToSection(link.id)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-secondary/80 text-xs font-black transition-all text-muted-foreground hover:text-foreground active:scale-95 translate-y-0 hover:-translate-y-0.5"
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/0 hover:bg-secondary/50 text-sm font-medium transition-all text-muted-foreground hover:text-foreground whitespace-nowrap shrink-0 active:scale-95"
                             >
-                                <link.icon className="w-3.5 h-3.5" />
-                                <span className="uppercase tracking-wider">{link.label}</span>
+                                <link.icon className="w-4 h-4" />
+                                {link.label}
                             </button>
                         ))}
                     </div>

@@ -24,6 +24,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Channels', path: '/dashboard/channels', icon: Users },
     { name: 'Videos', path: '/dashboard/videos', icon: Video },
     { name: 'Scripts', path: '/dashboard/writer', icon: PenTool },
+    { name: 'Scripts Copy', path: '/dashboard/writer-copy', icon: PenTool },
     { name: 'Projects', path: '/dashboard/projects', icon: Folder },
     { name: 'Vault', path: '/dashboard/vault', icon: Archive },
     { name: 'Exports', path: '/dashboard/exports', icon: Download },
@@ -109,7 +110,7 @@ export default function DashboardLayout({ children }) {
         {/* Bottom Section */}
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {/* Trial Banner */}
-          <div style={{ 
+          {/* <div style={{ 
             background: '#040404', 
             border: '1px solid #14532D', 
             borderRadius: '12px', 
@@ -138,7 +139,7 @@ export default function DashboardLayout({ children }) {
               <Rocket size={14} fill="currentColor" />
               Start your free trial
             </button>
-          </div>
+          </div> */}
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
             {bottomNavItems.map((item) => (

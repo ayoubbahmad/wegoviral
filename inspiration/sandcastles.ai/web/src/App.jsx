@@ -20,6 +20,7 @@ import Settings from './pages/dashboard/Settings'
 import BuildWatchlist from './pages/dashboard/BuildWatchlist'
 import ChannelVideos from './pages/dashboard/ChannelVideos'
 import SubmitChannels from './pages/dashboard/SubmitChannels'
+import WriterCopy from './pages/dashboard/WriterCopy';
 
 function LandingPage() {
   return (
@@ -46,6 +47,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardHome />} />
         <Route path="/dashboard/analysis" element={<Analysis />} />
         <Route path="/dashboard/writer" element={<Writer />} />
+        <Route path="/dashboard/writer-copy" element={<WriterCopy />} />
         <Route path="/dashboard/channels" element={<Channels />} />
         <Route path="/dashboard/videos" element={<Videos />} />
         <Route path="/dashboard/projects" element={<Projects />} />

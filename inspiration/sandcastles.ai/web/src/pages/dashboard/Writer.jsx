@@ -1,121 +1,270 @@
+
+import { useState, useRef } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { 
-  Sparkles, Save, Download, Share2, 
-  ChevronDown, Type, Zap, BookOpen, Clock, 
-  MessageSquare, MoreVertical, Plus
+  Lightbulb, BookOpen, Key, Palette, FileText, 
+  ChevronDown, ExternalLink, RefreshCw, X, Copy, Zap, Plus, Sparkles
 } from 'lucide-react';
-import { useState } from 'react';
 
 export default function Writer() {
-  const [activeTool, setActiveTool] = useState('templates');
+  const [activeStep, setActiveStep] = useState('topic');
+  const [topic, setTopic] = useState('');
 
-  const tools = [
-    { id: 'templates', name: 'Templates', icon: BookOpen },
-    { id: 'vault', name: 'From Vault', icon: Zap },
-    { id: 'ai', name: 'AI Refine', icon: Sparkles },
+  const sections = [
+    { id: 'topic', name: 'Topic', icon: Lightbulb },
+    { id: 'research', name: 'Research', icon: BookOpen },
+    { id: 'hook', name: 'Hook', icon: Key },
+    { id: 'style', name: 'Style', icon: Palette },
+    { id: 'script', name: 'Script', icon: FileText },
   ];
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveStep(id);
+    }
+  };
+
+  const cardStyle = {
+    background: '#0B0B0B',
+    border: '1px solid #1A1A1A',
+    borderRadius: '16px',
+    padding: '1.5rem',
+    marginBottom: '1.5rem',
+    position: 'relative',
+    transition: 'all 0.2s ease'
+  };
+
+  const sectionHeaderStyle = {
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '0.75rem', 
+    fontSize: '0.95rem', 
+    fontWeight: '700', 
+    color: '#fff', 
+    marginBottom: '1.5rem'
+  };
+
+  const labelStyle = {
+    fontSize: '0.8rem',
+    color: '#52525B',
+    marginBottom: '0.5rem',
+    display: 'block'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    background: 'transparent',
+    border: 'none',
+    borderBottom: '1px solid #1A1A1A',
+    padding: '0.75rem 0',
+    fontSize: '1rem',
+    color: '#fff',
+    outline: 'none',
+    marginBottom: '1rem'
+  };
+
+  const buttonStyle = {
+    background: '#2563EB',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '0.6rem 1.25rem',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  };
 
   return (
     <DashboardLayout>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Main Editor Area */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', paddingBottom: '10rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2.5rem' }}>New script</h1>
+
+        {/* Jump Navigation */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '1rem', 
+          marginBottom: '3rem', 
+          position: 'sticky', 
+          top: '2rem', 
+          zIndex: 10,
+          background: 'rgba(0,0,0,0.8)',
+          padding: '0.75rem',
+          borderRadius: '12px',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid #1A1A1A'
+        }}>
+          <span style={{ color: '#52525B', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}>Jump to:</span>
+          {sections.map(s => (
+            <button 
+              key={s.id}
+              onClick={() => scrollToSection(s.id)}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', 
+                background: activeStep === s.id ? '#1A1A1A' : 'transparent', 
+                color: activeStep === s.id ? '#fff' : '#52525B', 
+                padding: '0.4rem 0.75rem', borderRadius: '8px',
+                fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600',
+                transition: 'all 0.2s'
+              }}
+            >
+              <s.icon size={14} />
+              {s.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Step 1: Topic */}
+        <div id="topic" style={cardStyle}>
+          <div style={sectionHeaderStyle}><Lightbulb size={18} color="#3B82F6" /> Describe your topic <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={{ display: 'flex', gap: '1rem', position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+             <X size={16} color="#52525B" />
+             <RefreshCw size={16} color="#52525B" />
+             <Plus size={16} color="#52525B" />
+          </div>
+          <textarea 
+            placeholder="Enter your topic here..."
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            style={{ ...inputStyle, minHeight: '80px', border: 'none', background: '#050505', padding: '1rem', borderRadius: '8px' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+            <a href="#" style={{ color: '#52525B', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              How to write the best prompt <ExternalLink size={12} />
+            </a>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-               <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>New Script</h1>
-               <div style={{ background: '#141414', border: '1px solid #1A1A1A', padding: '0.25rem 0.5rem', borderRadius: '4px', color: '#52525B', fontSize: '0.75rem' }}>DRAFT</div>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-               <button style={{ background: 'transparent', border: '1px solid #1A1A1A', borderRadius: '8px', padding: '0.5rem 1rem', color: '#fff', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                  <Save size={16} /> Save
-               </button>
-               <button style={{ background: '#2563EB', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', color: '#fff', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                  <Download size={16} /> Export
-               </button>
+               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Research</span>
+               <button onClick={() => scrollToSection('research')} style={buttonStyle}>Save & Continue</button>
             </div>
           </div>
+        </div>
 
-          <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '20px', padding: '3rem', minHeight: '70vh' }}>
-             <input 
-               type="text" 
-               placeholder="Enter script title..." 
-               style={{ width: '100%', background: 'transparent', border: 'none', fontSize: '2.5rem', fontWeight: '700', color: '#fff', outline: 'none', marginBottom: '3rem' }} 
-             />
-
-             <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                <EditorSection title="The Hook" color="#3B82F6" placeholder="Start with a visual pattern interrupt or a shocking statement..." />
-                <EditorSection title="The Value" color="#10B981" placeholder="Explain the 'what' and 'why'. Provide value immediately..." />
-                <EditorSection title="The CTA" color="#A855F7" placeholder="Tell them exactly what to do next..." />
+        {/* Step 2: Research */}
+        <div id="research" style={cardStyle}>
+          <div style={sectionHeaderStyle}><BookOpen size={18} color="#3B82F6" /> Review the research <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={{ textAlign: 'center', padding: '3rem 0', color: '#52525B' }}>
+             <p style={{ fontSize: '0.9rem' }}>Describe your topic first, then the system will create a research report for you.</p>
+             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                   <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Hook</span>
+                   <button onClick={() => scrollToSection('hook')} style={{ ...buttonStyle, background: '#1A1A1A', color: '#52525B' }}>Continue</button>
+                </div>
              </div>
           </div>
         </div>
 
-        {/* Tools Sidebar */}
-        <div>
-           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', background: '#0B0B0B', border: '1px solid #1A1A1A', padding: '0.25rem', borderRadius: '10px' }}>
-              {tools.map(tool => (
-                <button 
-                  key={tool.id}
-                  onClick={() => setActiveTool(tool.id)}
-                  style={{ 
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.6rem',
-                    background: activeTool === tool.id ? '#1A1A1A' : 'transparent', border: 'none', borderRadius: '8px',
-                    color: activeTool === tool.id ? '#fff' : '#52525B', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer'
-                  }}
-                >
-                  <tool.icon size={14} />
-                  {tool.name}
-                </button>
-              ))}
-           </div>
+        {/* Step 3: Hook */}
+        <div id="hook" style={cardStyle}>
+          <div style={sectionHeaderStyle}><Key size={18} color="#3B82F6" /> Pick your favorite hook <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+             <div style={{ flex: 1, position: 'relative' }}>
+                <select style={{ width: '100%', background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#52525B', fontSize: '0.85rem', appearance: 'none' }}>
+                   <option>Filter by tag</option>
+                </select>
+                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#52525B' }} />
+             </div>
+             <input 
+               type="text" 
+               placeholder="Search your vault for a hook template" 
+               style={{ flex: 2, background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none' }} 
+             />
+          </div>
 
-           <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', padding: '1.25rem' }}>
-              {activeTool === 'templates' && (
-                <>
-                  <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem' }}>Viral Frameworks</h3>
-                  <div style={{ display: 'grid', gap: '0.75rem' }}>
-                     {["Problem-Agitate-Solve", "The Curiosity Gap", "Listicle Style", "Behind the Scenes"].map((t, i) => (
-                       <div key={i} style={{ background: '#141414', border: '1px solid #1A1A1A', padding: '1rem', borderRadius: '10px', cursor: 'pointer' }}>
-                          <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.25rem' }}>{t}</div>
-                          <div style={{ fontSize: '0.7rem', color: '#52525B' }}>Click to apply to script</div>
-                       </div>
-                     ))}
-                  </div>
-                </>
-              )}
-              {activeTool === 'ai' && (
-                <div style={{ textAlign: 'center', padding: '1rem' }}>
-                   <div style={{ width: '40px', height: '40px', background: 'rgba(168, 85, 247, 0.1)', color: '#A855F7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                      <Sparkles size={20} />
-                   </div>
-                   <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>AI Refinement</h3>
-                   <p style={{ fontSize: '0.75rem', color: '#52525B', marginBottom: '1.5rem' }}>Highlight text to see AI improvement suggestions</p>
-                   <button style={{ width: '100%', background: '#A855F7', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>
-                      Refine Entire Script
-                   </button>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', opacity: 0.5 }}>
+             {[1,2,3,4,5].map(i => (
+               <div key={i} style={{ aspectRatio: '9/16', background: '#121212', borderRadius: '8px', overflow: 'hidden', border: '1px solid #1A1A1A' }}>
+                  <img src={`https://images.unsplash.com/photo-${1541534741688 + i}-6078c65b5a33?w=200&q=80`} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
+               </div>
+             ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '1.5rem', color: '#EF4444', fontSize: '0.8rem' }}>
+             You don't have enough credits to generate more hooks. Please upgrade your plan or purchase credits.
+          </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '2rem', color: '#52525B', fontSize: '0.85rem' }}>
+             Pick a hook template from your Vault and the system will generate options for you.
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Style</span>
+               <button onClick={() => scrollToSection('style')} style={buttonStyle}>Save & Continue</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 4: Style */}
+        <div id="style" style={cardStyle}>
+          <div style={sectionHeaderStyle}><Palette size={18} color="#3B82F6" /> Choose a style <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+             <div style={{ flex: 1, position: 'relative' }}>
+                <select style={{ width: '100%', background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#52525B', fontSize: '0.85rem', appearance: 'none' }}>
+                   <option>Filter by tag</option>
+                </select>
+                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#52525B' }} />
+             </div>
+             <input 
+               type="text" 
+               placeholder="Search your vault for a style" 
+               style={{ flex: 2, background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none' }} 
+             />
+          </div>
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#52525B', fontSize: '0.9rem' }}>
+             No styles found. Try changing your search.
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Script</span>
+               <button onClick={() => scrollToSection('script')} style={buttonStyle}>Save & Continue</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 5: Script */}
+        <div id="script" style={cardStyle}>
+          <div style={sectionHeaderStyle}><FileText size={18} color="#3B82F6" /> Write the script <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={{ display: 'flex', gap: '1rem', position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+             <RefreshCw size={16} color="#52525B" />
+             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.5 }}>
+                <Copy size={16} color="#52525B" />
+                <ExternalLink size={16} color="#52525B" />
+             </div>
+          </div>
+          
+          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+             <p style={{ color: '#52525B', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Ready to get the first draft of your script?</p>
+             <button style={{ ...buttonStyle, margin: '0 auto' }}>Get first draft</button>
+          </div>
+
+          <div style={{ marginTop: '2.5rem' }}>
+             <div style={{ fontSize: '0.8rem', color: '#52525B', marginBottom: '0.75rem' }}>What changes would you like to make?</div>
+             <input type="text" placeholder="e.g. Make it more punchy" style={{ ...inputStyle, border: '1px solid #1A1A1A', borderRadius: '10px', padding: '1rem' }} />
+             
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                   {['Facts', 'Hooks', 'Length', 'Translate', 'Restart'].map(action => (
+                     <button key={action} style={{ background: 'transparent', border: 'none', color: '#52525B', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
+                        <Sparkles size={14} /> {action}
+                     </button>
+                   ))}
                 </div>
-              )}
-           </div>
+                <button style={{ ...buttonStyle, background: '#1E3A8A', color: '#3B82F6', fontSize: '0.8rem' }}>Apply edits</button>
+             </div>
+          </div>
+
+          <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#F59E0B', fontSize: '0.8rem', background: 'rgba(245, 158, 11, 0.05)', padding: '1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+             <Lightbulb size={16} /> Tip: Made changes to the research, hook, or style? Have the system do a clean rewrite to incorporate your changes.
+          </div>
         </div>
       </div>
     </DashboardLayout>
-  );
-}
-
-function EditorSection({ title, color, placeholder }) {
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-         <div style={{ width: '4px', height: '16px', background: color, borderRadius: '2px' }} />
-         <span style={{ fontSize: '0.75rem', fontWeight: '700', color: color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</span>
-      </div>
-      <textarea 
-        placeholder={placeholder}
-        style={{ 
-          width: '100%', background: 'transparent', border: 'none', color: '#A1A1AA', 
-          fontSize: '1rem', lineHeight: '1.8', outline: 'none', resize: 'none', minHeight: '100px'
-        }}
-      />
-    </div>
   );
 }

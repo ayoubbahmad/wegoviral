@@ -11,7 +11,10 @@ import {
     Trophy,
     Settings,
     Zap,
-    LogOut
+    LogOut,
+    Video,
+    FileText,
+    FolderOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -19,6 +22,9 @@ import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
     { name: "Home", href: "/home", icon: LayoutDashboard },
+    { name: "Videos", href: "/videos", icon: Video },
+    { name: "Scripts", href: "/scripts", icon: FileText },
+    { name: "Projects", href: "/projects", icon: FolderOpen },
     { name: "Performance", href: "/performance", icon: BarChart2 },
     { name: "Community", href: "/community", icon: Users },
     { name: "Competitors", href: "/competitors", icon: Target },

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/providers/Auth';
 import { Mail, User as UserIcon, Camera } from 'lucide-react';
-import { ThemeToggle } from '@/components/settings/ThemeToggle';
+import { ThemeToggle } from '@/containers/settings/ThemeToggle';
 
 export default function ProfilePage() {
   const { user, activeSocialAccount } = useAuth();

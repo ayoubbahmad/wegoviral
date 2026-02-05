@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { DashboardLayout } from '@/containers/layout/DashboardLayout';
 import { ToastProvider } from '@/providers/Toast';
 import { AuthProvider } from '@/providers/Auth';
 import { ThemeProvider } from '@/providers/Theme';

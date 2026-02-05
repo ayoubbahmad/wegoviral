@@ -4,7 +4,7 @@ import { useCompetitors } from "@/hooks/useCompetitors";
 import { CompetitorCard } from "@/components/competitors/CompetitorCard";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
-import { AddCompetitorModal } from "@/components/competitors/AddCompetitorModal";
+import { AddCompetitorModal } from "@/containers/competitors/AddCompetitor";
 
 export default function CompetitorsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UIState {
+interface SidebarState {
     sidebarCollapsed: boolean;
     toggleSidebar: () => void;
     setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
-export const useUIStore = create<UIState>()(
+export const useSidebarStore = create<SidebarState>()(
     persist(
         (set) => ({
             sidebarCollapsed: false,
@@ -15,7 +15,7 @@ export const useUIStore = create<UIState>()(
             setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
         }),
         {
-            name: "ui-storage",
+            name: "sidebar-storage",
         }
     )
 );

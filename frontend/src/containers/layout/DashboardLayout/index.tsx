@@ -1,9 +1,9 @@
 import { Sidebar } from "@/containers/layout/Sidebar";
-import { useUIStore } from "@/store/ui";
+import { useSidebarStore } from "@/containers/layout/Sidebar/slice";
 import { cn } from "@/lib/utils";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const { sidebarCollapsed } = useUIStore();
+    const { sidebarCollapsed } = useSidebarStore();
 
     return (
         <div className="min-h-screen bg-background text-foreground">

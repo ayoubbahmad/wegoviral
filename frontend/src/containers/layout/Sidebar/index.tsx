@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/Auth";
-import { useUIStore } from "@/store/ui";
+import { useSidebarStore } from "./slice";
 
 const navItems = [
     { name: "Home", href: "/home", icon: LayoutDashboard },
@@ -40,7 +40,7 @@ const navItems = [
 export function Sidebar() {
     const pathname = usePathname();
     const { user, logout } = useAuth();
-    const { sidebarCollapsed, toggleSidebar } = useUIStore();
+    const { sidebarCollapsed, toggleSidebar } = useSidebarStore();
 
     return (
         <aside

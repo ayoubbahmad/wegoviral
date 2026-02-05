@@ -3,12 +3,18 @@
 import { ProjectCard, NewProjectCard } from "@/components/projects/ProjectCard";
 import { Plus } from "lucide-react";
 import { useProjectsController } from "./controller";
+import { ProjectsSkeleton } from "@/views/Projects/skeleton";
 
 export const ProjectsContainer = () => {
     const {
         projects,
+        isLoading,
         handleNewProject
     } = useProjectsController();
+
+    if (isLoading) {
+        return <ProjectsSkeleton />;
+    }
 
     return (
         <div className="space-y-12 pb-32">

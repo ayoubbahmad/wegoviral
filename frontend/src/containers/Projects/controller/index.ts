@@ -1,7 +1,7 @@
 import { useGetProjects } from "../api";
 
 export const useProjectsController = () => {
-    const { data: projects = [] } = useGetProjects();
+    const { data: projects = [], isLoading } = useGetProjects();
 
     const handleNewProject = () => {
         // Implementation for logic to add a new project
@@ -10,6 +10,7 @@ export const useProjectsController = () => {
 
     return {
         projects,
+        isLoading,
         handleNewProject
     };
 };

@@ -13,15 +13,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useHomeController } from "./controller";
+import { HomeSkeleton } from "@/views/Home/skeleton";
 
 export const HomeContainer = () => {
   const {
     stats,
+    isLoading,
     videos,
     scripts,
     projects,
     challenges
   } = useHomeController();
+
+  if (isLoading) {
+    return <HomeSkeleton />;
+  }
 
   return (
     <div className="space-y-8 pb-12">

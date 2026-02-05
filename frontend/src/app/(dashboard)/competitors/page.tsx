@@ -2,13 +2,18 @@
 
 import { useCompetitors } from "@/hooks/useCompetitors";
 import { CompetitorCard } from "@/components/competitors/CompetitorCard";
+import { CompetitorsSkeleton } from "@/components/competitors/CompetitorsSkeleton";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { AddCompetitorModal } from "@/containers/competitors/AddCompetitor";
 
 export default function CompetitorsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { competitors, addCompetitor, removeCompetitor, updateCompetitor } = useCompetitors();
+    const { competitors, isLoading, addCompetitor, removeCompetitor, updateCompetitor } = useCompetitors();
+
+    if (isLoading) {
+        return <CompetitorsSkeleton />;
+    }
 
     return (
         <div className="space-y-8">

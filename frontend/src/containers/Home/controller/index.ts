@@ -1,7 +1,7 @@
 import { useGetHomeStats } from "../api";
 
 export const useHomeController = () => {
-    const { data: stats = [] } = useGetHomeStats();
+    const { data: stats = [], isLoading } = useGetHomeStats();
 
     const videos = [1, 2];
     const scripts = [1, 2];
@@ -16,6 +16,7 @@ export const useHomeController = () => {
 
     return {
         stats,
+        isLoading,
         videos,
         scripts,
         projects,

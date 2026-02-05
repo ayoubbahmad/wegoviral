@@ -23,7 +23,7 @@ export default function Features() {
   ];
 
   return (
-    <section id="features" className="section" style={{ backgroundColor: '#0A0A0A' }}>
+    <section id="features" className="section" style={{ backgroundColor: 'var(--bg-color)' }}>
       <div className="container">
         <div className="text-center mb-8">
           <h2 className="text-4xl mb-4">Everything you need to go viral</h2>

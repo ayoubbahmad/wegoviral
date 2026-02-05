@@ -50,7 +50,7 @@ export default function ScriptingIngredients() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.5rem',
-            color: '#71717A',
+            color: 'var(--text-secondary)',
             fontSize: '0.85rem',
             textDecoration: 'none',
             marginBottom: '2rem'
@@ -63,7 +63,7 @@ export default function ScriptingIngredients() {
           <h1 style={{ 
             fontSize: '3rem', 
             fontWeight: '900', 
-            color: '#fff', 
+            color: 'var(--text-primary)', 
             marginBottom: '1rem',
             letterSpacing: '-0.02em'
           }}>
@@ -84,7 +84,7 @@ export default function ScriptingIngredients() {
                 <h2 style={{ 
                   fontSize: '0.9rem', 
                   fontWeight: '800', 
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   letterSpacing: '0.05em'
                 }}>
                   {variable.name}
@@ -92,7 +92,7 @@ export default function ScriptingIngredients() {
               </div>
               <p style={{ 
                 fontSize: '1.1rem', 
-                color: '#A1A1AA', 
+                color: 'var(--text-secondary)', 
                 lineHeight: '1.8',
                 paddingLeft: '1rem'
               }}>
@@ -111,10 +111,10 @@ export default function ScriptingIngredients() {
           textAlign: 'center'
         }}>
           <Lightbulb size={32} color="#8B5CF6" style={{ margin: '0 auto 1rem' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', marginBottom: '0.75rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             Pro Tip
           </h3>
-          <p style={{ fontSize: '0.95rem', color: '#A1A1AA', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             Understanding these 7 core variables will help you create more effective and engaging video scripts. 
             Each variable plays a crucial role in the overall success of your content.
           </p>

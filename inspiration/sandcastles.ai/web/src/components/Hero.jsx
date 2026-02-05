@@ -20,7 +20,7 @@ export default function Hero() {
         <h1 className="text-5xl mb-4" style={{ maxWidth: '900px', margin: '0 auto 1.5rem', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
           Create viral short-form videos <br />
           <span style={{ 
-            background: 'linear-gradient(to right, #fff, #999)', 
+            background: 'linear-gradient(to right, var(--text-primary), var(--text-secondary))', 
             WebkitBackgroundClip: 'text', 
             WebkitTextFillColor: 'transparent' 
           }}>in seconds not hours</span>
@@ -29,7 +29,7 @@ export default function Hero() {
           Stop guessing. Use data to find out what works and AI to remix it. The unfair advantage for modern creators.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '5rem' }}>
-          <Link to="/trial" className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem', color: 'black' }}>Start 7-Day Free Trial</Link>
+          <Link to="/trial" className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>Start 7-Day Free Trial</Link>
           <a href="#features" className="btn btn-outline" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>See Features</a>
         </div>
         
@@ -38,7 +38,7 @@ export default function Hero() {
           maxWidth: '1100px', 
           aspectRatio: '16/9', 
           margin: '0 auto', 
-          background: 'linear-gradient(180deg, #1A1A1E 0%, #050505 100%)', 
+          background: 'var(--surface-color)', 
           border: '1px solid var(--border-color)',
           borderRadius: '16px',
           boxShadow: '0 0 100px rgba(139, 92, 246, 0.1)',

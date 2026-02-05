@@ -1,4 +1,29 @@
 :root {
+  --bg-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --surface-hover: #f1f3f5;
+  --primary-color: #000000;
+  --accent-color: #7c4dff; 
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --border-color: #e9ecef;
+
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark {
   --bg-color: #000000;
   --surface-color: #0B0B0B;
   --surface-hover: #1F1F1F;
@@ -7,19 +32,7 @@
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --border-color: #1A1A1A;
-
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
   color-scheme: dark;
-  color: var(--text-primary);
-  background-color: var(--bg-color);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -31,6 +44,7 @@ body {
   overflow-x: hidden;
 }
 
+/* ... existing styles ... */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-weight: 600;
@@ -73,11 +87,11 @@ button {
 
 .btn-primary {
   background-color: var(--primary-color);
-  color: #000;
+  color: var(--bg-color);
 }
 
 .btn-primary:hover {
-  background-color: #e5e5e5;
+  filter: brightness(0.9);
   transform: translateY(-1px);
 }
 
@@ -88,7 +102,7 @@ button {
 
 .btn-outline:hover {
   border-color: var(--text-primary);
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(128,128,128,0.05);
 }
 
 .section {

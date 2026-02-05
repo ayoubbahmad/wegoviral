@@ -3,7 +3,7 @@ import { Sparkles, Users, Paperclip, Search, ChevronDown, Plus, X } from 'lucide
 import { useState } from 'react';
 
 const actionButtonStyle = {
-  background: '#2563EB', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', 
+  background: '#2563EB', color: 'var(--text-primary)', padding: '0.5rem 1.25rem', borderRadius: '8px', 
   fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem',
   border: 'none', cursor: 'pointer'
 };
@@ -13,8 +13,8 @@ const Dropdown = ({ label, options, isOpen, setIsOpen, isPlatform, isSize }) => 
     <button 
       onClick={() => setIsOpen(!isOpen)}
       style={{ 
-        background: '#1A1A1A', border: '1px solid #27272A', borderRadius: '8px', padding: '0.4rem 0.75rem', 
-        color: '#A1A1AA', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'
+        background: 'var(--border-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', padding: '0.4rem 0.75rem', 
+        color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'
       }}
     >
       {label} <ChevronDown size={14} />
@@ -23,11 +23,11 @@ const Dropdown = ({ label, options, isOpen, setIsOpen, isPlatform, isSize }) => 
       <div style={{ 
         position: 'absolute', top: '110%', left: 0, width: isSize ? '220px' : isPlatform ? '160px' : '240px', 
         maxHeight: '300px', overflowY: 'auto',
-        background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
+        background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '10px', zIndex: 100, padding: '0.5rem'
       }}>
         {options.map((opt, i) => (
-          <div key={i} style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: isPlatform || isSize ? '#fff' : '#A1A1AA', cursor: 'pointer', borderRadius: '6px' }} 
-            onMouseEnter={(e) => e.currentTarget.style.background = '#121212'}
+          <div key={i} style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: isPlatform || isSize ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', borderRadius: '6px' }} 
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-hover)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
             {isPlatform ? (
@@ -36,7 +36,7 @@ const Dropdown = ({ label, options, isOpen, setIsOpen, isPlatform, isSize }) => 
                  {opt.name}
                </div>
             ) : isSize ? (
-               <div>{opt.label} <span style={{ color: '#52525B', fontSize: '0.8rem', marginLeft: '4px' }}>{opt.desc}</span></div>
+               <div>{opt.label} <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginLeft: '4px' }}>{opt.desc}</span></div>
             ) : opt}
           </div>
         ))}
@@ -53,7 +53,7 @@ export default function BuildWatchlist() {
 
   const platforms = [
     { name: 'YouTube', icon: '▶', color: '#FF0000' },
-    { name: 'TikTok', icon: '♪', color: '#fff' },
+    { name: 'TikTok', icon: '♪', color: 'var(--text-primary)' },
     { name: 'Instagram', icon: '📸', color: '#E4405F' },
   ];
 
@@ -81,14 +81,14 @@ export default function BuildWatchlist() {
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>Build your watchlist</h1>
-          <p style={{ color: '#71717A', fontSize: '0.9rem' }}>Find the best channels to use as inspiration for your content</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Find the best channels to use as inspiration for your content</p>
         </div>
 
         {/* Main Tabs */}
         <div style={{ 
           display: 'flex', 
-          background: '#0B0B0B', 
-          border: '1px solid #1A1A1A', 
+          background: 'var(--surface-color)', 
+          border: '1px solid var(--border-color)', 
           borderRadius: '10px', 
           padding: '0.25rem',
           marginBottom: '1.5rem'
@@ -109,8 +109,8 @@ export default function BuildWatchlist() {
                 gap: '0.6rem',
                 padding: '0.6rem',
                 borderRadius: '8px',
-                background: activeTab === tab.id ? '#1A1A1A' : 'transparent',
-                color: activeTab === tab.id ? '#fff' : '#71717A',
+                background: activeTab === tab.id ? 'var(--border-color)' : 'transparent',
+                color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-secondary)',
                 border: 'none',
                 fontSize: '0.85rem',
                 fontWeight: '500',
@@ -126,8 +126,8 @@ export default function BuildWatchlist() {
 
         {/* Content Area */}
         <div style={{ 
-          background: '#0B0B0B', 
-          border: '1px solid #1A1A1A', 
+          background: 'var(--surface-color)', 
+          border: '1px solid var(--border-color)', 
           borderRadius: '16px', 
           padding: '1.5rem',
           marginBottom: '1.5rem',
@@ -141,7 +141,7 @@ export default function BuildWatchlist() {
                   width: '100%', 
                   background: 'transparent', 
                   border: 'none', 
-                  color: '#fff', 
+                  color: 'var(--text-primary)', 
                   fontSize: '1rem', 
                   minHeight: '120px', 
                   outline: 'none',
@@ -151,7 +151,7 @@ export default function BuildWatchlist() {
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <span style={{ color: '#52525B', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
                   <Dropdown label="Niche" options={niches} isOpen={showNicheDropdown} setIsOpen={setShowNicheDropdown} />
                   <Dropdown label="Platform" options={platforms} isOpen={showPlatformDropdown} setIsOpen={setShowPlatformDropdown} isPlatform />
                   <Dropdown label="Account size" options={sizes} isOpen={showSizeDropdown} setIsOpen={setShowSizeDropdown} isSize />
@@ -166,8 +166,8 @@ export default function BuildWatchlist() {
           {activeTab === 'similar' && (
             <>
               <div style={{ 
-                background: '#141414', 
-                border: '1px solid #27272A', 
+                background: 'var(--surface-color)', 
+                border: '1px solid var(--surface-hover)', 
                 borderRadius: '10px', 
                 padding: '0.75rem 1rem', 
                 marginBottom: '1.5rem',
@@ -178,13 +178,13 @@ export default function BuildWatchlist() {
                 <input 
                   type="text" 
                   placeholder="Search for a channel by handle" 
-                  style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', width: '100%' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none', width: '100%' }}
                 />
-                <ChevronDown size={18} color="#52525B" />
+                <ChevronDown size={18} color="var(--text-secondary)" />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <span style={{ color: '#52525B', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', alignSelf: 'center' }}>Filter suggestions by:</span>
                   <Dropdown label="Niche" options={niches} isOpen={showNicheDropdown} setIsOpen={setShowNicheDropdown} />
                   <Dropdown label="Platform" options={platforms} isOpen={showPlatformDropdown} setIsOpen={setShowPlatformDropdown} isPlatform />
                   <Dropdown label="Account size" options={sizes} isOpen={showSizeDropdown} setIsOpen={setShowSizeDropdown} isSize />
@@ -204,7 +204,7 @@ export default function BuildWatchlist() {
                   width: '100%', 
                   background: 'transparent', 
                   border: 'none', 
-                  color: '#fff', 
+                  color: 'var(--text-primary)', 
                   fontSize: '1rem', 
                   minHeight: '120px', 
                   outline: 'none',
@@ -224,32 +224,32 @@ export default function BuildWatchlist() {
         {/* Suggested vs Included */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {/* Suggested */}
-          <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid #1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Suggested</span>
               <span style={{ fontSize: '0.75rem', color: '#2563EB', background: 'rgba(37, 99, 235, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>0 channels</span>
             </div>
-            <div style={{ flex: 1, minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525B', fontSize: '0.85rem' }}>
+            <div style={{ flex: 1, minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
               Use the textbox above to get suggestions
             </div>
-            <div style={{ padding: '0.75rem', borderTop: '1px solid #1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button style={{ background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>Load more</button>
-              <button style={{ background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>Add all to watchlist</button>
+            <div style={{ padding: '0.75rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>Load more</button>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>Add all to watchlist</button>
             </div>
           </div>
 
           {/* Included */}
-          <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid #1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Included</span>
               <span style={{ fontSize: '0.75rem', color: '#22C55E', background: 'rgba(34, 197, 94, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>0 channels</span>
             </div>
-            <div style={{ flex: 1, minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525B', fontSize: '0.85rem' }}>
+            <div style={{ flex: 1, minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
               No channels added yet
             </div>
-            <div style={{ padding: '0.75rem', borderTop: '1px solid #1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button style={{ background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>Remove all</button>
-              <button style={{ background: '#2563EB', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: '500', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'pointer' }}>Save watchlist</button>
+            <div style={{ padding: '0.75rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>Remove all</button>
+              <button style={{ background: '#2563EB', border: 'none', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: '500', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'pointer' }}>Save watchlist</button>
             </div>
           </div>
         </div>

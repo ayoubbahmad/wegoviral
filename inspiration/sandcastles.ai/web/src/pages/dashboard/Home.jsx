@@ -30,8 +30,8 @@ export default function DashboardHome() {
   return (
     <DashboardLayout>
       <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', paddingTop: '8vh' }}>
-        <div className="mb-2 text-secondary" style={{ fontSize: '1.1rem', fontWeight: '500', color: '#A1A1AA', marginBottom: '0.5rem' }}>👋 Hello, Creator</div>
-        <h1 style={{ fontSize: '3rem', fontWeight: '700', marginBottom: '4rem', letterSpacing: '-0.03em', lineHeight: '1.1' }}>
+        <div className="mb-2 text-secondary" style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '0.5rem' }}>👋 Hello, Creator</div>
+        <h1 style={{ fontSize: '3rem', fontWeight: '700', marginBottom: '4rem', letterSpacing: '-0.03em', lineHeight: '1.1', color: 'var(--text-primary)' }}>
           What do you want to do today?
         </h1>
 
@@ -47,8 +47,8 @@ export default function DashboardHome() {
               key={i} 
               to={action.link}
               style={{ 
-                background: '#0B0B0B', 
-                border: '1px solid #1A1A1A', 
+                background: 'var(--surface-color)', 
+                border: '1px solid var(--border-color)', 
                 borderRadius: '20px', 
                 padding: '2rem', 
                 textAlign: 'left',
@@ -57,20 +57,20 @@ export default function DashboardHome() {
                 justifyContent: 'space-between',
                 height: '220px',
                 textDecoration: 'none',
-                color: 'inherit',
+                color: 'var(--text-primary)',
                 transition: 'all 0.2s',
                 position: 'relative',
                 overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = '#27272A';
-                e.currentTarget.style.background = '#121212';
+                e.currentTarget.style.borderColor = 'var(--text-primary)';
+                e.currentTarget.style.background = 'var(--surface-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.borderColor = '#1A1A1A';
-                e.currentTarget.style.background = '#0B0B0B';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
+                e.currentTarget.style.background = 'var(--surface-color)';
               }}
             >
               <div style={{ 
@@ -89,7 +89,7 @@ export default function DashboardHome() {
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: '600', letterSpacing: '-0.02em', margin: 0 }}>{action.title}</h3>
-                <div style={{ color: '#52525B' }}>
+                <div style={{ color: 'var(--text-secondary)' }}>
                    <ArrowRight size={24} />
                 </div>
               </div>

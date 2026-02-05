@@ -93,13 +93,13 @@ export default function Videos() {
   const menuButtonStyle = {
     width: '40px', 
     height: '40px', 
-    background: '#0B0B0B', 
-    border: '1px solid #1A1A1A', 
+    background: 'var(--surface-color)', 
+    border: '1px solid var(--border-color)', 
     borderRadius: '10px', 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center',
-    color: '#52525B',
+    color: 'var(--text-secondary)',
     cursor: 'pointer',
     position: 'relative'
   };
@@ -108,7 +108,7 @@ export default function Videos() {
     <DashboardLayout>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>Videos</h1>
-        <p style={{ color: '#71717A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Discover what's gone viral in your niche, and why it worked</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Discover what's gone viral in your niche, and why it worked</p>
         
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           {/* Search Bar */}
@@ -116,8 +116,8 @@ export default function Videos() {
             flex: 1, 
             display: 'flex', 
             alignItems: 'center', 
-            background: '#0B0B0B', 
-            border: '1px solid #1A1A1A', 
+            background: 'var(--surface-color)', 
+            border: '1px solid var(--border-color)', 
             borderRadius: '10px', 
             padding: '0 0.5rem 0 1rem',
             height: '40px',
@@ -126,11 +126,11 @@ export default function Videos() {
             <input 
               type="text" 
               placeholder="Search for videos by topic" 
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.85rem', outline: 'none', width: '100%' }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', width: '100%' }}
             />
             <button style={{ 
-              background: '#27272A', 
-              color: '#A1A1AA', 
+              background: 'var(--surface-hover)', 
+              color: 'var(--text-secondary)', 
               fontSize: '0.75rem', 
               padding: '0.35rem 0.6rem', 
               borderRadius: '6px',
@@ -153,23 +153,23 @@ export default function Videos() {
             <div style={{ position: 'relative' }}>
               <button 
                 onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
-                style={{ ...menuButtonStyle, background: viewMode === 'table' ? '#1E3A8A' : '#0B0B0B', color: viewMode === 'table' ? '#3B82F6' : '#52525B', borderColor: viewMode === 'table' ? '#1E3A8A' : '#1A1A1A' }}
+                style={{ ...menuButtonStyle, background: viewMode === 'table' ? '#1E3A8A' : 'var(--surface-color)', color: viewMode === 'table' ? '#3B82F6' : 'var(--text-secondary)', borderColor: viewMode === 'table' ? '#1E3A8A' : 'var(--border-color)' }}
               >
                 {viewMode === 'cards' ? <LayoutGrid size={18} /> : <Table2 size={18} />}
               </button>
               
               {isViewDropdownOpen && (
                 <div style={{ 
-                  position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', background: '#0B0B0B', 
-                  border: '1px solid #1A1A1A', borderRadius: '12px', padding: '0.5rem', zIndex: 100, width: '140px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                  position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', background: 'var(--surface-color)', 
+                  border: '1px solid var(--border-color)', borderRadius: '12px', padding: '0.5rem', zIndex: 100, width: '140px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
                 }}>
-                  <div style={{ fontSize: '0.7rem', color: '#52525B', padding: '0.5rem', fontWeight: '700', textTransform: 'uppercase' }}>View as</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', padding: '0.5rem', fontWeight: '700', textTransform: 'uppercase' }}>View as</div>
                   <button 
                     onClick={() => { setViewMode('table'); setIsViewDropdownOpen(false); }}
                     style={{ 
                       width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', background: viewMode === 'table' ? '#2563EB' : 'transparent',
-                      color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem'
+                      color: 'var(--text-primary)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem'
                     }}
                   >
                     <Table2 size={16} /> Table
@@ -178,7 +178,7 @@ export default function Videos() {
                     onClick={() => { setViewMode('cards'); setIsViewDropdownOpen(false); }}
                     style={{ 
                       width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', background: viewMode === 'cards' ? '#2563EB' : 'transparent',
-                      color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', marginTop: '0.2rem'
+                      color: 'var(--text-primary)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', marginTop: '0.2rem'
                     }}
                   >
                     <LayoutGrid size={16} /> Cards
@@ -191,7 +191,7 @@ export default function Videos() {
             <button style={menuButtonStyle}><RotateCcw size={18} /></button>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              style={{ ...menuButtonStyle, background: showFilters ? '#1E3A8A' : '#0B0B0B', color: showFilters ? '#3B82F6' : '#52525B', borderColor: showFilters ? '#1E3A8A' : '#1A1A1A' }}
+              style={{ ...menuButtonStyle, background: showFilters ? '#1E3A8A' : 'var(--surface-color)', color: showFilters ? '#3B82F6' : 'var(--text-secondary)', borderColor: showFilters ? '#1E3A8A' : 'var(--border-color)' }}
             >
               <Filter size={18} />
             </button>
@@ -200,17 +200,17 @@ export default function Videos() {
 
         {/* Filters Section */}
         {showFilters && (
-          <div style={{ marginTop: '1rem', padding: '1rem', background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '12px' }}>
+          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.85rem', color: '#71717A', fontWeight: '600' }}>Saved filters:</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Saved filters:</span>
               <button 
                 onClick={() => setSelectedWatchlist('Tech')}
                 style={{ 
                   padding: '0.4rem 0.75rem', 
-                  background: selectedWatchlist === 'Tech' ? '#2563EB' : '#141414', 
-                  border: '1px solid #27272A', 
+                  background: selectedWatchlist === 'Tech' ? '#2563EB' : 'var(--surface-color)', 
+                  border: '1px solid var(--surface-hover)', 
                   borderRadius: '8px', 
-                  color: '#fff', 
+                  color: 'var(--text-primary)', 
                   fontSize: '0.8rem',
                   cursor: 'pointer',
                   display: 'flex',
@@ -220,29 +220,29 @@ export default function Videos() {
               >
                 Tech {selectedWatchlist === 'Tech' && <X size={12} onClick={(e) => { e.stopPropagation(); setSelectedWatchlist(null); }} />}
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Channel <ChevronDown size={12} />
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Posted date <ChevronDown size={12} />
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Platform <ChevronDown size={12} />
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Outlier score <ChevronDown size={12} />
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Views <ChevronDown size={12} />
               </button>
-              <button style={{ padding: '0.4rem 0.75rem', background: '#141414', border: '1px solid #27272A', borderRadius: '8px', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer' }}>
+              <button style={{ padding: '0.4rem 0.75rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Engagement rate <ChevronDown size={12} />
               </button>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-                <button style={{ padding: '0.4rem 0.75rem', background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
+                <button style={{ padding: '0.4rem 0.75rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
                   Clear
                 </button>
-                <button style={{ padding: '0.4rem 0.75rem', background: '#2563EB', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
+                <button style={{ padding: '0.4rem 0.75rem', background: '#2563EB', border: 'none', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}>
                   Save
                 </button>
               </div>
@@ -264,7 +264,7 @@ export default function Videos() {
                 style={{ 
                   position: 'relative', 
                   aspectRatio: '9/16', 
-                  background: '#000', 
+                  background: 'var(--bg-color)', 
                   borderRadius: '12px',
                   overflow: 'hidden',
                   marginBottom: '0.75rem',
@@ -287,7 +287,7 @@ export default function Videos() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff'
+                  color: 'var(--text-primary)'
                 }}>
                   <PlatformIcon platform={video.platform} />
                 </div>
@@ -298,14 +298,14 @@ export default function Videos() {
                   left: '0', 
                   right: '0', 
                   padding: '1.25rem 0.75rem 0.75rem',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)'
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)'
                 }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#fff' }}>{video.handle}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{video.handle}</div>
                 </div>
               </Link>
               
               <div style={{ padding: '0 0.25rem' }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.4rem', color: '#fff', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.4rem', color: 'var(--text-primary)', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {video.title}
                 </div>
                 
@@ -325,27 +325,27 @@ export default function Videos() {
         </div>
       ) : (
         /* Table View */
-        <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #1A1A1A', background: '#080808' }}>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>Video</th>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>Outlier</th>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>Platform</th>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>Views</th>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'var(--surface-hover)' }}>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Video</th>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Outlier</th>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Platform</th>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Views</th>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <TrendingUp size={14} /> Engagement
                   </div>
                 </th>
-                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#52525B', textTransform: 'uppercase' }}>Date</th>
+                <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Date</th>
               </tr>
             </thead>
             <tbody>
               {videoData.map((video, i) => (
                 <tr 
                   key={video.id} 
-                  style={{ borderBottom: i === videoData.length - 1 ? 'none' : '1px solid #1A1A1A', cursor: 'pointer', position: 'relative' }}
+                  style={{ borderBottom: i === videoData.length - 1 ? 'none' : '1px solid var(--border-color)', cursor: 'pointer', position: 'relative' }}
                   onMouseEnter={() => setHoveredRow(video.id)}
                   onMouseLeave={() => setHoveredRow(null)}
                 >
@@ -353,8 +353,8 @@ export default function Videos() {
                     <Link to="/dashboard/analysis" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <img src={video.thumbnail} alt="" style={{ width: '40px', height: '56px', borderRadius: '6px', objectFit: 'cover' }} />
                       <div style={{ maxWidth: '400px' }}>
-                         <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff', marginBottom: '0.2rem' }}>{video.handle}</div>
-                         <div style={{ fontSize: '0.8rem', color: '#A1A1AA', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{video.title}</div>
+                         <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{video.handle}</div>
+                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{video.title}</div>
                       </div>
                     </Link>
                   </td>
@@ -364,13 +364,13 @@ export default function Videos() {
                     </div>
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
-                    <div style={{ color: '#A1A1AA' }}>
+                    <div style={{ color: 'var(--text-secondary)' }}>
                       <PlatformIcon platform={video.platform} />
                     </div>
                   </td>
-                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>{video.views}</td>
-                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>{video.engagement}</td>
-                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#71717A', position: 'relative' }}>
+                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>{video.views}</td>
+                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>{video.engagement}</td>
+                  <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', position: 'relative' }}>
                     {video.time}
                     {hoveredRow === video.id && (
                       <div style={{ 
@@ -380,21 +380,21 @@ export default function Videos() {
                         transform: 'translateY(-50%)',
                         display: 'flex', 
                         gap: '0.5rem',
-                        background: '#0B0B0B',
+                        background: 'var(--surface-color)',
                         padding: '0.5rem',
                         borderRadius: '8px',
-                        border: '1px solid #1A1A1A'
+                        border: '1px solid var(--border-color)'
                       }}>
-                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Bookmark">
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Bookmark">
                           <Bookmark size={16} />
                         </button>
-                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Copy">
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Copy">
                           <Copy size={16} />
                         </button>
-                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Share">
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Share">
                           <Share2 size={16} />
                         </button>
-                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#A1A1AA', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="More">
+                        <button style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="More">
                           <MoreHorizontal size={16} />
                         </button>
                       </div>

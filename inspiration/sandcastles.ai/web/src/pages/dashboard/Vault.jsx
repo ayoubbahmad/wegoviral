@@ -95,25 +95,25 @@ export default function Vault() {
     padding: '0.75rem 1rem',
     fontSize: '0.75rem',
     fontWeight: '700',
-    color: '#52525B',
+    color: 'var(--text-secondary)',
     textTransform: 'uppercase',
     textAlign: 'left',
-    borderBottom: '1px solid #1A1A1A'
+    borderBottom: '1px solid var(--border-color)'
   };
 
   const cellStyle = {
     padding: '1rem',
     fontSize: '0.85rem',
-    color: '#fff',
-    borderBottom: '1px solid #1A1A1A'
+    color: 'var(--text-primary)',
+    borderBottom: '1px solid var(--border-color)'
   };
 
   const filterButtonStyle = {
-    background: '#0B0B0B',
-    border: '1px solid #1A1A1A',
+    background: 'var(--surface-color)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
     padding: '0.4rem 0.75rem',
-    color: '#A1A1AA',
+    color: 'var(--text-secondary)',
     fontSize: '0.8rem',
     fontWeight: '600',
     display: 'flex',
@@ -126,7 +126,7 @@ export default function Vault() {
     <DashboardLayout>
       <div style={{ paddingBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>Vault</h1>
-        <p style={{ color: '#71717A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Build a personalized collection of winning elements to use in your future scripts</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Build a personalized collection of winning elements to use in your future scripts</p>
 
         {/* View Toggle */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -134,22 +134,22 @@ export default function Vault() {
             flex: 1, 
             display: 'flex', 
             alignItems: 'center', 
-            background: '#0B0B0B', 
-            border: '1px solid #1A1A1A', 
+            background: 'var(--surface-color)', 
+            border: '1px solid var(--border-color)', 
             borderRadius: '10px', 
             padding: '0 0.5rem 0 1rem',
             height: '40px',
             maxWidth: '500px'
           }}>
-            <Search size={16} color="#52525B" style={{ marginRight: '0.75rem' }} />
+            <Search size={16} color="var(--text-secondary)" style={{ marginRight: '0.75rem' }} />
             <input 
               type="text" 
               placeholder="Search vault" 
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.85rem', outline: 'none', width: '100%' }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', width: '100%' }}
             />
             <button style={{ 
-              background: '#27272A', 
-              color: '#A1A1AA', 
+              background: 'var(--surface-hover)', 
+              color: 'var(--text-secondary)', 
               fontSize: '0.75rem', 
               padding: '0.3rem 0.6rem', 
               borderRadius: '6px',
@@ -161,7 +161,7 @@ export default function Vault() {
           </div>
           <button 
             onClick={() => setViewStyle(viewStyle === 'table' ? 'grid' : 'table')}
-            style={{ ...filterButtonStyle, width: '40px', justifyContent: 'center', background: '#2563EB', color: '#fff', border: 'none' }}
+            style={{ ...filterButtonStyle, width: '40px', justifyContent: 'center', background: '#2563EB', color: 'var(--text-primary)', border: 'none' }}
           >
             {viewStyle === 'table' ? <LayoutGrid size={16} /> : <Table2 size={16} />}
           </button>
@@ -173,30 +173,30 @@ export default function Vault() {
            <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button 
                 onClick={() => setActiveTab('all')}
-                style={{ ...filterButtonStyle, background: activeTab === 'all' ? '#1E3A8A' : '#0B0B0B', color: activeTab === 'all' ? '#3B82F6' : '#A1A1AA' }}
+                style={{ ...filterButtonStyle, background: activeTab === 'all' ? '#1E3A8A' : 'var(--surface-color)', color: activeTab === 'all' ? '#3B82F6' : 'var(--text-secondary)' }}
               >
                 <Hash size={16} /> All
               </button>
               <button 
                 onClick={() => setActiveTab('hooks')}
-                style={{ ...filterButtonStyle, background: activeTab === 'hooks' ? '#1E3A8A' : '#0B0B0B', color: activeTab === 'hooks' ? '#3B82F6' : '#A1A1AA' }}
+                style={{ ...filterButtonStyle, background: activeTab === 'hooks' ? '#1E3A8A' : 'var(--surface-color)', color: activeTab === 'hooks' ? '#3B82F6' : 'var(--text-secondary)' }}
               >
                 <Anchor size={16} /> Hooks
               </button>
               <button 
                 onClick={() => setActiveTab('styles')}
-                style={{ ...filterButtonStyle, background: activeTab === 'styles' ? '#1E3A8A' : '#0B0B0B', color: activeTab === 'styles' ? '#3B82F6' : '#A1A1AA' }}
+                style={{ ...filterButtonStyle, background: activeTab === 'styles' ? '#1E3A8A' : 'var(--surface-color)', color: activeTab === 'styles' ? '#3B82F6' : 'var(--text-secondary)' }}
               >
                 <Palette size={16} /> Styles
               </button>
               <button 
                 onClick={() => setActiveTab('videos')}
-                style={{ ...filterButtonStyle, background: activeTab === 'videos' ? '#1E3A8A' : '#0B0B0B', color: activeTab === 'videos' ? '#3B82F6' : '#A1A1AA' }}
+                style={{ ...filterButtonStyle, background: activeTab === 'videos' ? '#1E3A8A' : 'var(--surface-color)', color: activeTab === 'videos' ? '#3B82F6' : 'var(--text-secondary)' }}
               >
                 <Video size={16} /> Videos
               </button>
 
-              <div style={{ width: '1px', background: '#1A1A1A', margin: '0 0.5rem' }} />
+              <div style={{ width: '1px', background: 'var(--border-color)', margin: '0 0.5rem' }} />
 
               <button style={filterButtonStyle}>Views <ChevronDown size={14} /></button>
               <button style={filterButtonStyle}>Saved date <ChevronDown size={14} /></button>
@@ -215,10 +215,10 @@ export default function Vault() {
           {/* Main List/Grid Column */}
           <div style={{ transition: 'all 0.3s ease' }}>
             {viewStyle === 'table' ? (
-              <div style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: '#080808' }}>
+                    <tr style={{ background: 'var(--surface-hover)' }}>
                       <th style={columnHeaderStyle}>Name</th>
                       <th style={columnHeaderStyle}>Views</th>
                       <th style={{ ...columnHeaderStyle, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -233,15 +233,15 @@ export default function Vault() {
                         onClick={() => setSelectedItem(item)}
                         style={{ 
                           cursor: 'pointer', 
-                          background: selectedItem?.id === item.id ? '#121212' : 'transparent',
+                          background: selectedItem?.id === item.id ? 'var(--surface-hover)' : 'transparent',
                           borderLeft: selectedItem?.id === item.id ? '2px solid #2563EB' : '2px solid transparent'
                         }}
                       >
                         <td style={cellStyle}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <div style={{ 
-                              width: '32px', height: '32px', borderRadius: '8px', background: '#1A1A1A', 
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525B'
+                              width: '32px', height: '32px', borderRadius: '8px', background: 'var(--border-color)', 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)'
                             }}>
                               {item.type === 'hook' && <Anchor size={16} />}
                               {item.type === 'style' && <Palette size={16} />}
@@ -271,20 +271,20 @@ export default function Vault() {
                     key={item.id}
                     onClick={() => setSelectedItem(item)}
                     style={{
-                      background: '#0B0B0B', border: selectedItem?.id === item.id ? '1px solid #2563EB' : '1px solid #1A1A1A',
+                      background: 'var(--surface-color)', border: selectedItem?.id === item.id ? '1px solid #2563EB' : '1px solid var(--border-color)',
                       borderRadius: '16px', padding: '1.25rem', cursor: 'pointer', position: 'relative', overflow: 'hidden'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                       <div style={{ 
-                        width: '40px', height: '40px', borderRadius: '10px', background: '#1A1A1A', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525B'
+                        width: '40px', height: '40px', borderRadius: '10px', background: 'var(--border-color)', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)'
                       }}>
                         {item.type === 'hook' && <Anchor size={20} />}
                         {item.type === 'style' && <Palette size={20} />}
                         {item.type === 'video' && <Video size={20} />}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#52525B', fontWeight: '700' }}>{item.views} views</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '700' }}>{item.views} views</div>
                     </div>
                     <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '0.5rem', lineHeight: '1.4' }}>{item.name}</div>
                     <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1.25rem' }}>
@@ -292,7 +292,7 @@ export default function Vault() {
                          <span key={tag} style={{ fontSize: '0.65rem', color: '#2563EB', background: 'rgba(37, 99, 235, 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>{tag}</span>
                        ))}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#52525B' }}>{item.date}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{item.date}</div>
                   </div>
                 ))}
               </div>
@@ -302,15 +302,15 @@ export default function Vault() {
           {/* Details Panel Column */}
           {selectedItem && (
             <div style={{ 
-              background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', 
+              background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', 
               padding: '1.75rem', position: 'sticky', top: '2rem', height: 'fit-content',
-              maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto', boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+              maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto', boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                 <h2 style={{ fontSize: '1.1rem', fontWeight: '800', flex: 1, paddingRight: '1rem', lineHeight: '1.3' }}>{selectedItem.name}</h2>
                 <button 
                   onClick={() => setSelectedItem(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
                 >
                   <X size={20} />
                 </button>
@@ -318,8 +318,8 @@ export default function Vault() {
 
               <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
                  <div style={{ 
-                   display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#1A1A1A', 
-                   padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', color: '#A1A1AA' 
+                   display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'var(--border-color)', 
+                   padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)' 
                  }}>
                    {selectedItem.type === 'hook' && <><Anchor size={12} /> Hook</>}
                    {selectedItem.type === 'style' && <><Palette size={12} /> Style</>}
@@ -336,14 +336,14 @@ export default function Vault() {
               {selectedItem.type === 'hook' && (
                 <>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Madlib</h3>
-                    <div style={{ background: '#080808', border: '1px solid #1A1A1A', padding: '1.25rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: '1.6', color: '#A1A1AA' }}>
+                    <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Madlib</h3>
+                    <div style={{ background: 'var(--surface-hover)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
                       {selectedItem.madlib}
                     </div>
                   </div>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Original Hook</h3>
-                    <div style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#fff', fontStyle: 'italic', background: '#080808', padding: '1.25rem', borderRadius: '12px', border: '1px solid #1A1A1A' }}>
+                    <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Original Hook</h3>
+                    <div style={{ fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-primary)', fontStyle: 'italic', background: 'var(--surface-hover)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                       "{selectedItem.original}"
                     </div>
                   </div>
@@ -353,18 +353,18 @@ export default function Vault() {
               {selectedItem.type === 'style' && (
                 <>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Description</h3>
-                    <div style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#A1A1AA' }}>
+                    <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: '800', letterSpacing: '0.05em' }}>Description</h3>
+                    <div style={{ fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
                       {selectedItem.description}
                     </div>
                   </div>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '1.25rem', fontWeight: '800', letterSpacing: '0.05em' }}>Attributes</h3>
+                    <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '1.25rem', fontWeight: '800', letterSpacing: '0.05em' }}>Attributes</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {Object.entries(selectedItem.attributes).map(([key, val]) => (
                         <div key={key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                          <span style={{ color: '#52525B' }}>{key}</span>
-                          <span style={{ color: '#fff', fontWeight: '600' }}>{val}</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>{key}</span>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{val}</span>
                         </div>
                       ))}
                     </div>
@@ -376,15 +376,15 @@ export default function Vault() {
                  <>
                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
                       <img src={selectedItem.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                         <Play size={40} fill="#fff" />
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                         <Play size={40} fill='var(--text-primary)' />
                       </div>
                    </div>
                    <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <img src={selectedItem.creator.avatar} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                       <div>
                          <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>{selectedItem.creator.handle}</div>
-                         <div style={{ fontSize: '0.75rem', color: '#52525B' }}>Creator</div>
+                         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Creator</div>
                       </div>
                    </div>
                  </>
@@ -392,25 +392,25 @@ export default function Vault() {
 
               {selectedItem.source && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: '800' }}>Sources</h3>
-                  <div style={{ background: '#080808', border: '1px solid #1A1A1A', padding: '0.75rem', borderRadius: '12px', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: '800' }}>Sources</h3>
+                  <div style={{ background: 'var(--surface-hover)', border: '1px solid var(--border-color)', padding: '0.75rem', borderRadius: '12px', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <img src={selectedItem.source.thumbnail} style={{ width: '40px', height: '56px', borderRadius: '4px', objectFit: 'cover' }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                        <div style={{ fontSize: '0.8rem', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedItem.source.title}</div>
-                       <div style={{ fontSize: '0.75rem', color: '#52525B' }}>{selectedItem.source.handle}</div>
+                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{selectedItem.source.handle}</div>
                     </div>
-                    <ExternalLink size={14} color="#52525B" />
+                    <ExternalLink size={14} color="var(--text-secondary)" />
                   </div>
                 </div>
               )}
 
               <div>
-                <h3 style={{ fontSize: '0.75rem', color: '#52525B', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: '800' }}>Tags</h3>
+                <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: '800' }}>Tags</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {selectedItem.tags.map(tag => (
-                    <span key={tag} style={{ fontSize: '0.75rem', color: '#fff', background: '#1A1A1A', padding: '0.4rem 0.75rem', borderRadius: '6px' }}>{tag}</span>
+                    <span key={tag} style={{ fontSize: '0.75rem', color: 'var(--text-primary)', background: 'var(--border-color)', padding: '0.4rem 0.75rem', borderRadius: '6px' }}>{tag}</span>
                   ))}
-                  <button style={{ background: 'transparent', border: '1px dashed #1A1A1A', borderRadius: '6px', padding: '0.4rem 0.75rem', color: '#52525B', cursor: 'pointer' }}>
+                  <button style={{ background: 'transparent', border: '1px dashed var(--border-color)', borderRadius: '6px', padding: '0.4rem 0.75rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                     <Plus size={14} />
                   </button>
                 </div>
@@ -423,39 +423,39 @@ export default function Vault() {
       {/* Manage Tags Modal */}
       {isManageTagsOpen && (
         <div style={{ 
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, 
+          position: 'fixed', inset: 0, background: 'var(--surface-color)', zIndex: 1000, 
           display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' 
         }} onClick={() => setIsManageTagsOpen(false)}>
           <div style={{ 
-            background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '20px', 
-            padding: '2rem', width: '100%', maxWidth: '500px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' 
+            background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '20px', 
+            padding: '2rem', width: '100%', maxWidth: '500px', boxShadow: '0 20px 50px rgba(0,0,0,0.15)' 
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: '800' }}>Manage tags</h2>
-              <button onClick={() => setIsManageTagsOpen(false)} style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer' }}>
+              <button onClick={() => setIsManageTagsOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                 <X size={24} />
               </button>
             </div>
             
-            <p style={{ color: '#71717A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Use tags to organize the items in your vault. Add, edit, or remove tags here.</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Use tags to organize the items in your vault. Add, edit, or remove tags here.</p>
 
             <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
                <input 
                  type="text" 
                  placeholder="Search tags" 
-                 style={{ flex: 1, background: '#050505', border: '1px solid #1A1A1A', borderRadius: '10px', padding: '0.75rem 1rem', color: '#fff', outline: 'none' }} 
+                 style={{ flex: 1, background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.75rem 1rem', color: 'var(--text-primary)', outline: 'none' }} 
                />
                <button style={buttonStyle}>Create new tag</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                {['Sandcastles Favorites', 'Camera angles', 'Great editing', 'Hook inspiration'].map(tag => (
-                 <div key={tag} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: '#080808', borderRadius: '10px', border: '1px solid transparent' }} onMouseEnter={e => e.currentTarget.style.borderColor = '#1A1A1A'} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}>
+                 <div key={tag} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: 'var(--surface-hover)', borderRadius: '10px', border: '1px solid transparent' }} onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-color)'} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                       <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#52525B' }} />
+                       <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--text-secondary)' }} />
                        <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>{tag}</span>
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', color: '#52525B' }}>
+                    <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)' }}>
                        <Edit2 size={16} style={{ cursor: 'pointer' }} />
                        <Trash2 size={16} style={{ cursor: 'pointer' }} />
                     </div>
@@ -464,7 +464,7 @@ export default function Vault() {
             </div>
 
             <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end' }}>
-               <button onClick={() => setIsManageTagsOpen(false)} style={{ ...buttonStyle, background: '#1A1A1A', border: '1px solid #27272A' }}>Close</button>
+               <button onClick={() => setIsManageTagsOpen(false)} style={{ ...buttonStyle, background: 'var(--border-color)', border: '1px solid var(--surface-hover)' }}>Close</button>
             </div>
           </div>
         </div>
@@ -474,8 +474,8 @@ export default function Vault() {
 }
 
 const buttonStyle = {
-  background: '#fff',
-  color: '#000',
+  background: 'var(--text-primary)',
+  color: 'var(--bg-color)',
   border: 'none',
   borderRadius: '10px',
   padding: '0.75rem 1.25rem',

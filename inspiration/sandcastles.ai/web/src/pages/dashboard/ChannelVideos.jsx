@@ -69,21 +69,21 @@ export default function ChannelVideos() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
             <button 
                 onClick={() => navigate('/dashboard/channels')}
-                style={{ background: 'transparent', border: 'none', color: '#71717A', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             >
                 <ArrowLeft size={20} />
             </button>
             <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Videos</h1>
         </div>
-        <p style={{ color: '#71717A', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Discover what's gone viral in your niche, and why it worked</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Discover what's gone viral in your niche, and why it worked</p>
         
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <div style={{ 
             flex: 1, 
             display: 'flex', 
             alignItems: 'center', 
-            background: '#0B0B0B', 
-            border: '1px solid #1A1A1A', 
+            background: 'var(--surface-color)', 
+            border: '1px solid var(--border-color)', 
             borderRadius: '10px', 
             padding: '0 1rem',
             height: '40px',
@@ -93,11 +93,11 @@ export default function ChannelVideos() {
               type="text" 
               placeholder="Search for videos by topic" 
               defaultValue="Search for videos by topic"
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.85rem', outline: 'none', width: '100%' }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', width: '100%' }}
             />
             <button style={{ 
-              background: '#27272A', 
-              color: '#A1A1AA', 
+              background: 'var(--surface-hover)', 
+              color: 'var(--text-secondary)', 
               fontSize: '0.75rem', 
               padding: '0.2rem 0.5rem', 
               borderRadius: '6px',
@@ -111,13 +111,13 @@ export default function ChannelVideos() {
               <button key={i} style={{ 
                 width: '40px', 
                 height: '40px', 
-                background: i === 1 ? '#1D4ED833' : '#0B0B0B', 
-                border: i === 1 ? '1px solid #1D4ED8' : '1px solid #1A1A1A', 
+                background: i === 1 ? '#1D4ED833' : 'var(--surface-color)', 
+                border: i === 1 ? '1px solid #1D4ED8' : '1px solid var(--border-color)', 
                 borderRadius: '8px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                color: i === 1 ? '#3B82F6' : '#52525B'
+                color: i === 1 ? '#3B82F6' : 'var(--text-secondary)'
               }}>
                 <div style={{ width: '16px', height: '16px', border: '1.5px solid currentColor', borderRadius: '4px' }} />
               </button>
@@ -138,7 +138,7 @@ export default function ChannelVideos() {
               style={{ 
                 position: 'relative', 
                 aspectRatio: '9/16', 
-                background: '#000', 
+                background: 'var(--bg-color)', 
                 borderRadius: '12px',
                 overflow: 'hidden',
                 marginBottom: '0.75rem'
@@ -169,17 +169,17 @@ export default function ChannelVideos() {
                 left: '0', 
                 right: '0', 
                 padding: '0.75rem',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)'
+                background: 'linear-gradient(to top, var(--surface-color), transparent)'
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#fff' }}>Ray William Johnson</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-primary)' }}>Ray William Johnson</div>
               </div>
             </Link>
             
             <div style={{ padding: '0 0.25rem' }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: '500', marginBottom: '0.25rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: '500', marginBottom: '0.25rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {video.title}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#71717A', marginBottom: '0.75rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
                 {video.handle} • {video.time}
               </div>
               

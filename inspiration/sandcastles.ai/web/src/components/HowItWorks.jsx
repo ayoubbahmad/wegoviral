@@ -51,7 +51,7 @@ export default function HowItWorks() {
                   padding: '0.75rem 1.5rem',
                   borderRadius: '99px',
                   background: activeTab === index ? 'var(--surface-hover)' : 'transparent',
-                  color: activeTab === index ? '#fff' : 'var(--text-secondary)',
+                  color: activeTab === index ? 'var(--bg-color)' : 'var(--text-secondary)',
                   fontWeight: '500',
                   transition: 'all 0.2s'
                 }}
@@ -65,7 +65,7 @@ export default function HowItWorks() {
           <div style={{ 
             width: '100%', 
             maxWidth: '900px', 
-            background: 'linear-gradient(145deg, var(--surface-color), #0a0a0a)', 
+            background: 'var(--surface-color)', 
             border: '1px solid var(--border-color)',
             borderRadius: '24px',
             padding: '4rem',

@@ -73,7 +73,7 @@ export default function WatchlistDetails() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              color: '#71717A',
+              color: 'var(--text-secondary)',
               fontSize: '0.85rem',
               textDecoration: 'none',
               marginBottom: '1rem'
@@ -81,10 +81,10 @@ export default function WatchlistDetails() {
           >
             <ChevronLeft size={16} /> Back to watchlists
           </Link>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             {watchlist.name}
           </h1>
-          <p style={{ color: '#71717A', fontSize: '0.9rem' }}>{watchlist.description}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{watchlist.description}</p>
         </div>
 
         {/* Action Buttons */}
@@ -93,8 +93,8 @@ export default function WatchlistDetails() {
           gap: '0.75rem', 
           marginBottom: '2rem',
           padding: '1rem',
-          background: '#0B0B0B',
-          border: '1px solid #1A1A1A',
+          background: 'var(--surface-color)',
+          border: '1px solid var(--border-color)',
           borderRadius: '12px'
         }}>
           <button style={{ 
@@ -103,7 +103,7 @@ export default function WatchlistDetails() {
             background: '#2563EB',
             border: 'none',
             borderRadius: '10px',
-            color: '#fff',
+            color: 'var(--text-primary)',
             fontSize: '0.85rem',
             fontWeight: '600',
             cursor: 'pointer',
@@ -116,10 +116,10 @@ export default function WatchlistDetails() {
           </button>
           <button style={{ 
             padding: '0.75rem 1.25rem',
-            background: '#141414',
-            border: '1px solid #27272A',
+            background: 'var(--surface-color)',
+            border: '1px solid var(--surface-hover)',
             borderRadius: '10px',
-            color: '#fff',
+            color: 'var(--text-primary)',
             fontSize: '0.85rem',
             fontWeight: '600',
             cursor: 'pointer',
@@ -138,8 +138,8 @@ export default function WatchlistDetails() {
               key={channel.id}
               style={{
                 padding: '1.5rem',
-                background: '#0B0B0B',
-                border: '1px solid #1A1A1A',
+                background: 'var(--surface-color)',
+                border: '1px solid var(--border-color)',
                 borderRadius: '16px'
               }}
             >
@@ -157,10 +157,10 @@ export default function WatchlistDetails() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <div>
-                      <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#fff', marginBottom: '0.25rem' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
                         {channel.name}
                       </h3>
-                      <p style={{ fontSize: '0.85rem', color: '#71717A' }}>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                         {channel.followers}
                       </p>
                     </div>
@@ -168,17 +168,17 @@ export default function WatchlistDetails() {
                       padding: '0.5rem',
                       background: 'transparent',
                       border: 'none',
-                      color: '#71717A',
+                      color: 'var(--text-secondary)',
                       cursor: 'pointer'
                     }}>
                       <MoreHorizontal size={20} />
                     </button>
                   </div>
-                  <p style={{ fontSize: '0.9rem', color: '#A1A1AA', lineHeight: '1.6', marginBottom: '1rem' }}>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '1rem' }}>
                     {channel.description}
                   </p>
                   <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#71717A', marginBottom: '0.5rem', fontWeight: '600' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontWeight: '600' }}>
                       Popular topics:
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -187,11 +187,11 @@ export default function WatchlistDetails() {
                           key={i}
                           style={{
                             padding: '0.35rem 0.75rem',
-                            background: '#141414',
-                            border: '1px solid #27272A',
+                            background: 'var(--surface-color)',
+                            border: '1px solid var(--surface-hover)',
                             borderRadius: '6px',
                             fontSize: '0.75rem',
-                            color: '#A1A1AA'
+                            color: 'var(--text-secondary)'
                           }}
                         >
                           {topic}
@@ -213,7 +213,7 @@ export default function WatchlistDetails() {
           borderRadius: '16px',
           textAlign: 'center'
         }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             Start your free trial
           </h2>
           <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)', marginBottom: '1.5rem' }}>
@@ -221,7 +221,7 @@ export default function WatchlistDetails() {
           </p>
           <button style={{
             padding: '0.75rem 2rem',
-            background: '#fff',
+            background: 'var(--text-primary)',
             border: 'none',
             borderRadius: '10px',
             color: '#2563EB',

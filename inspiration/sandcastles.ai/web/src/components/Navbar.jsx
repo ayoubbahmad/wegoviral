@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   return (
@@ -8,8 +9,8 @@ export default function Navbar() {
       left: 0,
       width: '100%',
       padding: '1.25rem 0', 
-      borderBottom: '1px solid rgba(255,255,255,0.05)',
-      backgroundColor: 'rgba(5,5,5,0.8)',
+      borderBottom: '1px solid var(--border-color)',
+      backgroundColor: 'var(--surface-color)',
       backdropFilter: 'blur(10px)',
       zIndex: 50
     }}>
@@ -24,7 +25,8 @@ export default function Navbar() {
         </div>
         <div className="actions" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
           <Link to="/login" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Log in</Link>
-          <Link to="/trial" className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '0.5rem 1.25rem', color: 'black' }}>Start Free Trial</Link>
+          <ThemeToggle />
+          <Link to="/trial" className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '0.5rem 1.25rem' }}>Start Free Trial</Link>
         </div>
       </div>
     </nav>

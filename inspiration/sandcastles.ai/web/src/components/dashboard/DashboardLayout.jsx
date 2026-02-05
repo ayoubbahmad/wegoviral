@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   Rocket
 } from 'lucide-react';
+import ThemeToggle from '../ThemeToggle';
 
 export default function DashboardLayout({ children }) {
   const location = useLocation();
@@ -38,30 +39,30 @@ export default function DashboardLayout({ children }) {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#000000', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
       {/* Sidebar */}
       <aside style={{ 
         width: '260px', 
-        borderRight: '1px solid #1A1A1A', 
+        borderRight: '1px solid var(--border-color)', 
         position: 'fixed', 
         height: '100vh', 
         display: 'flex',
         flexDirection: 'column',
         padding: '1.5rem 1rem',
-        background: '#040404', 
+        background: 'var(--surface-color)', 
         zIndex: 50
       }}>
         {/* Logo Area */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', padding: '0 0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-             <div style={{ padding: '0.35rem', background: '#fff', borderRadius: '6px', display: 'flex' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+             <div style={{ padding: '0.35rem', background: 'var(--text-primary)', borderRadius: '6px', display: 'flex' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bg-color)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
              </div>
-             <div className="font-bold text-lg" style={{ letterSpacing: '-0.02em' }}>Sandcastles</div>
+             <div className="font-bold text-lg" style={{ letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>Sandcastles</div>
           </div>
-          <button style={{ color: '#52525B', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}>
+          <button style={{ color: 'var(--text-secondary)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}>
             <ChevronLeft size={18} />
           </button>
         </div>
@@ -80,8 +81,8 @@ export default function DashboardLayout({ children }) {
                   gap: '0.75rem',
                   padding: '0.6rem 0.75rem',
                   borderRadius: '8px',
-                  background: isActive ? '#1F1F1F' : 'transparent',
-                  color: isActive ? '#fff' : '#71717A',
+                  background: isActive ? 'var(--surface-hover)' : 'transparent',
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                   fontWeight: isActive ? '500' : '400',
                   fontSize: '0.85rem',
                   textDecoration: 'none',
@@ -89,18 +90,18 @@ export default function DashboardLayout({ children }) {
                 }}
                 onMouseEnter={(e) => {
                     if(!isActive) {
-                        e.currentTarget.style.color = '#fff';
-                        e.currentTarget.style.background = '#121212';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                        e.currentTarget.style.background = 'var(--surface-hover)';
                     }
                 }}
                 onMouseLeave={(e) => {
-                     if(!isActive) {
-                        e.currentTarget.style.color = '#71717A';
+                    if(!isActive) {
+                        e.currentTarget.style.color = 'var(--text-secondary)';
                         e.currentTarget.style.background = 'transparent';
-                     }
+                    }
                 }}
               >
-                <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} style={{ color: isActive ? '#fff' : 'currentColor' }} />
+                <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} style={{ color: isActive ? 'var(--primary-color)' : 'currentColor' }} />
                 {item.name}
               </Link>
             )
@@ -109,37 +110,9 @@ export default function DashboardLayout({ children }) {
 
         {/* Bottom Section */}
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Trial Banner */}
-          {/* <div style={{ 
-            background: '#040404', 
-            border: '1px solid #14532D', 
-            borderRadius: '12px', 
-            padding: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem'
-          }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: '500', color: '#fff', textAlign: 'center', lineHeight: '1.4' }}>
-              Start your free trial to unlock all features
-            </div>
-            <button style={{ 
-              background: '#22C55E1A', 
-              color: '#22C55E', 
-              border: '1px solid #22C55E4D',
-              borderRadius: '8px',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}>
-              <Rocket size={14} fill="currentColor" />
-              Start your free trial
-            </button>
-          </div> */}
+          <div style={{ padding: '0 0.5rem', marginBottom: '0.5rem' }}>
+            <ThemeToggle />
+          </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
             {bottomNavItems.map((item) => (
@@ -152,17 +125,17 @@ export default function DashboardLayout({ children }) {
                   gap: '0.75rem',
                   padding: '0.5rem 0.75rem',
                   borderRadius: '8px',
-                  color: '#71717A',
+                  color: 'var(--text-secondary)',
                   fontSize: '0.85rem',
                   textDecoration: 'none',
                   transition: 'color 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                   e.currentTarget.style.color = '#fff';
-                   e.currentTarget.style.background = '#121212';
+                   e.currentTarget.style.color = 'var(--text-primary)';
+                   e.currentTarget.style.background = 'var(--surface-hover)';
                 }}
                 onMouseLeave={(e) => {
-                   e.currentTarget.style.color = '#71717A';
+                   e.currentTarget.style.color = 'var(--text-secondary)';
                    e.currentTarget.style.background = 'transparent';
                 }}
               >

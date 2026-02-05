@@ -33,7 +33,7 @@ export default function Channels() {
         <div>
           <div style={{ marginBottom: '2rem' }}>
             <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.25rem' }}>Channels</h1>
-            <p style={{ color: '#71717A', fontSize: '0.9rem' }}>Discover and track top channels to improve your content strategy</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Discover and track top channels to improve your content strategy</p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2.5rem' }}>
@@ -44,7 +44,7 @@ export default function Channels() {
                 alignItems: 'center', 
                 gap: '0.5rem', 
                 background: '#2563EB', 
-                color: '#fff', 
+                color: 'var(--text-primary)', 
                 padding: '0.5rem 1rem', 
                 borderRadius: '99px',
                 fontSize: '0.875rem',
@@ -59,9 +59,9 @@ export default function Channels() {
               display: 'flex', 
               alignItems: 'center', 
               gap: '0.5rem', 
-              background: '#0B0B0B', 
-              border: '1px solid #1A1A1A',
-              color: '#A1A1AA', 
+              background: 'var(--surface-color)', 
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-secondary)', 
               padding: '0.5rem 1rem', 
               borderRadius: '99px',
               fontSize: '0.875rem'
@@ -75,9 +75,9 @@ export default function Channels() {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '0.5rem', 
-                background: '#0B0B0B', 
-                border: '1px solid #1A1A1A',
-                color: '#A1A1AA', 
+                background: 'var(--surface-color)', 
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)', 
                 padding: '0.5rem 1rem', 
                 borderRadius: '99px',
                 fontSize: '0.875rem',
@@ -95,8 +95,8 @@ export default function Channels() {
                 key={i} 
                 onClick={() => setSelectedChannel(channel)}
                 style={{ 
-                  background: '#0B0B0B', 
-                  border: '1px solid #1A1A1A', 
+                  background: 'var(--surface-color)', 
+                  border: '1px solid var(--border-color)', 
                   borderRadius: '12px', 
                   padding: '0.75rem', 
                   display: 'flex', 
@@ -106,23 +106,23 @@ export default function Channels() {
                   transition: 'background 0.2s, border-color 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#121212';
-                  e.currentTarget.style.borderColor = '#27272A';
+                  e.currentTarget.style.background = 'var(--surface-hover)';
+                  e.currentTarget.style.borderColor = 'var(--surface-hover)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#0B0B0B';
-                  e.currentTarget.style.borderColor = '#1A1A1A';
+                  e.currentTarget.style.background = 'var(--surface-color)';
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
                 }}
               >
                 <div style={{ position: 'relative' }}>
                   <img src={channel.avatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                  <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', border: '2px solid #0B0B0B', borderRadius: '4px' }}>
+                  <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', border: '2px solid var(--surface-color)', borderRadius: '4px' }}>
                     <PlatformIcon platform={channel.platform} />
                   </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.9rem', fontWeight: '500' }}>{channel.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#71717A' }}>{channel.followers}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{channel.followers}</div>
                 </div>
               </div>
             ))}
@@ -132,28 +132,28 @@ export default function Channels() {
         {/* Watchlists Sidebar */}
         <div>
           <div style={{ 
-            background: '#0B0B0B', 
-            border: '1px solid #1A1A1A', 
+            background: 'var(--surface-color)', 
+            border: '1px solid var(--border-color)', 
             borderRadius: '16px', 
             padding: '1.5rem' 
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '0.95rem', fontWeight: '600' }}>Your watchlists</div>
-              <button style={{ color: '#52525B', background: 'transparent', border: 'none', cursor: 'pointer' }}><Plus size={18} /></button>
+              <button style={{ color: 'var(--text-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}><Plus size={18} /></button>
             </div>
 
             <div style={{ 
-              background: '#070707', 
-              border: '1px solid #1A1A1A', 
+              background: 'var(--surface-hover)', 
+              border: '1px solid var(--border-color)', 
               borderRadius: '12px', 
               padding: '1rem' 
             }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '500', marginBottom: '0.5rem' }}>Health and English Prep</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.75rem', color: '#71717A' }}>2 channels</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>2 channels</span>
                 <div style={{ display: 'flex', paddingLeft: '4px' }}>
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=prof" style={{ width: '16px', height: '16px', borderRadius: '50%', border: '1px solid #070707' }} />
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=rythm" style={{ width: '16px', height: '16px', borderRadius: '50%', border: '1px solid #070707', marginLeft: '-6px' }} />
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=prof" style={{ width: '16px', height: '16px', borderRadius: '50%', border: '1px solid var(--surface-hover)' }} />
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=rythm" style={{ width: '16px', height: '16px', borderRadius: '50%', border: '1px solid var(--surface-hover)', marginLeft: '-6px' }} />
                 </div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function Channels() {
           <div style={{ 
             position: 'fixed', 
             top: 0, left: 0, right: 0, bottom: 0, 
-            background: 'rgba(0,0,0,0.7)', 
+            background: 'rgba(0,0,0,0.2)', 
             backdropFilter: 'blur(4px)',
             display: 'flex', 
             alignItems: 'center', 
@@ -173,8 +173,8 @@ export default function Channels() {
             zIndex: 1000 
           }} onClick={() => setSelectedChannel(null)}>
             <div style={{ 
-              background: '#0B0B0B', 
-              border: '1px solid #1A1A1A', 
+              background: 'var(--surface-color)', 
+              border: '1px solid var(--border-color)', 
               borderRadius: '16px', 
               width: '440px', 
               padding: '1.5rem',
@@ -184,30 +184,30 @@ export default function Channels() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div style={{ position: 'relative' }}>
                     <img src={selectedChannel.avatar} alt="" style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
-                    <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', border: '2px solid #0B0B0B', borderRadius: '4px' }}>
+                    <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', border: '2px solid var(--surface-color)', borderRadius: '4px' }}>
                         <PlatformIcon platform={selectedChannel.platform} />
                     </div>
                 </div>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>{selectedChannel.name}</div>
-                        <ExternalLink size={14} style={{ color: '#52525B', cursor: 'pointer' }} />
+                        <ExternalLink size={14} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} />
                     </div>
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#A1A1AA' }}>{selectedChannel.followers}</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{selectedChannel.followers}</div>
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ fontSize: '0.85rem', color: '#71717A', marginBottom: '0.75rem' }}>Add this channel to a watchlist:</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>Add this channel to a watchlist:</div>
                 <div style={{ 
-                  background: '#1A1A1A', 
-                  border: '1px solid #27272A', 
+                  background: 'var(--border-color)', 
+                  border: '1px solid var(--surface-hover)', 
                   borderRadius: '10px', 
                   padding: '0.75rem 1rem', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'space-between',
-                  color: '#A1A1AA',
+                  color: 'var(--text-secondary)',
                   fontSize: '0.9rem',
                   cursor: 'pointer'
                 }}>
@@ -221,10 +221,10 @@ export default function Channels() {
                   to="/dashboard/channel-videos"
                   style={{ 
                     background: 'transparent', 
-                    border: '1px solid #1A1A1A', 
+                    border: '1px solid var(--border-color)', 
                     borderRadius: '8px', 
                     padding: '0.6rem 1rem', 
-                    color: '#fff', 
+                    color: 'var(--text-primary)', 
                     fontSize: '0.85rem', 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -240,7 +240,7 @@ export default function Channels() {
                     border: 'none', 
                     borderRadius: '8px', 
                     padding: '0.6rem 1.5rem', 
-                    color: '#fff', 
+                    color: 'var(--text-primary)', 
                     fontSize: '0.85rem', 
                     fontWeight: '600',
                     cursor: 'pointer'

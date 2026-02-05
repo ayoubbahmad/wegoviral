@@ -73,8 +73,8 @@ export default function WriterEnhanced() {
   };
 
   const cardStyle = {
-    background: '#0B0B0B',
-    border: '1px solid #1A1A1A',
+    background: 'var(--surface-color)',
+    border: '1px solid var(--border-color)',
     borderRadius: '16px',
     padding: '1.5rem',
     marginBottom: '1.5rem',
@@ -88,13 +88,13 @@ export default function WriterEnhanced() {
     gap: '0.75rem', 
     fontSize: '0.95rem', 
     fontWeight: '700', 
-    color: '#fff', 
+    color: 'var(--text-primary)', 
     marginBottom: '1.5rem'
   };
 
   const buttonStyle = {
     background: '#2563EB',
-    color: '#fff',
+    color: 'var(--text-primary)',
     border: 'none',
     borderRadius: '8px',
     padding: '0.6rem 1.25rem',
@@ -121,21 +121,21 @@ export default function WriterEnhanced() {
           position: 'sticky', 
           top: '2rem', 
           zIndex: 10,
-          background: 'rgba(0,0,0,0.8)',
+          background: 'var(--surface-color)',
           padding: '0.75rem',
           borderRadius: '12px',
           backdropFilter: 'blur(8px)',
-          border: '1px solid #1A1A1A'
+          border: '1px solid var(--border-color)'
         }}>
-          <span style={{ color: '#52525B', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}>Jump to:</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}>Jump to:</span>
           {sections.map(s => (
             <button 
               key={s.id}
               onClick={() => scrollToSection(s.id)}
               style={{ 
                 display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', 
-                background: activeStep === s.id ? '#1A1A1A' : 'transparent', 
-                color: activeStep === s.id ? '#fff' : '#52525B', 
+                background: activeStep === s.id ? 'var(--border-color)' : 'transparent', 
+                color: activeStep === s.id ? 'var(--text-primary)' : 'var(--text-secondary)', 
                 padding: '0.4rem 0.75rem', borderRadius: '8px',
                 fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600',
                 transition: 'all 0.2s'
@@ -149,24 +149,24 @@ export default function WriterEnhanced() {
 
         {/* Step 1: Topic */}
         <div id="topic" style={cardStyle}>
-          <div style={sectionHeaderStyle}><Lightbulb size={18} color="#3B82F6" /> Describe your topic <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={sectionHeaderStyle}><Lightbulb size={18} color="#3B82F6" /> Describe your topic <span style={{ color: 'var(--text-secondary)', cursor: 'help' }}>ⓘ</span></div>
           <div style={{ display: 'flex', gap: '1rem', position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-             <X size={16} color="#52525B" style={{ cursor: 'pointer' }} />
-             <RefreshCw size={16} color="#52525B" style={{ cursor: 'pointer' }} />
-             <Plus size={16} color="#52525B" style={{ cursor: 'pointer' }} />
+             <X size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
+             <RefreshCw size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
+             <Plus size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
           </div>
           <textarea 
             placeholder="What do you want to make a video about?"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            style={{ width: '100%', minHeight: '100px', border: 'none', background: '#050505', padding: '1rem', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', resize: 'vertical' }}
+            style={{ width: '100%', minHeight: '100px', border: 'none', background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', resize: 'vertical' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-            <a href="#" style={{ color: '#52525B', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <a href="#" style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               How to write the best prompt <ExternalLink size={12} />
             </a>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Research</span>
+               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Next step: Research</span>
                <button onClick={() => { handleProcessResearch(); scrollToSection('research'); }} style={buttonStyle}>Save & Continue</button>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function WriterEnhanced() {
 
         {/* Step 2: Research */}
         <div id="research" style={cardStyle}>
-          <div style={sectionHeaderStyle}><BookOpen size={18} color="#3B82F6" /> Review the research <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={sectionHeaderStyle}><BookOpen size={18} color="#3B82F6" /> Review the research <span style={{ color: 'var(--text-secondary)', cursor: 'help' }}>ⓘ</span></div>
           
           {isProcessing ? (
             <div style={{ textAlign: 'center', padding: '3rem 0' }}>
@@ -185,12 +185,12 @@ export default function WriterEnhanced() {
             </div>
           ) : researchComplete ? (
             <div>
-              <div style={{ background: '#050505', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#fff', marginBottom: '1rem' }}>Research Summary</h3>
-                <p style={{ color: '#A1A1AA', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1rem' }}>
+              <div style={{ background: 'var(--surface-color)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1rem' }}>Research Summary</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1rem' }}>
                   Based on your topic, here are the key insights and trending angles that could make your video successful...
                 </p>
-                <ul style={{ color: '#A1A1AA', fontSize: '0.9rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
+                <ul style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
                   <li>Key insight #1 about your topic</li>
                   <li>Trending angle that's performing well</li>
                   <li>Audience pain points to address</li>
@@ -198,18 +198,18 @@ export default function WriterEnhanced() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                   <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Hook</span>
+                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Next step: Hook</span>
                    <button onClick={() => scrollToSection('hook')} style={buttonStyle}>Continue</button>
                 </div>
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem 0', color: '#52525B' }}>
+            <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-secondary)' }}>
                <p style={{ fontSize: '0.9rem' }}>Describe your topic first, then the system will create a research report for you.</p>
                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                     <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Hook</span>
-                     <button onClick={() => scrollToSection('hook')} style={{ ...buttonStyle, background: '#1A1A1A', color: '#52525B' }}>Continue</button>
+                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Next step: Hook</span>
+                     <button onClick={() => scrollToSection('hook')} style={{ ...buttonStyle, background: 'var(--border-color)', color: 'var(--text-secondary)' }}>Continue</button>
                   </div>
                </div>
             </div>
@@ -218,19 +218,19 @@ export default function WriterEnhanced() {
 
         {/* Step 3: Hook */}
         <div id="hook" style={cardStyle}>
-          <div style={sectionHeaderStyle}><Key size={18} color="#3B82F6" /> Pick your favorite hook <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={sectionHeaderStyle}><Key size={18} color="#3B82F6" /> Pick your favorite hook <span style={{ color: 'var(--text-secondary)', cursor: 'help' }}>ⓘ</span></div>
           
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
              <div style={{ flex: 1, position: 'relative' }}>
-                <select style={{ width: '100%', background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#52525B', fontSize: '0.85rem', appearance: 'none' }}>
+                <select style={{ width: '100%', background: 'var(--surface-color)', border: '1px solid var(--border-color)', padding: '0.6rem 1rem', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', appearance: 'none' }}>
                    <option>Filter by tag</option>
                 </select>
-                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#52525B', pointerEvents: 'none' }} />
+                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
              </div>
              <input 
                type="text" 
                placeholder="Search your vault for a hook template" 
-               style={{ flex: 2, background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none' }} 
+               style={{ flex: 2, background: 'var(--surface-color)', border: '1px solid var(--border-color)', padding: '0.6rem 1rem', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }} 
              />
           </div>
 
@@ -242,10 +242,10 @@ export default function WriterEnhanced() {
                  style={{ 
                    position: 'relative',
                    aspectRatio: '9/16', 
-                   background: '#121212', 
+                   background: 'var(--surface-hover)', 
                    borderRadius: '12px', 
                    overflow: 'hidden', 
-                   border: selectedHooks.includes(hook.id) ? '2px solid #2563EB' : '1px solid #1A1A1A',
+                   border: selectedHooks.includes(hook.id) ? '2px solid #2563EB' : '1px solid var(--border-color)',
                    cursor: 'pointer',
                    transition: 'all 0.2s'
                  }}
@@ -253,23 +253,23 @@ export default function WriterEnhanced() {
                   <img src={hook.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={hook.title} />
                   {selectedHooks.includes(hook.id) && (
                     <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', width: '24px', height: '24px', background: '#2563EB', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={14} color="#fff" />
+                      <Check size={14} color='var(--text-primary)' />
                     </div>
                   )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0.75rem 0.5rem', background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#fff', marginBottom: '0.25rem' }}>{hook.title}</div>
-                    <div style={{ fontSize: '0.65rem', color: '#71717A' }}>{hook.views} views</div>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0.75rem 0.5rem', background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{hook.title}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>{hook.views} views</div>
                   </div>
                </div>
              ))}
           </div>
 
           {selectedHooks.length > 0 && (
-            <div style={{ padding: '1rem', background: '#050505', borderRadius: '12px', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '0.5rem', fontWeight: '600' }}>
+            <div style={{ padding: '1rem', background: 'var(--surface-color)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontWeight: '600' }}>
                 Selected hooks ({selectedHooks.length})
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#71717A' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 Pick a hook template from your Vault and the system will generate options for you.
               </div>
             </div>
@@ -277,7 +277,7 @@ export default function WriterEnhanced() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Style</span>
+               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Next step: Style</span>
                <button onClick={() => scrollToSection('style')} style={buttonStyle}>Save & Continue</button>
             </div>
           </div>
@@ -285,18 +285,18 @@ export default function WriterEnhanced() {
 
         {/* Step 4: Style */}
         <div id="style" style={cardStyle}>
-          <div style={sectionHeaderStyle}><Palette size={18} color="#3B82F6" /> Choose a style <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span></div>
+          <div style={sectionHeaderStyle}><Palette size={18} color="#3B82F6" /> Choose a style <span style={{ color: 'var(--text-secondary)', cursor: 'help' }}>ⓘ</span></div>
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
              <div style={{ flex: 1, position: 'relative' }}>
-                <select style={{ width: '100%', background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#52525B', fontSize: '0.85rem', appearance: 'none' }}>
+                <select style={{ width: '100%', background: 'var(--surface-color)', border: '1px solid var(--border-color)', padding: '0.6rem 1rem', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', appearance: 'none' }}>
                    <option>Filter by tag</option>
                 </select>
-                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#52525B', pointerEvents: 'none' }} />
+                <ChevronDown size={14} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
              </div>
              <input 
                type="text" 
                placeholder="Search your vault for a style" 
-               style={{ flex: 2, background: '#050505', border: '1px solid #1A1A1A', padding: '0.6rem 1rem', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none' }} 
+               style={{ flex: 2, background: 'var(--surface-color)', border: '1px solid var(--border-color)', padding: '0.6rem 1rem', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }} 
              />
           </div>
 
@@ -308,10 +308,10 @@ export default function WriterEnhanced() {
                  style={{ 
                    position: 'relative',
                    aspectRatio: '9/16', 
-                   background: '#121212', 
+                   background: 'var(--surface-hover)', 
                    borderRadius: '12px', 
                    overflow: 'hidden', 
-                   border: selectedStyle === style.id ? '2px solid #2563EB' : '1px solid #1A1A1A',
+                   border: selectedStyle === style.id ? '2px solid #2563EB' : '1px solid var(--border-color)',
                    cursor: 'pointer',
                    transition: 'all 0.2s'
                  }}
@@ -319,26 +319,26 @@ export default function WriterEnhanced() {
                   <img src={style.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={style.title} />
                   {selectedStyle === style.id && (
                     <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', width: '24px', height: '24px', background: '#2563EB', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={14} color="#fff" />
+                      <Check size={14} color='var(--text-primary)' />
                     </div>
                   )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0.75rem 0.5rem', background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#fff', marginBottom: '0.25rem' }}>{style.title}</div>
-                    <div style={{ fontSize: '0.65rem', color: '#71717A' }}>{style.views} views</div>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0.75rem 0.5rem', background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{style.title}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>{style.views} views</div>
                   </div>
                </div>
              ))}
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-            <button style={{ background: 'transparent', border: 'none', color: '#71717A', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>
+            <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}>
               Load more
             </button>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-               <span style={{ fontSize: '0.8rem', color: '#52525B' }}>Next step: Script</span>
+               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Next step: Script</span>
                <button onClick={handleGenerateScript} style={buttonStyle}>Save & Continue</button>
             </div>
           </div>
@@ -347,30 +347,30 @@ export default function WriterEnhanced() {
         {/* Step 5: Script */}
         <div id="script" style={cardStyle}>
           <div style={sectionHeaderStyle}>
-            <FileText size={18} color="#3B82F6" /> Write the script <span style={{ color: '#52525B', cursor: 'help' }}>ⓘ</span>
+            <FileText size={18} color="#3B82F6" /> Write the script <span style={{ color: 'var(--text-secondary)', cursor: 'help' }}>ⓘ</span>
           </div>
           <div style={{ display: 'flex', gap: '1rem', position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-             <button onClick={() => setShowHistory(!showHistory)} style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: '600' }}>
+             <button onClick={() => setShowHistory(!showHistory)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: '600' }}>
                <Clock size={16} /> View history
              </button>
-             <RefreshCw size={16} color="#52525B" style={{ cursor: 'pointer' }} />
-             <Copy size={16} color="#52525B" style={{ cursor: 'pointer' }} />
-             <Download size={16} color="#52525B" style={{ cursor: 'pointer' }} />
-             <Share2 size={16} color="#52525B" style={{ cursor: 'pointer' }} />
+             <RefreshCw size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
+             <Copy size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
+             <Download size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
+             <Share2 size={16} color="var(--text-secondary)" style={{ cursor: 'pointer' }} />
           </div>
           
           {scriptGenerated ? (
             <div>
-              <div style={{ background: '#050505', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', minHeight: '300px' }}>
+              <div style={{ background: 'var(--surface-color)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', minHeight: '300px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ fontSize: '0.85rem', color: '#71717A' }}>241 words</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>241 words</div>
                   <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <button style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer' }}><RefreshCw size={14} /></button>
-                    <button style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer' }}><Copy size={14} /></button>
-                    <button style={{ background: 'transparent', border: 'none', color: '#52525B', cursor: 'pointer' }}><Download size={14} /></button>
+                    <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><RefreshCw size={14} /></button>
+                    <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><Copy size={14} /></button>
+                    <button style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><Download size={14} /></button>
                   </div>
                 </div>
-                <div style={{ color: '#fff', fontSize: '0.95rem', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                <div style={{ color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
                   {`This is a revolutionary AI project from Google.
 
 It's called Nano Banana Impact.
@@ -394,13 +394,13 @@ Nano Banana also uses half the power of previous models.`}
               </div>
 
               <div style={{ marginTop: '2rem' }}>
-                 <div style={{ fontSize: '0.8rem', color: '#52525B', marginBottom: '0.75rem' }}>What changes would you like to make?</div>
-                 <input type="text" placeholder="e.g. Make it more punchy" style={{ width: '100%', border: '1px solid #1A1A1A', borderRadius: '10px', padding: '1rem', background: '#050505', color: '#fff', fontSize: '0.9rem', outline: 'none' }} />
+                 <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>What changes would you like to make?</div>
+                 <input type="text" placeholder="e.g. Make it more punchy" style={{ width: '100%', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '1rem', background: 'var(--surface-color)', color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none' }} />
                  
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                        {['Facts', 'Hooks', 'Length', 'Translate', 'Restart'].map(action => (
-                         <button key={action} style={{ background: 'transparent', border: 'none', color: '#52525B', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
+                         <button key={action} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
                             <Sparkles size={14} /> {action}
                          </button>
                        ))}
@@ -415,7 +415,7 @@ Nano Banana also uses half the power of previous models.`}
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-               <p style={{ color: '#52525B', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Ready to get the first draft of your script?</p>
+               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Ready to get the first draft of your script?</p>
                <button onClick={handleGenerateScript} style={{ ...buttonStyle, margin: '0 auto' }}>Get first draft</button>
             </div>
           )}
@@ -423,22 +423,22 @@ Nano Banana also uses half the power of previous models.`}
 
         {/* History Modal */}
         {showHistory && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setShowHistory(false)}>
-            <div style={{ background: '#0B0B0B', border: '1px solid #27272A', borderRadius: '16px', width: '600px', maxHeight: '80vh', overflow: 'auto', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setShowHistory(false)}>
+            <div style={{ background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '16px', width: '600px', maxHeight: '80vh', overflow: 'auto', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff' }}>Script History</h2>
-                <button onClick={() => setShowHistory(false)} style={{ background: 'transparent', border: 'none', color: '#71717A', cursor: 'pointer' }}>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)' }}>Script History</h2>
+                <button onClick={() => setShowHistory(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                   <X size={20} />
                 </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {[1, 2, 3].map(i => (
-                  <div key={i} style={{ padding: '1rem', background: '#141414', border: '1px solid #27272A', borderRadius: '12px', cursor: 'pointer' }}>
+                  <div key={i} style={{ padding: '1rem', background: 'var(--surface-color)', border: '1px solid var(--surface-hover)', borderRadius: '12px', cursor: 'pointer' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>Version {4 - i}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#71717A' }}>{i} hour{i > 1 ? 's' : ''} ago</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>Version {4 - i}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{i} hour{i > 1 ? 's' : ''} ago</div>
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#A1A1AA', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                       This is a revolutionary AI project from Google...
                     </div>
                   </div>

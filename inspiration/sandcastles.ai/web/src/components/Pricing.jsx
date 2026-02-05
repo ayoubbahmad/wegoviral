@@ -22,7 +22,7 @@ export default function Pricing() {
               {plan.active && (
                 <div style={{ 
                   position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', 
-                  background: 'var(--accent-color)', color: '#fff', padding: '0.25rem 1rem', 
+                  background: 'var(--accent-color)', color: 'var(--bg-color)', padding: '0.25rem 1rem', 
                   borderRadius: '99px', fontSize: '0.875rem', fontWeight: '600'
                 }}>
                   Most Popular

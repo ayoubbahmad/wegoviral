@@ -28,8 +28,8 @@ export default function Settings() {
         <div style={{ display: 'grid', gap: '2rem' }}>
           {/* Credits Card */}
           <div style={{ 
-            background: 'linear-gradient(135deg, #1E1B4B 0%, #000 100%)', 
-            border: '1px solid #312E81', 
+            background: 'var(--surface-color)', 
+            border: '1px solid #3B82F6', 
             borderRadius: '20px', 
             padding: '2rem',
             display: 'flex',
@@ -37,13 +37,13 @@ export default function Settings() {
             justifyContent: 'space-between'
           }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#A5B4FC', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3B82F6', fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>
                 <Zap size={16} fill="currentColor" /> YOUR SUBSCRIPTION
               </div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Pro Plan</h2>
-              <p style={{ color: '#A1A1AA', fontSize: '0.9rem' }}>You have <span style={{ color: '#fff', fontWeight: '600' }}>850 / 1000</span> credits remaining this month.</p>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Pro Plan</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>You have <span style={{ color: '#3B82F6', fontWeight: '800' }}>850 / 1000</span> credits remaining this month.</p>
             </div>
-            <button style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '10px', padding: '0.75rem 1.5rem', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer' }}>
+            <button style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '10px', padding: '0.75rem 1.5rem', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer' }}>
               Manage Plan
             </button>
           </div>
@@ -51,9 +51,9 @@ export default function Settings() {
           {/* Settings Grid */}
           <div style={{ display: 'grid', gap: '1rem' }}>
             {sections.map((section, i) => (
-              <div key={i} style={{ background: '#0B0B0B', border: '1px solid #1A1A1A', borderRadius: '16px', overflow: 'hidden' }}>
-                <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #1A1A1A', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                   <section.icon size={18} color="#52525B" />
+              <div key={i} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                   <section.icon size={18} color="var(--text-secondary)" />
                    <h3 style={{ fontSize: '1rem', fontWeight: '600' }}>{section.title}</h3>
                 </div>
                 <div>
@@ -62,14 +62,14 @@ export default function Settings() {
                         key={j} 
                         style={{ 
                             padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            borderBottom: j === section.items.length - 1 ? 'none' : '1px solid #1A1A1A',
+                            borderBottom: j === section.items.length - 1 ? 'none' : '1px solid var(--border-color)',
                             cursor: 'pointer'
                         }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#141414'}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-color)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                        <span style={{ color: '#A1A1AA', fontSize: '0.9rem' }}>{item}</span>
-                        <ChevronRight size={16} color="#27272A" />
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{item}</span>
+                        <ChevronRight size={16} color="var(--surface-hover)" />
                      </div>
                    ))}
                 </div>

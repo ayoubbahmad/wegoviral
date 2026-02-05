@@ -44,7 +44,7 @@ export default function Watchlists() {
       <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '2rem' }}>
         {/* Left Sidebar - New Channels */}
         <div>
-          <div style={{ fontSize: '0.75rem', color: '#71717A', marginBottom: '1rem', fontStyle: 'italic' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem', fontStyle: 'italic' }}>
             52 new channels added today
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -57,10 +57,10 @@ export default function Watchlists() {
                   borderRadius: '50%' 
                 }} />
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>
                     {channel.name}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#71717A' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                     {channel.followers} followers
                   </div>
                 </div>
@@ -77,7 +77,7 @@ export default function Watchlists() {
                 <button style={{ 
                   background: 'transparent', 
                   border: 'none', 
-                  color: '#71717A', 
+                  color: 'var(--text-secondary)', 
                   fontSize: '0.85rem',
                   cursor: 'pointer',
                   display: 'flex',
@@ -100,7 +100,7 @@ export default function Watchlists() {
                   <div style={{ 
                     width: '24px', 
                     height: '24px', 
-                    background: '#000', 
+                    background: 'var(--bg-color)', 
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
@@ -121,7 +121,7 @@ export default function Watchlists() {
                 <button style={{ 
                   background: 'transparent', 
                   border: 'none', 
-                  color: '#71717A', 
+                  color: 'var(--text-secondary)', 
                   fontSize: '0.85rem',
                   cursor: 'pointer',
                   display: 'flex',
@@ -141,7 +141,7 @@ export default function Watchlists() {
               background: '#2563EB', 
               border: 'none', 
               borderRadius: '10px', 
-              color: '#fff', 
+              color: 'var(--text-primary)', 
               fontSize: '0.85rem',
               fontWeight: '600',
               cursor: 'pointer',
@@ -155,17 +155,17 @@ export default function Watchlists() {
 
           <div style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#fff' }}>Your watchlists</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Your watchlists</h2>
               <button style={{ 
                 width: '32px', 
                 height: '32px', 
-                background: '#141414', 
-                border: '1px solid #27272A', 
+                background: 'var(--surface-color)', 
+                border: '1px solid var(--surface-hover)', 
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#A1A1AA',
+                color: 'var(--text-secondary)',
                 cursor: 'pointer'
               }}>
                 <Plus size={16} />
@@ -180,8 +180,8 @@ export default function Watchlists() {
                   style={{
                     textDecoration: 'none',
                     padding: '1.5rem',
-                    background: '#0B0B0B',
-                    border: '1px solid #1A1A1A',
+                    background: 'var(--surface-color)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '16px',
                     display: 'flex',
                     alignItems: 'center',
@@ -190,20 +190,20 @@ export default function Watchlists() {
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#27272A';
-                    e.currentTarget.style.background = '#121212';
+                    e.currentTarget.style.borderColor = 'var(--surface-hover)';
+                    e.currentTarget.style.background = 'var(--surface-hover)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = '#1A1A1A';
-                    e.currentTarget.style.background = '#0B0B0B';
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                    e.currentTarget.style.background = 'var(--surface-color)';
                   }}
                 >
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', marginBottom: '0.5rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
                       {watchlist.name}
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <span style={{ fontSize: '0.85rem', color: '#71717A' }}>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                         {watchlist.channelCount} channels
                       </span>
                       <div style={{ display: 'flex', marginLeft: '0.5rem' }}>
@@ -216,7 +216,7 @@ export default function Watchlists() {
                               width: '24px',
                               height: '24px',
                               borderRadius: '50%',
-                              border: '2px solid #0B0B0B',
+                              border: '2px solid var(--surface-color)',
                               marginLeft: i > 0 ? '-8px' : '0'
                             }}
                           />
@@ -224,7 +224,7 @@ export default function Watchlists() {
                       </div>
                     </div>
                   </div>
-                  <ChevronRight size={20} color="#52525B" />
+                  <ChevronRight size={20} color="var(--text-secondary)" />
                 </Link>
               ))}
             </div>

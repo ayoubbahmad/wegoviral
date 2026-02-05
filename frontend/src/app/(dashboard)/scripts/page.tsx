@@ -1,7 +1,9 @@
-import { ScriptWizard } from "@/components/scripts/ScriptWizard";
+"use client";
+
+import { ScriptWizardContainer } from "@/containers/Scripts/ScriptWizard";
 
 export default function ScriptsPage() {
     return (
-        <ScriptWizard />
+        <ScriptWizardContainer />
     );
 }

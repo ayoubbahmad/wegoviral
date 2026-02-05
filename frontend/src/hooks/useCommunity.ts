@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 
 export function useCommunity() {
@@ -18,8 +18,8 @@ export function useCommunity() {
         setIsLoading(true);
         try {
             const [fData, sData] = await Promise.all([
-                apiFetch(`/community/followers?socialAccountId=${activeSocialAccount.id}`),
-                apiFetch(`/community/summary?socialAccountId=${activeSocialAccount.id}`)
+                (apiClient.get(`/community/followers?socialAccountId=${activeSocialAccount.id}`) as any),
+                (apiClient.get(`/community/summary?socialAccountId=${activeSocialAccount.id}`) as any)
             ]);
             setFollowers(fData);
             setSummary(sData);

@@ -29,12 +29,5 @@ apiClient.interceptors.response.use(
     }
 );
 
+export { apiClient };
 export default apiClient;
-
-// Keep apiFetch for backward compatibility during transition if needed, 
-// but it will now use axios under the hood.
-export async function apiFetch(endpoint: string, options: any = {}) {
-    const method = (options.method || 'GET').toLowerCase();
-    const response = await (apiClient as any)[method](endpoint, options.body ? JSON.parse(options.body) : undefined);
-    return response;
-}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { Hook } from "@/types/library";
 
 export function useHooks() {
@@ -11,7 +11,7 @@ export function useHooks() {
     const refresh = useCallback(async () => {
         setIsLoading(true);
         try {
-            const data = await apiFetch('/hooks');
+            const data: any = await apiClient.get('/hooks');
             setHooks(data);
         } catch (error) {
             console.error('Error fetching hooks:', error);
@@ -26,10 +26,7 @@ export function useHooks() {
 
     const addHook = async (newHook: Omit<Hook, "id" | "addedAt">) => {
         try {
-            const savedHook = await apiFetch('/hooks', {
-                method: 'POST',
-                body: JSON.stringify(newHook),
-            });
+            const savedHook: any = await apiClient.post('/hooks', newHook);
             setHooks(prev => [savedHook, ...prev]);
             return { success: true, hook: savedHook };
         } catch (error) {
@@ -39,7 +36,7 @@ export function useHooks() {
 
     const removeHook = async (id: string) => {
         try {
-            await apiFetch(`/hooks/${id}`, { method: 'DELETE' });
+            await apiClient.delete(`/hooks/${id}`);
             setHooks(prev => prev.filter(h => h.id !== id));
             return { success: true };
         } catch (error) {
@@ -49,10 +46,7 @@ export function useHooks() {
 
     const updateHook = async (id: string, updates: Partial<Hook>) => {
         try {
-            const updatedHook = await apiFetch(`/hooks/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify(updates),
-            });
+            const updatedHook: any = await apiClient.patch(`/hooks/${id}`, updates);
             setHooks(prev => prev.map(h => h.id === id ? updatedHook : h));
             return { success: true, hook: updatedHook };
         } catch (error) {

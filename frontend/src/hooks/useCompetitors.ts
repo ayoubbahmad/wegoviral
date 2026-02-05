@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { Competitor } from "@/types/competitor";
 
 export function useCompetitors() {
@@ -11,7 +11,7 @@ export function useCompetitors() {
     const refresh = useCallback(async () => {
         setIsLoading(true);
         try {
-            const data = await apiFetch('/competitors');
+            const data: any = await apiClient.get('/competitors');
             setCompetitors(data);
         } catch (error) {
             console.error('Error fetching competitors:', error);
@@ -26,10 +26,7 @@ export function useCompetitors() {
 
     const addCompetitor = async (newComp: Omit<Competitor, "id">) => {
         try {
-            const savedComp = await apiFetch('/competitors', {
-                method: 'POST',
-                body: JSON.stringify(newComp),
-            });
+            const savedComp: any = await apiClient.post('/competitors', newComp);
             setCompetitors(prev => [savedComp, ...prev]);
             return { success: true, competitor: savedComp };
         } catch (error) {
@@ -39,7 +36,7 @@ export function useCompetitors() {
 
     const removeCompetitor = async (id: string) => {
         try {
-            await apiFetch(`/competitors/${id}`, { method: 'DELETE' });
+            await apiClient.delete(`/competitors/${id}`);
             setCompetitors(prev => prev.filter(c => c.id !== id));
             return { success: true };
         } catch (error) {
@@ -49,10 +46,7 @@ export function useCompetitors() {
 
     const updateCompetitor = async (id: string, updates: Partial<Competitor>) => {
         try {
-            const updatedComp = await apiFetch(`/competitors/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify(updates),
-            });
+            const updatedComp: any = await apiClient.patch(`/competitors/${id}`, updates);
             setCompetitors(prev => prev.map(c => c.id === id ? updatedComp : c));
             return { success: true, competitor: updatedComp };
         } catch (error) {

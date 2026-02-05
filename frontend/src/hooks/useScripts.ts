@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { ScriptTemplate } from "@/types/library";
 
 export function useScripts() {
@@ -11,7 +11,7 @@ export function useScripts() {
     const refresh = useCallback(async () => {
         setIsLoading(true);
         try {
-            const data = await apiFetch('/scripts');
+            const data: any = await apiClient.get('/scripts');
             setScripts(data);
         } catch (error) {
             console.error('Error fetching scripts:', error);
@@ -26,10 +26,7 @@ export function useScripts() {
 
     const addScript = async (newScript: Omit<ScriptTemplate, "id" | "createdAt">) => {
         try {
-            const savedScript = await apiFetch('/scripts', {
-                method: 'POST',
-                body: JSON.stringify(newScript),
-            });
+            const savedScript: any = await apiClient.post('/scripts', newScript);
             setScripts(prev => [savedScript, ...prev]);
             return { success: true, script: savedScript };
         } catch (error) {
@@ -39,7 +36,7 @@ export function useScripts() {
 
     const removeScript = async (id: string) => {
         try {
-            await apiFetch(`/scripts/${id}`, { method: 'DELETE' });
+            await apiClient.delete(`/scripts/${id}`);
             setScripts(prev => prev.filter(s => s.id !== id));
             return { success: true };
         } catch (error) {
@@ -49,10 +46,7 @@ export function useScripts() {
 
     const updateScript = async (id: string, updates: Partial<ScriptTemplate>) => {
         try {
-            const updatedScript = await apiFetch(`/scripts/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify(updates),
-            });
+            const updatedScript: any = await apiClient.patch(`/scripts/${id}`, updates);
             setScripts(prev => prev.map(s => s.id === id ? updatedScript : s));
             return { success: true, script: updatedScript };
         } catch (error) {

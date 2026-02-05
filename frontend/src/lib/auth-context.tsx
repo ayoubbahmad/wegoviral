@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "./api-client";
+import { apiClient } from "./api-client";
 
 interface User {
     id: string;
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-            const data = await apiFetch("/auth/me");
+            const data: any = await apiClient.get("/auth/me");
             const user = data.user;
             setUser(user);
 
@@ -83,10 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (email: string, password: string) => {
         try {
-            const data = await apiFetch("/auth/login", {
-                method: "POST",
-                body: JSON.stringify({ email, password }),
-            });
+            const data: any = await apiClient.post("/auth/login", { email, password });
 
             localStorage.setItem("creator_os_token", data.token);
             const user = data.user;
@@ -107,10 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = async (email: string, username: string, password: string, name?: string) => {
         try {
-            const data = await apiFetch("/auth/register", {
-                method: "POST",
-                body: JSON.stringify({ email, username, password, name }),
-            });
+            const data: any = await apiClient.post("/auth/register", { email, username, password, name });
 
             localStorage.setItem("creator_os_token", data.token);
             const user = data.user;

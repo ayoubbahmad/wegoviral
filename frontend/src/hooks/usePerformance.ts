@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 
 export function usePerformance() {
@@ -18,8 +18,8 @@ export function usePerformance() {
         setIsLoading(true);
         try {
             const [pData, iData] = await Promise.all([
-                apiFetch(`/performance/posts?socialAccountId=${activeSocialAccount.id}`),
-                apiFetch(`/performance/insights?socialAccountId=${activeSocialAccount.id}`)
+                (apiClient.get(`/performance/posts?socialAccountId=${activeSocialAccount.id}`) as any),
+                (apiClient.get(`/performance/insights?socialAccountId=${activeSocialAccount.id}`) as any)
             ]);
             setPosts(pData);
             setInsights(iData);

@@ -5,19 +5,14 @@ import {
   Eye, 
   ArrowUpRight 
 } from "lucide-react";
+import { HomeStats } from "./types";
+
+export * from "./types";
 
 // API Endpoints
 export const HOME_ENDPOINTS = {
     GET_STATS: '/home/stats',
 };
-
-// Response Types
-export interface HomeStats {
-    label: string;
-    value: string;
-    trend?: number;
-    icon: any;
-}
 
 // Tanstack Query Hooks
 export const useGetHomeStats = () => {

@@ -1,25 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { HookTemplate, StyleTemplate } from "./types";
+
+export * from "./types";
 
 // API Endpoints
 export const SCRIPT_WIZARD_ENDPOINTS = {
     GET_HOOK_TEMPLATES: '/scripts/hooks',
     GET_STYLE_TEMPLATES: '/scripts/styles',
 };
-
-// Response Types
-export interface HookTemplate {
-  id: number;
-  title: string;
-  views: string;
-  thumbnailUrl: string;
-}
-
-export interface StyleTemplate {
-  id: number;
-  title: string;
-  views: string;
-  thumbnailUrl: string;
-}
 
 // Tanstack Query Hooks
 export const useGetHookTemplates = () => {

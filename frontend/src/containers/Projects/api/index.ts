@@ -1,17 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { Project } from "./types";
+
+export * from "./types";
 
 // API Endpoints
 export const PROJECTS_ENDPOINTS = {
     GET_LIST: '/projects',
 };
-
-// Response Types
-export interface Project {
-    id: string;
-    name: string;
-    items: number;
-    lastModified: string;
-}
 
 // Tanstack Query Hooks
 export const useGetProjects = () => {

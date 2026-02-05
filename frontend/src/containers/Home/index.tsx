@@ -32,7 +32,7 @@ export const HomeContainer = () => {
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
+        {stats?.map((stat) => (
           <div key={stat.label} className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-all group">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>

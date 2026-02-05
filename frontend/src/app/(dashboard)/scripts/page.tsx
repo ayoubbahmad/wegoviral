@@ -1,6 +1,6 @@
 "use client";
 
-import ScriptsPage from "@/pages/Scripts";
+import ScriptsPage from "@/views/Scripts";
 
 export default function Scripts() {
     return <ScriptsPage />;

@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/Auth";
-import { useUIStore } from "@/store/ui/slice";
+import { useUIStore } from "@/store/ui";
 
 const navItems = [
     { name: "Home", href: "/home", icon: LayoutDashboard },

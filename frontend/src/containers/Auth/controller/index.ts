@@ -10,7 +10,7 @@ export const useAuthController = () => {
     const router = useRouter();
     const { login, register, user, isLoading } = useAuth();
 
-    const initialMode = searchParams.get("tab") === "signup" ? "signup" : "login";
+    const initialMode = searchParams?.get("tab") === "signup" ? "signup" : "login";
     const [mode, setMode] = useState<"login" | "signup">(initialMode);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);

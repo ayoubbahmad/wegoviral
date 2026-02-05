@@ -1,5 +1,5 @@
 import { Sidebar } from "@/containers/layout/Sidebar";
-import { useUIStore } from "@/store/ui/slice";
+import { useUIStore } from "@/store/ui";
 import { cn } from "@/lib/utils";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {

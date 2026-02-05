@@ -39,7 +39,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Access Denied or Not Found</h2>
                     <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-                        {error || "This competitor doesn't exist or you don't have permission to view it."}
+                        {error instanceof Error ? error.message : (error || "This competitor doesn't exist or you don't have permission to view it.")}
                     </p>
                 </div>
                 <Link href="/competitors" className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity">
@@ -74,7 +74,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                                 </a>
                             </div>
                             <div className="flex gap-2 mt-3">
-                                {competitor.tags.map(tag => (
+                                {competitor.tags?.map((tag:any) => (
                                     <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground border border-border">
                                         {tag}
                                     </span>
@@ -114,7 +114,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
 
                         {posts.length > 0 ? (
                             <div className="grid gap-6">
-                                {posts.map(post => (
+                                {posts.map((post:any) => (
                                     <div key={post.id} className="flex flex-col lg:flex-row gap-6 p-5 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
                                         {/* Thumbnail / Visual */}
                                         <div className="relative w-full lg:w-48 aspect-[4/5] bg-secondary rounded-xl overflow-hidden shrink-0 group">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/providers/Toast";
+import { Competitor } from '@/types/competitor';
 import { useGetCompetitor } from "../api";
 
 export const useCompetitorDetailController = (id: string) => {
@@ -25,7 +26,7 @@ export const useCompetitorDetailController = (id: string) => {
         competitor,
         posts,
         isLoading,
-        error: error ? (error as Error).message : null,
+        error,
         savedHooks,
         savedStructures,
         handleSave,

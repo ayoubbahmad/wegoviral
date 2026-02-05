@@ -11,6 +11,7 @@ export interface Competitor {
     };
     tags: string[]; // e.g., "Tech", "Lifestyle"
     isFollowing?: boolean;
+    posts?: CompetitorPost[];
 }
 
 export interface CompetitorPost {

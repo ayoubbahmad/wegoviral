@@ -1,30 +1,40 @@
+import axios from "axios";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export async function apiFetch(endpoint: string, options: RequestInit = {}) {
+const apiClient = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+apiClient.interceptors.request.use((config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('creator_os_token') : null;
-
-    const headers = new Headers(options.headers);
-    if (!headers.has('Content-Type')) {
-        headers.set('Content-Type', 'application/json');
-    }
     if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+        config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+});
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers,
-    });
-
-    if (!response.ok) {
-        if (response.status === 401 && typeof window !== 'undefined') {
+apiClient.interceptors.response.use(
+    (response) => response.data,
+    (error) => {
+        if (error.response?.status === 401 && typeof window !== 'undefined') {
             localStorage.removeItem('creator_os_token');
             window.location.href = '/login';
         }
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || error.message || 'API request failed');
+        const message = error.response?.data?.error || error.response?.data?.message || 'API request failed';
+        return Promise.reject(new Error(message));
     }
+);
 
-    if (response.status === 204) return null;
-    return response.json();
+export default apiClient;
+
+// Keep apiFetch for backward compatibility during transition if needed, 
+// but it will now use axios under the hood.
+export async function apiFetch(endpoint: string, options: any = {}) {
+    const method = (options.method || 'GET').toLowerCase();
+    const response = await (apiClient as any)[method](endpoint, options.body ? JSON.parse(options.body) : undefined);
+    return response;
 }

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Loader2 } from "lucide-react";
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme, type Theme } from '@/lib/theme-context';
+import { useTheme, type Theme } from '@/providers/Theme';
 import { useState } from 'react';
 
 export function ThemeToggle() {

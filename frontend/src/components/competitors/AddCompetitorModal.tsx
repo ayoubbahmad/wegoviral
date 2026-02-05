@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal } from "@/components/ui/Modal";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/providers/Toast";
 import { useState } from "react";
 import { AtSign, User } from "lucide-react";
 

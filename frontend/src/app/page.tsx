@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 
 export default function LandingPage() {
     const { user, isLoading } = useAuth();

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 import { useLoginForm, useSignupForm, LoginFormValues, SignupFormValues } from "../forms";
 
 export const useAuthController = () => {

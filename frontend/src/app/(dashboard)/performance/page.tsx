@@ -5,7 +5,7 @@ import { PostingTimeHeatmap } from "@/components/performance/PostingTimeHeatmap"
 import { TopPostsGrid } from "@/components/performance/TopPostsGrid";
 import { Clock, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 import Link from "next/link";
 import { MOCK_PERFORMANCE_POSTS, MOCK_POSTING_TIMES } from "@/lib/mock-data";
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/providers/Toast";
 import { useGetCompetitor } from "../api";
 
 export const useCompetitorDetailController = (id: string) => {

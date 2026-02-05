@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "@/lib/api-client";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 
 export function usePerformance() {
     const { activeSocialAccount } = useAuth();

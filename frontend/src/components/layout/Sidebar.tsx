@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/providers/Auth";
 
 const navItems = [
     { name: "Home", href: "/home", icon: LayoutDashboard },

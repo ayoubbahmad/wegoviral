@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from '@/providers/Auth';
 import { Mail, User as UserIcon, Camera } from 'lucide-react';
 import { ThemeToggle } from '@/components/settings/ThemeToggle';
 

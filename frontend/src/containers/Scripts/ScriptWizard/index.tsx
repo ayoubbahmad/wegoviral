@@ -36,8 +36,6 @@ const STEPS_WITH_ICONS = [
 export function ScriptWizardContainer() {
   const {
     activeStep,
-    topic,
-    setTopic,
     isProcessing,
     researchComplete,
     selectedHooks,
@@ -45,13 +43,16 @@ export function ScriptWizardContainer() {
     selectedStyle,
     setSelectedStyle,
     scriptGenerated,
-    handleProcessResearch,
+    handleTopicSubmit,
     handleGenerateScript,
+    handleRefinementSubmit,
     showHistory,
     setShowHistory,
     scrollToSection,
     hookTemplates,
-    styleTemplates
+    styleTemplates,
+    topicForm,
+    refinementForm
   } = useScriptWizardController();
 
   return (
@@ -106,17 +107,21 @@ export function ScriptWizardContainer() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="What do you want to make a video about? Be as specific as possible..."
-            className="w-100 min-h-[160px] w-full bg-secondary/20 border border-border/50 rounded-2xl p-6 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50 transition-colors resize-none font-medium leading-relaxed"
-          />
+        <form onSubmit={topicForm.handleSubmit(handleTopicSubmit)} className="space-y-6">
+          <div className="space-y-2">
+            <textarea
+              {...topicForm.register("topic")}
+              placeholder="What do you want to make a video about? Be as specific as possible..."
+              className="w-100 min-h-[160px] w-full bg-secondary/20 border border-border/50 rounded-2xl p-6 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50 transition-colors resize-none font-medium leading-relaxed"
+            />
+            {topicForm.formState.errors.topic && (
+              <p className="text-xs text-destructive ml-2 font-bold">{topicForm.formState.errors.topic.message}</p>
+            )}
+          </div>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+              <button type="button" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
                 How to write the best prompt <ExternalLink className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -124,14 +129,14 @@ export function ScriptWizardContainer() {
             <div className="flex items-center gap-6">
               <span className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">Next step: Research</span>
               <button 
-                onClick={handleProcessResearch}
+                type="submit"
                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-105 active:scale-95"
               >
                 Save & Continue <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-        </div>
+        </form>
       </section>
 
       {/* Step 2: Research */}
@@ -345,29 +350,37 @@ export function ScriptWizardContainer() {
                </div>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={refinementForm.handleSubmit(handleRefinementSubmit)} className="space-y-4">
                <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Quick Refinements</h3>
-               <div className="flex items-center gap-2">
-                 <input 
-                   type="text" 
-                   placeholder="e.g. 'Make it more professional' or 'Add a CTA at the end'"
-                   className="flex-1 bg-secondary/20 border border-border/50 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-sm"
-                 />
-                 <button className="p-4 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
-                    <ArrowRight className="w-5 h-5" />
-                 </button>
+               <div className="flex flex-col gap-2">
+                 <div className="flex items-center gap-2">
+                   <input 
+                     type="text" 
+                     {...refinementForm.register("refinement")}
+                     placeholder="e.g. 'Make it more professional' or 'Add a CTA at the end'"
+                     className="flex-1 bg-secondary/20 border border-border/50 rounded-2xl px-6 py-4 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-sm"
+                   />
+                   <button type="submit" className="p-4 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                      <ArrowRight className="w-5 h-5" />
+                   </button>
+                 </div>
+                 {refinementForm.formState.errors.refinement && (
+                   <p className="text-[10px] text-destructive ml-2 font-bold">{refinementForm.formState.errors.refinement.message}</p>
+                 )}
                </div>
                <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
                  {['Professional', 'Humorous', 'Shorten', 'Extend', 'Rewrite Hooks'].map((action) => (
                    <button 
                      key={action}
+                     type="button"
+                     onClick={() => refinementForm.setValue("refinement", action)}
                      className="px-4 py-2 rounded-full border border-border/50 bg-card hover:border-primary/50 hover:bg-secondary transition-all text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap"
                    >
                      {action}
                    </button>
                  ))}
                </div>
-            </div>
+            </form>
 
             <div className="flex items-center gap-4 p-6 rounded-2xl bg-yellow-500/5 border border-yellow-500/10">
                <div className="p-2 rounded-lg bg-yellow-500/20 text-yellow-500">

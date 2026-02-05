@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGetHookTemplates, useGetStyleTemplates } from '../api';
+import { useScriptTopicForm, useScriptRefinementForm, ScriptTopicValues, ScriptRefinementValues } from '../forms';
 
 // Types
 export type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
@@ -16,8 +17,10 @@ export const useScriptWizardController = () => {
   const { data: hookTemplates = [] } = useGetHookTemplates();
   const { data: styleTemplates = [] } = useGetStyleTemplates();
   
+  const topicForm = useScriptTopicForm();
+  const refinementForm = useScriptRefinementForm();
+
   const [activeStep, setActiveStep] = useState<Step>('topic');
-  const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [researchComplete, setResearchComplete] = useState(false);
   const [selectedHooks, setSelectedHooks] = useState<number[]>([]);
@@ -58,7 +61,7 @@ export const useScriptWizardController = () => {
     }
   }, []);
 
-  const handleProcessResearch = useCallback(() => {
+  const handleTopicSubmit = useCallback((values: ScriptTopicValues) => {
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
@@ -78,11 +81,15 @@ export const useScriptWizardController = () => {
     scrollToSection('script');
   }, [scrollToSection]);
 
+  const handleRefinementSubmit = useCallback((values: ScriptRefinementValues) => {
+    // In a real app, this would trigger an API call to refine the script
+    console.log("Refining script with:", values.refinement);
+    refinementForm.reset();
+  }, [refinementForm]);
+
   return {
     activeStep,
     setActiveStep,
-    topic,
-    setTopic,
     isProcessing,
     researchComplete,
     selectedHooks,
@@ -90,12 +97,15 @@ export const useScriptWizardController = () => {
     selectedStyle,
     setSelectedStyle,
     scriptGenerated,
-    handleProcessResearch,
+    handleTopicSubmit,
     handleGenerateScript,
+    handleRefinementSubmit,
     showHistory,
     setShowHistory,
     scrollToSection,
     hookTemplates,
-    styleTemplates
+    styleTemplates,
+    topicForm,
+    refinementForm,
   };
 };

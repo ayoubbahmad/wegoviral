@@ -33,23 +33,6 @@ const STEPS_WITH_ICONS = [
   { id: 'script', label: 'Script', icon: FileText },
 ] as const;
 
-// Mock Data
-const HOOK_TEMPLATES = [
-  { id: 1, title: 'Google Alpha Earth', views: '23M', thumbnailUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80' },
-  { id: 2, title: 'What would happen if', views: '9.4M', thumbnailUrl: 'https://images.unsplash.com/photo-1484589065579-248aad0d8b13?w=300&q=80' },
-  { id: 3, title: "Education | Here's What Hap...", views: '1.7M', thumbnailUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=300&q=80' },
-  { id: 4, title: 'Question | Is it Just Me?', views: '820M', thumbnailUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&q=80' },
-  { id: 5, title: 'Question | 5 Minute...', views: '1M', thumbnailUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=300&q=80' },
-];
-
-const STYLE_TEMPLATES = [
-  { id: 1, title: 'Google Alpha Earth', views: '2M', thumbnailUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&q=80' },
-  { id: 2, title: 'What would happen if', views: '9.4M', thumbnailUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&q=80' },
-  { id: 3, title: 'Listicle (5 Steps)', views: '1M', thumbnailUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&q=80' },
-  { id: 4, title: 'Long Tutorial', views: '1.7M', thumbnailUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80' },
-  { id: 5, title: 'Rapid Tutorial', views: '580K', thumbnailUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=300&q=80' },
-];
-
 export function ScriptWizardContainer() {
   const {
     activeStep,
@@ -66,7 +49,9 @@ export function ScriptWizardContainer() {
     handleGenerateScript,
     showHistory,
     setShowHistory,
-    scrollToSection
+    scrollToSection,
+    hookTemplates,
+    styleTemplates
   } = useScriptWizardController();
 
   return (
@@ -234,7 +219,7 @@ export function ScriptWizardContainer() {
         </div>
 
         <div className="grid grid-cols-5 gap-4 mb-8">
-          {HOOK_TEMPLATES.map((hook) => (
+          {hookTemplates.map((hook: any) => (
             <button
               key={hook.id}
               onClick={() => toggleHookSelection(hook.id)}
@@ -285,7 +270,7 @@ export function ScriptWizardContainer() {
         </div>
 
         <div className="grid grid-cols-3 gap-6 mb-8">
-          {STYLE_TEMPLATES.map((style) => (
+          {styleTemplates.map((style: any) => (
             <button
               key={style.id}
               onClick={() => setSelectedStyle(style.id)}

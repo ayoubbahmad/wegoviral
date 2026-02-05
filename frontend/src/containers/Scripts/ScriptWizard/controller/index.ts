@@ -1,6 +1,5 @@
-"use client";
-
 import { useState, useEffect, useCallback } from 'react';
+import { useGetHookTemplates, useGetStyleTemplates } from '../api';
 
 // Types
 export type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
@@ -14,6 +13,9 @@ export const STEPS = [
 ] as const;
 
 export const useScriptWizardController = () => {
+  const { data: hookTemplates = [] } = useGetHookTemplates();
+  const { data: styleTemplates = [] } = useGetStyleTemplates();
+  
   const [activeStep, setActiveStep] = useState<Step>('topic');
   const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -92,6 +94,8 @@ export const useScriptWizardController = () => {
     handleGenerateScript,
     showHistory,
     setShowHistory,
-    scrollToSection
+    scrollToSection,
+    hookTemplates,
+    styleTemplates
   };
 };

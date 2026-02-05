@@ -1,39 +1,7 @@
-"use client";
-
-import { 
-  Users, 
-  Activity, 
-  Eye, 
-  ArrowUpRight 
-} from "lucide-react";
+import { useGetHomeStats } from "../api";
 
 export const useHomeController = () => {
-    // In a real app, you might fetch this data using Tanstack Query
-    const stats = [
-        {
-            label: "Total Followers",
-            value: "12,345",
-            trend: 12,
-            icon: Users,
-        },
-        {
-            label: "Avg. Engagement",
-            value: "4.8%",
-            trend: 2.1,
-            icon: Activity,
-        },
-        {
-            label: "Impressions (30d)",
-            value: "45.2k",
-            trend: 8,
-            icon: Eye,
-        },
-        {
-            label: "Content Score",
-            value: "92",
-            icon: ArrowUpRight,
-        },
-    ];
+    const { data: stats = [] } = useGetHomeStats();
 
     const videos = [1, 2];
     const scripts = [1, 2];

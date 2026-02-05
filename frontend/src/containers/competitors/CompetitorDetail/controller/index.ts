@@ -1,19 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import apiClient from "@/lib/api-client";
-import { Competitor, CompetitorPost } from "@/types/competitor";
 import { useState } from "react";
 import { useToast } from "@/components/ui/Toast";
+import { useGetCompetitor } from "../api";
 
 export const useCompetitorDetailController = (id: string) => {
     const { showToast } = useToast();
     const [savedHooks, setSavedHooks] = useState<string[]>([]);
     const [savedStructures, setSavedStructures] = useState<string[]>([]);
 
-    const { data: competitor, isLoading, error } = useQuery<Competitor>({
-        queryKey: ["competitor", id],
-        queryFn: () => apiClient.get(`/competitors/${id}`),
-        enabled: !!id,
-    });
+    const { data: competitor, isLoading, error } = useGetCompetitor(id);
 
     const posts = competitor?.posts || [];
 

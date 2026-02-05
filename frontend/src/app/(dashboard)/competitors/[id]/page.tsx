@@ -1,10 +1,10 @@
 "use client";
 
 import { use } from "react";
-import { CompetitorDetail } from "@/containers/competitors/CompetitorDetail";
+import CompetitorDetailPage from "@/pages/CompetitorDetail";
 
-export default function CompetitorDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function CompetitorDetailRoute(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);
 
-    return <CompetitorDetail id={params.id} />;
+    return <CompetitorDetailPage id={params.id} />;
 }

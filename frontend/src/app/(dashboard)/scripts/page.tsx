@@ -1,9 +1,7 @@
 "use client";
 
-import { ScriptWizardContainer } from "@/containers/Scripts/ScriptWizard";
+import ScriptsPage from "@/pages/Scripts";
 
-export default function ScriptsPage() {
-    return (
-        <ScriptWizardContainer />
-    );
+export default function Scripts() {
+    return <ScriptsPage />;
 }

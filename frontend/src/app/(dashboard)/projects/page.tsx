@@ -1,7 +1,7 @@
 "use client";
 
-import { ProjectsContainer } from "@/containers/Projects";
+import ProjectsPage from "@/pages/Projects";
 
-export default function ProjectsPage() {
-    return <ProjectsContainer />;
+export default function Projects() {
+    return <ProjectsPage />;
 }

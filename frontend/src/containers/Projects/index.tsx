@@ -26,7 +26,7 @@ export const ProjectsContainer = () => {
                 description="Organize your content into dedicated project folders."
                 actions={
                     <Button 
-                        variant="pill" 
+                        variant="primary" 
                         size="lg"
                         onClick={handleNewProject}
                     >

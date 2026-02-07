@@ -35,19 +35,18 @@ export const ScriptsLibraryContainer = () => {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between gap-4">
-        <PageHeader 
-          title="Scripts Library"
-          description="Manage and organize all your video scripts in one place."
-          className="flex-1"
-        />
-        <Link href="/scripts/new">
-          <Button variant="primary" className="h-11 px-6">
-            <Plus className="w-4 h-4" />
-            Create New Script
-          </Button>
-        </Link>
-      </div>
+      <PageHeader 
+        title="Scripts Library"
+        description="Manage and organize all your video scripts in one place."
+        actions={
+          <Link href="/scripts/new">
+            <Button variant="primary" size="lg">
+              <Plus className="w-4 h-4" />
+              Create New Script
+            </Button>
+          </Link>
+        }
+      />
 
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">

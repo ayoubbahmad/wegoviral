@@ -24,6 +24,7 @@ import {
   Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PageContainer } from '@/components/ui/PageContainer';
 
 // Mock data for the specific video
 const MOCK_VIDEO_DATA = {
@@ -96,14 +97,14 @@ export default function VideoAnalysisPage() {
     }
   };
 
-  return (
+    return (
     <>
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
       `}</style>
-      <div className='max-w-[1400px] mx-auto space-y-8 pb-32 pt-4'>
+      <PageContainer className="pt-4">
         {/* Header Content Area */}
         <div className='flex flex-col gap-4'>
           <h1 className='text-2xl font-black leading-tight tracking-tight text-foreground max-w-4xl'>
@@ -252,7 +253,7 @@ export default function VideoAnalysisPage() {
             </section>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </>
   );
 }

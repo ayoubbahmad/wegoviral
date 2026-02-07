@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 const MOCK_VIDEOS: Video[] = [
     {
@@ -104,7 +105,7 @@ export default function VideosPage() {
     const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
     return (
-        <div className="space-y-8 pb-12">
+        <PageContainer>
             <PageHeader 
                 title="Videos"
                 description="Discover what's gone viral in your niche, and why it worked."
@@ -185,6 +186,6 @@ export default function VideosPage() {
             ) : (
                 <VideoTable videos={MOCK_VIDEOS} />
             )}
-        </div>
+        </PageContainer>
     );
 }

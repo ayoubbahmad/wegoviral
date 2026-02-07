@@ -9,6 +9,7 @@ import { MOCK_COMMUNITY } from "@/lib/mock-data";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Tabs } from "@/components/ui/Tabs";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 export default function CommunityPage() {
     const { followers, summary, isLoading } = useCommunity();
@@ -38,7 +39,7 @@ export default function CommunityPage() {
     const displayedFollowers = getFilteredAndSortedFollowers();
 
     return (
-        <div className="space-y-12 pb-12">
+        <PageContainer>
             <PageHeader 
                 title="Community Intelligence"
                 description="Identify your most valuable fans and understand who is engaging with you."
@@ -99,6 +100,6 @@ export default function CommunityPage() {
             ) : (
                 <FollowerList followers={displayedFollowers} />
             )}
-        </div>
+        </PageContainer>
     );
 }

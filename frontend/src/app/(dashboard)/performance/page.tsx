@@ -10,6 +10,7 @@ import Link from "next/link";
 import { MOCK_PERFORMANCE_POSTS, MOCK_POSTING_TIMES } from "@/lib/mock-data";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 export default function PerformancePage() {
     const { activeSocialAccount } = useAuth();
@@ -22,7 +23,7 @@ export default function PerformancePage() {
     ];
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-500 pb-12">
+        <PageContainer className="animate-in fade-in duration-500">
             <PageHeader 
                 title="Performance Insights"
                 description="Understand what works and when to post for maximum impact."
@@ -103,6 +104,6 @@ export default function PerformancePage() {
                     <TopPostsGrid posts={dataPosts} />
                 )}
             </div>
-        </div>
+        </PageContainer>
     );
 }

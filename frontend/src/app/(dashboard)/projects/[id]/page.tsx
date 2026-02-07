@@ -7,6 +7,7 @@ import { ChevronLeft, Play, MoreHorizontal, LayoutGrid, List, Plus, Search, Filt
 import Link from "next/link";
 import { useState } from 'react';
 import { cn } from "@/lib/utils";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 // Mock data for a project's videos
 const MOCK_PROJECT_VIDEOS = [
@@ -76,7 +77,7 @@ export default function ProjectDetailsPage() {
     const projectName = PROJECT_MAP[id] || 'Unnamed Project';
 
     return (
-        <div className="space-y-10 pb-32">
+        <PageContainer>
             {/* Header / Breadcrumbs */}
             <div className="space-y-6">
                 <Link 
@@ -169,6 +170,6 @@ export default function ProjectDetailsPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </PageContainer>
     );
 }

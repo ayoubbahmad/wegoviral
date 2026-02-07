@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 // Mock data for suggested channels (empty initially or some suggestions)
 const MOCK_SUGGESTED_CHANNELS = [
@@ -19,7 +20,7 @@ export default function ChannelsPage() {
     const [activeTab, setActiveTab] = useState<"niche" | "similar" | "manual">("niche");
 
     return (
-        <div className="max-w-5xl mx-auto space-y-12 pb-32">
+        <PageContainer>
             <PageHeader 
                 title="Build your watchlist"
                 description="Find the best channels to use as inspiration for your content"
@@ -132,6 +133,6 @@ export default function ChannelsPage() {
                      </div>
                 </div>
             </div>
-        </div>
+        </PageContainer>
     );
 }

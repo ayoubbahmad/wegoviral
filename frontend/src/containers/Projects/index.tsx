@@ -6,6 +6,7 @@ import { useProjectsController } from "./controller";
 import { ProjectsSkeleton } from "@/views/Projects/skeleton";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 export const ProjectsContainer = () => {
     const {
@@ -19,7 +20,7 @@ export const ProjectsContainer = () => {
     }
 
     return (
-        <div className="space-y-12 pb-32">
+        <PageContainer>
             <PageHeader 
                 title="Projects"
                 description="Organize your content into dedicated project folders."
@@ -46,6 +47,6 @@ export const ProjectsContainer = () => {
                     />
                 ))}
             </div>
-        </div>
+        </PageContainer>
     );
 };

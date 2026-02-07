@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { AddNewItem } from "@/components/library/AddNewItem";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
@@ -16,7 +17,7 @@ export default function LibraryPage() {
     const { scripts, addScript, removeScript, updateScript } = useScripts();
 
     return (
-        <div className="space-y-12 pb-32">
+        <PageContainer>
             <PageHeader 
                 title="Library"
                 description="Manage your creative assets, hooks, and script structures."
@@ -52,6 +53,6 @@ export default function LibraryPage() {
                     />
                 )}
             </div>
-        </div>
+        </PageContainer>
     );
 }

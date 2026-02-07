@@ -16,6 +16,7 @@ import { useHomeController } from "./controller";
 import { HomeSkeleton } from "@/views/Home/skeleton";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PageContainer } from "@/components/ui/PageContainer";
 
 export const HomeContainer = () => {
   const {
@@ -32,7 +33,7 @@ export const HomeContainer = () => {
   }
 
   return (
-    <div className="space-y-12 pb-12">
+    <PageContainer>
       <PageHeader 
         title="Home"
         description="Welcome back. Everything you need to scale your influence in one place."
@@ -211,6 +212,6 @@ export const HomeContainer = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };

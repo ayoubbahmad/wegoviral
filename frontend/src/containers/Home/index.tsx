@@ -100,13 +100,15 @@ export const HomeContainer = () => {
             titleClassName="text-purple-500"
           />
 
-          <Button 
-            variant="outline" 
-            className="w-full border-dashed border-purple-500/20 text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/50 group"
-          >
-            <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            Create New Script
-          </Button>
+          <Link href="/scripts/new" className="block w-full">
+            <Button 
+              variant="outline" 
+              className="w-full border-dashed border-purple-500/20 text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/50 group"
+            >
+              <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              Create New Script
+            </Button>
+          </Link>
 
           <div className="space-y-3 pt-1">
             {scripts.map((i) => (

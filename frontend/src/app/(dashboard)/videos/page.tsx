@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { PageContainer } from "@/components/ui/PageContainer";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { ViewToggle } from "@/components/ui/ViewToggle";
 
 const MOCK_VIDEOS: Video[] = [
     {
@@ -112,50 +114,16 @@ export default function VideosPage() {
             />
 
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                {/* Search Bar */}
-                <div className="relative w-full max-w-xl group">
-                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                        <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                    </div>
-                    <input 
-                        type="text" 
-                        placeholder="Search for videos by topic..."
-                        className="w-full h-11 pl-11 pr-20 rounded-xl bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm"
-                    />
-                    <button className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn">
-                        Go
-                        <span className="text-[10px] opacity-50 group-hover/btn:translate-x-0.5 transition-transform">↵</span>
-                    </button>
-                </div>
+                <SearchInput 
+                    placeholder="Search for videos by topic..."
+                />
 
                 {/* View Controls */}
                 <div className="flex items-center gap-2">
-                    <div className="flex p-1 bg-card border border-border/50 rounded-xl">
-                        <Button 
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setViewMode("table")}
-                            className={cn(
-                                "p-2 rounded-lg transition-all",
-                                viewMode === "table" ? "bg-primary/10 text-primary shadow-sm" : ""
-                            )}
-                            title="Table View"
-                        >
-                            <Table2 className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setViewMode("cards")}
-                            className={cn(
-                                "p-2 rounded-lg transition-all",
-                                viewMode === "cards" ? "bg-primary/10 text-primary shadow-sm" : ""
-                            )}
-                            title="Grid View"
-                        >
-                            <LayoutGrid className="w-4 h-4" />
-                        </Button>
-                    </div>
+                    <ViewToggle 
+                        mode={viewMode === "cards" ? "grid" : "table"}
+                        onChange={(m) => setViewMode(m === "grid" ? "cards" : "table")}
+                    />
 
                     <Button variant="outline" className="h-11 px-4 text-sm font-medium">
                         <ArrowUpDown className="w-4 h-4" />

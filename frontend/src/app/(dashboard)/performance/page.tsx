@@ -11,6 +11,8 @@ import { MOCK_PERFORMANCE_POSTS, MOCK_POSTING_TIMES } from "@/lib/mock-data";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { PageContainer } from "@/components/ui/PageContainer";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export default function PerformancePage() {
     const { activeSocialAccount } = useAuth();
@@ -32,15 +34,13 @@ export default function PerformancePage() {
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Heatmap Section */}
                 <div className="lg:col-span-2 p-6 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden">
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="p-1.5 bg-blue-500/10 rounded-lg">
-                            <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold">Best Time to Post</h2>
-                            <p className="text-xs text-muted-foreground">Based on historical engagement rates.</p>
-                        </div>
-                    </div>
+                    <SectionHeader 
+                      title="Best Time to Post"
+                      icon={Clock}
+                      description="Based on historical engagement rates."
+                      className="mb-6"
+                      titleClassName="text-lg"
+                    />
 
                     {activeSocialAccount ? (
                         <PostingTimeHeatmap data={MOCK_POSTING_TIMES} />
@@ -73,17 +73,19 @@ export default function PerformancePage() {
                         </p>
                     </div>
                     <div className="p-6 rounded-2xl bg-card border border-border">
-                        <h3 className="font-semibold mb-4">Content Mix</h3>
-                        <div className="space-y-3">
+                        <SectionHeader 
+                          title="Content Mix" 
+                          className="mb-4" 
+                          titleClassName="text-base"
+                        />
+                        <div className="space-y-4">
                             {contentMix.map((item: any, i: number) => (
-                                <div key={i}>
-                                    <div className="flex justify-between text-sm mb-1">
+                                <div key={i} className="space-y-1.5">
+                                    <div className="flex justify-between text-xs font-medium">
                                         <span>{item.label}</span>
-                                        <span className="font-bold">{item.value}%</span>
+                                        <span className="text-muted-foreground">{item.value}%</span>
                                     </div>
-                                    <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-                                        <div className={cn("h-full", item.color)} style={{ width: `${item.value}%` }}></div>
-                                    </div>
+                                    <ProgressBar value={item.value} color={item.color} />
                                 </div>
                             ))}
                         </div>
@@ -92,12 +94,11 @@ export default function PerformancePage() {
             </div>
 
             <div className="border-t border-border pt-8">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="p-1.5 bg-green-500/10 rounded-lg">
-                        <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <h2 className="text-xl font-bold">Top Performing Content</h2>
-                </div>
+                <SectionHeader 
+                  title="Top Performing Content"
+                  icon={TrendingUp}
+                  className="mb-6"
+                />
                 {isLoading ? (
                     <div className="p-12 text-center text-muted-foreground">Loading posts...</div>
                 ) : (

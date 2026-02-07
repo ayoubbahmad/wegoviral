@@ -17,6 +17,9 @@ import { HomeSkeleton } from "@/views/Home/skeleton";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PageContainer } from "@/components/ui/PageContainer";
+import { StatCard } from "@/components/ui/StatCard";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export const HomeContainer = () => {
   const {
@@ -42,33 +45,25 @@ export const HomeContainer = () => {
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats?.map((stat) => (
-          <div key={stat.label} className="p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
-              <stat.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-2xl font-bold tracking-tight">{stat.value}</span>
-              {stat.trend && (
-                <span className="text-xs font-medium text-emerald-500 flex items-center bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
-                  +{stat.trend}% <ArrowUpRight className="w-3 h-3 ml-0.5" />
-                </span>
-              )}
-            </div>
-          </div>
+          <StatCard 
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+            trend={stat.trend}
+          />
         ))}
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
         {/* Videos Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
-              <Video className="w-5 h-5" />
-              Videos
-            </h2>
-            <Link href="/videos" className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors">View All</Link>
-          </div>
+          <SectionHeader 
+            title="Videos"
+            icon={Video}
+            href="/videos"
+            titleClassName="text-primary"
+          />
           
           <Button 
             variant="outline" 
@@ -98,13 +93,12 @@ export const HomeContainer = () => {
 
         {/* Scripts Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-purple-500">
-              <FileText className="w-5 h-5" />
-              Scripts
-            </h2>
-            <Link href="/scripts" className="text-xs font-medium text-muted-foreground hover:text-purple-500 transition-colors">View All</Link>
-          </div>
+          <SectionHeader 
+            title="Scripts"
+            icon={FileText}
+            href="/scripts"
+            titleClassName="text-purple-500"
+          />
 
           <Button 
             variant="outline" 
@@ -133,13 +127,12 @@ export const HomeContainer = () => {
 
         {/* Projects Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-amber-500">
-              <FolderOpen className="w-5 h-5" />
-              Projects
-            </h2>
-            <Link href="/projects" className="text-xs font-medium text-muted-foreground hover:text-amber-500 transition-colors">View All</Link>
-          </div>
+          <SectionHeader 
+            title="Projects"
+            icon={FolderOpen}
+            href="/projects"
+            titleClassName="text-amber-500"
+          />
 
           <Button 
             variant="outline" 
@@ -154,11 +147,8 @@ export const HomeContainer = () => {
               <div key={i} className="p-4 rounded-xl bg-card border border-border/50 hover:border-amber-500/50 transition-all cursor-pointer shadow-sm hover:shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold text-sm">{proj.name}</h3>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase">{proj.progress}%</span>
                 </div>
-                <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full ${proj.color} transition-all`} style={{ width: `${proj.progress}%` }} />
-                </div>
+                <ProgressBar value={proj.progress} color={proj.color} showLabel />
               </div>
             ))}
           </div>
@@ -166,13 +156,12 @@ export const HomeContainer = () => {
 
         {/* Challenges Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-emerald-500">
-              <Trophy className="w-5 h-5" />
-              Challenges
-            </h2>
-            <Link href="/challenges" className="text-xs font-medium text-muted-foreground hover:text-emerald-500 transition-colors">View All</Link>
-          </div>
+          <SectionHeader 
+            title="Challenges"
+            icon={Trophy}
+            href="/challenges"
+            titleClassName="text-emerald-500"
+          />
 
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" className="border-dashed border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/50 group">

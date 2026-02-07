@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { PageContainer } from "@/components/ui/PageContainer";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 // Mock data for suggested channels (empty initially or some suggestions)
 const MOCK_SUGGESTED_CHANNELS = [
@@ -90,31 +91,32 @@ export default function ChannelsPage() {
             {/* Suggested & Included Lists */}
             <div className="grid md:grid-cols-2 gap-6">
                  {/* Suggested Column */}
-                <div className="bg-card/30 border border-border rounded-2xl p-6 min-h-[300px] flex flex-col">
-                    <div className="flex flex-col h-full items-center justify-center text-center text-muted-foreground space-y-2 p-8">
-                        {MOCK_SUGGESTED_CHANNELS.length > 0 && searchQuery ? (
-                             <div className="w-full space-y-3">
-                                 {MOCK_SUGGESTED_CHANNELS.map(channel => (
-                                     <div key={channel.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border text-left">
-                                         <div className="flex items-center gap-3">
-                                             <img src={channel.avatar} alt={channel.name} className="w-8 h-8 rounded-full" />
-                                             <div>
-                                                 <p className="text-sm font-semibold">{channel.name}</p>
-                                                 <p className="text-xs text-muted-foreground">{channel.followers} • {channel.platform}</p>
-                                             </div>
+                <div className="bg-card/30 border border-border rounded-2xl p-6 min-h-[400px] flex flex-col">
+                    {MOCK_SUGGESTED_CHANNELS.length > 0 && searchQuery ? (
+                         <div className="w-full space-y-3">
+                             {MOCK_SUGGESTED_CHANNELS.map(channel => (
+                                 <div key={channel.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border text-left">
+                                     <div className="flex items-center gap-3">
+                                         <img src={channel.avatar} alt={channel.name} className="w-8 h-8 rounded-full" />
+                                         <div>
+                                             <p className="text-sm font-semibold">{channel.name}</p>
+                                             <p className="text-xs text-muted-foreground">{channel.followers} • {channel.platform}</p>
                                          </div>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary">
-                                              <UserPlus className="w-4 h-4" />
-                                          </Button>
                                      </div>
-                                 ))}
-                             </div>
-                        ) : (
-                            <>
-                                <p className="text-sm">Use the textbox above to get suggestions</p>
-                            </>
-                        )}
-                    </div>
+                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary">
+                                          <UserPlus className="w-4 h-4" />
+                                      </Button>
+                                 </div>
+                             ))}
+                         </div>
+                    ) : (
+                        <EmptyState 
+                          title="No suggestions yet"
+                          description="Use the textbox above to describe your niche and find inspiration."
+                          icon={Search}
+                          className="flex-1 bg-transparent border-none p-0"
+                        />
+                    )}
                      <div className="mt-auto pt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50">
                          <span>Load more</span>
                          <button className="hover:text-foreground transition-colors">Add all to watchlist</button>
@@ -122,10 +124,12 @@ export default function ChannelsPage() {
                 </div>
 
                  {/* Included Column */}
-                 <div className="bg-card/30 border border-border rounded-2xl p-6 min-h-[300px] flex flex-col">
-                    <div className="flex flex-col h-full items-center justify-center text-center text-muted-foreground space-y-2">
-                        <p className="text-sm">No channels added yet</p>
-                    </div>
+                 <div className="bg-card/30 border border-border rounded-2xl p-6 min-h-[400px] flex flex-col">
+                    <EmptyState 
+                      title="Watchlist is empty"
+                      description="Add channels from the suggestions to build your reference library."
+                      className="flex-1 bg-transparent border-none p-0"
+                    />
                     
                     <div className="mt-auto pt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50">
                          <button className="hover:text-foreground transition-colors">Remove all</button>

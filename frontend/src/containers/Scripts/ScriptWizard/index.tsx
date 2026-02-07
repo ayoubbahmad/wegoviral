@@ -34,7 +34,7 @@ const STEPS_WITH_ICONS = [
   { id: 'script', label: 'Script', icon: FileText },
 ] as const;
 
-export function ScriptWizardContainer() {
+export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
   const {
     activeStep,
     isProcessing,
@@ -55,8 +55,9 @@ export function ScriptWizardContainer() {
     hookTemplates,
     styleTemplates,
     topicForm,
-    refinementForm
-  } = useScriptWizardController();
+    refinementForm,
+    scriptData
+  } = useScriptWizardController(scriptId);
 
   return (
     <div className="space-y-12 pb-32">
@@ -356,14 +357,11 @@ export function ScriptWizardContainer() {
           <div className="space-y-8">
             <div className="relative p-8 rounded-2xl bg-secondary/30 border border-border/50 min-h-[400px]">
                <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                 241 Words · ~1:30 mins
+                 {scriptData?.wordCount || 241} Words · ~{scriptData?.wordCount ? Math.ceil(scriptData.wordCount / 160) : '1:30'} mins
                </div>
                <div className="prose prose-invert max-w-none">
-                 <p className="text-lg leading-[2] text-foreground font-medium">
-                   This is a revolutionary AI project from Google.<br /><br />
-                   It's called Nano Banana Impact.<br /><br />
-                   And this thing is like Photoshop with superpowers.<br /><br />
-                   Google created this to completely transform how we edit and generate images.
+                 <p className="text-lg leading-[2] text-foreground font-medium whitespace-pre-wrap">
+                   {scriptData?.content?.generatedContent || "This is a revolutionary AI project from Google...\n\nIt's called Nano Banana Impact.\n\nAnd this thing is like Photoshop with superpowers.\n\nGoogle created this to completely transform how we edit and generate images."}
                  </p>
                </div>
             </div>

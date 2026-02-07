@@ -11,6 +11,10 @@ export const scriptsApi = {
     return apiClient.get<any, Script[]>(SCRIPTS_ENDPOINTS.BASE);
   },
   
+  getScript: async (id: string) => {
+    return apiClient.get<any, Script>(SCRIPTS_ENDPOINTS.DETAIL(id));
+  },
+  
   createScript: async (data: CreateScriptDTO) => {
     return apiClient.post<any, Script>(SCRIPTS_ENDPOINTS.BASE, data);
   },

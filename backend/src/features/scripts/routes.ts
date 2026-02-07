@@ -8,6 +8,7 @@ const router = Router();
 router.use(protect);
 
 router.get('/', scriptsController.getScripts);
+router.get('/:id', scriptsController.getScript);
 router.post('/', scriptsController.createScript);
 router.patch('/:id', scriptsController.updateScript);
 router.delete('/:id', scriptsController.deleteScript);

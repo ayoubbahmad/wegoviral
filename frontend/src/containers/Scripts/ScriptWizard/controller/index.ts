@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useGetHookTemplates, useGetStyleTemplates } from '../api';
 import { useScriptTopicForm, useScriptRefinementForm, ScriptTopicValues, ScriptRefinementValues } from '../forms';
 import { scriptsApi } from '../../Library/api';
+import { Script } from '../../Library/api/types';
 
 // Types
 export type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
@@ -16,7 +17,7 @@ export const STEPS = [
   { id: 'script', label: 'Script' },
 ] as const;
 
-export const useScriptWizardController = () => {
+export const useScriptWizardController = (scriptId?: string) => {
   const router = useRouter();
   const { data: hookTemplates = [] } = useGetHookTemplates();
   const { data: styleTemplates = [] } = useGetStyleTemplates();
@@ -32,9 +33,35 @@ export const useScriptWizardController = () => {
   const [scriptGenerated, setScriptGenerated] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Persistence mutation
+  // Fetch script data if editing
+  const { data: scriptData, isLoading: isLoadingScript } = useQuery({
+    queryKey: ['script', scriptId],
+    queryFn: () => scriptsApi.getScript(scriptId!),
+    enabled: !!scriptId,
+  });
+
+  // Initialize state from script data
+  useEffect(() => {
+    if (scriptData) {
+      topicForm.reset({ topic: scriptData.content?.topic || '' });
+      setSelectedHooks(scriptData.content?.hooks || []);
+      setSelectedStyle(scriptData.content?.style || null);
+      setResearchComplete(true);
+      setScriptGenerated(true);
+      setActiveStep('script');
+    }
+  }, [scriptData, topicForm]);
+
+  // Persistence mutations
   const saveMutation = useMutation({
     mutationFn: scriptsApi.createScript,
+    onSuccess: () => {
+      router.push('/scripts');
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => scriptsApi.updateScript(id, data),
     onSuccess: () => {
       router.push('/scripts');
     }
@@ -94,24 +121,29 @@ export const useScriptWizardController = () => {
   }, [scrollToSection]);
 
   const handleRefinementSubmit = useCallback((values: ScriptRefinementValues) => {
-    // In a real app, this would trigger an API call to refine the script
     console.log("Refining script with:", values.refinement);
     refinementForm.reset();
   }, [refinementForm]);
 
   const handleSaveScript = async () => {
     const values = topicForm.getValues();
+    const payload = {
+      title: values.topic.substring(0, 50) + "...",
+      content: {
+        topic: values.topic,
+        hooks: selectedHooks,
+        style: selectedStyle,
+        generatedContent: scriptData?.content?.generatedContent || "This is a revolutionary AI project from Google..." 
+      },
+      category: "General"
+    };
+
     try {
-      await saveMutation.mutateAsync({
-        title: values.topic.substring(0, 50) + "...",
-        content: {
-          topic: values.topic,
-          hooks: selectedHooks,
-          style: selectedStyle,
-          generatedContent: "This is a revolutionary AI project from Google..." // In a real app, this would be the actual generated text
-        },
-        category: "General"
-      });
+      if (scriptId) {
+        await updateMutation.mutateAsync({ id: scriptId, data: payload });
+      } else {
+        await saveMutation.mutateAsync(payload);
+      }
     } catch (err) {
       console.error("Failed to save script:", err);
       alert("Failed to save script. Please try again.");
@@ -121,7 +153,7 @@ export const useScriptWizardController = () => {
   return {
     activeStep,
     setActiveStep,
-    isProcessing,
+    isProcessing: isProcessing || isLoadingScript,
     researchComplete,
     selectedHooks,
     toggleHookSelection,
@@ -132,7 +164,7 @@ export const useScriptWizardController = () => {
     handleGenerateScript,
     handleRefinementSubmit,
     handleSaveScript,
-    isSaving: saveMutation.isPending,
+    isSaving: saveMutation.isPending || updateMutation.isPending,
     showHistory,
     setShowHistory,
     scrollToSection,
@@ -140,5 +172,6 @@ export const useScriptWizardController = () => {
     styleTemplates,
     topicForm,
     refinementForm,
+    scriptData
   };
 };

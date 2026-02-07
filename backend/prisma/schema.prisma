@@ -57,6 +57,9 @@ model ScriptTemplate {
   title     String
   content   Json     // Structure details (array of steps)
   category  String
+  status    String   @default("Draft")
+  excerpt   String?
+  wordCount Int?     @default(0)
   
   userId    String
   user      UserProfile @relation(fields: [userId], references: [id])

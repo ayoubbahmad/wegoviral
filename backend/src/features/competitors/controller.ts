@@ -1,118 +1,68 @@
 import { Response } from 'express';
-import { prisma } from '../../lib/prisma';
-
-export const getCompetitor = async (req: any, res: Response) => {
-    try {
-        const id = req.params.id as string;
-        const competitor = await prisma.competitor.findFirst({
-            where: { id, userId: req.user.id },
-            include: {
-                posts: {
-                    orderBy: { postedAt: 'desc' }
-                }
-            }
-        });
-
-        if (!competitor) {
-            return res.status(404).json({ error: 'Competitor not found' });
-        }
-
-        res.json({
-            ...competitor,
-            isFollowing: true,
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch competitor' });
-    }
-};
+import { competitorsService } from './service';
 
 export const getCompetitors = async (req: any, res: Response) => {
     try {
-        const competitors = await prisma.competitor.findMany({
-            where: { userId: req.user.id },
-            orderBy: { createdAt: 'desc' },
-        });
-        res.json(competitors.map(comp => ({
-            ...comp,
-            isFollowing: true,
-        })));
+        const competitors = await competitorsService.getAllCompetitors(req.user.id);
+        res.json(competitors);
     } catch (error) {
+        console.error('Get Competitors Error:', error);
         res.status(500).json({ error: 'Failed to fetch competitors' });
+    }
+};
+
+export const getCompetitor = async (req: any, res: Response) => {
+    try {
+        const competitor = await competitorsService.getCompetitorById(req.params.id, req.user.id);
+        if (!competitor) {
+            return res.status(404).json({ error: 'Competitor not found' });
+        }
+        res.json(competitor);
+    } catch (error) {
+        console.error('Get Competitor Error:', error);
+        res.status(500).json({ error: 'Failed to fetch competitor' });
     }
 };
 
 export const createCompetitor = async (req: any, res: Response) => {
     try {
         const { handle, name, avatarUrl, bio, tags, stats, socialAccountId } = req.body;
-
         if (!handle || !name) {
             return res.status(400).json({ error: 'Handle and name are required' });
         }
 
-        const competitor = await prisma.competitor.create({
-            data: {
-                handle,
-                name,
-                avatarUrl: avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
-                bio,
-                tags: tags || [],
-                stats: stats || {},
-                userId: req.user.id,
-                socialAccountId
-            },
+        const competitor = await competitorsService.createCompetitor(req.user.id, {
+            handle, name, avatarUrl, bio, tags, stats, socialAccountId
         });
         res.status(201).json(competitor);
     } catch (error: any) {
         console.error('Create Competitor Error:', error);
-        res.status(500).json({
-            error: 'Failed to create competitor',
-            details: error.message
-        });
+        res.status(500).json({ error: 'Failed to create competitor', details: error.message });
     }
 };
 
 export const updateCompetitor = async (req: any, res: Response) => {
     try {
-        const id = req.params.id as string;
-        const data = req.body;
-
-        // Ensure user owns the competitor
-        const competitor = await prisma.competitor.findFirst({
-            where: { id, userId: req.user.id }
-        });
-
+        const competitor = await competitorsService.updateCompetitor(req.params.id, req.user.id, req.body);
         if (!competitor) {
             return res.status(404).json({ error: 'Competitor not found' });
         }
-
-        const updatedComp = await prisma.competitor.update({
-            where: { id },
-            data,
-        });
-        res.json(updatedComp);
+        res.json(competitor);
     } catch (error) {
+        console.error('Update Competitor Error:', error);
         res.status(500).json({ error: 'Failed to update competitor' });
     }
 };
 
 export const deleteCompetitor = async (req: any, res: Response) => {
     try {
-        const id = req.params.id as string;
-
-        // Ensure user owns the competitor
-        const competitor = await prisma.competitor.findFirst({
-            where: { id, userId: req.user.id }
-        });
-
-        if (!competitor) {
+        const success = await competitorsService.deleteCompetitor(req.params.id, req.user.id);
+        if (!success) {
             return res.status(404).json({ error: 'Competitor not found' });
         }
-
-        await prisma.competitor.delete({
-            where: { id },
-        });
         res.status(204).send();
     } catch (error) {
+        console.error('Delete Competitor Error:', error);
         res.status(500).json({ error: 'Failed to delete competitor' });
     }
 };

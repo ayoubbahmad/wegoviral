@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
-export const getFollowers = async (req: any, res: Response) => {
+export const getUserPosts = async (req: any, res: Response) => {
     try {
         const { socialAccountId } = req.query;
         if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
@@ -15,21 +15,22 @@ export const getFollowers = async (req: any, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized access to this social account' });
         }
 
-        const followers = await prisma.follower.findMany({
+        const posts = await prisma.userPost.findMany({
             where: { socialAccountId: String(socialAccountId) },
-            include: { interactions: true },
+            orderBy: { postedAt: 'desc' },
         });
 
-        res.json(followers.map(f => ({
-            ...f,
-            stats: f.stats as any,
+        res.json(posts.map(p => ({
+            ...p,
+            postedAt: p.postedAt.toISOString(),
+            metrics: p.metrics as any,
         })));
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch followers' });
+        res.status(500).json({ error: 'Failed to fetch user posts' });
     }
 };
 
-export const getCommunitySummary = async (req: any, res: Response) => {
+export const getPerformanceInsights = async (req: any, res: Response) => {
     try {
         const { socialAccountId } = req.query;
         if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
@@ -43,20 +44,15 @@ export const getCommunitySummary = async (req: any, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized access to this social account' });
         }
 
-        const totalCount = await prisma.follower.count({ where: { socialAccountId: String(socialAccountId) } });
-        const vipCount = await prisma.follower.count({
-            where: {
-                socialAccountId: String(socialAccountId),
-                segment: { in: ['VIP', 'Superfan'] }
-            }
-        });
-
+        // Mocking for now as in the original server action
         res.json({
-            total: totalCount,
-            vips: vipCount,
-            newThisMonth: 0,
+            bestTime: "Tuesday at 6 PM",
+            contentMix: [
+                { label: "Reels", value: 60, color: "bg-blue-500" },
+                { label: "Carousels", value: 30, color: "bg-purple-500" },
+            ]
         });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch community summary' });
+        res.status(500).json({ error: 'Failed to fetch performance insights' });
     }
 };

@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
 export const getCompetitor = async (req: any, res: Response) => {
     try {

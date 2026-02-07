@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as scriptsController from '../controllers/scripts.controller';
-import { protect } from '../middleware/auth.middleware';
+import * as scriptsController from './controller';
+import { protect } from '../../middleware/auth.middleware';
 
 const router = Router();
 

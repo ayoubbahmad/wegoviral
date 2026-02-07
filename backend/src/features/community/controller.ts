@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
-export const getUserPosts = async (req: any, res: Response) => {
+export const getFollowers = async (req: any, res: Response) => {
     try {
         const { socialAccountId } = req.query;
         if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
@@ -15,22 +15,21 @@ export const getUserPosts = async (req: any, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized access to this social account' });
         }
 
-        const posts = await prisma.userPost.findMany({
+        const followers = await prisma.follower.findMany({
             where: { socialAccountId: String(socialAccountId) },
-            orderBy: { postedAt: 'desc' },
+            include: { interactions: true },
         });
 
-        res.json(posts.map(p => ({
-            ...p,
-            postedAt: p.postedAt.toISOString(),
-            metrics: p.metrics as any,
+        res.json(followers.map(f => ({
+            ...f,
+            stats: f.stats as any,
         })));
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch user posts' });
+        res.status(500).json({ error: 'Failed to fetch followers' });
     }
 };
 
-export const getPerformanceInsights = async (req: any, res: Response) => {
+export const getCommunitySummary = async (req: any, res: Response) => {
     try {
         const { socialAccountId } = req.query;
         if (!socialAccountId) return res.status(400).json({ error: 'socialAccountId is required' });
@@ -44,15 +43,20 @@ export const getPerformanceInsights = async (req: any, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized access to this social account' });
         }
 
-        // Mocking for now as in the original server action
+        const totalCount = await prisma.follower.count({ where: { socialAccountId: String(socialAccountId) } });
+        const vipCount = await prisma.follower.count({
+            where: {
+                socialAccountId: String(socialAccountId),
+                segment: { in: ['VIP', 'Superfan'] }
+            }
+        });
+
         res.json({
-            bestTime: "Tuesday at 6 PM",
-            contentMix: [
-                { label: "Reels", value: 60, color: "bg-blue-500" },
-                { label: "Carousels", value: 30, color: "bg-purple-500" },
-            ]
+            total: totalCount,
+            vips: vipCount,
+            newThisMonth: 0,
         });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch performance insights' });
+        res.status(500).json({ error: 'Failed to fetch community summary' });
     }
 };

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as hooksController from '../controllers/hooks.controller';
-import { protect } from '../middleware/auth.middleware';
+import * as hooksController from './controller';
+import { protect } from '../../middleware/auth.middleware';
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as performanceController from '../controllers/performance.controller';
-import { protect } from '../middleware/auth.middleware';
+import * as performanceController from './controller';
+import { protect } from '../../middleware/auth.middleware';
 
 const router = Router();
 

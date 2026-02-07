@@ -4,12 +4,12 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import hooksRoutes from './routes/hooks.routes';
-import competitorsRoutes from './routes/competitors.routes';
-import scriptsRoutes from './routes/scripts.routes';
-import communityRoutes from './routes/community.routes';
-import performanceRoutes from './routes/performance.routes';
-import authRoutes from './routes/auth.routes';
+import hooksRoutes from './features/hooks/routes';
+import competitorsRoutes from './features/competitors/routes';
+import scriptsRoutes from './features/scripts/routes';
+import communityRoutes from './features/community/routes';
+import performanceRoutes from './features/performance/routes';
+import authRoutes from './features/auth/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;

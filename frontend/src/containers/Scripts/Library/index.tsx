@@ -9,7 +9,8 @@ import {
   Layers,
   Clock,
   ChevronRight,
-  FileText
+  FileText,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -21,17 +22,25 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ViewToggle } from "@/components/ui/ViewToggle";
 import { ScriptCard } from "@/components/scripts/ScriptCard";
-
-// Mock data for scripts
-const MOCK_SCRIPTS = [
-  { id: "1", title: "Winning Vertical Guide V1", status: "Draft", lastUpdated: "4h ago", wordCount: 450, excerpt: "Today we're breaking down exactly why some creators are crushing the vertical game..." },
-  { id: "2", title: "The 3 Hook Framework", status: "Completed", lastUpdated: "1d ago", wordCount: 820, excerpt: "In this script, we analyze the top 0.1% of hooks that consistently drive retention..." },
-  { id: "3", title: "Screaming at the Camera", status: "Draft", lastUpdated: "2d ago", wordCount: 310, excerpt: "A high-energy approach to stopping the scroll immediately with intense visuals..." },
-  { id: "4", title: "Silent Storytelling Tactics", status: "Completed", lastUpdated: "1w ago", wordCount: 1200, excerpt: "How to use visual cues and text overlays to tell a story without saying a word..." },
-];
+import { useScriptsController } from "./controller";
 
 export const ScriptsLibraryContainer = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const { scripts, isLoading, handleDeleteScript } = useScriptsController();
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageHeader 
+          title="Scripts Library"
+          description="Manage and organize all your video scripts in one place."
+        />
+        <div className="flex items-center justify-center p-32">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -57,48 +66,51 @@ export const ScriptsLibraryContainer = () => {
             <ViewToggle mode={viewMode} onChange={setViewMode} />
             <Link 
               href="/scripts/ingredients" 
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary/50 text-xs font-bold text-muted-foreground hover:text-primary transition-all border border-border/50"
+              className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-secondary/50"
             >
-              <Sparkles className="w-4 h-4" /> 7 Core Variables
+              <Calendar className="w-3.5 h-3.5" />
+              Ingredients
             </Link>
+            <button className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-secondary/50">
+              <Sparkles className="w-3.5 h-3.5" />
+              AI Generate
+            </button>
           </div>
         </div>
 
-        {MOCK_SCRIPTS.length > 0 ? (
+        {scripts.length > 0 ? (
           viewMode === "grid" ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {MOCK_SCRIPTS.map((script) => (
+              {scripts.map((script) => (
                 <ScriptCard 
                   key={script.id}
                   script={script as any}
                   variant="full"
+                  onDelete={() => handleDeleteScript(script.id)}
                 />
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-border/50 bg-muted/30">
-                    <th className="p-4 text-[10px] font-black uppercase text-muted-foreground tracking-widest">Script Name</th>
-                    <th className="p-4 text-[10px] font-black uppercase text-muted-foreground tracking-widest text-center">Status</th>
-                    <th className="p-4 text-[10px] font-black uppercase text-muted-foreground tracking-widest">Word Count</th>
-                    <th className="p-4 text-[10px] font-black uppercase text-muted-foreground tracking-widest">Last Updated</th>
-                    <th className="p-4"></th>
+                  <tr className="border-b border-border/50 bg-secondary/30">
+                    <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Title</th>
+                    <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-center">Status</th>
+                    <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Words</th>
+                    <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Last Updated</th>
+                    <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {MOCK_SCRIPTS.map((script) => (
-                    <tr key={script.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors group cursor-pointer">
+                  {scripts.map((script) => (
+                    <tr key={script.id} className="border-b border-border/30 last:border-0 hover:bg-secondary/20 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
                             <FileText className="w-4 h-4" />
                           </div>
-                          <div>
-                            <div className="text-sm font-bold group-hover:text-primary transition-colors">{script.title}</div>
-                            <div className="text-[10px] text-muted-foreground line-clamp-1 max-w-[200px]">{script.excerpt}</div>
-                          </div>
+                          <span className="font-bold text-sm tracking-tight">{script.title}</span>
                         </div>
                       </td>
                       <td className="p-4 text-center">
@@ -121,9 +133,19 @@ export const ScriptsLibraryContainer = () => {
                         </div>
                       </td>
                       <td className="p-4 text-right">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
-                          <ChevronRight className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 rounded-lg text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteScript(script.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                              <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

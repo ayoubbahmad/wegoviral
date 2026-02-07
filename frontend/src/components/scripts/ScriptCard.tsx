@@ -1,5 +1,6 @@
-import { FileText, Clock, Layers } from "lucide-react";
+import { FileText, Clock, Layers, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/Button";
 
 export interface Script {
   id: string;
@@ -14,11 +15,17 @@ interface ScriptCardProps {
   script: Script;
   variant?: "compact" | "full";
   onClick?: () => void;
+  onDelete?: () => void;
   className?: string;
 }
 
-export function ScriptCard({ script, variant = "full", onClick, className }: ScriptCardProps) {
+export function ScriptCard({ script, variant = "full", onClick, onDelete, className }: ScriptCardProps) {
   const isCompact = variant === "compact";
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete?.();
+  };
 
   return (
     <div 
@@ -38,12 +45,24 @@ export function ScriptCard({ script, variant = "full", onClick, className }: Scr
           <h3 className="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors pr-2">{script.title}</h3>
         )}
         
-        <span className={cn(
-          "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider",
-          script.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500"
-        )}>
-          {script.status}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={cn(
+            "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider",
+            script.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500"
+          )}>
+            {script.status}
+          </span>
+          {onDelete && (
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 w-6 p-0 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                onClick={handleDelete}
+            >
+                <Trash2 className="w-3.5 h-3.5" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {!isCompact && (

@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useGetHookTemplates, useGetStyleTemplates } from '../api';
 import { useScriptTopicForm, useScriptRefinementForm, ScriptTopicValues, ScriptRefinementValues } from '../forms';
+import { scriptsApi } from '../../Library/api';
 
 // Types
 export type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
@@ -14,6 +17,7 @@ export const STEPS = [
 ] as const;
 
 export const useScriptWizardController = () => {
+  const router = useRouter();
   const { data: hookTemplates = [] } = useGetHookTemplates();
   const { data: styleTemplates = [] } = useGetStyleTemplates();
   
@@ -27,6 +31,14 @@ export const useScriptWizardController = () => {
   const [selectedStyle, setSelectedStyle] = useState<number | null>(null);
   const [scriptGenerated, setScriptGenerated] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Persistence mutation
+  const saveMutation = useMutation({
+    mutationFn: scriptsApi.createScript,
+    onSuccess: () => {
+      router.push('/scripts');
+    }
+  });
 
   // Scroll visibility tracking
   useEffect(() => {
@@ -87,6 +99,25 @@ export const useScriptWizardController = () => {
     refinementForm.reset();
   }, [refinementForm]);
 
+  const handleSaveScript = async () => {
+    const values = topicForm.getValues();
+    try {
+      await saveMutation.mutateAsync({
+        title: values.topic.substring(0, 50) + "...",
+        content: {
+          topic: values.topic,
+          hooks: selectedHooks,
+          style: selectedStyle,
+          generatedContent: "This is a revolutionary AI project from Google..." // In a real app, this would be the actual generated text
+        },
+        category: "General"
+      });
+    } catch (err) {
+      console.error("Failed to save script:", err);
+      alert("Failed to save script. Please try again.");
+    }
+  };
+
   return {
     activeStep,
     setActiveStep,
@@ -100,6 +131,8 @@ export const useScriptWizardController = () => {
     handleTopicSubmit,
     handleGenerateScript,
     handleRefinementSubmit,
+    handleSaveScript,
+    isSaving: saveMutation.isPending,
     showHistory,
     setShowHistory,
     scrollToSection,

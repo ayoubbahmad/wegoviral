@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useScriptWizardController, Step } from './controller';
+import { Button } from '@/components/ui/Button';
 
 const STEPS_WITH_ICONS = [
   { id: 'topic', label: 'Topic', icon: Lightbulb },
@@ -46,6 +47,8 @@ export function ScriptWizardContainer() {
     handleTopicSubmit,
     handleGenerateScript,
     handleRefinementSubmit,
+    handleSaveScript,
+    isSaving,
     showHistory,
     setShowHistory,
     scrollToSection,
@@ -327,6 +330,21 @@ export function ScriptWizardContainer() {
             >
                <Clock className="w-4 h-4" /> History
             </button>
+            <div className="w-px h-6 bg-border mx-2" />
+            <Button 
+                variant="primary" 
+                size="sm" 
+                className="rounded-xl h-10 px-4"
+                onClick={handleSaveScript}
+                disabled={isSaving}
+            >
+                {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                ) : (
+                    <Check className="w-4 h-4" />
+                )}
+                Save to Library
+            </Button>
             <div className="w-px h-6 bg-border mx-2" />
             <button className="p-2.5 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-all"><Copy className="w-4 h-4" /></button>
             <button className="p-2.5 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-all"><Download className="w-4 h-4" /></button>

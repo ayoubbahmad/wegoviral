@@ -1,15 +1,15 @@
 "use client";
 
 import { 
-  FileText, 
   Plus, 
   Search, 
-  Clock, 
   MoreVertical,
-  ChevronRight,
   Sparkles,
   Calendar,
-  Layers
+  Layers,
+  Clock,
+  ChevronRight,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -20,6 +20,7 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ViewToggle } from "@/components/ui/ViewToggle";
+import { ScriptCard } from "@/components/scripts/ScriptCard";
 
 // Mock data for scripts
 const MOCK_SCRIPTS = [
@@ -68,42 +69,11 @@ export const ScriptsLibraryContainer = () => {
           viewMode === "grid" ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {MOCK_SCRIPTS.map((script) => (
-                <div 
-                  key={script.id} 
-                  className="group flex flex-col p-6 rounded-[2rem] bg-card border border-border/50 hover:border-purple-500/30 transition-all cursor-pointer shadow-sm hover:shadow-xl relative overflow-hidden"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500 group-hover:scale-110 transition-transform">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                      script.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500"
-                    }`}>
-                      {script.status}
-                    </span>
-                  </div>
-                  
-                  <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">{script.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed mb-6 flex-1">
-                    {script.excerpt}
-                  </p>
-                  
-                  <div className="pt-6 border-t border-border/30 flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-zinc-500" />
-                        {script.lastUpdated}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Layers className="w-3.5 h-3.5 text-zinc-500" />
-                        {script.wordCount}w
-                      </div>
-                    </div>
-                    <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                      <ChevronRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </div>
+                <ScriptCard 
+                  key={script.id}
+                  script={script as any}
+                  variant="full"
+                />
               ))}
             </div>
           ) : (
@@ -133,7 +103,7 @@ export const ScriptsLibraryContainer = () => {
                         </div>
                       </td>
                       <td className="p-4 text-center">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                           script.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500"
                         }`}>
                           {script.status}

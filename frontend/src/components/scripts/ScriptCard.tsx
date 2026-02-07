@@ -1,0 +1,75 @@
+import { FileText, Clock, Layers } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export interface Script {
+  id: string;
+  title: string;
+  excerpt: string;
+  status: "Draft" | "Completed";
+  lastUpdated: string;
+  wordCount: number;
+}
+
+interface ScriptCardProps {
+  script: Script;
+  variant?: "compact" | "full";
+  onClick?: () => void;
+  className?: string;
+}
+
+export function ScriptCard({ script, variant = "full", onClick, className }: ScriptCardProps) {
+  const isCompact = variant === "compact";
+
+  return (
+    <div 
+      onClick={onClick}
+      className={cn(
+        "group flex flex-col bg-card border border-border/50 hover:border-purple-500/30 transition-all cursor-pointer shadow-sm hover:shadow-xl relative overflow-hidden",
+        isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
+        className
+      )}
+    >
+      <div className={cn("flex items-start justify-between", isCompact ? "mb-2" : "mb-4")}>
+        {!isCompact ? (
+          <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500 group-hover:scale-110 transition-transform">
+            <FileText className="w-6 h-6" />
+          </div>
+        ) : (
+          <h3 className="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors pr-2">{script.title}</h3>
+        )}
+        
+        <span className={cn(
+          "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider",
+          script.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500"
+        )}>
+          {script.status}
+        </span>
+      </div>
+
+      {!isCompact && (
+        <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">{script.title}</h3>
+      )}
+
+      <p className={cn(
+        "text-muted-foreground leading-relaxed font-medium",
+        isCompact ? "text-xs line-clamp-2 mb-3" : "text-sm line-clamp-3 mb-6 flex-1"
+      )}>
+        {script.excerpt}
+      </p>
+
+      <div className={cn(
+        "flex items-center gap-3 text-[10px] text-zinc-500 font-bold",
+        !isCompact && "pt-6 border-t border-border/30 justify-between"
+      )}>
+        <div className="flex items-center gap-1.5">
+          <Clock className={cn("text-zinc-500", isCompact ? "w-3 h-3" : "w-3.5 h-3.5")} />
+          <span>{script.lastUpdated}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Layers className={cn("text-zinc-500", isCompact ? "w-3 h-3" : "w-3.5 h-3.5")} />
+          <span>{script.wordCount} words</span>
+        </div>
+      </div>
+    </div>
+  );
+}

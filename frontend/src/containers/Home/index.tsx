@@ -20,6 +20,7 @@ import { PageContainer } from "@/components/ui/PageContainer";
 import { StatCard } from "@/components/ui/StatCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { ScriptCard } from "@/components/scripts/ScriptCard";
 
 export const HomeContainer = () => {
   const {
@@ -112,17 +113,18 @@ export const HomeContainer = () => {
 
           <div className="space-y-3 pt-1">
             {scripts.map((i) => (
-              <div key={i} className="p-4 rounded-xl bg-card border border-border/50 hover:border-purple-500/50 transition-all cursor-pointer shadow-sm hover:shadow-md">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-bold text-sm">Winning Vertical Guide V{i}</h3>
-                  <span className="text-[10px] bg-purple-500/10 text-purple-500 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">Draft</span>
-                </div>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-3 font-medium">Today we're breaking down exactly why some creators are crushing the vertical game...</p>
-                <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold">
-                  <span>Updated 4h ago</span>
-                  <span>450 words</span>
-                </div>
-              </div>
+              <ScriptCard 
+                key={i}
+                variant="compact"
+                script={{
+                  id: String(i),
+                  title: `Winning Vertical Guide V${i}`,
+                  excerpt: "Today we're breaking down exactly why some creators are crushing the vertical game...",
+                  status: "Draft",
+                  lastUpdated: "4h ago",
+                  wordCount: 450
+                }}
+              />
             ))}
           </div>
         </div>

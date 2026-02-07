@@ -92,7 +92,7 @@ export function ScriptWizardContainer() {
       </div>
 
       {/* Step 1: Topic */}
-      <section id="topic" className="p-8 rounded-[32px] border border-border bg-card/30 relative group">
+      <section id="topic" className="p-8 rounded-2xl border border-border bg-card/30 relative group">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
@@ -140,7 +140,7 @@ export function ScriptWizardContainer() {
       </section>
 
       {/* Step 2: Research */}
-      <section id="research" className="p-8 rounded-[32px] border border-border bg-card/30">
+      <section id="research" className="p-8 rounded-2xl border border-border bg-card/30">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-500">
             <BookOpen className="w-5 h-5" />
@@ -200,7 +200,7 @@ export function ScriptWizardContainer() {
       </section>
 
       {/* Step 3: Hook */}
-      <section id="hook" className="p-8 rounded-[32px] border border-border bg-card/30">
+      <section id="hook" className="p-8 rounded-2xl border border-border bg-card/30">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-pink-500/10 text-pink-500">
@@ -266,7 +266,7 @@ export function ScriptWizardContainer() {
       </section>
 
       {/* Step 4: Style */}
-      <section id="style" className="p-8 rounded-[32px] border border-border bg-card/30">
+      <section id="style" className="p-8 rounded-2xl border border-border bg-card/30">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-500">
             <Palette className="w-5 h-5" />
@@ -280,7 +280,7 @@ export function ScriptWizardContainer() {
               key={style.id}
               onClick={() => setSelectedStyle(style.id)}
               className={cn(
-                "group relative aspect-video rounded-3xl overflow-hidden border-2 transition-all active:scale-95",
+                "group relative aspect-video rounded-2xl overflow-hidden border-2 transition-all active:scale-95",
                 selectedStyle === style.id 
                   ? "border-primary shadow-lg shadow-primary/20" 
                   : "border-border/50 hover:border-border"
@@ -312,7 +312,7 @@ export function ScriptWizardContainer() {
       </section>
 
       {/* Step 5: Script */}
-      <section id="script" className="p-8 rounded-[32px] border border-border bg-card/30 relative">
+      <section id="script" className="p-8 rounded-2xl border border-border bg-card/30 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-green-500/10 text-green-500">
@@ -336,7 +336,7 @@ export function ScriptWizardContainer() {
 
         {scriptGenerated ? (
           <div className="space-y-8">
-            <div className="relative p-8 rounded-[32px] bg-secondary/30 border border-border/50 min-h-[400px]">
+            <div className="relative p-8 rounded-2xl bg-secondary/30 border border-border/50 min-h-[400px]">
                <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
                  241 Words · ~1:30 mins
                </div>
@@ -393,7 +393,7 @@ export function ScriptWizardContainer() {
           </div>
         ) : (
           <div className="py-32 flex flex-col items-center justify-center text-center gap-6">
-             <div className="p-6 rounded-3xl bg-secondary/20 border border-border/50">
+             <div className="p-6 rounded-2xl bg-secondary/20 border border-border/50">
                <Sparkles className="w-12 h-12 text-primary/30" />
              </div>
              <div className="space-y-2">
@@ -425,7 +425,7 @@ export function ScriptWizardContainer() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-card border border-border rounded-[32px] shadow-2xl overflow-hidden"
+              className="relative w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
             >
               <div className="p-8 border-b border-border flex items-center justify-between">
                 <h3 className="text-xl font-black uppercase tracking-tight">Script History</h3>

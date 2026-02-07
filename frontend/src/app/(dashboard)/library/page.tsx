@@ -7,6 +7,8 @@ import { HookCard } from "@/components/library/HookCard";
 import { ScriptTemplateList } from "@/components/library/ScriptTemplateList";
 import { cn } from "@/lib/utils";
 import { AddNewItem } from "@/components/library/AddNewItem";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Tabs } from "@/components/ui/Tabs";
 
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
@@ -14,43 +16,21 @@ export default function LibraryPage() {
     const { scripts, addScript, removeScript, updateScript } = useScripts();
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Library</h1>
-                    <p className="text-muted-foreground mt-2">Manage your creative assets, hooks, and script structures.</p>
-                </div>
-                <AddNewItem onAddHook={addHook} onAddScript={addScript} />
-            </div>
+        <div className="space-y-12 pb-32">
+            <PageHeader 
+                title="Library"
+                description="Manage your creative assets, hooks, and script structures."
+                actions={<AddNewItem onAddHook={addHook} onAddScript={addScript} />}
+            />
 
-            <div className="border-b border-border">
-                <div className="flex gap-6">
-                    <button
-                        onClick={() => setActiveTab("hooks")}
-                        className={cn(
-                            "pb-3 text-sm font-medium transition-colors relative",
-                            activeTab === "hooks" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                        )}
-                    >
-                        Hooks
-                        {activeTab === "hooks" && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full layout-id='active-tab'" />
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("scripts")}
-                        className={cn(
-                            "pb-3 text-sm font-medium transition-colors relative",
-                            activeTab === "scripts" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                        )}
-                    >
-                        Script Templates
-                        {activeTab === "scripts" && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full layout-id='active-tab'" />
-                        )}
-                    </button>
-                </div>
-            </div>
+            <Tabs 
+                activeId={activeTab}
+                onChange={(id) => setActiveTab(id as any)}
+                items={[
+                    { id: "hooks", label: "Hooks" },
+                    { id: "scripts", label: "Script Templates" }
+                ]}
+            />
 
             <div className="min-h-[400px]">
                 {activeTab === "hooks" ? (

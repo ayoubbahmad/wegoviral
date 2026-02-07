@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/Auth";
 import Link from "next/link";
 import { MOCK_PERFORMANCE_POSTS, MOCK_POSTING_TIMES } from "@/lib/mock-data";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
 
 export default function PerformancePage() {
     const { activeSocialAccount } = useAuth();
@@ -20,11 +22,11 @@ export default function PerformancePage() {
     ];
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Performance Insights</h1>
-                <p className="text-muted-foreground mt-2">Understand what works and when to post for maximum impact.</p>
-            </div>
+        <div className="space-y-12 animate-in fade-in duration-500 pb-12">
+            <PageHeader 
+                title="Performance Insights"
+                description="Understand what works and when to post for maximum impact."
+            />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Heatmap Section */}
@@ -52,12 +54,9 @@ export default function PerformancePage() {
                                     <p className="text-xs text-muted-foreground mb-3">
                                         Connect your account to analyze your specific audience activity and find your best posting times.
                                     </p>
-                                    <Link
-                                        href="/settings"
-                                        className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all"
-                                    >
+                                    <Button onClick={() => window.location.href = '/settings'}>
                                         Connect Now
-                                    </Link>
+                                    </Button>
                                 </div>
                             </div>
                         </div>

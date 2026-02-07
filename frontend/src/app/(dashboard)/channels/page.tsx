@@ -1,8 +1,11 @@
 "use client";
 
-import { Search, SlidersHorizontal, UserPlus, Info, Check } from "lucide-react";
+import { Search, SlidersHorizontal, UserPlus, Info, Check, AlignLeft, Link2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Tabs } from "@/components/ui/Tabs";
+import { Button } from "@/components/ui/Button";
 
 // Mock data for suggested channels (empty initially or some suggestions)
 const MOCK_SUGGESTED_CHANNELS = [
@@ -13,37 +16,28 @@ const MOCK_SUGGESTED_CHANNELS = [
 export default function ChannelsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterOpen, setFilterOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<"niche" | "similar" | "manual">("niche");
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-20">
-            <div className="space-y-2">
-                 <h1 className="text-3xl font-bold tracking-tight">Build your watchlist</h1>
-                 <p className="text-muted-foreground">Find the best channels to use as inspiration for your content</p>
-            </div>
+        <div className="max-w-5xl mx-auto space-y-12 pb-32">
+            <PageHeader 
+                title="Build your watchlist"
+                description="Find the best channels to use as inspiration for your content"
+            />
 
             {/* Search Section */}
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {/* Search Tabs */}
-                <div className="flex border-b border-border">
-                    <button className="px-4 py-2 text-sm font-medium border-b-2 border-primary text-foreground">
-                        <div className="flex items-center gap-2">
-                            <span className="rotate-90">≡</span> {/* Placeholder for the 'Describe your Niche' list icon */}
-                            Describe your Niche
-                        </div>
-                    </button>
-                     <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-                        <div className="flex items-center gap-2">
-                             <UserPlus className="w-4 h-4" />
-                             Similar to Channel
-                        </div>
-                    </button>
-                    <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-                        <div className="flex items-center gap-2">
-                             <span className="rotate-45">📎</span> 
-                             Manual
-                        </div>
-                    </button>
-                </div>
+                <Tabs 
+                    activeId={activeTab}
+                    onChange={(id) => setActiveTab(id as any)}
+                    items={[
+                        { id: "niche", label: "Describe your Niche", icon: AlignLeft },
+                        { id: "similar", label: "Similar to Channel", icon: UserPlus },
+                        { id: "manual", label: "Manual", icon: Link2 }
+                    ]}
+                    containerClassName="!justify-start"
+                />
 
                 {/* Input Area */}
                 <div className="relative rounded-xl border border-border bg-card/50 p-2 focus-within:ring-1 focus-within:ring-primary transition-all">
@@ -80,10 +74,14 @@ export default function ChannelsPage() {
                             </div>
                          </div>
                          
-                         <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                         <Button 
+                            variant="primary" 
+                            size="sm"
+                            className="h-8"
+                         >
                              Search
                              <span className="text-[10px] opacity-70">↵</span>
-                         </button>
+                         </Button>
                     </div>
                 </div>
             </div>
@@ -104,9 +102,9 @@ export default function ChannelsPage() {
                                                  <p className="text-xs text-muted-foreground">{channel.followers} • {channel.platform}</p>
                                              </div>
                                          </div>
-                                         <button className="text-blue-500 hover:bg-blue-500/10 p-1.5 rounded-lg transition-colors">
-                                             <UserPlus className="w-4 h-4" />
-                                         </button>
+                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary">
+                                              <UserPlus className="w-4 h-4" />
+                                          </Button>
                                      </div>
                                  ))}
                              </div>
@@ -130,7 +128,7 @@ export default function ChannelsPage() {
                     
                     <div className="mt-auto pt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50">
                          <button className="hover:text-foreground transition-colors">Remove all</button>
-                         <button className="bg-blue-600/20 text-blue-500 px-3 py-1.5 rounded-lg font-medium cursor-not-allowed">Save watchlist</button>
+                         <Button variant="pill" size="sm" className="opacity-50 cursor-not-allowed">Save watchlist</Button>
                      </div>
                 </div>
             </div>

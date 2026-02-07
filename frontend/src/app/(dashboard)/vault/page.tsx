@@ -1,8 +1,12 @@
+import { PageHeader } from "@/components/ui/PageHeader";
+
 export default function VaultPage() {
     return (
-        <div className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">Vault</h1>
-            <p className="text-muted-foreground">Your saved assets and ideas.</p>
+        <div className="space-y-12 pb-32">
+            <PageHeader 
+                title="Vault"
+                description="Your saved assets and ideas."
+            />
         </div>
     );
 }

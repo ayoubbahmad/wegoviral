@@ -3,6 +3,8 @@
 import { useAuth } from '@/providers/Auth';
 import { Mail, User as UserIcon, Camera } from 'lucide-react';
 import { ThemeToggle } from '@/containers/settings/ThemeToggle';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
   const { user, activeSocialAccount } = useAuth();
@@ -10,13 +12,11 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className='space-y-8 animate-in fade-in duration-500'>
-      <div>
-        <h1 className='text-3xl font-bold tracking-tight'>Your Profile</h1>
-        <p className='text-muted-foreground mt-2'>
-          Manage your account and preferences.
-        </p>
-      </div>
+    <div className='space-y-12 pb-32 animate-in fade-in duration-500'>
+      <PageHeader 
+        title="Your Profile"
+        description="Manage your account and preferences."
+      />
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>
         <div className='flex flex-col items-center sm:flex-row gap-6'>

@@ -8,6 +8,7 @@ import { TypographyShowcase } from "./TypographyShowcase";
 import { ButtonShowcase } from "./ButtonShowcase";
 import { CardShowcase } from "./CardShowcase";
 import { FeedbackShowcase } from "./FeedbackShowcase";
+import { Tabs } from "../ui/Tabs";
 
 const SECTIONS = [
     { id: 'colors', label: 'Colors', icon: Palette, component: ColorShowcase },
@@ -33,25 +34,12 @@ export function DesignSystemShowcase() {
             </div>
 
             {/* Navigation */}
-            <div className="sticky top-8 z-40 flex justify-center">
-                <div className="flex items-center gap-1 p-1.5 rounded-2xl bg-card/80 backdrop-blur-md border border-border/50 shadow-2xl">
-                    {SECTIONS.map((section) => (
-                        <button
-                            key={section.id}
-                            onClick={() => setActiveSection(section.id)}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95",
-                                activeSection === section.id
-                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                            )}
-                        >
-                            <section.icon className="w-4 h-4" />
-                            {section.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <Tabs 
+                items={SECTIONS}
+                activeId={activeSection}
+                onChange={setActiveSection}
+                sticky
+            />
 
             {/* Content Area */}
             <div className="px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">

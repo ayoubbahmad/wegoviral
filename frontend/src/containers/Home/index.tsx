@@ -14,6 +14,8 @@ import {
 import Link from "next/link";
 import { useHomeController } from "./controller";
 import { HomeSkeleton } from "@/views/Home/skeleton";
+import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const HomeContainer = () => {
   const {
@@ -30,11 +32,11 @@ export const HomeContainer = () => {
   }
 
   return (
-    <div className="space-y-8 pb-12">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Home</h1>
-        <p className="text-muted-foreground mt-2">Welcome back. Everything you need to scale your influence in one place.</p>
-      </div>
+    <div className="space-y-12 pb-12">
+      <PageHeader 
+        title="Home"
+        description="Welcome back. Everything you need to scale your influence in one place."
+      />
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -67,10 +69,13 @@ export const HomeContainer = () => {
             <Link href="/videos" className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors">View All</Link>
           </div>
           
-          <button className="w-full py-3 rounded-xl border border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-sm font-semibold text-primary flex items-center justify-center gap-2 bg-primary/5">
-            <Plus className="w-4 h-4" />
+          <Button 
+            variant="outline" 
+            className="w-full border-dashed group"
+          >
+            <Plus className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
             Analyze New Video
-          </button>
+          </Button>
 
           <div className="space-y-3 pt-1">
             {videos.map((i) => (
@@ -100,10 +105,13 @@ export const HomeContainer = () => {
             <Link href="/scripts" className="text-xs font-medium text-muted-foreground hover:text-purple-500 transition-colors">View All</Link>
           </div>
 
-          <button className="w-full py-3 rounded-xl border border-dashed border-border hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-sm font-semibold text-purple-500 flex items-center justify-center gap-2 bg-purple-500/5">
-            <Plus className="w-4 h-4" />
+          <Button 
+            variant="outline" 
+            className="w-full border-dashed border-purple-500/20 text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/50 group"
+          >
+            <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
             Create New Script
-          </button>
+          </Button>
 
           <div className="space-y-3 pt-1">
             {scripts.map((i) => (
@@ -132,10 +140,13 @@ export const HomeContainer = () => {
             <Link href="/projects" className="text-xs font-medium text-muted-foreground hover:text-amber-500 transition-colors">View All</Link>
           </div>
 
-          <button className="w-full py-3 rounded-xl border border-dashed border-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all text-sm font-semibold text-amber-500 flex items-center justify-center gap-2 bg-amber-500/5">
-            <Plus className="w-4 h-4" />
+          <Button 
+            variant="outline" 
+            className="w-full border-dashed border-amber-500/20 text-amber-500 hover:bg-amber-500/5 hover:border-amber-500/50 group"
+          >
+            <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
             Start New Project
-          </button>
+          </Button>
 
           <div className="space-y-3 pt-1">
             {projects.map((proj, i) => (
@@ -163,14 +174,14 @@ export const HomeContainer = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <button className="py-3 rounded-xl border border-dashed border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-sm font-semibold text-emerald-500 flex items-center justify-center gap-2 bg-emerald-500/5 group">
+            <Button variant="outline" className="border-dashed border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/50 group">
               <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform" />
               Join
-            </button>
-            <button className="py-3 rounded-xl border border-dashed border-border hover:border-emerald-800/50 hover:bg-emerald-800/5 transition-all text-sm font-semibold text-emerald-600 flex items-center justify-center gap-2 bg-emerald-800/5 border-emerald-800/20">
-              <Plus className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" className="border-dashed border-emerald-800/20 text-emerald-600 hover:bg-emerald-800/5 hover:border-emerald-800/50 group">
+              <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
               Create
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-3 pt-1">

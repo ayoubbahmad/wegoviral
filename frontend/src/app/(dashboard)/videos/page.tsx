@@ -14,6 +14,8 @@ import {
     Filter
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
 
 const MOCK_VIDEOS: Video[] = [
     {
@@ -103,10 +105,10 @@ export default function VideosPage() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Videos</h1>
-                <p className="text-muted-foreground mt-2">Discover what's gone viral in your niche, and why it worked.</p>
-            </div>
+            <PageHeader 
+                title="Videos"
+                description="Discover what's gone viral in your niche, and why it worked."
+            />
 
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 {/* Search Bar */}
@@ -128,45 +130,49 @@ export default function VideosPage() {
                 {/* View Controls */}
                 <div className="flex items-center gap-2">
                     <div className="flex p-1 bg-card border border-border/50 rounded-xl">
-                        <button 
+                        <Button 
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setViewMode("table")}
                             className={cn(
                                 "p-2 rounded-lg transition-all",
-                                viewMode === "table" ? "bg-primary/10 text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                viewMode === "table" ? "bg-primary/10 text-primary shadow-sm" : ""
                             )}
                             title="Table View"
                         >
                             <Table2 className="w-4 h-4" />
-                        </button>
-                        <button 
+                        </Button>
+                        <Button 
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setViewMode("cards")}
                             className={cn(
                                 "p-2 rounded-lg transition-all",
-                                viewMode === "cards" ? "bg-primary/10 text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                viewMode === "cards" ? "bg-primary/10 text-primary shadow-sm" : ""
                             )}
                             title="Grid View"
                         >
                             <LayoutGrid className="w-4 h-4" />
-                        </button>
+                        </Button>
                     </div>
 
-                    <button className="h-11 px-4 rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all flex items-center gap-2 text-sm font-medium">
+                    <Button variant="outline" className="h-11 px-4 text-sm font-medium">
                         <ArrowUpDown className="w-4 h-4" />
                         Sort
-                    </button>
+                    </Button>
                     
-                    <button className="h-11 px-4 rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all flex items-center gap-2 text-sm font-medium">
+                    <Button variant="outline" className="h-11 px-4 text-sm font-medium">
                         <Filter className="w-4 h-4" />
                         Filters
-                    </button>
+                    </Button>
 
-                    <button className="h-11 w-11 flex items-center justify-center rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground transition-all">
+                    <Button variant="outline" className="h-11 w-11 p-0">
                         <Clock className="w-4 h-4" />
-                    </button>
+                    </Button>
 
-                    <button className="h-11 w-11 flex items-center justify-center rounded-xl bg-card border border-border/50 text-muted-foreground hover:text-foreground transition-all">
+                    <Button variant="outline" className="h-11 w-11 p-0">
                         <RotateCcw className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             </div>
 

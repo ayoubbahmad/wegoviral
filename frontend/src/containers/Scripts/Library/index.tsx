@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { cn, formatRelativeDate } from "@/lib/utils";
 import { ViewToggle } from "@/components/ui/ViewToggle";
 import { ScriptCard } from "@/components/scripts/ScriptCard";
 import { useScriptsController } from "./controller";
@@ -129,7 +130,7 @@ export const ScriptsLibraryContainer = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                           <Clock className="w-3.5 h-3.5" />
-                          {script.lastUpdated}
+                          {formatRelativeDate(script.lastUpdated)}
                         </div>
                       </td>
                       <td className="p-4 text-right">

@@ -1,5 +1,5 @@
 import { FileText, Clock, Layers, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatRelativeDate } from "@/lib/utils";
 import { Button } from "../ui/Button";
 
 export interface Script {
@@ -82,7 +82,7 @@ export function ScriptCard({ script, variant = "full", onClick, onDelete, classN
       )}>
         <div className="flex items-center gap-1.5">
           <Clock className={cn("text-zinc-500", isCompact ? "w-3 h-3" : "w-3.5 h-3.5")} />
-          <span>{script.lastUpdated}</span>
+          <span>{formatRelativeDate(script.lastUpdated)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Layers className={cn("text-zinc-500", isCompact ? "w-3 h-3" : "w-3.5 h-3.5")} />

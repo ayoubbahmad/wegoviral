@@ -32,6 +32,7 @@ const navItems = [
     { name: "Performance", href: "/performance", icon: BarChart2 },
     { name: "Community", href: "/community", icon: Users },
     { name: "Competitors", href: "/competitors", icon: Target },
+    // { name: "Channels", href: "/channels", icon: Target },
     { name: "Library", href: "/library", icon: Library },
     { name: "Challenges", href: "/challenges", icon: Trophy },
     { name: "Design System", href: "/design-system", icon: Paintbrush },

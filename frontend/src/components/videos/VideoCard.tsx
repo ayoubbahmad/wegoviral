@@ -64,20 +64,20 @@ export function VideoCard({ video }: VideoCardProps) {
 
         <div className="mt-3 space-y-2">
           <Link href={`/video/${video.id}`}>
-            <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
+            <h3 className="line-clamp-1 text-sm font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
               {video.title}
             </h3>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <img
               src={video.channelAvatarUrl}
               alt={video.channelName}
-              className="h-5 w-5 rounded-full"
+              className="h-5 w-5 rounded-full flex-shrink-0"
             />
-            <span className="text-xs text-muted-foreground truncate">{video.channelName}</span>
-            <span className="text-xs text-muted-foreground">•</span>
-            <span className="text-xs text-muted-foreground">{video.publishedAt}</span>
+            <span className="text-xs text-muted-foreground truncate min-w-0">{video.channelName}</span>
+            <span className="text-xs text-muted-foreground flex-shrink-0">•</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">{video.publishedAt}</span>
           </div>
 
           <div className="grid grid-cols-3 gap-1.5 pt-1">

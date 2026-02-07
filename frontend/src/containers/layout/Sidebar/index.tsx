@@ -49,9 +49,12 @@ export function Sidebar() {
                 sidebarCollapsed ? "w-20" : "w-64"
             )}
         >
-            <div className="flex h-16 items-center px-4 border-b border-border/50 justify-between">
-                <div className="flex items-center">
-                    <div className="p-1.5 bg-primary rounded-md shrink-0">
+            <div className={cn(
+                "flex h-16 items-center border-b border-border/50 transition-all",
+                sidebarCollapsed ? "justify-center" : "justify-between px-4"
+            )}>
+                <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-primary rounded-lg shrink-0 shadow-lg shadow-primary/20">
                         <Zap className="w-5 h-5 text-primary-foreground" />
                     </div>
                     {!sidebarCollapsed && (
@@ -59,7 +62,7 @@ export function Sidebar() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
-                            className="ml-3 text-xl font-bold tracking-tight whitespace-nowrap"
+                            className="text-xl font-bold tracking-tight whitespace-nowrap"
                         >
                             Creator OS
                         </motion.span>
@@ -93,11 +96,11 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors cursor-pointer justify-center md:justify-start",
+                                "group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors cursor-pointer justify-start",
                                 isActive
                                     ? "text-primary-foreground"
                                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
-                                sidebarCollapsed && "px-0 justify-center"
+                                sidebarCollapsed && "px-0 justify-center gap-0"
                             )}
                             title={sidebarCollapsed ? item.name : ""}
                         >
@@ -165,8 +168,8 @@ export function Sidebar() {
                 <Link
                     href="/settings"
                     className={cn(
-                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors",
-                        sidebarCollapsed && "px-0 justify-center"
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors justify-start",
+                        sidebarCollapsed && "px-0 justify-center gap-0"
                     )}
                     title={sidebarCollapsed ? "Settings" : ""}
                 >

@@ -31,6 +31,7 @@ export const useScriptWizardController = (scriptId?: string) => {
   const [selectedHooks, setSelectedHooks] = useState<number[]>([]);
   const [selectedStyle, setSelectedStyle] = useState<number | null>(null);
   const [scriptGenerated, setScriptGenerated] = useState(false);
+  const [editableContent, setEditableContent] = useState("");
   const [showHistory, setShowHistory] = useState(false);
 
   // Fetch script data if editing
@@ -46,6 +47,7 @@ export const useScriptWizardController = (scriptId?: string) => {
       topicForm.reset({ topic: scriptData.content?.topic || '' });
       setSelectedHooks(scriptData.content?.hooks || []);
       setSelectedStyle(scriptData.content?.style || null);
+      setEditableContent((scriptData.content as any)?.generatedContent || "");
       setResearchComplete(true);
       setScriptGenerated(true);
       setActiveStep('script');
@@ -116,12 +118,16 @@ export const useScriptWizardController = (scriptId?: string) => {
   }, []);
 
   const handleGenerateScript = useCallback(() => {
+    const defaultContent = "This is a revolutionary AI project from Google...\n\nIt's called Nano Banana Impact.\n\nAnd this thing is like Photoshop with superpowers.\n\nGoogle created this to completely transform how we edit and generate images.";
+    setEditableContent(defaultContent);
     setScriptGenerated(true);
     scrollToSection('script');
   }, [scrollToSection]);
 
   const handleRefinementSubmit = useCallback((values: ScriptRefinementValues) => {
     console.log("Refining script with:", values.refinement);
+    // Simulate AI refinement by appending text for now
+    setEditableContent(prev => prev + `\n\n[AI Refinement: ${values.refinement}]`);
     refinementForm.reset();
   }, [refinementForm]);
 
@@ -133,7 +139,7 @@ export const useScriptWizardController = (scriptId?: string) => {
         topic: values.topic,
         hooks: selectedHooks,
         style: selectedStyle,
-        generatedContent: scriptData?.content?.generatedContent || "This is a revolutionary AI project from Google..." 
+        generatedContent: editableContent
       },
       category: "General"
     };
@@ -160,6 +166,8 @@ export const useScriptWizardController = (scriptId?: string) => {
     selectedStyle,
     setSelectedStyle,
     scriptGenerated,
+    editableContent,
+    setEditableContent,
     handleTopicSubmit,
     handleGenerateScript,
     handleRefinementSubmit,

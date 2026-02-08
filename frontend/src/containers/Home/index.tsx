@@ -75,8 +75,8 @@ export const HomeContainer = () => {
           </Button>
 
           <div className="space-y-3 pt-1">
-            {videos.map((i) => (
-              <div key={i} className="group relative aspect-video rounded-xl bg-muted/30 border border-border/50 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all">
+            {videos.map((video: any) => (
+              <div key={video.id} className="group relative aspect-video rounded-xl bg-muted/30 border border-border/50 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
                   <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
@@ -84,8 +84,8 @@ export const HomeContainer = () => {
                   </div>
                 </div>
                 <div className="absolute bottom-3 left-3 right-3 z-20">
-                  <p className="text-xs font-bold text-white line-clamp-1">Viral Hook Analysis: Episode #{i + 12}</p>
-                  <p className="text-[10px] text-zinc-400">2.4M views • 2 days ago</p>
+                  <p className="text-xs font-bold text-white line-clamp-1">{video.title}</p>
+                  <p className="text-[10px] text-zinc-400">{video.views} views • {video.postedAt}</p>
                 </div>
               </div>
             ))}
@@ -112,17 +112,17 @@ export const HomeContainer = () => {
           </Link>
 
           <div className="space-y-3 pt-1">
-            {scripts.map((i) => (
+            {scripts.map((script: any) => (
               <ScriptCard 
-                key={i}
+                key={script.id}
                 variant="compact"
                 script={{
-                  id: String(i),
-                  title: `Winning Vertical Guide V${i}`,
-                  excerpt: "Today we're breaking down exactly why some creators are crushing the vertical game...",
-                  status: "Draft",
-                  lastUpdated: "4h ago",
-                  wordCount: 450
+                  id: script.id,
+                  title: script.title,
+                  excerpt: script.excerpt || script.content?.topic?.substring(0, 100) || "No content...",
+                  status: script.status || "Draft",
+                  lastUpdated: script.updatedAt || "Just now",
+                  wordCount: script.wordCount || 0
                 }}
               />
             ))}

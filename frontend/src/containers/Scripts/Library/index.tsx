@@ -13,6 +13,7 @@ import {
   Trash2
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -26,6 +27,7 @@ import { ScriptCard } from "@/components/scripts/ScriptCard";
 import { useScriptsController } from "./controller";
 
 export const ScriptsLibraryContainer = () => {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const { scripts, isLoading, handleDeleteScript } = useScriptsController();
 
@@ -88,6 +90,7 @@ export const ScriptsLibraryContainer = () => {
                   script={script as any}
                   variant="full"
                   onDelete={() => handleDeleteScript(script.id)}
+                  onClick={() => router.push(`/scripts/${script.id}`)}
                 />
               ))}
             </div>
@@ -105,7 +108,11 @@ export const ScriptsLibraryContainer = () => {
                 </thead>
                 <tbody>
                   {scripts.map((script) => (
-                    <tr key={script.id} className="border-b border-border/30 last:border-0 hover:bg-secondary/20 transition-colors group">
+                    <tr 
+                      key={script.id} 
+                      className="border-b border-border/30 last:border-0 hover:bg-secondary/20 transition-colors group cursor-pointer"
+                      onClick={() => router.push(`/scripts/${script.id}`)}
+                    >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">

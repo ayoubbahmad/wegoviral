@@ -44,6 +44,8 @@ export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
     selectedStyle,
     setSelectedStyle,
     scriptGenerated,
+    editableContent,
+    setEditableContent,
     handleTopicSubmit,
     handleGenerateScript,
     handleRefinementSubmit,
@@ -356,13 +358,16 @@ export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
         {scriptGenerated ? (
           <div className="space-y-8">
             <div className="relative p-8 rounded-2xl bg-secondary/30 border border-border/50 min-h-[400px]">
-               <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                 {scriptData?.wordCount || 241} Words · ~{scriptData?.wordCount ? Math.ceil(scriptData.wordCount / 160) : '1:30'} mins
+               <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 z-10">
+                 {editableContent.trim() ? editableContent.trim().split(/\s+/).length : 0} Words · ~{Math.ceil((editableContent.trim() ? editableContent.trim().split(/\s+/).length : 0) / 160)} mins
                </div>
-               <div className="prose prose-invert max-w-none">
-                 <p className="text-lg leading-[2] text-foreground font-medium whitespace-pre-wrap">
-                   {scriptData?.content?.generatedContent || "This is a revolutionary AI project from Google...\n\nIt's called Nano Banana Impact.\n\nAnd this thing is like Photoshop with superpowers.\n\nGoogle created this to completely transform how we edit and generate images."}
-                 </p>
+               <div className="relative z-0">
+                 <textarea
+                   value={editableContent}
+                   onChange={(e) => setEditableContent(e.target.value)}
+                   className="w-full min-h-[400px] bg-transparent border-none text-lg leading-[2] text-foreground font-medium outline-none resize-none focus:ring-0 placeholder:text-muted-foreground/30"
+                   placeholder="Your AI script will appear here. Feel free to add your own touch..."
+                 />
                </div>
             </div>
 

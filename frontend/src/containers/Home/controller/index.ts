@@ -1,25 +1,38 @@
-import { useGetHomeStats } from "../api";
+import { useGetHomeSummary } from "../api";
+import { 
+  Users, 
+  Activity, 
+  Eye, 
+  ArrowUpRight,
+  Globe,
+  Flame,
+  Trophy
+} from "lucide-react";
+
+const ICON_MAP: Record<string, any> = {
+    Users,
+    Activity,
+    Eye,
+    ArrowUpRight,
+    Globe,
+    Flame,
+    Trophy
+};
 
 export const useHomeController = () => {
-    const { data: stats = [], isLoading } = useGetHomeStats();
+    const { data: summary, isLoading } = useGetHomeSummary();
 
-    const videos = [1, 2];
-    const scripts = [1, 2];
-    const projects = [
-        { name: "30-Day Growth Challenge", progress: 65, color: "bg-amber-500" },
-        { name: "Creator OS Launch", progress: 92, color: "bg-emerald-500" }
-    ];
-    const challenges = [
-        { name: "Viral Hook Marathon", recruits: 1284, hot: true },
-        { name: "Consistency Sprint", recruits: 450, hot: false }
-    ];
+    const stats = (summary?.stats || []).map(stat => ({
+        ...stat,
+        icon: ICON_MAP[stat.icon] || Globe
+    }));
 
     return {
         stats,
         isLoading,
-        videos,
-        scripts,
-        projects,
-        challenges
+        videos: summary?.videos || [],
+        scripts: summary?.scripts || [],
+        projects: summary?.projects || [],
+        challenges: summary?.challenges || []
     };
 };

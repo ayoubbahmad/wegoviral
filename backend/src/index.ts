@@ -10,6 +10,7 @@ import scriptsRoutes from './features/scripts/routes';
 import communityRoutes from './features/community/routes';
 import performanceRoutes from './features/performance/routes';
 import authRoutes from './features/auth/routes';
+import homeRoutes from './features/home/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,6 +29,7 @@ app.use('/api/scripts', scriptsRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/performance', performanceRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/home', homeRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

@@ -1,50 +1,65 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 import { 
   Users, 
   Activity, 
   Eye, 
-  ArrowUpRight 
+  ArrowUpRight,
+  Globe,
+  Flame,
+  Trophy
 } from "lucide-react";
-import { HomeStats } from "./types";
 
-export * from "./types";
+// Standard icon mapping
+const ICON_MAP: Record<string, any> = {
+    Users,
+    Activity,
+    Eye,
+    ArrowUpRight,
+    Globe,
+    Flame,
+    Trophy
+};
 
-// API Endpoints
-export const HOME_ENDPOINTS = {
-    GET_STATS: '/home/stats',
+// Types
+export interface HomeStats {
+  label: string;
+  value: string;
+  trend?: number;
+  icon: any;
+}
+
+export interface HomeSummary {
+    stats: any[];
+    scripts: any[];
+    videos: any[];
+    projects: any[];
+    challenges: any[];
+}
+
+// API Functions
+export const homeApi = {
+    getSummary: async (): Promise<HomeSummary> => {
+        return apiClient.get('/home/summary');
+    }
 };
 
 // Tanstack Query Hooks
-export const useGetHomeStats = () => {
-    return useQuery<HomeStats[]>({
-        queryKey: ["home-stats"],
-        queryFn: async () => {
-            // Mocking the API call for now
-            return [
-                {
-                    label: "Total Followers",
-                    value: "12,345",
-                    trend: 12,
-                    icon: Users,
-                },
-                {
-                    label: "Avg. Engagement",
-                    value: "4.8%",
-                    trend: 2.1,
-                    icon: Activity,
-                },
-                {
-                    label: "Impressions (30d)",
-                    value: "45.2k",
-                    trend: 8,
-                    icon: Eye,
-                },
-                {
-                    label: "Content Score",
-                    value: "92",
-                    icon: ArrowUpRight,
-                },
-            ];
-        },
+export const useGetHomeSummary = () => {
+    return useQuery({
+        queryKey: ["home-summary"],
+        queryFn: homeApi.getSummary,
     });
+};
+
+// Legacy support or specific stat hook
+export const useGetHomeStats = () => {
+    const { data: summary, isLoading, error } = useGetHomeSummary();
+    
+    const stats = (summary?.stats || []).map(stat => ({
+        ...stat,
+        icon: ICON_MAP[stat.icon] || Globe
+    }));
+
+    return { data: stats, isLoading, error };
 };

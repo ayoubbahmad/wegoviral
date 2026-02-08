@@ -13,7 +13,7 @@ interface ViewToggleProps {
  */
 export const ViewToggle = ({ mode, onChange, className }: ViewToggleProps) => {
   return (
-    <div className={cn("flex p-1 bg-card border border-border/50 rounded-xl", className)}>
+    <div className={cn("flex p-1 bg-card border border-border/50 rounded-lg", className)}>
       <Button 
         variant="ghost"
         size="sm"

@@ -29,6 +29,9 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from '@/components/ui/Card';
 import { Input } from "@/components/ui/Input";
+import { PageContainer } from "@/components/ui/PageContainer";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { ViewToggle } from "@/components/ui/ViewToggle";
 
 export const AutomationsContainer = () => {
   const { 
@@ -105,24 +108,22 @@ export const AutomationsContainer = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <PageContainer>
       <PageHeader
         title="DM Automations"
         description="Trigger automatic messages based on keywords in comments or mentions."
         actions={
-          <div className="flex items-center gap-3">
-             <Button onClick={() => {
-                if (isAdding) {
-                   setIsAdding(false);
-                   setEditingId(null);
-                } else {
-                   setIsAdding(true);
-                }
-             }} variant={isAdding ? "outline" : "primary"} className="pl-3">
-                {isAdding ? <XCircle className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                {isAdding ? "Cancel" : "New Automation"}
-             </Button>
-          </div>
+          <Button onClick={() => {
+            if (isAdding) {
+              setIsAdding(false);
+              setEditingId(null);
+            } else {
+              setIsAdding(true);
+            }
+          }} variant={isAdding ? "outline" : "primary"} className="px-5">
+            {isAdding ? <XCircle className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {isAdding ? "Cancel" : "New Automation"}
+          </Button>
         }
       />
 
@@ -132,7 +133,7 @@ export const AutomationsContainer = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
+            className="overflow-hidden mb-8"
           >
             <Card className="p-6 border-primary/20 bg-primary/5 shadow-xl shadow-primary/5">
               <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -265,51 +266,34 @@ export const AutomationsContainer = () => {
         )}
       </AnimatePresence>
 
-      {/* Controls Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-muted/20 border border-border/50 rounded-2xl">
-         <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative w-full md:w-64">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-               <Input 
-                  placeholder="Search automations..." 
-                  value={searchTerm}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                  className="pl-9 bg-background border-border/50 focus:border-primary"
-               />
-            </div>
-            <div className="flex bg-muted/50 p-1 rounded-xl shrink-0">
+      <div className="space-y-6">
+        {/* Controls Bar */}
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <SearchInput 
+            placeholder="Search automations..." 
+            value={searchTerm}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          />
+
+          <div className="flex items-center gap-2">
+            <ViewToggle mode={viewType} onChange={setViewType} />
+            
+            <div className="flex bg-card p-1 border border-border/50 rounded-xl">
                <button 
                   onClick={() => setSelectedPlatform("all")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPlatform === "all" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPlatform === "all" ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}
                >
                   All
                </button>
                <button 
                   onClick={() => setSelectedPlatform("instagram")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPlatform === "instagram" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPlatform === "instagram" ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}
                >
                   Instagram
                </button>
             </div>
-         </div>
-
-         <div className="flex items-center gap-2">
-            <div className="flex bg-muted/50 p-1 rounded-xl">
-               <button 
-                  onClick={() => setViewType("grid")}
-                  className={`p-1.5 rounded-lg transition-all ${viewType === "grid" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
-               >
-                  <LayoutGrid className="w-4 h-4" />
-               </button>
-               <button 
-                  onClick={() => setViewType("table")}
-                  className={`p-1.5 rounded-lg transition-all ${viewType === "table" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
-               >
-                  <ListIcon className="w-4 h-4" />
-               </button>
-            </div>
-         </div>
-      </div>
+          </div>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3 grid gap-4">
@@ -573,5 +557,6 @@ export const AutomationsContainer = () => {
         </div>
       </div>
     </div>
+  </PageContainer>
   );
 };

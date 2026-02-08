@@ -1,5 +1,6 @@
 import { LucideIcon, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "./Card";
 
 interface StatCardProps {
   label: string;
@@ -8,10 +9,12 @@ interface StatCardProps {
   trend?: number;
   description?: string;
   className?: string;
+  variant?: "default" | "glass" | "secondary";
 }
 
 /**
  * Standardized card for displaying metrics and key performance indicators.
+ * Built on the unified Card component.
  */
 export const StatCard = ({
   label,
@@ -20,12 +23,13 @@ export const StatCard = ({
   trend,
   description,
   className,
+  variant = "default",
 }: StatCardProps) => {
   return (
-    <div className={cn(
-      "p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-all group",
-      className
-    )}>
+    <Card 
+      variant={variant}
+      className={cn("group", className)}
+    >
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-muted-foreground">{label}</span>
         <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -47,6 +51,6 @@ export const StatCard = ({
           <p className="text-xs text-muted-foreground">{description}</p>
         )}
       </div>
-    </div>
+    </Card>
   );
 };

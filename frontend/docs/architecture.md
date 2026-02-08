@@ -69,12 +69,34 @@ Encapsulates form validation and state management using React Hook Form and Zod.
 - **`schemas.ts`**: Zod schemas for form validation.
 - **Rule**: Validation logic never leaks into the UI or Controller.
 
+## 🧱 Standard Dashboard Patterns
+
+To maintain a premium and consistent feel across the platform, all dashboard sub-pages (Scripts, Videos, Automations, etc.) should follow the same layout pattern.
+
+### 1. Page Wrapper
+Always wrap the container content in a `PageContainer`. This ensures consistent padding, max-width, and responsive behavior across the entire dashboard.
+
+### 2. Header & Actions
+Use the `PageHeader` component at the top of every page.
+- **Title**: Clear, concise page name.
+- **Description**: Brief explanation of what the user can do.
+- **Actions**: Primary actions (like "Create New") should be passed to the `actions` prop as a `Button`.
+
+### 3. Controls Bar
+Directly below the header, include a controls bar for list management:
+- **Search**: Use `SearchInput` on the left.
+- **View Switching**: Use `ViewToggle` to switch between `grid` and `table` modes.
+- **Filters/Sort**: Add secondary `Button` components (variant="outline") for additional controls.
+
+### 4. Empty States
+When no data is available, use the `EmptyState` component instead of basic text.
+
 ---
 
 ## Folder Structure Example
 ```text
 src/containers/FeatureName/
-├── index.tsx              # View (Container)
+├── index.tsx              # View (Container) - Uses PageContainer & PageHeader
 ├── controller/
 │   └── index.ts           # Controller Hook
 ├── api/

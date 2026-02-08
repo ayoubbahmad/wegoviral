@@ -7,6 +7,7 @@ import { ColorShowcase } from "./ColorShowcase";
 import { TypographyShowcase } from "./TypographyShowcase";
 import { ButtonShowcase } from "./ButtonShowcase";
 import { CardShowcase } from "./CardShowcase";
+import { FormShowcase } from "./FormShowcase";
 import { FeedbackShowcase } from "./FeedbackShowcase";
 import { Tabs } from "../ui/Tabs";
 
@@ -15,6 +16,7 @@ const SECTIONS = [
     { id: 'typography', label: 'Typography', icon: Type, component: TypographyShowcase },
     { id: 'buttons', label: 'Buttons', icon: MousePointer2, component: ButtonShowcase },
     { id: 'cards', label: 'Cards', icon: Layout, component: CardShowcase },
+    { id: 'forms', label: 'Forms', icon: Layout, component: FormShowcase },
     { id: 'feedback', label: 'Feedback', icon: BellRing, component: FeedbackShowcase },
 ];
 
@@ -47,12 +49,12 @@ export function DesignSystemShowcase() {
             </div>
 
             {/* Rules / Specs */}
-            <div className="p-12 rounded-[3rem] border border-dashed border-border/50 bg-secondary/10 space-y-6">
+            <div className="p-12 rounded-2xl border border-dashed border-border/50 bg-secondary/10 space-y-6">
                 <h2 className="text-xl font-black text-foreground uppercase italic tracking-tight">System Specification</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="space-y-2">
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary">Border Radius</p>
-                        <p className="text-sm font-medium text-muted-foreground">Main containers: 3.5rem (56px) / 2.5rem (40px). Components: 1.5rem (24px) / 1rem (16px).</p>
+                        <p className="text-sm font-medium text-muted-foreground">Main containers: 1rem (16px). Secondary components: 0.75rem (12px). Small items: 0.5rem (8px).</p>
                     </div>
                     <div className="space-y-2">
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary">Spacing Scale</p>

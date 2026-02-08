@@ -31,7 +31,7 @@ export const Tabs = ({
       containerClassName
     )}>
       <div className={cn(
-        "flex items-center gap-1 p-1.5 rounded-2xl bg-card/80 backdrop-blur-md border border-border/50 shadow-2xl w-fit",
+        "flex items-center gap-1 p-1.5 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 shadow-2xl w-fit",
         className
       )}>
         {items.map((item) => (
@@ -39,7 +39,7 @@ export const Tabs = ({
             key={item.id}
             onClick={() => onChange(item.id)}
             className={cn(
-              "flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap",
+              "flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap",
               activeId === item.id
                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"

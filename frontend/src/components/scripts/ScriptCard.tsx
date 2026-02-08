@@ -1,6 +1,7 @@
 import { FileText, Clock, Layers, Trash2 } from "lucide-react";
 import { cn, formatRelativeDate } from "@/lib/utils";
 import { Button } from "../ui/Button";
+import { Card } from "../ui/Card";
 
 export interface Script {
   id: string;
@@ -28,11 +29,14 @@ export function ScriptCard({ script, variant = "full", onClick, onDelete, classN
   };
 
   return (
-    <div 
+    <Card 
       onClick={onClick}
+      hover
+      variant={isCompact ? "glass" : "default"}
+      padding="none"
       className={cn(
-        "group flex flex-col bg-card border border-border/50 hover:border-purple-500/30 transition-all cursor-pointer shadow-sm hover:shadow-xl relative overflow-hidden",
-        isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
+        "flex flex-col relative overflow-hidden h-full",
+        isCompact ? "p-4" : "p-6",
         className
       )}
     >
@@ -89,6 +93,6 @@ export function ScriptCard({ script, variant = "full", onClick, onDelete, classN
           <span>{script.wordCount} words</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -26,14 +26,14 @@ export const SearchInput = ({
       <input 
         type="text" 
         className={cn(
-          "w-full h-11 pl-11 pr-20 rounded-xl bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm",
+          "w-full h-11 pl-11 pr-20 rounded-lg bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm",
           className
         )}
         {...props}
       />
       <button 
         onClick={() => onSearch?.(props.value as string)}
-        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn"
+        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-md bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn"
       >
         {buttonText}
         <span className="text-[10px] opacity-50 group-hover/btn:translate-x-0.5 transition-transform">↵</span>

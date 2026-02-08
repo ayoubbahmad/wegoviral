@@ -3,9 +3,9 @@
 import { useAuth } from '@/providers/Auth';
 import { Mail, User as UserIcon, Camera } from 'lucide-react';
 import { ThemeToggle } from '@/containers/settings/ThemeToggle';
-import { SocialAccountsManager } from '@/containers/settings/SocialAccountsManager';
+// import { SocialAccountsManager } from '@/containers/settings/SocialAccountsManager';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Button } from '@/components/ui/Button';
+// import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
   const { user, activeSocialAccount } = useAuth();
@@ -90,6 +90,8 @@ export default function ProfilePage() {
           Social account management UI coming in Phase 4.3
         </div>
       </div>
+
+      {/* <SocialAccountsManager /> */}
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>
         <h2 className='text-lg font-semibold mb-6'>Appearance</h2>

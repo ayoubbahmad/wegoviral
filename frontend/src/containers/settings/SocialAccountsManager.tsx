@@ -79,7 +79,7 @@ export const SocialAccountsManager = () => {
           
           <Button 
             variant="outline" 
-            fullWidth 
+            // fullWidth 
             onClick={connectInstagram}
             className="border-dashed border-border mt-4 py-6 rounded-2xl text-muted-foreground"
           >

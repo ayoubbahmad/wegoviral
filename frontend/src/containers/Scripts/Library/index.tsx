@@ -52,7 +52,7 @@ export const ScriptsLibraryContainer = () => {
         description="Manage and organize all your video scripts in one place."
         actions={
           <Link href="/scripts/new">
-            <Button variant="primary" size="lg">
+            <Button variant="primary" size="md">
               <Plus className="w-4 h-4" />
               Create New Script
             </Button>

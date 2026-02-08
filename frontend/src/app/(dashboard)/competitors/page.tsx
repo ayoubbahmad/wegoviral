@@ -26,7 +26,7 @@ export default function CompetitorsPage() {
                 actions={
                     <Button 
                         variant="primary" 
-                        size="lg"
+                        size="md"
                         onClick={() => setIsModalOpen(true)}
                     >
                         <Plus className="w-4 h-4" /> Add Competitor

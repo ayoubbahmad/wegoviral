@@ -31,11 +31,11 @@ export const Primary: Story = {
   },
 };
 
-export const Rounded: Story = {
+export const Pill: Story = {
   args: {
     children: (
       <>
-        <Plus className="w-3.5 h-3.5" /> Rounded Action
+        <Plus className="w-3.5 h-3.5" /> Pill / Rounded Action
       </>
     ),
     variant: 'pill',

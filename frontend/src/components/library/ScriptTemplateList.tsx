@@ -24,6 +24,7 @@ export function ScriptTemplateList({ scripts, onDelete, onUpdate }: ScriptTempla
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
+
         if (confirm("Are you sure you want to delete this script template?")) {
             setIsDeleting(id);
             await onDelete?.(id);
@@ -31,6 +32,7 @@ export function ScriptTemplateList({ scripts, onDelete, onUpdate }: ScriptTempla
         }
     };
 
+    
     return (
         <div className="space-y-4">
             {scripts.map((script) => (

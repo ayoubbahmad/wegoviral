@@ -18,6 +18,6 @@ export interface ScriptTemplate {
     id: string;
     title: string;
     category: string;
-    content: any; // Using any for Json structure flexibility
+    content: any[]; // Using any for Json structure flexibility
     createdAt: string;
 }

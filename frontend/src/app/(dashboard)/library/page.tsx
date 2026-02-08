@@ -47,7 +47,7 @@ export default function LibraryPage() {
                     </div>
                 ) : (
                     <ScriptTemplateList
-                        scripts={scripts as any}
+                        scripts={scripts}
                         onDelete={removeScript}
                         onUpdate={updateScript}
                     />

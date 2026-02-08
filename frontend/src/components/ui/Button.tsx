@@ -14,11 +14,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", hoverScale = false, ...props }, ref) => {
     const variants = {
       primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20",
-      pill: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 font-black uppercase tracking-widest rounded-xl",
+      pill: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 font-black uppercase tracking-widest rounded-full",
       outline: "border border-border/50 bg-background hover:bg-secondary/50 text-muted-foreground hover:text-foreground",
       ghost: "hover:bg-secondary/50 text-muted-foreground hover:text-foreground",
       secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50 font-bold",
-      floating: "rounded-2xl bg-primary text-primary-foreground shadow-2xl shadow-primary/40 p-4",
+      floating: "rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/40 p-4",
     };
 
     const sizes = {

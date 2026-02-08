@@ -27,7 +27,7 @@ export const ProjectsContainer = () => {
                 actions={
                     <Button 
                         variant="primary" 
-                        size="lg"
+                        size="md"
                         onClick={handleNewProject}
                     >
                         <Plus className="w-4 h-4" /> New Project

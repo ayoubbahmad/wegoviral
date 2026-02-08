@@ -1,4 +1,4 @@
-import { Hook, ScriptTemplate } from "@/types/library";
+import { Hook, ScriptTemplate } from "@/containers/Library/api/types";
 import { Competitor, CompetitorPost } from "@/types/competitor";
 import { Follower } from "@/types/community";
 import { PerformancePost, PostingTimeAnalysis } from "@/types/performance";

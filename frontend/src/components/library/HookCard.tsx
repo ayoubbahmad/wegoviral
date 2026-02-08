@@ -4,6 +4,7 @@ import { Hook } from "@/containers/Library/api/types";
 import { Edit2, Trash2, Copy, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Card } from "../ui/Card";
 
 interface HookCardProps {
     hook: Hook;
@@ -30,7 +31,10 @@ export function HookCard({ hook, onDelete, onUpdate }: HookCardProps) {
     };
 
     return (
-        <div className="group relative rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+        <Card 
+            hover
+            className="group relative flex flex-col h-full"
+        >
             <div className="flex items-start justify-between mb-4">
                 <div className="flex gap-2">
                     <span className={cn(
@@ -84,6 +88,6 @@ export function HookCard({ hook, onDelete, onUpdate }: HookCardProps) {
                     {hook.lastUsed && <span>Last: {new Date(hook.lastUsed).toLocaleDateString()}</span>}
                 </div>
             )}
-        </div>
+        </Card>
     );
 }

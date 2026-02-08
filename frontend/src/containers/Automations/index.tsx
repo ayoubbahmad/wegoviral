@@ -327,7 +327,11 @@ export const AutomationsContainer = () => {
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                 >
-                  <Card className="group hover:border-primary/40 transition-all duration-300 relative overflow-hidden bg-background">
+                  <Card 
+                    padding="none"
+                    hover
+                    className="group transition-all duration-300 relative overflow-hidden bg-background"
+                  >
                     <div className="absolute top-0 right-0 p-4">
                       <button 
                         onClick={() => handleToggleActive(automation.id, automation.active)}

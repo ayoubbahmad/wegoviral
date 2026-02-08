@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { 
   useGetAutomations, 
   useCreateAutomation, 
@@ -12,6 +13,19 @@ export const useAutomationsController = () => {
   const createMutation = useCreateAutomation();
   const updateMutation = useUpdateAutomation();
   const deleteMutation = useDeleteAutomation();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState("all");
+
+  const filteredAutomations = useMemo(() => {
+    return automations.filter(automation => {
+      const matchesSearch = automation.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           automation.triggerKeyword.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesPlatform = selectedPlatform === "all" || (automation.platform || "instagram").toLowerCase() === selectedPlatform.toLowerCase();
+      
+      return matchesSearch && matchesPlatform;
+    });
+  }, [automations, searchTerm, selectedPlatform]);
 
   const handleCreate = async (data: CreateAutomationDTO) => {
     return createMutation.mutateAsync(data);
@@ -32,8 +46,13 @@ export const useAutomationsController = () => {
   };
 
   return {
-    automations,
+    automations: filteredAutomations,
+    rawAutomations: automations,
     isLoading,
+    searchTerm,
+    setSearchTerm,
+    selectedPlatform,
+    setSelectedPlatform,
     handleCreate,
     handleUpdate,
     handleDelete,

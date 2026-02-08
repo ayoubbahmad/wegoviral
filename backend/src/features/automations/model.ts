@@ -11,6 +11,8 @@ export interface Automation {
   lastRunAt: Date | null;
   commentReplyEnabled: boolean;
   commentReplyMessage: string | null;
+  instagramPostId: string | null;
+  isGlobal: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +25,8 @@ export interface CreateAutomationDTO {
   socialAccountId?: string;
   commentReplyEnabled?: boolean;
   commentReplyMessage?: string;
+  instagramPostId?: string;
+  isGlobal?: boolean;
 }
 
 export interface UpdateAutomationDTO {
@@ -34,4 +38,6 @@ export interface UpdateAutomationDTO {
   socialAccountId?: string;
   commentReplyEnabled?: boolean;
   commentReplyMessage?: string;
+  instagramPostId?: string;
+  isGlobal?: boolean;
 }

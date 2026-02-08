@@ -219,6 +219,10 @@ model Automation {
   commentReplyEnabled Boolean @default(false)
   commentReplyMessage String?
   
+  // Instagram Specific
+  instagramPostId String?
+  isGlobal        Boolean @default(true)
+  
   userId          String
   user            UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
   

@@ -48,7 +48,7 @@ export class AutomationService {
   }
 
   // Simulated trigger logic for keywords
-  async processKeywordTrigger(socialAccountId: string, handle: string, comment: string) {
+  async processKeywordTrigger(socialAccountId: string, handle: string, comment: string, mediaId?: string) {
     const automations = await prisma.automation.findMany({
       where: { 
         socialAccountId,
@@ -57,7 +57,11 @@ export class AutomationService {
     });
 
     for (const automation of automations) {
-      if (comment.toLowerCase().includes(automation.triggerKeyword.toLowerCase())) {
+      // Logic for matching keyword and post binding
+      const keywordMatched = comment.toLowerCase().includes(automation.triggerKeyword.toLowerCase());
+      const postMatched = automation.isGlobal || (mediaId && automation.instagramPostId === mediaId);
+
+      if (keywordMatched && postMatched) {
         console.log(`[AUTOMATION] Trigger matched: "${automation.triggerKeyword}" for user @${handle}`);
         console.log(`[AUTOMATION] Sending DM: "${automation.responseMessage}"`);
         

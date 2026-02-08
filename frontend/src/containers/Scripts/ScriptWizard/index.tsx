@@ -359,7 +359,16 @@ export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
           <div className="space-y-8">
             <div className="relative p-8 rounded-2xl bg-secondary/30 border border-border/50 min-h-[400px]">
                <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 z-10">
-                 {editableContent.trim() ? editableContent.trim().split(/\s+/).length : 0} Words · ~{Math.ceil((editableContent.trim() ? editableContent.trim().split(/\s+/).length : 0) / 160)} mins
+                 {/* This should be placed outside the html code... */}
+                 {(() => {
+                    const words = editableContent.trim() ? editableContent.trim().split(/\s+/).length : 0;
+                    const wpm = 160; // Vitesse de lecture moyenne
+                    const totalSeconds = Math.floor((words / wpm) * 60);
+                    const mins = Math.floor(totalSeconds / 60);
+                    const secs = totalSeconds % 60;
+
+                    return `${words} Words · ~${mins}m ${secs}s`;
+                  })()}
                </div>
                <div className="relative z-0">
                  <textarea

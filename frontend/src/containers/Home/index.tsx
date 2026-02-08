@@ -12,6 +12,7 @@ import {
   Globe
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useHomeController } from "./controller";
 import { HomeSkeleton } from "@/views/Home/skeleton";
 import { Button } from "@/components/ui/Button";
@@ -23,6 +24,7 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { ScriptCard } from "@/components/scripts/ScriptCard";
 
 export const HomeContainer = () => {
+  const router = useRouter();
   const {
     stats,
     isLoading,
@@ -124,6 +126,7 @@ export const HomeContainer = () => {
                   lastUpdated: script.updatedAt || "Just now",
                   wordCount: script.wordCount || 0
                 }}
+                onClick={() => router.push(`/scripts/${script.id}`)}
               />
             ))}
           </div>

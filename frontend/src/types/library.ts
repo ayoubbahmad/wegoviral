@@ -21,3 +21,16 @@ export interface ScriptTemplate {
     content: any[]; // Using any for Json structure flexibility
     createdAt: string;
 }
+
+export interface Script {
+    id: string;
+    title: string;
+    category: string;
+    content: any; // Flexible content structure
+    status: "Draft" | "Completed";
+    excerpt?: string;
+    wordCount?: number;
+    templateId?: string;
+    createdAt: string;
+    lastUpdated?: string;
+}

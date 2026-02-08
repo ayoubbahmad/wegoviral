@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 
-import { Hook } from "@/types/library";
+
 
 interface AddNewItemProps {
     onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;

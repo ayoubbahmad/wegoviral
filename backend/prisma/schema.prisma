@@ -23,6 +23,7 @@ model UserProfile {
   competitors    Competitor[]
   socialAccounts SocialAccount[]
   scriptTemplates ScriptTemplate[]
+  scripts        Script[]
   automations    Automation[]
 }
 
@@ -68,6 +69,29 @@ model ScriptTemplate {
   hookId    String?
   hook      Hook?       @relation(fields: [hookId], references: [id])
   
+  // Relations
+  scripts   Script[]    // Scripts created using this template
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Script {
+  id        String   @id @default(uuid())
+  title     String
+  content   Json     // The actual script content
+  category  String
+  status    String   @default("Draft") // Draft, Completed
+  excerpt   String?
+  wordCount Int?     @default(0)
+
+  // Optional link to a template/blueprint
+  templateId String?
+  template   ScriptTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

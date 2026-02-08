@@ -27,7 +27,7 @@ export class ScriptsService {
   }
 
   async getAllScripts(userId: string) {
-    const scripts = await prisma.scriptTemplate.findMany({
+    const scripts = await prisma.script.findMany({
       where: { userId },
       orderBy: { updatedAt: 'desc' },
     });
@@ -35,18 +35,18 @@ export class ScriptsService {
   }
 
   async getScriptById(id: string, userId: string) {
-    const script = await prisma.scriptTemplate.findFirst({
+    const script = await prisma.script.findFirst({
       where: { id, userId }
     });
     if (!script) return null;
     return ScriptsService.formatScript(script);
   }
 
-  async createScript(userId: string, data: CreateScriptDTO) {
+  async createScript(userId: string, data: CreateScriptDTO & { templateId?: string }) {
     const wordCount = ScriptsService.calculateWordCount(data.content);
     const excerpt = ScriptsService.generateExcerpt(data.content);
 
-    const script = await prisma.scriptTemplate.create({
+    const script = await prisma.script.create({
       data: {
         title: data.title,
         content: data.content as any,
@@ -55,6 +55,7 @@ export class ScriptsService {
         excerpt,
         wordCount,
         userId,
+        templateId: data.templateId,
       },
     });
     return ScriptsService.formatScript(script);
@@ -62,7 +63,7 @@ export class ScriptsService {
 
   async updateScript(id: string, userId: string, data: UpdateScriptDTO) {
     // Ensure user owns the script
-    const existingScript = await prisma.scriptTemplate.findFirst({
+    const existingScript = await prisma.script.findFirst({
       where: { id, userId }
     });
 
@@ -71,7 +72,7 @@ export class ScriptsService {
     const wordCount = data.content ? ScriptsService.calculateWordCount(data.content) : existingScript.wordCount;
     const excerpt = data.content ? ScriptsService.generateExcerpt(data.content) : existingScript.excerpt;
 
-    const updatedScript = await prisma.scriptTemplate.update({
+    const updatedScript = await prisma.script.update({
       where: { id },
       data: {
         title: data.title,
@@ -86,13 +87,13 @@ export class ScriptsService {
   }
 
   async deleteScript(id: string, userId: string) {
-    const script = await prisma.scriptTemplate.findFirst({
+    const script = await prisma.script.findFirst({
       where: { id, userId }
     });
 
     if (!script) return false;
 
-    await prisma.scriptTemplate.delete({
+    await prisma.script.delete({
       where: { id },
     });
     return true;

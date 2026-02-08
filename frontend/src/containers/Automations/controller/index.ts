@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { 
   useGetAutomations, 
   useCreateAutomation, 
@@ -7,15 +7,44 @@ import {
   CreateAutomationDTO,
   UpdateAutomationDTO
 } from "../api";
+import { getAuthUrl, getMySocialAccounts, SocialAccount } from "../api/social-accounts";
 
 export const useAutomationsController = () => {
-  const { data: automations = [], isLoading } = useGetAutomations();
+  const { data: automations = [], isLoading, refetch } = useGetAutomations();
   const createMutation = useCreateAutomation();
   const updateMutation = useUpdateAutomation();
   const deleteMutation = useDeleteAutomation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState("all");
+  const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
+  const fetchAccounts = async () => {
+    try {
+      setIsLoadingAccounts(true);
+      const accounts = await getMySocialAccounts();
+      setSocialAccounts(accounts);
+    } catch (err) {
+      console.error("Failed to fetch social accounts", err);
+    } finally {
+      setIsLoadingAccounts(false);
+    }
+  };
+
+  const connectInstagram = async () => {
+    try {
+      const { url } = await getAuthUrl();
+      window.location.href = url; // Redirect to FB
+    } catch (err) {
+      console.error("Failed to get auth URL", err);
+      alert("Failed to initiate Instagram connection. Check if API is running.");
+    }
+  };
 
   const filteredAutomations = useMemo(() => {
     return automations.filter(automation => {
@@ -53,9 +82,13 @@ export const useAutomationsController = () => {
     setSearchTerm,
     selectedPlatform,
     setSelectedPlatform,
+    socialAccounts,
+    isLoadingAccounts,
+    connectInstagram,
     handleCreate,
     handleUpdate,
     handleDelete,
-    handleToggleActive
+    handleToggleActive,
+    refreshAutomations: refetch
   };
 };

@@ -38,10 +38,13 @@ export const AutomationsContainer = () => {
     setSearchTerm,
     selectedPlatform,
     setSelectedPlatform,
+    socialAccounts,
+    isLoadingAccounts,
     handleCreate,
     handleDelete, 
     handleToggleActive,
-    handleUpdate 
+    handleUpdate,
+    refreshAutomations
   } = useAutomationsController();
 
   const [isAdding, setIsAdding] = useState(false);
@@ -107,17 +110,19 @@ export const AutomationsContainer = () => {
         title="DM Automations"
         description="Trigger automatic messages based on keywords in comments or mentions."
         actions={
-          <Button onClick={() => {
-            if (isAdding) {
-              setIsAdding(false);
-              setEditingId(null);
-            } else {
-              setIsAdding(true);
-            }
-          }} variant={isAdding ? "outline" : "primary"} className="pl-3">
-            {isAdding ? <XCircle className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {isAdding ? "Cancel" : "New Automation"}
-          </Button>
+          <div className="flex items-center gap-3">
+             <Button onClick={() => {
+                if (isAdding) {
+                   setIsAdding(false);
+                   setEditingId(null);
+                } else {
+                   setIsAdding(true);
+                }
+             }} variant={isAdding ? "outline" : "primary"} className="pl-3">
+                {isAdding ? <XCircle className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                {isAdding ? "Cancel" : "New Automation"}
+             </Button>
+          </div>
         }
       />
 

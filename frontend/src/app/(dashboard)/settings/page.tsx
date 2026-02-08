@@ -3,6 +3,7 @@
 import { useAuth } from '@/providers/Auth';
 import { Mail, User as UserIcon, Camera } from 'lucide-react';
 import { ThemeToggle } from '@/containers/settings/ThemeToggle';
+import { SocialAccountsManager } from '@/containers/settings/SocialAccountsManager';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 

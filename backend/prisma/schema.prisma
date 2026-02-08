@@ -23,6 +23,7 @@ model UserProfile {
   competitors    Competitor[]
   socialAccounts SocialAccount[]
   scriptTemplates ScriptTemplate[]
+  automations    Automation[]
 }
 
 // -- Library (Hooks & Scripts) --
@@ -193,9 +194,37 @@ model SocialAccount {
   competitors Competitor[]
   userPosts   UserPost[]
   followers   Follower[]
+  automations Automation[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@unique([userId, platform, accountId]) // One user can't connect same account twice
+}
+
+// -- Automations & Keyword Triggers --
+model Automation {
+  id              String   @id @default(uuid())
+  name            String
+  triggerKeyword  String
+  responseMessage String
+  platform        String?  // 'instagram', 'tiktok', etc.
+  active          Boolean  @default(true)
+  
+  // Monitoring & Stats
+  runCount        Int      @default(0)
+  lastRunAt       DateTime?
+  
+  // Multi-Action Support
+  commentReplyEnabled Boolean @default(false)
+  commentReplyMessage String?
+  
+  userId          String
+  user            UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  socialAccountId String?
+  socialAccount   SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

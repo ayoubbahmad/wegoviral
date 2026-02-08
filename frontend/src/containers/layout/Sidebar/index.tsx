@@ -31,6 +31,7 @@ const navItems = [
     { name: "Projects", href: "/projects", icon: FolderOpen },
     { name: "Performance", href: "/performance", icon: BarChart2 },
     { name: "Community", href: "/community", icon: Users },
+    { name: "Automations", href: "/automations", icon: Zap },
     { name: "Competitors", href: "/competitors", icon: Target },
     // { name: "Channels", href: "/channels", icon: Target },
     { name: "Library", href: "/library", icon: Library },

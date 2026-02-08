@@ -11,6 +11,7 @@ import communityRoutes from './features/community/routes';
 import performanceRoutes from './features/performance/routes';
 import authRoutes from './features/auth/routes';
 import homeRoutes from './features/home/routes';
+import automationRoutes from './features/automations/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,6 +31,7 @@ app.use('/api/community', communityRoutes);
 app.use('/api/performance', performanceRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
+app.use('/api/automations', automationRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

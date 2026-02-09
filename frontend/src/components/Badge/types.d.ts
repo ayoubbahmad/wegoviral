@@ -14,7 +14,7 @@ export interface BadgeProps {
   children: ReactNode;
   variant?: BadgeVariant;
   shape?: BadgeShape;
-  icon?: any;
+  icon?: React.ElementType;
   className?: string;
   onClick?: () => void;
 }

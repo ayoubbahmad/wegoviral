@@ -1,24 +1,17 @@
 'use client';
 
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Plus,
-  MessageSquare,
   Zap,
   Trash2,
   ChevronRight,
-  Settings2,
   ToggleLeft,
   ToggleRight,
-  Search,
   CheckCircle2,
-  XCircle,
   AlertTriangle,
   Info,
   Instagram,
   Edit2,
-  Globe,
 } from 'lucide-react';
 import { useAutomationsController } from './controller';
 import { Button } from '@/components/Button';
@@ -28,8 +21,9 @@ import { SearchInput } from '@/components/SearchInput';
 import { ViewToggle } from '@/components/ViewToggle';
 import { AutomationCard } from './components/AutomationCard';
 import { Table } from '@/components/Table';
-import { PageHeader } from '@/components/PageHeader';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { mockedPosts } from './constants';
 
 export const AutomationsContainer = () => {
   const {
@@ -39,116 +33,20 @@ export const AutomationsContainer = () => {
     setSearchTerm,
     selectedPlatform,
     setSelectedPlatform,
-    socialAccounts,
-    isLoadingAccounts,
-    handleCreate,
     handleDelete,
     handleToggleActive,
-    handleUpdate,
-    refreshAutomations,
+    isAdding,
+    editingId,
+    viewType,
+    setViewType,
+    formData,
+    setFormData,
+    handleSubmit,
+    startEdit,
   } = useAutomationsController();
-
-  const [isAdding, setIsAdding] = useState(false);
-  const [viewType, setViewType] = useState<'grid' | 'table'>('grid');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    triggerKeyword: '',
-    responseMessage: '',
-    commentReplyEnabled: false,
-    commentReplyMessage: '',
-    isGlobal: true,
-    instagramPostId: '',
-  });
-
-  const mockedPosts = [
-    {
-      id: 'post_1',
-      thumbnail:
-        'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=100&h=100&fit=crop',
-      title: 'New AI Wearable Video',
-    },
-    {
-      id: 'post_2',
-      thumbnail:
-        'https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=100&h=100&fit=crop',
-      title: 'Scale Your Agency (Reel)',
-    },
-    {
-      id: 'post_3',
-      thumbnail:
-        'https://images.unsplash.com/photo-1611162616484-2a2951163988?w=100&h=100&fit=crop',
-      title: 'Direct Response Marketing 101',
-    },
-  ];
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.triggerKeyword || !formData.responseMessage)
-      return;
-
-    if (editingId) {
-      await handleUpdate(editingId, formData);
-    } else {
-      await handleCreate(formData);
-    }
-
-    setIsAdding(false);
-    setEditingId(null);
-    setFormData({
-      name: '',
-      triggerKeyword: '',
-      responseMessage: '',
-      commentReplyEnabled: false,
-      commentReplyMessage: '',
-      isGlobal: true,
-      instagramPostId: '',
-    });
-  };
-
-  const startEdit = (automation: any) => {
-    setFormData({
-      name: automation.name,
-      triggerKeyword: automation.triggerKeyword,
-      responseMessage: automation.responseMessage,
-      commentReplyEnabled: automation.commentReplyEnabled,
-      commentReplyMessage: automation.commentReplyMessage || '',
-      isGlobal: automation.isGlobal,
-      instagramPostId: automation.instagramPostId || '',
-    });
-    setEditingId(automation.id);
-    setIsAdding(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <>
-      <PageHeader
-        title='Automations'
-        description='Trigger automatic messages based on keywords in comments or mentions.'
-        actions={
-          <Button
-            onClick={() => {
-              if (isAdding) {
-                setIsAdding(false);
-                setEditingId(null);
-              } else {
-                setIsAdding(true);
-              }
-            }}
-            variant={isAdding ? 'outline' : 'primary'}
-            className='px-5'
-          >
-            {isAdding ? (
-              <XCircle className='w-4 h-4' />
-            ) : (
-              <Plus className='w-4 h-4' />
-            )}
-            {isAdding ? 'Cancel' : 'New Automation'}
-          </Button>
-        }
-      />
-
       <AnimatePresence>
         {isAdding && (
           <motion.div
@@ -159,7 +57,7 @@ export const AutomationsContainer = () => {
           >
             <Card className='p-6 border-primary/20 bg-primary/5 shadow-xl shadow-primary/5'>
               <form
-                onSubmit={onSubmit}
+                onSubmit={handleSubmit}
                 className='grid grid-cols-1 md:grid-cols-3 gap-6'
               >
                 <div className='space-y-2'>
@@ -212,7 +110,7 @@ export const AutomationsContainer = () => {
                         Automated Comment Reply
                       </p>
                       <p className='text-xs text-muted-foreground'>
-                        Automatically reply to the viewer's comment after
+                        Automatically reply to the viewer&apos;s comment after
                         sending the DM.
                       </p>
                     </div>
@@ -320,9 +218,12 @@ export const AutomationsContainer = () => {
                               }
                               className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${formData.instagramPostId === post.id ? 'bg-primary/10 border-primary shadow-sm' : 'bg-background border-border hover:border-primary/50'}`}
                             >
-                              <img
+                              <Image
                                 src={post.thumbnail}
-                                className='w-10 h-10 rounded-lg object-cover'
+                                alt={post.title}
+                                width={40}
+                                height={40}
+                                className='rounded-lg object-cover'
                               />
                               <div className='min-w-0'>
                                 <p className='text-xs font-bold truncate'>
@@ -401,8 +302,8 @@ export const AutomationsContainer = () => {
                   </div>
                   <h3 className='text-xl font-bold'>No results found</h3>
                   <p className='text-muted-foreground text-sm leading-relaxed'>
-                    Try adjusting your search or filters to find what you're
-                    looking for.
+                    Try adjusting your search or filters to find what
+                    you&apos;re looking for.
                   </p>
                   <Button
                     variant='outline'
@@ -480,7 +381,7 @@ export const AutomationsContainer = () => {
                       </Table.Cell>
                       <Table.Cell>
                         <code className='text-[10px] px-2 py-0.5 rounded-md bg-muted font-bold text-primary border border-border/50'>
-                          "{automation.triggerKeyword}"
+                          &quot;{automation.triggerKeyword}&quot;
                         </code>
                       </Table.Cell>
                       <Table.Cell>

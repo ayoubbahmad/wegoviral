@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
+import { Badge } from '@/components/Badge';
 
 export function CardShowcase() {
   return (
@@ -90,9 +91,9 @@ export function CardShowcase() {
           <Card variant='secondary' className='space-y-3'>
             <div className='flex items-center justify-between'>
               <TrendingUp className='w-5 h-5 text-green-500' />
-              <span className='text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 uppercase'>
+              <Badge variant='success' shape='pill'>
                 +12%
-              </span>
+              </Badge>
             </div>
             <div>
               <p className='text-2xl font-black text-foreground tabular-nums'>

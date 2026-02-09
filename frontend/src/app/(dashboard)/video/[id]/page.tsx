@@ -2,14 +2,14 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { VideoPlayer } from '@/components/video-analysis/VideoPlayer';
-import { VideoMetrics } from '@/components/video-analysis/VideoMetrics';
-import { AnalysisModals } from '@/components/video-analysis/AnalysisModals';
+import { VideoPlayer } from '@/containers/VideoAnalysis/VideoPlayer';
+import { VideoMetrics } from '@/containers/VideoAnalysis/VideoMetrics';
+import { AnalysisModals } from '@/containers/VideoAnalysis/AnalysisModals';
 import {
   HookAnalysis,
   StructureAnalysis,
   StyleAnalysis,
-} from '@/components/video-analysis/AnalysisDetails';
+} from '@/containers/VideoAnalysis/AnalysisDetails';
 import {
   FileText,
   AlignLeft,
@@ -24,7 +24,7 @@ import {
   Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PageContainer } from '@/components/ui/PageContainer';
+import { PageContainer } from '@/components/PageContainer';
 
 // Mock data for the specific video
 const MOCK_VIDEO_DATA = {
@@ -97,14 +97,14 @@ export default function VideoAnalysisPage() {
     }
   };
 
-    return (
+  return (
     <>
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
       `}</style>
-      <PageContainer className="pt-4">
+      <PageContainer className='pt-4'>
         {/* Header Content Area */}
         <div className='flex flex-col gap-4'>
           <h1 className='text-2xl font-black leading-tight tracking-tight text-foreground max-w-4xl'>

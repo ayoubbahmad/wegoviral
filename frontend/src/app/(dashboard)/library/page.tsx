@@ -1,7 +1,7 @@
 "use client";
 
-import { LibraryContainer } from "@/containers/Library";
+import { LibraryView } from "@/views/Library";
 
 export default function LibraryPage() {
-    return <LibraryContainer />;
+    return <LibraryView />;
 }

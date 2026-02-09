@@ -14,25 +14,22 @@ import {
   Search,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
-  Info,
-  Globe,
-  Instagram,
-  Clapperboard,
-  Edit2,
-  LayoutGrid,
-  List as ListIcon,
-  Filter
+  AlertTriangle, 
+  Info, 
+  Instagram, 
+  Edit2, 
+  Globe
 } from "lucide-react";
 import { useAutomationsController } from "./controller";
-import { Button } from "@/components/ui/Button";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from '@/components/ui/Card';
-import { Input } from "@/components/ui/Input";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { ViewToggle } from "@/components/ui/ViewToggle";
-import { AutomationCard } from "@/components/automations/AutomationCard";
+import { Button } from "@/components/Button";
+import { Card } from '@/components/Card';
+import { Input } from "@/components/Input";
+import { SearchInput } from "@/components/SearchInput";
+import { ViewToggle } from "@/components/ViewToggle";
+import { AutomationCard } from "./components/AutomationCard";
+import { Table } from "@/components/Table";
+import { PageHeader } from "@/components/PageHeader";
+import { cn } from "@/lib/utils";
 
 export const AutomationsContainer = () => {
   const { 
@@ -109,9 +106,9 @@ export const AutomationsContainer = () => {
   };
 
   return (
-    <PageContainer>
+    <>
       <PageHeader
-        title="DM Automations"
+        title="Automations"
         description="Trigger automatic messages based on keywords in comments or mentions."
         actions={
           <Button onClick={() => {
@@ -243,7 +240,7 @@ export const AutomationsContainer = () => {
                                      onClick={() => setFormData({ ...formData, instagramPostId: post.id })}
                                      className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${formData.instagramPostId === post.id ? "bg-primary/10 border-primary shadow-sm" : "bg-background border-border hover:border-primary/50"}`}
                                   >
-                                     <img src={post.thumbnail} className="w-10 h-10 rounded-lg object-crop" />
+                                     <img src={post.thumbnail} className="w-10 h-10 rounded-lg object-cover" />
                                      <div className="min-w-0">
                                         <p className="text-xs font-bold truncate">{post.title}</p>
                                         <p className="text-[10px] text-muted-foreground">Instagram</p>
@@ -296,171 +293,172 @@ export const AutomationsContainer = () => {
           </div>
         </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3 grid gap-4">
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-48 rounded-3xl bg-muted animate-pulse border border-border/50" />
-              ))}
-            </div>
-          ) : automations.length === 0 ? (
-            <Card className="p-20 text-center border-dashed bg-muted/20">
-              <div className="max-w-md mx-auto space-y-4">
-                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Zap className="w-10 h-10 text-muted-foreground/30" />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3">
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-48 rounded-3xl bg-muted animate-pulse border border-border/50" />
+                ))}
+              </div>
+            ) : automations.length === 0 ? (
+              <Card className="p-20 text-center border-dashed bg-muted/20">
+                <div className="max-w-md mx-auto space-y-4">
+                  <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Zap className="w-10 h-10 text-muted-foreground/30" />
+                  </div>
+                  <h3 className="text-xl font-bold">No results found</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Try adjusting your search or filters to find what you're looking for.
+                  </p>
+                  <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedPlatform("all"); }}>
+                    Clear Filters
+                  </Button>
                 </div>
-                <h3 className="text-xl font-bold">No results found</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Try adjusting your search or filters to find what you're looking for.
+              </Card>
+            ) : viewType === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {automations.map((automation) => (
+                  <motion.div
+                    key={automation.id}
+                    layout
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                  >
+                    <AutomationCard 
+                      automation={automation}
+                      onEdit={startEdit}
+                      onDelete={handleDelete}
+                      onToggle={handleToggleActive}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <Table>
+                  <Table.Header>
+                      <Table.Head>Automation</Table.Head>
+                      <Table.Head>Platform</Table.Head>
+                      <Table.Head>Keyword</Table.Head>
+                      <Table.Head>Action Flow</Table.Head>
+                      <Table.Head>Runs</Table.Head>
+                      <Table.Head align="right">Actions</Table.Head>
+                  </Table.Header>
+                  <Table.Body>
+                      {automations.map((automation) => (
+                          <Table.Row key={automation.id}>
+                              <Table.Cell>
+                                  <div className="flex items-center gap-3">
+                                      <div className={cn(
+                                          "w-8 h-8 rounded-lg flex items-center justify-center",
+                                          automation.active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground/30'
+                                      )}>
+                                          <Zap className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                          <p className="text-sm font-bold leading-tight">{automation.name}</p>
+                                          <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-black opacity-60 mt-0.5">
+                                              {automation.isGlobal ? "Global rule" : "Post-specific"}
+                                          </p>
+                                      </div>
+                                  </div>
+                              </Table.Cell>
+                              <Table.Cell>
+                                  <div className="flex items-center gap-2">
+                                      <Instagram className="w-3.5 h-3.5 text-muted-foreground" />
+                                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Instagram</span>
+                                  </div>
+                              </Table.Cell>
+                              <Table.Cell>
+                                  <code className="text-[10px] px-2 py-0.5 rounded-md bg-muted font-bold text-primary border border-border/50">
+                                      "{automation.triggerKeyword}"
+                                  </code>
+                              </Table.Cell>
+                              <Table.Cell>
+                                  <div className="flex items-center gap-1.5">
+                                      <div className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[8px] font-black uppercase leading-none">DM</div>
+                                      {automation.commentReplyEnabled && (
+                                          <>
+                                              <ChevronRight className="w-3 h-3 text-muted-foreground/30" />
+                                              <div className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[8px] font-black uppercase leading-none">REPLY</div>
+                                          </>
+                                      )}
+                                  </div>
+                              </Table.Cell>
+                              <Table.Cell>
+                                  <p className="text-sm font-black text-muted-foreground">{automation.runCount || 0}</p>
+                              </Table.Cell>
+                              <Table.Cell align="right">
+                                  <div className="flex items-center justify-end gap-1">
+                                      <button 
+                                          onClick={() => handleToggleActive(automation.id, automation.active)}
+                                          className="p-1.5 hover:bg-muted rounded-lg transition-colors"
+                                      >
+                                          {automation.active ? <ToggleRight className="w-6 h-6 text-primary" /> : <ToggleLeft className="w-6 h-6 text-muted-foreground/30" />}
+                                      </button>
+                                      <button 
+                                          onClick={() => startEdit(automation)}
+                                          className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-primary transition-colors"
+                                      >
+                                          <Edit2 className="w-4 h-4" />
+                                      </button>
+                                      <button 
+                                          onClick={() => handleDelete(automation.id)}
+                                          className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
+                                      >
+                                          <Trash2 className="w-4 h-4" />
+                                      </button>
+                                  </div>
+                              </Table.Cell>
+                          </Table.Row>
+                      ))}
+                  </Table.Body>
+              </Table>
+            )}
+          </div>
+
+          {/* Safety Sidebar */}
+          <div className="space-y-6">
+            <Card className="p-6 bg-amber-500/5 border-amber-500/20">
+                <div className="flex items-center gap-2 text-amber-500 mb-4">
+                  <AlertTriangle className="w-5 h-5" />
+                  <h4 className="font-bold">Instagram Safety</h4>
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold uppercase text-muted-foreground">Monthly Limits</p>
+                      <p className="text-xs leading-relaxed">Safety limit: <span className="font-bold text-foreground">200 automated messages/hour</span> to avoid account flags.</p>
+                  </div>
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold uppercase text-muted-foreground">7-Day Window</p>
+                      <p className="text-xs leading-relaxed">Automations only trigger for comments made within the last 7 days.</p>
+                  </div>
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold uppercase text-muted-foreground">One Rule Per Post</p>
+                      <p className="text-xs leading-relaxed">Only the first matched automation will trigger per interaction.</p>
+                  </div>
+                  <div className="pt-2 border-t border-amber-500/10">
+                      <div className="flex items-start gap-2 text-xs text-amber-700/70 italic">
+                        <Info className="w-3 h-3 mt-0.5 shrink-0" />
+                        <p>We use the official Instagram Business API to keep your account safe.</p>
+                      </div>
+                  </div>
+                </div>
+            </Card>
+
+            <Card className="p-6 bg-primary/5 border-primary/20">
+                <h4 className="font-bold mb-4">Post Binding</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                  Link your automations to specific posts to run different campaigns on each Reel or post.
                 </p>
-                <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedPlatform("all"); }}>
-                  Clear Filters
-                </Button>
-              </div>
+                <div className="p-3 bg-background rounded-2xl border border-border/50 text-center">
+                  <p className="text-[10px] font-bold text-primary italic">Pro Tip</p>
+                  <p className="text-[11px] mt-1">Global rules act as a backup for all other posts.</p>
+                </div>
             </Card>
-          ) : viewType === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {automations.map((automation) => (
-                <motion.div
-                  key={automation.id}
-                  layout
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                >
-                  <AutomationCard 
-                    automation={automation}
-                    onEdit={startEdit}
-                    onDelete={handleDelete}
-                    onToggle={handleToggleActive}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <Card className="overflow-hidden border-border/50">
-               <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                     <thead>
-                        <tr className="bg-muted/30 border-b border-border/50">
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Automation</th>
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Platform</th>
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Keyword</th>
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Action Flow</th>
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Runs</th>
-                           <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-muted-foreground text-right">Actions</th>
-                        </tr>
-                     </thead>
-                     <tbody className="divide-y divide-border/50">
-                        {automations.map((automation) => (
-                           <tr key={automation.id} className="hover:bg-muted/10 transition-colors">
-                              <td className="px-6 py-4">
-                                 <div className="flex items-center gap-3">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${automation.active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground/30'}`}>
-                                       <Zap className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                       <p className="text-sm font-bold">{automation.name}</p>
-                                       <p className="text-[10px] text-muted-foreground">{automation.isGlobal ? "Global rule" : "Post-specific"}</p>
-                                    </div>
-                                 </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                 <div className="flex items-center gap-2">
-                                    <Instagram className="w-3 h-3 text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">Instagram</span>
-                                 </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                 <code className="text-[11px] px-2 py-1 rounded-md bg-muted font-bold">"{automation.triggerKeyword}"</code>
-                              </td>
-                              <td className="px-6 py-4">
-                                 <div className="flex items-center gap-1">
-                                    <div className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[9px] font-bold">DM</div>
-                                    {automation.commentReplyEnabled && (
-                                       <ChevronRight className="w-3 h-3 text-muted-foreground/40" />
-                                    )}
-                                    {automation.commentReplyEnabled && (
-                                       <div className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[9px] font-bold">REPLY</div>
-                                    )}
-                                 </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                 <p className="text-xs font-bold">{automation.runCount || 0}</p>
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                 <div className="flex items-center justify-end gap-1">
-                                    <button 
-                                       onClick={() => handleToggleActive(automation.id, automation.active)}
-                                       className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-                                    >
-                                       {automation.active ? <ToggleRight className="w-6 h-6 text-primary" /> : <ToggleLeft className="w-6 h-6 text-muted-foreground/30" />}
-                                    </button>
-                                    <button 
-                                       onClick={() => startEdit(automation)}
-                                       className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-primary transition-colors"
-                                    >
-                                       <Edit2 className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                       onClick={() => handleDelete(automation.id)}
-                                       className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
-                                    >
-                                       <Trash2 className="w-4 h-4" />
-                                    </button>
-                                 </div>
-                              </td>
-                           </tr>
-                        ))}
-                     </tbody>
-                  </table>
-               </div>
-            </Card>
-          )}
-        </div>
-
-        {/* Safety Sidebar */}
-        <div className="space-y-6">
-           <Card className="p-6 bg-amber-500/5 border-amber-500/20">
-              <div className="flex items-center gap-2 text-amber-500 mb-4">
-                 <AlertTriangle className="w-5 h-5" />
-                 <h4 className="font-bold">Instagram Safety</h4>
-              </div>
-              <div className="space-y-4">
-                 <div className="space-y-1">
-                    <p className="text-[11px] font-bold uppercase text-muted-foreground">Monthly Limits</p>
-                    <p className="text-xs leading-relaxed">Safety limit: <span className="font-bold text-foreground">200 automated messages/hour</span> to avoid account flags.</p>
-                 </div>
-                 <div className="space-y-1">
-                    <p className="text-[11px] font-bold uppercase text-muted-foreground">7-Day Window</p>
-                    <p className="text-xs leading-relaxed">Automations only trigger for comments made within the last 7 days.</p>
-                 </div>
-                 <div className="space-y-1">
-                    <p className="text-[11px] font-bold uppercase text-muted-foreground">One Rule Per Post</p>
-                    <p className="text-xs leading-relaxed">Only the first matched automation will trigger per interaction.</p>
-                 </div>
-                 <div className="pt-2 border-t border-amber-500/10">
-                    <div className="flex items-start gap-2 text-xs text-amber-700/70 italic">
-                       <Info className="w-3 h-3 mt-0.5 shrink-0" />
-                       <p>We use the official Instagram Business API to keep your account safe.</p>
-                    </div>
-                 </div>
-              </div>
-           </Card>
-
-           <Card className="p-6 bg-primary/5 border-primary/20">
-              <h4 className="font-bold mb-4">Post Binding</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                 Link your automations to specific posts to run different campaigns on each Reel or post.
-              </p>
-              <div className="p-3 bg-background rounded-2xl border border-border/50 text-center">
-                 <p className="text-[10px] font-bold text-primary italic">Pro Tip</p>
-                 <p className="text-[11px] mt-1">Global rules act as a backup for all other posts.</p>
-              </div>
-           </Card>
+          </div>
         </div>
       </div>
-    </div>
-  </PageContainer>
+    </>
   );
 };

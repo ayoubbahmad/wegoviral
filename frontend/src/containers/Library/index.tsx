@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Tabs } from "@/components/ui/Tabs";
-import { AddNewItem } from "@/components/library/AddNewItem";
-import { HookCard } from "@/components/library/HookCard";
-import { ScriptTemplateList } from "@/components/library/ScriptTemplateList";
+import { PageContainer } from "@/components/PageContainer";
+import { PageHeader } from "@/components/PageHeader";
+import { Tabs } from "@/components/Tabs";
+import { AddNewItem } from "./components/AddNewItem";
+import { HookCard } from "./components/HookCard";
+import { ScriptTemplateList } from "./components/ScriptTemplateList";
 import { useLibraryController } from "./controller";
 
-import { ViewToggle } from "@/components/ui/ViewToggle";
+import { ViewToggle } from "@/components/ViewToggle";
 
 export const LibraryContainer = () => {
     const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
@@ -28,16 +28,14 @@ export const LibraryContainer = () => {
 
     if (isLoading) {
         return (
-            <PageContainer>
-                <div className="flex items-center justify-center h-full">
-                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
-            </PageContainer>
+            <div className="flex items-center justify-center h-full">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
         );
     }
 
     return (
-        <PageContainer>
+        <>
             <PageHeader 
                 title="Library"
                 description="Manage your creative assets, hooks, and script structures."
@@ -131,6 +129,6 @@ export const LibraryContainer = () => {
                     />
                 )}
             </div>
-        </PageContainer>
+        </>
     );
 };

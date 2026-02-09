@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useScriptWizardController, Step } from './controller';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/Button';
 
 const STEPS_WITH_ICONS = [
   { id: 'topic', label: 'Topic', icon: Lightbulb },

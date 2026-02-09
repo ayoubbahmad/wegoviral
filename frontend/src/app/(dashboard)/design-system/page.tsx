@@ -1,7 +1,5 @@
-import { DesignSystemShowcase } from "@/components/design-system/DesignSystemShowcase";
+import { DesignSystemShowcase } from '@/containers/DesignSystem/DesignSystemShowcase';
 
 export default function DesignSystemPage() {
-    return (
-        <DesignSystemShowcase />
-    );
+  return <DesignSystemShowcase />;
 }

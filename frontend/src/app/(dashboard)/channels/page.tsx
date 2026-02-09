@@ -3,11 +3,11 @@
 import { Search, SlidersHorizontal, UserPlus, Info, Check, AlignLeft, Link2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Tabs } from "@/components/ui/Tabs";
-import { Button } from "@/components/ui/Button";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/PageHeader";
+import { Tabs } from "@/components/Tabs";
+import { Button } from "@/components/Button";
+import { PageContainer } from "@/components/PageContainer";
+import { EmptyState } from "@/components/EmptyState";
 
 // Mock data for suggested channels (empty initially or some suggestions)
 const MOCK_SUGGESTED_CHANNELS = [

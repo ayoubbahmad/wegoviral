@@ -2,8 +2,8 @@
 
 import { Trophy, Zap, Star, Target, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/Button";
 
 export default function ChallengesPage() {
     return (

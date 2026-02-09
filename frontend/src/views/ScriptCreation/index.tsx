@@ -1,7 +1,7 @@
 "use client";
 
 import { ScriptWizardContainer } from "@/containers/Scripts/ScriptWizard";
-import { PageContainer } from "@/components/ui/PageContainer";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function ScriptCreationPage() {
   return (

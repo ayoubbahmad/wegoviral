@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Instagram, RefreshCw, CheckCircle2, AlertCircle, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
 import { useAutomationsController } from "../Automations/controller";
 import { useSearchParams, useRouter } from "next/navigation";
 import { handleOAuthCallback } from "../Automations/api/social-accounts";

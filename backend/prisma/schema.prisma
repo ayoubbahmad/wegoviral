@@ -38,7 +38,11 @@ model Hook {
   
   // Usage Tracking
   usageCount        Int      @default(0)
+  views             Int      @default(0)
   lastUsed          DateTime?
+  
+  tags              String[] @default([])
+  sourceMetadata    Json?    // { url: string, title: string, thumbnail: string, handle: string }
   
   userId            String
   user              UserProfile @relation(fields: [userId], references: [id])
@@ -62,6 +66,9 @@ model ScriptTemplate {
   status    String   @default("Draft")
   excerpt   String?
   wordCount Int?     @default(0)
+  views     Int      @default(0)
+  tags      String[] @default([])
+  sourceMetadata Json?  // { url: string, title: string, thumbnail: string, handle: string }
   
   userId    String
   user      UserProfile @relation(fields: [userId], references: [id])

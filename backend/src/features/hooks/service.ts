@@ -15,7 +15,7 @@ export class HooksService {
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
-    return hooks.map(hook => this.formatHook(hook));
+    return hooks.map((hook) => this.formatHook(hook));
   }
 
   async createHook(userId: string, data: CreateHookDTO) {
@@ -26,8 +26,11 @@ export class HooksService {
         emotion: data.emotion || 'Neutral',
         topic: data.topic || 'General',
         performanceRating: data.performanceRating || 0,
+        views: data.views || 0,
+        tags: data.tags || [],
+        sourceMetadata: data.sourceMetadata || null,
         userId,
-        socialAccountId: data.socialAccountId
+        socialAccountId: data.socialAccountId,
       },
     });
     return this.formatHook(hook);
@@ -35,21 +38,32 @@ export class HooksService {
 
   async updateHook(id: string, userId: string, data: UpdateHookDTO) {
     const hook = await prisma.hook.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!hook) return null;
 
     const updatedHook = await prisma.hook.update({
       where: { id },
-      data,
+      data: {
+        content: data.content,
+        type: data.type,
+        emotion: data.emotion,
+        topic: data.topic,
+        performanceRating: data.performanceRating,
+        views: data.views,
+        tags: data.tags,
+        sourceMetadata: data.sourceMetadata,
+        socialAccountId: data.socialAccountId,
+        lastUsed: data.lastUsed,
+      },
     });
     return this.formatHook(updatedHook);
   }
 
   async deleteHook(id: string, userId: string) {
     const hook = await prisma.hook.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!hook) return false;

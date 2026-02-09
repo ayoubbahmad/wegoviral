@@ -5,6 +5,14 @@ export interface Hook {
   emotion: string;
   topic: string;
   performanceRating: number;
+  views: number;
+  tags: string[];
+  sourceMetadata?: {
+    url?: string;
+    title?: string;
+    thumbnail?: string;
+    handle?: string;
+  } | null;
   lastUsed?: Date | null;
   userId: string;
   socialAccountId?: string | null;
@@ -18,6 +26,9 @@ export interface CreateHookDTO {
   emotion?: string;
   topic?: string;
   performanceRating?: number;
+  views?: number;
+  tags?: string[];
+  sourceMetadata?: any;
   socialAccountId?: string;
 }
 
@@ -27,6 +38,9 @@ export interface UpdateHookDTO {
   emotion?: string;
   topic?: string;
   performanceRating?: number;
+  views?: number;
+  tags?: string[];
+  sourceMetadata?: any;
   socialAccountId?: string;
   lastUsed?: Date;
 }

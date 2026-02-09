@@ -20,9 +20,12 @@ export class ScriptTemplatesService {
     return {
       ...script,
       lastUpdated: script.updatedAt.toISOString(),
-      wordCount: script.wordCount || this.calculateWordCount(script.content as ScriptContent),
-      excerpt: script.excerpt || this.generateExcerpt(script.content as ScriptContent),
-      status: script.status || 'Draft'
+      wordCount:
+        script.wordCount ||
+        this.calculateWordCount(script.content as ScriptContent),
+      excerpt:
+        script.excerpt || this.generateExcerpt(script.content as ScriptContent),
+      status: script.status || 'Draft',
     };
   }
 
@@ -31,12 +34,12 @@ export class ScriptTemplatesService {
       where: { userId },
       orderBy: { updatedAt: 'desc' },
     });
-    return scripts.map(s => ScriptTemplatesService.formatScript(s));
+    return scripts.map((s) => ScriptTemplatesService.formatScript(s));
   }
 
   async getScriptById(id: string, userId: string) {
     const script = await prisma.scriptTemplate.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
     if (!script) return null;
     return ScriptTemplatesService.formatScript(script);
@@ -54,22 +57,33 @@ export class ScriptTemplatesService {
         status: 'Completed',
         excerpt,
         wordCount,
+        views: data.views || 0,
+        tags: data.tags || [],
+        sourceMetadata: data.sourceMetadata || null,
         userId,
       },
     });
     return ScriptTemplatesService.formatScript(script);
   }
 
-  async updateScriptTemplate(id: string, userId: string, data: UpdateScriptDTO) {
+  async updateScriptTemplate(
+    id: string,
+    userId: string,
+    data: UpdateScriptDTO,
+  ) {
     // Ensure user owns the script
     const existingScript = await prisma.scriptTemplate.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!existingScript) return null;
 
-    const wordCount = data.content ? ScriptTemplatesService.calculateWordCount(data.content) : existingScript.wordCount;
-    const excerpt = data.content ? ScriptTemplatesService.generateExcerpt(data.content) : existingScript.excerpt;
+    const wordCount = data.content
+      ? ScriptTemplatesService.calculateWordCount(data.content)
+      : existingScript.wordCount;
+    const excerpt = data.content
+      ? ScriptTemplatesService.generateExcerpt(data.content)
+      : existingScript.excerpt;
 
     const updatedScript = await prisma.scriptTemplate.update({
       where: { id },
@@ -80,6 +94,9 @@ export class ScriptTemplatesService {
         status: data.status,
         excerpt,
         wordCount,
+        views: data.views,
+        tags: data.tags,
+        sourceMetadata: data.sourceMetadata,
       },
     });
     return ScriptTemplatesService.formatScript(updatedScript);
@@ -87,7 +104,7 @@ export class ScriptTemplatesService {
 
   async deleteScript(id: string, userId: string) {
     const script = await prisma.scriptTemplate.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!script) return false;

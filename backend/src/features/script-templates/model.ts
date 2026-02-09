@@ -1,4 +1,4 @@
-import { JsonValue } from "@prisma/client/runtime/library";
+import { JsonValue } from '@prisma/client/runtime/library';
 
 export interface ScriptContent {
   topic?: string;
@@ -16,6 +16,9 @@ export interface Script {
   status: string;
   excerpt: string | null;
   wordCount: number | null;
+  views: number;
+  tags: string[];
+  sourceMetadata: JsonValue;
   userId: string;
   hookId: string | null;
   createdAt: Date;
@@ -26,6 +29,9 @@ export interface CreateScriptDTO {
   title: string;
   content: ScriptContent;
   category?: string;
+  views?: number;
+  tags?: string[];
+  sourceMetadata?: any;
 }
 
 export interface UpdateScriptDTO {
@@ -33,4 +39,7 @@ export interface UpdateScriptDTO {
   content?: ScriptContent;
   category?: string;
   status?: string;
+  views?: number;
+  tags?: string[];
+  sourceMetadata?: any;
 }

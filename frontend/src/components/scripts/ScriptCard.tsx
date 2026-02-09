@@ -25,6 +25,7 @@ export function ScriptCard({ script, variant = "full", onClick, onDelete, classN
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     onDelete?.();
   };
 
@@ -35,7 +36,7 @@ export function ScriptCard({ script, variant = "full", onClick, onDelete, classN
       variant={isCompact ? "glass" : "default"}
       padding="none"
       className={cn(
-        "flex flex-col relative overflow-hidden h-full",
+        "flex flex-col relative overflow-hidden h-full group",
         isCompact ? "p-4" : "p-6",
         className
       )}

@@ -146,7 +146,10 @@ export const ScriptsLibraryContainer = () => {
                             variant="ghost" 
                             size="sm" 
                             className="h-8 w-8 p-0 rounded-lg text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDeleteScript(script.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteScript(script.id);
+                            }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

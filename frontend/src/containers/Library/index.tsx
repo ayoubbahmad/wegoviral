@@ -1,134 +1,174 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { PageContainer } from "@/components/PageContainer";
-import { PageHeader } from "@/components/PageHeader";
-import { Tabs } from "@/components/Tabs";
-import { AddNewItem } from "./components/AddNewItem";
-import { HookCard } from "./components/HookCard";
-import { ScriptTemplateList } from "./components/ScriptTemplateList";
-import { useLibraryController } from "./controller";
-
-import { ViewToggle } from "@/components/ViewToggle";
+import { Tabs } from '@/components/Tabs';
+import { HookCard } from './components/HookCard';
+import { ScriptTemplateList } from './components/ScriptTemplateList';
+import { useLibraryController } from './controller';
+import { ViewToggle } from '@/components/ViewToggle';
+import { DetailsPanel } from './components/DetailsPanel';
+import { SearchInput } from '@/components/SearchInput';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Hash, Anchor, Palette, Video } from 'lucide-react';
+import { Badge } from '@/components/Badge';
 
 export const LibraryContainer = () => {
-    const [activeTab, setActiveTab] = useState<"hooks" | "scripts">("hooks");
-    const [viewType, setViewType] = useState<"grid" | "table">("grid");
-    const { 
-        hooks, 
-        templates, 
-        isLoading, 
-        addHook, 
-        removeHook, 
-        updateHook, 
-        addTemplate, 
-        removeTemplate, 
-        updateTemplate 
-    } = useLibraryController();
+  const {
+    hooks,
+    templates,
+    isLoading,
+    activeTab,
+    setActiveTab,
+    viewType,
+    setViewType,
+    selectedItemId,
+    setSelectedItemId,
+    searchTerm,
+    setSearchTerm,
+    selectedItem,
+  } = useLibraryController();
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-full">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <>
-            <PageHeader 
-                title="Library"
-                description="Manage your creative assets, hooks, and script structures."
-                actions={
-                    <AddNewItem 
-                        onAddHook={async (data) => {
-                            try {
-                                await addHook(data);
-                                return { success: true };
-                            } catch (error: any) {
-                                return { success: false, error: error.message };
-                            }
-                        }} 
-                        onAddScript={async (data) => {
-                            try {
-                                await addTemplate(data);
-                                return { success: true };
-                            } catch (error: any) {
-                                return { success: false, error: error.message };
-                            }
-                        }} 
-                    />
-                }
-            />
-
-            <div className="flex items-center justify-between mb-8">
-                <Tabs 
-                    items={[
-                        { id: "hooks", label: "Hooks" },
-                        { id: "scripts", label: "Script Templates" }
-                    ]}
-                    activeId={activeTab}
-                    onChange={(id) => setActiveTab(id as any)}
-                    className="mb-0"
-                />
-                
-                <ViewToggle mode={viewType} onChange={setViewType} />
-            </div>
-
-            <div className="min-h-[400px]">
-                {activeTab === "hooks" ? (
-                    viewType === "grid" ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {hooks.map((hook) => (
-                                <HookCard 
-                                    key={hook.id} 
-                                    hook={hook} 
-                                    onDelete={removeHook}
-                                    onUpdate={(id, data) => updateHook({ id, data })}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="rounded-2xl border border-border bg-card overflow-hidden">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b border-border bg-muted/30">
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Content</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Type</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Emotion</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border/50">
-                                    {hooks.map((hook) => (
-                                        <tr key={hook.id} className="hover:bg-muted/5 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <p className="text-sm font-medium line-clamp-1">"{hook.content}"</p>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground">{hook.type}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-xs text-muted-foreground">{hook.emotion}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                {/* Simplified actions for table view */}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )
-                ) : (
-                    <ScriptTemplateList
-                        scripts={templates}
-                        viewType={viewType}
-                        onDelete={removeTemplate}
-                        onUpdate={(id, data) => updateTemplate({ id, data })}
-                    />
-                )}
-            </div>
-        </>
+      <div className='flex items-center justify-center h-64'>
+        <div className='w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin' />
+      </div>
     );
+  }
+
+  return (
+    <div className='flex flex-col gap-8'>
+      {/* Search and Filters */}
+      <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
+        <div className='w-full md:max-w-md'>
+          <SearchInput
+            placeholder='Search assets...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className='flex items-center gap-4'>
+          <ViewToggle mode={viewType} onChange={setViewType} />
+          <div className='w-px h-6 bg-border/50 hidden md:block' />
+        </div>
+      </div>
+
+      <div className='flex flex-col lg:flex-row gap-8 items-start relative'>
+        {/* Content Column */}
+        <div
+          className={cn(
+            'flex-1 w-full transition-all duration-300',
+            selectedItemId ? 'lg:w-[calc(100%-380px)]' : 'w-full',
+          )}
+        >
+          <Tabs
+            items={[
+              { id: 'hooks', label: 'Hooks', icon: Anchor },
+              { id: 'scripts', label: 'Templates', icon: Palette },
+              { id: 'videos', label: 'Videos', icon: Video },
+            ]}
+            activeId={activeTab}
+            onChange={(id) => setActiveTab(id as any)}
+            className='mb-8'
+          />
+
+          <div className='min-h-[400px]'>
+            {activeTab === 'hooks' ? (
+              viewType === 'grid' ? (
+                <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
+                  {hooks.map((hook) => (
+                    <HookCard
+                      key={hook.id}
+                      hook={hook}
+                      isActive={selectedItemId === hook.id}
+                      onClick={() => setSelectedItemId(hook.id)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className='rounded-2xl border border-border bg-card overflow-hidden'>
+                  <table className='w-full text-left'>
+                    <thead>
+                      <tr className='border-b border-border bg-muted/30'>
+                        <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
+                          Hook
+                        </th>
+                        <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
+                          Type
+                        </th>
+                        <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right'>
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className='divide-y divide-border/50'>
+                      {hooks.map((hook) => (
+                        <tr
+                          key={hook.id}
+                          className={cn(
+                            'hover:bg-muted/5 transition-colors cursor-pointer',
+                            selectedItemId === hook.id &&
+                              'bg-primary/5 border-l-2 border-primary',
+                          )}
+                          onClick={() => setSelectedItemId(hook.id)}
+                        >
+                          <td className='px-6 py-4'>
+                            <p className='text-sm font-medium line-clamp-1'>
+                              "{hook.content}"
+                            </p>
+                          </td>
+                          <td className='px-6 py-4'>
+                            <Badge variant='secondary' className='text-[10px]'>
+                              {hook.type}
+                            </Badge>
+                          </td>
+                          <td className='px-6 py-4 text-right'>
+                            {/* Actions */}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            ) : activeTab === 'scripts' ? (
+              <ScriptTemplateList
+                scripts={templates}
+                viewType={viewType}
+                selectedId={selectedItemId}
+                onSelect={(id) => setSelectedItemId(id)}
+              />
+            ) : (
+              <div className='flex flex-col items-center justify-center p-20 border-2 border-dashed border-border rounded-3xl bg-muted/20'>
+                <Video className='w-12 h-12 text-muted-foreground/30 mb-4' />
+                <h3 className='text-lg font-bold'>Videos Tab Coming Soon</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Save viral videos directly to your library.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Details Panel - Sticky/Floating on Desktop */}
+        <AnimatePresence>
+          {selectedItemId && (
+            <motion.div
+              initial={{ x: 400, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 400, opacity: 0 }}
+              className='w-full lg:w-[380px] lg:sticky lg:top-8 shrink-0 z-20'
+            >
+              <DetailsPanel
+                item={selectedItem || null}
+                type={activeTab}
+                onClose={() => setSelectedItemId(null)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 };

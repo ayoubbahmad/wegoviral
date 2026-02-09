@@ -33,6 +33,8 @@ export interface ScriptTemplate {
   title: string;
   category: string;
   content: any[];
+  excerpt?: string;
+  wordCount?: number;
   views?: number;
   tags?: string[];
   sourceMetadata?: any;

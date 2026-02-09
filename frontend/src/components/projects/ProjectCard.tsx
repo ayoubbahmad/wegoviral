@@ -11,63 +11,61 @@ interface ProjectCardProps {
   lastModified: string;
 }
 
+import { Card } from '../ui/Card';
+
 export function ProjectCard({ id, name, items, lastModified }: ProjectCardProps) {
   const router = useRouter();
   
   return (
-    <div 
+    <Card 
       onClick={() => router.push(`/projects/${id}`)}
-      className={cn(
-        "group flex flex-col justify-between p-6 h-[200px] rounded-3xl border border-border/50 bg-card/30",
-        "hover:bg-card/50 hover:border-border hover:shadow-2xl hover:shadow-primary/5 transition-all cursor-pointer active:scale-[0.98]"
-      )}
+      hover
+      className="flex flex-col h-[220px]"
     >
-      <div className="flex justify-between items-start">
-        <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
-          <Folder className="w-6 h-6 fill-current opacity-80" />
-        </div>
-        <button 
-          onClick={(e) => { e.stopPropagation(); }} 
-          className="p-2 rounded-xl hover:bg-secondary text-muted-foreground transition-colors"
-        >
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
-      </div>
+      <Card.Header 
+        icon={Folder}
+        actions={
+          <button 
+            onClick={(e) => { e.stopPropagation(); }} 
+            className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+          </button>
+        }
+      />
 
-      <div className="space-y-3">
-        <h3 className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors truncate">
+      <Card.Content className="flex-1">
+        <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
           {name}
         </h3>
-        <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <FileText className="w-3.5 h-3.5" />
-            <span>{items} items</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{lastModified}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      </Card.Content>
+
+      <Card.Footer 
+        metadata={
+          <>
+            <Card.MetaItem icon={FileText} label={`${items} items`} />
+            <Card.MetaItem icon={Clock} label={lastModified} />
+          </>
+        }
+      />
+    </Card>
   );
 }
 
 export function NewProjectCard({ onClick }: { onClick?: () => void }) {
   return (
-    <div 
+    <Card 
       onClick={onClick}
-      className={cn(
-        "group flex flex-col items-center justify-center p-6 h-[200px] rounded-3xl border-2 border-dashed border-border/50 bg-transparent",
-        "hover:bg-secondary/20 hover:border-primary/50 transition-all cursor-pointer active:scale-[0.98] gap-4"
-      )}
+      hover
+      variant="glass"
+      className="flex flex-col items-center justify-center h-[220px] border-2 border-dashed border-border/50 bg-transparent group"
     >
-      <div className="p-4 rounded-full bg-secondary/30 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-all">
+      <div className="p-4 rounded-full bg-secondary/30 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-all mb-4">
         <Folder className="w-8 h-8" />
       </div>
-      <span className="text-xs font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
+      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
         Create New Project
       </span>
-    </div>
+    </Card>
   );
 }

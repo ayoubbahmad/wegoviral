@@ -10,6 +10,8 @@ interface CompetitorCardProps {
     onDelete?: (id: string) => void;
 }
 
+import { Card } from "../ui/Card";
+
 export function CompetitorCard({ competitor, onDelete }: CompetitorCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -22,72 +24,74 @@ export function CompetitorCard({ competitor, onDelete }: CompetitorCardProps) {
             setIsDeleting(false);
         }
     };
+
     return (
-        <Link
-            href={`/competitors/${competitor.id}`}
-            className="group relative flex flex-col gap-4 p-5 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all cursor-pointer"
-        >
-            <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                    <img
-                        src={competitor.avatarUrl}
-                        alt={competitor.name}
-                        className="w-12 h-12 rounded-full border border-border"
-                    />
-                    <div>
-                        <h3 className="font-semibold leading-tight">{competitor.name}</h3>
-                        <p className="text-sm text-muted-foreground">{competitor.handle}</p>
+        <Link href={`/competitors/${competitor.id}`} className="group block h-full">
+            <Card hover className="flex flex-col h-full overflow-hidden">
+                <Card.Header 
+                    actions={
+                        <div className="flex items-center gap-2">
+                             {competitor.isFollowing && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-green-500/10 text-green-600 uppercase tracking-wider">
+                                    Tracking
+                                </span>
+                            )}
+                            <button
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
+                            >
+                                <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    }
+                >
+                    <div className="flex items-center gap-3">
+                        <img
+                            src={competitor.avatarUrl}
+                            alt={competitor.name}
+                            className="w-12 h-12 rounded-full border border-border flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                            <h3 className="font-bold leading-tight truncate text-foreground group-hover:text-primary transition-colors">{competitor.name}</h3>
+                            <p className="text-xs text-muted-foreground font-medium">{competitor.handle}</p>
+                        </div>
                     </div>
-                </div>
+                </Card.Header>
 
-                <div className="flex items-center gap-2">
-                    {competitor.isFollowing && (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/20">
-                            Tracking
-                        </span>
-                    )}
-                    <button
-                        onClick={handleDelete}
-                        disabled={isDeleting}
-                        className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
-                    >
-                        <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                </div>
-            </div>
+                <Card.Content className="space-y-4">
+                    <p className="text-sm text-muted-foreground font-medium line-clamp-2 min-h-[40px]">
+                        {competitor.bio}
+                    </p>
 
-            <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px]">
-                {competitor.bio}
-            </p>
-
-            <div className="flex items-center gap-2 flex-wrap">
-                {competitor.tags.map(tag => (
-                    <span key={tag} className="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground font-medium">
-                        {tag}
-                    </span>
-                ))}
-            </div>
-
-            <div className="pt-4 mt-auto border-t border-border grid grid-cols-3 gap-2">
-                <div className="text-center">
-                    <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                        <Users className="w-3 h-3" /> Followers
+                    <div className="flex items-center gap-2 flex-wrap pb-2">
+                        {competitor.tags.map(tag => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-black uppercase tracking-widest">
+                                {tag}
+                            </span>
+                        ))}
                     </div>
-                    <span className="font-bold text-sm block">{competitor.stats.followers}</span>
-                </div>
-                <div className="text-center border-l border-border">
-                    <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                        <Activity className="w-3 h-3" /> Avg. Likes
-                    </div>
-                    <span className="font-bold text-sm block">{competitor.stats.avgLikes}</span>
-                </div>
-                <div className="text-center border-l border-border">
-                    <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                        <TrendingUp className="w-3 h-3" /> Eng. Rate
-                    </div>
-                    <span className="font-bold text-sm block text-green-500">{competitor.stats.engagementRate}</span>
-                </div>
-            </div>
+                </Card.Content>
+
+                <Card.Footer 
+                    metadata={
+                        <div className="grid grid-cols-3 w-full divide-x divide-border/30 text-center">
+                            <div className="px-1">
+                                <Card.MetaItem icon={Users} label={competitor.stats.followers} className="justify-center mb-0.5" />
+                                <span className="text-[9px] uppercase tracking-tighter text-muted-foreground/50">Followers</span>
+                            </div>
+                            <div className="px-1">
+                                <Card.MetaItem icon={Activity} label={competitor.stats.avgLikes} className="justify-center mb-0.5" />
+                                <span className="text-[9px] uppercase tracking-tighter text-muted-foreground/50">Avg. Likes</span>
+                            </div>
+                            <div className="px-1">
+                                <Card.MetaItem icon={TrendingUp} label={competitor.stats.engagementRate} className="justify-center mb-0.5 text-green-500" />
+                                <span className="text-[9px] uppercase tracking-tighter text-muted-foreground/50">Engagement</span>
+                            </div>
+                        </div>
+                    }
+                />
+            </Card>
         </Link>
     );
 }

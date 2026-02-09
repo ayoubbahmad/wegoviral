@@ -28,29 +28,32 @@ export const StatCard = ({
   return (
     <Card 
       variant={variant}
-      className={cn("group", className)}
+      className={cn("group h-full flex flex-col", className)}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">{label}</span>
-        <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-      </div>
-      <div className="mt-4 flex flex-col gap-1">
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold tracking-tight">{value}</span>
-          {trend !== undefined && (
+      <Card.Header 
+        title={label}
+        icon={Icon}
+        actions={
+          trend !== undefined && (
             <span className={cn(
-              "text-xs font-medium flex items-center px-1.5 py-0.5 rounded-full",
+              "text-[10px] font-bold flex items-center px-1.5 py-0.5 rounded-md",
               trend >= 0 ? "text-emerald-500 bg-emerald-500/10" : "text-rose-500 bg-rose-500/10"
             )}>
               {trend >= 0 ? `+${trend}%` : `${trend}%`}
               <ArrowUpRight className={cn("w-3 h-3 ml-0.5", trend < 0 && "rotate-90")} />
             </span>
+          )
+        }
+      />
+      
+      <Card.Content>
+        <div className="flex flex-col gap-1">
+          <span className="text-2xl font-bold tracking-tight text-foreground">{value}</span>
+          {description && (
+            <p className="text-xs text-muted-foreground font-medium">{description}</p>
           )}
         </div>
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
-      </div>
+      </Card.Content>
     </Card>
   );
 };

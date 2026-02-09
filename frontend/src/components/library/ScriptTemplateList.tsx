@@ -46,19 +46,15 @@ export function ScriptTemplateList({ scripts, viewType = "table", onDelete, onUp
                         className="group flex flex-col h-full overflow-hidden"
                         onClick={() => handleCopy(script.id, script.content)}
                     >
-                        <div className="p-6 flex-1 flex flex-col">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="p-3 bg-secondary rounded-xl group-hover:scale-110 transition-transform">
-                                    <FileText className="w-6 h-6 text-foreground" />
-                                </div>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-bold uppercase tracking-widest border border-border">
-                                    {script.category}
-                                </span>
-                            </div>
+                        <Card.Header 
+                            icon={FileText}
+                            subtitle={script.category}
+                        />
 
+                        <Card.Content className="flex-1">
                             <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">{script.title}</h3>
                             
-                            <div className="text-xs text-muted-foreground flex flex-wrap gap-1 mb-6">
+                            <div className="text-xs text-muted-foreground flex flex-wrap gap-1">
                                 {script.content.slice(0, 3).map((step: any, i: number) => (
                                     <span key={i} className="flex items-center">
                                         {step.step}
@@ -67,29 +63,33 @@ export function ScriptTemplateList({ scripts, viewType = "table", onDelete, onUp
                                 ))}
                                 {script.content.length > 3 && <span>...</span>}
                             </div>
+                        </Card.Content>
 
-                            <div className="mt-auto flex items-center justify-between pt-4 border-t border-border/30">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCopy(script.id, script.content);
-                                    }}
-                                    className={cn(
-                                        "text-xs font-bold uppercase tracking-widest transition-colors",
-                                        copiedId === script.id ? "text-green-500" : "text-primary hover:text-primary/80"
-                                    )}
-                                >
-                                    {copiedId === script.id ? "Copied!" : "Use Template"}
-                                </button>
-                                <button
-                                    onClick={(e) => handleDelete(e, script.id)}
-                                    disabled={isDeleting === script.id}
-                                    className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
+                        <Card.Footer 
+                            actions={
+                                <>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCopy(script.id, script.content);
+                                        }}
+                                        className={cn(
+                                            "text-[10px] font-black uppercase tracking-widest transition-colors",
+                                            copiedId === script.id ? "text-green-500" : "text-primary hover:text-primary/80"
+                                        )}
+                                    >
+                                        {copiedId === script.id ? "Copied!" : "Use Template"}
+                                    </button>
+                                    <button
+                                        onClick={(e) => handleDelete(e, script.id)}
+                                        disabled={isDeleting === script.id}
+                                        className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </>
+                            }
+                        />
                     </Card>
                 ))}
             </div>
@@ -139,14 +139,14 @@ export function ScriptTemplateList({ scripts, viewType = "table", onDelete, onUp
                                         }}
                                         className={cn(
                                             "text-[10px] font-black uppercase tracking-tighter",
-                                            copiedId === script.id ? "text-green-500" : "text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                                            copiedId === script.id ? "text-green-500" : "text-primary transition-opacity"
                                         )}
                                     >
                                         {copiedId === script.id ? "Copied" : "Use"}
                                     </button>
                                     <button
                                         onClick={(e) => handleDelete(e, script.id)}
-                                        className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                        className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>

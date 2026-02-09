@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/Input";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { ViewToggle } from "@/components/ui/ViewToggle";
+import { AutomationCard } from "@/components/automations/AutomationCard";
 
 export const AutomationsContainer = () => {
   const { 
@@ -327,113 +328,12 @@ export const AutomationsContainer = () => {
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                 >
-                  <Card 
-                    padding="none"
-                    hover
-                    className="group transition-all duration-300 relative overflow-hidden bg-background"
-                  >
-                    <div className="absolute top-0 right-0 p-4">
-                      <button 
-                        onClick={() => handleToggleActive(automation.id, automation.active)}
-                        className="transition-colors"
-                      >
-                        {automation.active ? (
-                          <ToggleRight className="w-8 h-8 text-primary" />
-                        ) : (
-                          <ToggleLeft className="w-8 h-8 text-muted-foreground/30" />
-                        )}
-                      </button>
-                    </div>
-                    
-                    <div className="p-6 space-y-6">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                              <Zap className="w-4 h-4" />
-                           </div>
-                           <h3 className="font-bold text-lg">{automation.name}</h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">
-                            Status: <span className={automation.active ? "text-emerald-500" : "text-zinc-500"}>
-                              {automation.active ? "Enabled" : "Disabled"}
-                            </span>
-                          </p>
-                          <span className="text-muted-foreground/30">•</span>
-                          <div className="flex items-center gap-1">
-                             {automation.isGlobal ? (
-                                <Globe className="w-3 h-3 text-muted-foreground" />
-                             ) : (
-                                <Clapperboard className="w-3 h-3 text-primary" />
-                             )}
-                             <span className="text-[10px] font-bold text-muted-foreground">
-                                {automation.isGlobal ? "Global" : "Linked Post"}
-                             </span>
-                          </div>
-                        </div>
-                        <div className="mt-2 text-[10px] font-bold text-muted-foreground/60">
-                          Runs: <span className="text-foreground">{automation.runCount || 0}</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                         <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
-                            <div className="mt-1">
-                               <MessageSquare className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="space-y-1">
-                               <p className="text-[10px] font-bold uppercase text-muted-foreground">Trigger Keyword</p>
-                               <p className="text-sm font-mono font-bold text-foreground">"{automation.triggerKeyword}"</p>
-                            </div>
-                         </div>
-
-                         <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50">
-                            <div className="mt-1">
-                               <Settings2 className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="space-y-1">
-                               <p className="text-[10px] font-bold uppercase text-muted-foreground">Action Flow</p>
-                               <div className="flex flex-col gap-2 mt-1">
-                                  <div className="flex items-center gap-2">
-                                     <div className="px-2 py-0.5 rounded-lg bg-primary/20 text-primary text-[10px] font-bold">DM</div>
-                                     <p className="text-[11px] text-foreground line-clamp-1 italic">"{automation.responseMessage}"</p>
-                                  </div>
-                                  {automation.commentReplyEnabled && (
-                                     <div className="flex items-center gap-2">
-                                        <div className="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-500 text-[10px] font-bold">REPLY</div>
-                                        <p className="text-[11px] text-foreground line-clamp-1 italic">"{automation.commentReplyMessage}"</p>
-                                     </div>
-                                  )}
-                               </div>
-                            </div>
-                         </div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2">
-                         <p className="text-[10px] text-muted-foreground/60 italic">
-                            Platform: {automation.platform || "Instagram"}
-                         </p>
-                         <div className="flex items-center gap-1">
-                           <Button 
-                             variant="ghost" 
-                             size="sm" 
-                             className="text-primary/50 hover:text-primary hover:bg-primary/10"
-                             onClick={() => startEdit(automation)}
-                           >
-                              <Edit2 className="w-4 h-4" />
-                           </Button>
-                           <Button 
-                             variant="ghost" 
-                             size="sm" 
-                             className="text-red-500/50 hover:text-red-500 hover:bg-red-500/10"
-                             onClick={() => handleDelete(automation.id)}
-                           >
-                              <Trash2 className="w-4 h-4" />
-                           </Button>
-                         </div>
-                      </div>
-                    </div>
-                  </Card>
+                  <AutomationCard 
+                    automation={automation}
+                    onEdit={startEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggleActive}
+                  />
                 </motion.div>
               ))}
             </div>

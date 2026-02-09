@@ -40,7 +40,7 @@ export function VideoCard({ video }: VideoCardProps) {
             hover
             className="border-none bg-transparent shadow-none hover:shadow-none hover:scale-100 flex flex-col h-full"
           >
-            <div className="relative aspect-[9/16] overflow-hidden rounded-2xl bg-muted border border-border/50">
+            <Card.Content className="relative aspect-[9/16] overflow-hidden rounded-2xl bg-muted border border-border/50">
               <img
                 src={video.thumbnailUrl}
                 alt={video.title}
@@ -54,7 +54,7 @@ export function VideoCard({ video }: VideoCardProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Play className="w-12 h-12 text-white fill-white opacity-80" />
               </div>
-            </div>
+            </Card.Content>
 
             <div className="mt-3 space-y-2 flex-1 flex flex-col">
               <h3 className="line-clamp-1 text-sm font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
@@ -72,39 +72,38 @@ export function VideoCard({ video }: VideoCardProps) {
                 <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">{video.publishedAt}</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-1.5 pt-1 mt-auto">
-                  {video.metrics.outlierScore && (
-                      <div className="flex items-center gap-1.5 rounded-md bg-green-500/10 px-1.5 py-1 text-[10px] font-bold text-green-500">
-                          <TrendingUp className="w-3 h-3" />
-                          <span>{video.metrics.outlierScore}</span>
-                      </div>
-                  )}
-                   <div className="flex items-center gap-1.5 rounded-md bg-blue-500/10 px-1.5 py-1 text-[10px] font-bold text-blue-500">
-                      <Eye className="w-3 h-3" />
-                      <span>{video.metrics.views}</span>
+              <Card.Footer 
+                className="border-none pt-2 mt-auto"
+                metadata={
+                  <div className="flex flex-wrap gap-1.5">
+                    {video.metrics.outlierScore && (
+                        <div className="flex items-center gap-1.5 rounded-md bg-green-500/10 px-1.5 py-1 text-[10px] font-bold text-green-500">
+                            <TrendingUp className="w-3 h-3" />
+                            <span>{video.metrics.outlierScore}</span>
+                        </div>
+                    )}
+                    <div className="flex items-center gap-1.5 rounded-md bg-blue-500/10 px-1.5 py-1 text-[10px] font-bold text-blue-500">
+                        <Eye className="w-3 h-3" />
+                        <span>{video.metrics.views}</span>
+                    </div>
                   </div>
-                   {video.metrics.engagementRate && (
-                      <div className="flex items-center gap-1.5 rounded-md bg-orange-500/10 px-1.5 py-1 text-[10px] font-bold text-orange-500">
-                          <TrendingUp className="w-3 h-3 rotate-180" />
-                          <span>{video.metrics.engagementRate}</span>
-                      </div>
-                   )}
-              </div>
+                }
+                actions={
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsModalOpen(true);
+                    }}
+                    className="p-2 rounded-lg bg-secondary/50 text-muted-foreground transition-all hover:bg-primary hover:text-white hover:scale-110"
+                  >
+                    <FolderPlus className="w-4 h-4" />
+                  </button>
+                }
+              />
             </div>
           </Card>
         </Link>
-
-        {/* Save to Project Button */}
-        <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsModalOpen(true);
-          }}
-          className="absolute top-2 left-2 p-2 rounded-lg bg-black/50 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-primary hover:scale-110 z-10"
-        >
-          <FolderPlus className="w-4 h-4" />
-        </button>
       </div>
 
       <AddToProjectModal 

@@ -44,36 +44,40 @@ export const SocialAccountsManager = () => {
       ) : socialAccounts.length > 0 ? (
         <div className="space-y-3">
           {socialAccounts.map((account) => (
-            <Card key={account.id} className="p-4 flex items-center justify-between group hover:border-primary/30 transition-all">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <img 
-                    src={account.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`} 
-                    className="w-12 h-12 rounded-full border-2 border-background shadow-sm" 
-                  />
-                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow-sm border border-border">
-                    <Instagram className="w-3.5 h-3.5 text-pink-600" />
+            <Card key={account.id} hover className="overflow-hidden">
+              <Card.Header 
+                actions={
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 text-[9px] font-black uppercase rounded-lg hover:bg-secondary">
+                      Refresh
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg" onClick={(e) => { e.stopPropagation(); /* handle delete */ }}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                }
+              >
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <img 
+                      src={account.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`} 
+                      className="w-12 h-12 rounded-xl border-2 border-background shadow-sm" 
+                    />
+                    <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow-sm border border-border">
+                      <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-sm leading-none flex items-center gap-2 text-foreground group-hover:text-primary transition-colors">
+                      {account.username}
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                    </h3>
+                    <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-black opacity-60">
+                      Instagram Business
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-sm leading-none flex items-center gap-2">
-                    {account.username}
-                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                  </h3>
-                  <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-black">
-                    Instagram Business
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="outline" size="sm" className="h-8 text-[10px] font-black uppercase">
-                  Refresh
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
+              </Card.Header>
             </Card>
           ))}
           

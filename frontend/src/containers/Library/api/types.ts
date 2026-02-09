@@ -47,6 +47,8 @@ export interface CreateHookDTO {
   emotion: Emotion;
   topic: string;
   sourceUrl?: string;
+  tags?: string[];
+  sourceMetadata?: any;
 }
 
 export interface UpdateHookDTO extends Partial<CreateHookDTO> {
@@ -57,6 +59,8 @@ export interface CreateScriptTemplateDTO {
   title: string;
   content: any[];
   category: string;
+  tags?: string[];
+  sourceMetadata?: any;
 }
 
 export interface UpdateScriptTemplateDTO extends Partial<CreateScriptTemplateDTO> {}

@@ -14,14 +14,17 @@ import authRoutes from './features/auth/routes';
 import homeRoutes from './features/home/routes';
 import automationRoutes from './features/automations/routes';
 import socialAccountRoutes from './features/social-accounts/routes';
+import libraryRoutes from './features/library/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
-}));
+  }),
+);
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -36,27 +39,28 @@ app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/automations', automationRoutes);
 app.use('/api/social-accounts', socialAccountRoutes);
+app.use('/api/library', libraryRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Start server
 const server = app.listen(PORT, () => {
-    console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
 });
 
 process.on('unhandledRejection', (err: any) => {
-    console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-    console.error(err.name, err.message, err.stack);
-    server.close(() => {
-        process.exit(1);
-    });
+  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.error(err.name, err.message, err.stack);
+  server.close(() => {
+    process.exit(1);
+  });
 });
 
 process.on('uncaughtException', (err: any) => {
-    console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-    console.error(err.name, err.message, err.stack);
-    process.exit(1);
+  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.error(err.name, err.message, err.stack);
+  process.exit(1);
 });

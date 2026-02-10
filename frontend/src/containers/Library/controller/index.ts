@@ -86,6 +86,8 @@ export const useLibraryController = () => {
     setFilters,
     isAdding,
     setIsAdding,
+    isEditing,
+    setIsEditing,
   } = useLibraryStore();
 
   return {
@@ -111,6 +113,8 @@ export const useLibraryController = () => {
     setFilters,
     isAdding,
     setIsAdding,
+    isEditing,
+    setIsEditing,
     selectedItem:
       activeTab === 'hooks'
         ? hooks.find((h) => h.id === selectedItemId)

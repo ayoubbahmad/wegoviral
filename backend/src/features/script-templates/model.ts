@@ -18,6 +18,7 @@ export interface Script {
   wordCount: number | null;
   views: number;
   tags: string[];
+  sourceUrl: string | null;
   sourceMetadata: JsonValue;
   userId: string;
   hookId: string | null;
@@ -31,6 +32,7 @@ export interface CreateScriptDTO {
   category?: string;
   views?: number;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
 }
 
@@ -41,5 +43,6 @@ export interface UpdateScriptDTO {
   status?: string;
   views?: number;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
 }

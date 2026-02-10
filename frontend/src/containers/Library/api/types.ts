@@ -37,6 +37,7 @@ export interface ScriptTemplate {
   wordCount?: number;
   views?: number;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
   createdAt: string;
 }
@@ -60,6 +61,7 @@ export interface CreateScriptTemplateDTO {
   content: any[];
   category: string;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
 }
 

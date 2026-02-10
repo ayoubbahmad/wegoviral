@@ -9,7 +9,7 @@ import { DetailsPanel } from './components/DetailsPanel';
 import { SearchInput } from '@/components/SearchInput';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hash, Anchor, Palette, Video } from 'lucide-react';
+import { Hash, Anchor, Palette, Video, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/Badge';
 
 export const LibraryContainer = () => {
@@ -26,7 +26,28 @@ export const LibraryContainer = () => {
     searchTerm,
     setSearchTerm,
     selectedItem,
+    removeHook,
+    removeTemplate,
+    setIsEditing,
   } = useLibraryController();
+
+  const handleDeleteHook = async (id: string) => {
+    try {
+      await removeHook(id);
+      if (selectedItemId === id) setSelectedItemId(null);
+    } catch (error) {
+      console.error('Failed to delete hook', error);
+    }
+  };
+
+  const handleDeleteTemplate = async (id: string) => {
+    try {
+      await removeTemplate(id);
+      if (selectedItemId === id) setSelectedItemId(null);
+    } catch (error) {
+      console.error('Failed to delete template', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -83,6 +104,7 @@ export const LibraryContainer = () => {
                       hook={hook}
                       isActive={selectedItemId === hook.id}
                       onClick={() => setSelectedItemId(hook.id)}
+                      onDelete={handleDeleteHook}
                     />
                   ))}
                 </div>
@@ -107,7 +129,7 @@ export const LibraryContainer = () => {
                         <tr
                           key={hook.id}
                           className={cn(
-                            'hover:bg-muted/5 transition-colors cursor-pointer',
+                            'hover:bg-muted/5 transition-colors cursor-pointer group',
                             selectedItemId === hook.id &&
                               'bg-primary/5 border-l-2 border-primary',
                           )}
@@ -124,7 +146,21 @@ export const LibraryContainer = () => {
                             </Badge>
                           </td>
                           <td className='px-6 py-4 text-right'>
-                            {/* Actions */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    'Are you sure you want to delete this hook?',
+                                  )
+                                ) {
+                                  handleDeleteHook(hook.id);
+                                }
+                              }}
+                              className='p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100'
+                            >
+                              <Trash2 className='w-4 h-4' />
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -138,6 +174,7 @@ export const LibraryContainer = () => {
                 viewType={viewType}
                 selectedId={selectedItemId}
                 onSelect={(id) => setSelectedItemId(id)}
+                onDelete={handleDeleteTemplate}
               />
             ) : (
               <div className='flex flex-col items-center justify-center p-20 border-2 border-dashed border-border rounded-3xl bg-muted/20'>
@@ -164,6 +201,7 @@ export const LibraryContainer = () => {
                 item={selectedItem || null}
                 type={activeTab}
                 onClose={() => setSelectedItemId(null)}
+                onEdit={() => setIsEditing(true)}
               />
             </motion.div>
           )}

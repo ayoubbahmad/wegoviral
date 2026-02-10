@@ -1,11 +1,12 @@
 import { LibraryContainer } from '@/containers/Library';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
-import { AddNewItem } from '@/containers/Library/components/AddNewItem';
+import { LibraryAssetModal } from '@/containers/Library/components/AddNewItem';
 import { useLibraryController } from '@/containers/Library/controller';
 
 export const LibraryView = () => {
-  const { addHook, addTemplate } = useLibraryController();
+  const { addHook, updateHook, addTemplate, updateTemplate, selectedItem } =
+    useLibraryController();
 
   return (
     <PageContainer>
@@ -13,10 +14,18 @@ export const LibraryView = () => {
         title='Library'
         description='Manage your creative assets, hooks, and script structures.'
         actions={
-          <AddNewItem
+          <LibraryAssetModal
             onAddHook={async (data) => {
               try {
                 await addHook(data);
+                return { success: true };
+              } catch (error: any) {
+                return { success: false, error: error.message };
+              }
+            }}
+            onUpdateHook={async (id, data) => {
+              try {
+                await updateHook({ id, data });
                 return { success: true };
               } catch (error: any) {
                 return { success: false, error: error.message };
@@ -30,6 +39,15 @@ export const LibraryView = () => {
                 return { success: false, error: error.message };
               }
             }}
+            onUpdateScript={async (id, data) => {
+              try {
+                await updateTemplate({ id, data });
+                return { success: true };
+              } catch (error: any) {
+                return { success: false, error: error.message };
+              }
+            }}
+            editItem={selectedItem}
           />
         }
       />

@@ -59,6 +59,7 @@ export class ScriptTemplatesService {
         wordCount,
         views: data.views || 0,
         tags: data.tags || [],
+        sourceUrl: data.sourceUrl || null,
         sourceMetadata: data.sourceMetadata || null,
         userId,
       },
@@ -96,6 +97,7 @@ export class ScriptTemplatesService {
         wordCount,
         views: data.views,
         tags: data.tags,
+        sourceUrl: data.sourceUrl,
         sourceMetadata: data.sourceMetadata,
       },
     });

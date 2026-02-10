@@ -19,45 +19,65 @@ export async function scrapeUrl(url: string): Promise<ScrapedMetadata> {
     });
 
     const getMeta = (property: string) => {
-      const match =
-        html.match(
-          new RegExp(
-            `<meta[^>]+(?:property|name)="${property}"[^>]+content="([^"]+)"`,
-            'i',
-          ),
-        ) ||
-        html.match(
-          new RegExp(
-            `<meta[^>]+content="([^"]+)"[^>]+(?:property|name)="${property}"`,
-            'i',
-          ),
-        );
+      // Improved regex to handle:
+      // 1. Single or double quotes: ['"]
+      // 2. Attribute order (content before property or vice-versa)
+      // 3. property or name attributes
+      // 4. Case insensitivity
+      const metaRegex = new RegExp(
+        `<meta[^>]+(?:property|name)=['"]${property}['"][^>]+content=['"]([^'"]+)['"]`,
+        'i',
+      );
+      const contentFirstRegex = new RegExp(
+        `<meta[^>]+content=['"]([^'"]+)['"][^>]+(?:property|name)=['"]${property}['"]`,
+        'i',
+      );
+
+      const match = html.match(metaRegex) || html.match(contentFirstRegex);
       return match ? match[1] : null;
     };
 
     const title =
-      getMeta('og:title') || html.match(/<title>(.*?)<\/title>/i)?.[1];
-    const description = getMeta('og:description') || getMeta('description');
-    const thumbnail = getMeta('og:image');
+      getMeta('og:title') ||
+      getMeta('twitter:title') ||
+      html.match(/<title>(.*?)<\/title>/i)?.[1];
+
+    const description =
+      getMeta('og:description') ||
+      getMeta('description') ||
+      getMeta('twitter:description');
+
+    const thumbnail =
+      getMeta('og:image') || getMeta('twitter:image') || getMeta('thumbnail');
 
     // Attempt to extract handle/channel name for TikTok/Instagram/YouTube
     let handle = getMeta('og:site_name');
+
     if (url.includes('tiktok.com')) {
-      const tiktokMatch = html.match(/@([^/]+)/);
+      const tiktokMatch = html.match(/@([^/"\s?]+)/);
       if (tiktokMatch) handle = tiktokMatch[1];
+    } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const ytMatch =
+        html.match(/"author":"([^"]+)"/) ||
+        html.match(/<link[^>]+itemprop="name"[^>]+content="([^"]+)"/);
+      if (ytMatch) handle = ytMatch[1];
     } else if (url.includes('instagram.com')) {
-      // Instagram often blocks scraping without more complex headers/auth
+      // Instagram usually needs a real browser, but we can try site_name
+      handle = handle || 'Instagram';
     }
 
-    return {
+    const result = {
       title: title?.trim(),
       description: description?.trim(),
       thumbnail,
       handle: handle?.trim(),
       url,
     };
-  } catch (error) {
-    console.error('Scraping error:', error);
+
+    console.log('Scraped metadata:', result);
+    return result;
+  } catch (error: any) {
+    console.error('Scraping error for URL:', url, error.message);
     return { url };
   }
 }

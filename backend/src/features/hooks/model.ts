@@ -7,6 +7,7 @@ export interface Hook {
   performanceRating: number;
   views: number;
   tags: string[];
+  sourceUrl?: string | null;
   sourceMetadata?: {
     url?: string;
     title?: string;
@@ -28,6 +29,7 @@ export interface CreateHookDTO {
   performanceRating?: number;
   views?: number;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
   socialAccountId?: string;
 }
@@ -40,6 +42,7 @@ export interface UpdateHookDTO {
   performanceRating?: number;
   views?: number;
   tags?: string[];
+  sourceUrl?: string;
   sourceMetadata?: any;
   socialAccountId?: string;
   lastUsed?: Date;

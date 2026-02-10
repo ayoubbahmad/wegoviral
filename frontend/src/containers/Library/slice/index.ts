@@ -13,6 +13,7 @@ interface LibraryState {
   searchTerm: string;
   filters: LibraryFilters;
   isAdding: boolean;
+  isEditing: boolean;
 
   // Actions
   setActiveTab: (tab: 'hooks' | 'scripts' | 'videos') => void;
@@ -21,6 +22,7 @@ interface LibraryState {
   setSearchTerm: (term: string) => void;
   setFilters: (filters: Partial<LibraryFilters>) => void;
   setIsAdding: (isAdding: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
   resetFilters: () => void;
 }
 
@@ -37,6 +39,7 @@ export const useLibraryStore = create<LibraryState>((set) => ({
   searchTerm: '',
   filters: initialFilters,
   isAdding: false,
+  isEditing: false,
 
   setActiveTab: (activeTab) => set({ activeTab, selectedItemId: null }),
   setViewType: (viewType) => set({ viewType }),
@@ -46,6 +49,7 @@ export const useLibraryStore = create<LibraryState>((set) => ({
     set((state) => ({
       filters: { ...state.filters, ...filters },
     })),
-  setIsAdding: (isAdding) => set({ isAdding }),
+  setIsAdding: (isAdding) => set({ isAdding, isEditing: false }),
+  setIsEditing: (isEditing) => set({ isEditing, isAdding: false }),
   resetFilters: () => set({ filters: initialFilters }),
 }));

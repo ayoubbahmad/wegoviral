@@ -7,20 +7,28 @@ import {
   Clock,
   Hash,
   ExternalLink,
+  User,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
 import { cn, formatRelativeDate } from '@/lib/utils';
+import Image from 'next/image';
 import { Hook, ScriptTemplate } from '../api/types';
 
 interface DetailsPanelProps {
   item: Hook | ScriptTemplate | null;
   onClose: () => void;
+  onEdit?: () => void;
   type: 'hooks' | 'scripts' | 'videos';
 }
 
-export const DetailsPanel = ({ item, onClose, type }: DetailsPanelProps) => {
+export const DetailsPanel = ({
+  item,
+  onClose,
+  onEdit,
+  type,
+}: DetailsPanelProps) => {
   if (!item) return null;
 
   const isHook = type === 'hooks';
@@ -73,7 +81,6 @@ export const DetailsPanel = ({ item, onClose, type }: DetailsPanelProps) => {
             </Badge>
           </div>
         </div>
-
         {/* Content Section */}
         <div className='space-y-4'>
           <h4 className='text-xs font-black uppercase tracking-widest text-muted-foreground opacity-60'>
@@ -85,7 +92,6 @@ export const DetailsPanel = ({ item, onClose, type }: DetailsPanelProps) => {
               : template.excerpt || 'No preview available'}
           </div>
         </div>
-
         {/* Metadata section (Tags etc) */}
         <div className='space-y-4'>
           <h4 className='text-xs font-black uppercase tracking-widest text-muted-foreground opacity-60'>
@@ -105,29 +111,60 @@ export const DetailsPanel = ({ item, onClose, type }: DetailsPanelProps) => {
         </div>
 
         {/* Source Section */}
-        {(isHook ? hook.sourceMetadata : template.sourceMetadata) && (
+        {((isHook ? hook.sourceMetadata : template.sourceMetadata) ||
+          (isHook ? hook.sourceUrl : '')) && (
           <div className='space-y-4'>
             <h4 className='text-xs font-black uppercase tracking-widest text-muted-foreground opacity-60'>
               Source
             </h4>
-            <div className='p-4 rounded-2xl bg-primary/5 border border-primary/20 flex gap-4 items-center'>
-              <div className='w-12 h-16 bg-muted rounded-lg overflow-hidden shrink-0 border border-border/50'>
-                {/* Source Thumbnail could go here */}
-              </div>
+            <a
+              href={isHook ? hook.sourceUrl : (template as any).sourceUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='p-4 rounded-2xl bg-secondary/30 border border-border/50 flex gap-4 items-center hover:bg-secondary/50 transition-colors group'
+            >
+              {(
+                isHook
+                  ? hook.sourceMetadata?.thumbnail
+                  : template.sourceMetadata?.thumbnail
+              ) ? (
+                <div className='w-16 h-20 bg-muted rounded-xl overflow-hidden shrink-0 border border-border/50 relative'>
+                  <Image
+                    src={
+                      isHook
+                        ? hook.sourceMetadata?.thumbnail
+                        : template.sourceMetadata?.thumbnail
+                    }
+                    alt='Source'
+                    fill
+                    className='object-cover'
+                  />
+                </div>
+              ) : (
+                <div className='w-16 h-20 bg-muted rounded-xl flex items-center justify-center shrink-0 border border-border/50'>
+                  <Video className='w-6 h-6 text-muted-foreground/40' />
+                </div>
+              )}
               <div className='flex-1 min-w-0'>
-                <p className='text-sm font-bold truncate'>
+                <div className='flex items-center gap-1.5 mb-1'>
+                  <User className='w-3 h-3 text-primary' />
+                  <span className='text-[10px] font-black uppercase tracking-widest text-primary'>
+                    {(isHook
+                      ? hook.sourceMetadata?.handle
+                      : template.sourceMetadata?.handle) || 'ORIGINAL CREATOR'}
+                  </span>
+                </div>
+                <p className='text-sm font-bold truncate leading-snug'>
                   {(isHook
                     ? hook.sourceMetadata?.title
                     : template.sourceMetadata?.title) || 'Source video'}
                 </p>
-                <p className='text-xs text-muted-foreground'>
-                  {(isHook
-                    ? hook.sourceMetadata?.handle
-                    : template.sourceMetadata?.handle) || '@creator'}
+                <p className='text-[10px] text-muted-foreground truncate opacity-70 mt-0.5'>
+                  {isHook ? hook.sourceUrl : (template as any).sourceUrl}
                 </p>
               </div>
-              <ExternalLink className='w-4 h-4 text-muted-foreground' />
-            </div>
+              <ExternalLink className='w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors' />
+            </a>
           </div>
         )}
       </div>
@@ -136,7 +173,7 @@ export const DetailsPanel = ({ item, onClose, type }: DetailsPanelProps) => {
         <Button variant='primary' className='flex-1'>
           Use This
         </Button>
-        <Button variant='outline' className='flex-1'>
+        <Button variant='outline' className='flex-1' onClick={onEdit}>
           Edit
         </Button>
       </div>

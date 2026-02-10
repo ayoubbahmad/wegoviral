@@ -42,6 +42,7 @@ model Hook {
   lastUsed          DateTime?
   
   tags              String[] @default([])
+  sourceUrl         String?
   sourceMetadata    Json?    // { url: string, title: string, thumbnail: string, handle: string }
   
   userId            String
@@ -68,6 +69,7 @@ model ScriptTemplate {
   wordCount Int?     @default(0)
   views     Int      @default(0)
   tags      String[] @default([])
+  sourceUrl String?
   sourceMetadata Json?  // { url: string, title: string, thumbnail: string, handle: string }
   
   userId    String

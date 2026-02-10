@@ -7,13 +7,33 @@ import { libraryApi } from '../api';
 import { Badge } from '@/components/Badge';
 import Image from 'next/image';
 
-interface AddNewItemProps {
+import { useLibraryStore } from '../slice';
+import { Hook, ScriptTemplate } from '../api/types';
+
+interface LibraryAssetModalProps {
   onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
+  onUpdateHook?: (
+    id: string,
+    hook: any,
+  ) => Promise<{ success: boolean; error?: string }>;
   onAddScript?: (script: any) => Promise<{ success: boolean; error?: string }>;
+  onUpdateScript?: (
+    id: string,
+    script: any,
+  ) => Promise<{ success: boolean; error?: string }>;
+  editItem?: Hook | ScriptTemplate | null;
 }
 
-export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function LibraryAssetModal({
+  onAddHook,
+  onUpdateHook,
+  onAddScript,
+  onUpdateScript,
+  editItem,
+}: LibraryAssetModalProps) {
+  const { isAdding, setIsAdding, isEditing, setIsEditing } = useLibraryStore();
+  const isOpen = isAdding || isEditing;
+
   const [type, setType] = useState<'hook' | 'script'>('hook');
 
   // Form states
@@ -50,6 +70,31 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
     }
   };
 
+  // Populate form for editing
+  useState(() => {
+    if (isEditing && editItem) {
+      if ('content' in editItem && typeof editItem.content === 'string') {
+        const hook = editItem as Hook;
+        setType('hook');
+        setHookContent(hook.content);
+        setHookType(hook.type);
+        setHookEmotion(hook.emotion);
+        setSourceUrl(hook.sourceUrl || '');
+        setTags(hook.tags || []);
+        setMetadata(hook.sourceMetadata || null);
+      } else {
+        const script = editItem as ScriptTemplate;
+        setType('script');
+        setScriptTitle(script.title);
+        setScriptCategory(script.category);
+        setScriptSteps(script.content || [{ step: 'Hook', description: '' }]);
+        setSourceUrl(script.sourceUrl || '');
+        setTags(script.tags || []);
+        setMetadata(script.sourceMetadata || null);
+      }
+    }
+  });
+
   const handleAddTag = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
@@ -72,7 +117,7 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
 
     let result;
     if (type === 'hook') {
-      result = await onAddHook?.({
+      const hookData = {
         content: hookContent,
         type: hookType,
         emotion: hookEmotion,
@@ -80,19 +125,34 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
         sourceUrl: sourceUrl,
         tags: tags,
         sourceMetadata: metadata,
-      });
+      };
+
+      if (isEditing && editItem) {
+        result = await onUpdateHook?.(editItem.id, hookData);
+      } else {
+        result = await onAddHook?.(hookData);
+      }
     } else {
-      result = await onAddScript?.({
+      const scriptData = {
         title: scriptTitle,
         category: scriptCategory,
         content: scriptSteps,
         tags: tags,
+        sourceUrl: sourceUrl,
         sourceMetadata: metadata,
-      });
+      };
+
+      if (isEditing && editItem) {
+        result = await onUpdateScript?.(editItem.id, scriptData);
+      } else {
+        result = await onAddScript?.(scriptData);
+      }
     }
 
     if (result?.success) {
-      setIsOpen(false);
+      setIsAdding(false);
+      setIsEditing(false);
+
       // Reset states
       setHookContent('');
       setScriptTitle('');
@@ -106,10 +166,15 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
     setIsLoading(false);
   };
 
+  const handleClose = () => {
+    setIsAdding(false);
+    setIsEditing(false);
+  };
+
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsAdding(true)}
         className='flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
       >
         <Plus className='w-4 h-4' />
@@ -118,8 +183,14 @@ export function AddNewItem({ onAddHook, onAddScript }: AddNewItemProps) {
 
       <Modal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title={type === 'hook' ? 'Add New Hook' : 'Add Script Template'}
+        onClose={handleClose}
+        title={
+          isEditing
+            ? `Edit ${type === 'hook' ? 'Hook' : 'Script'}`
+            : type === 'hook'
+              ? 'Add New Hook'
+              : 'Add Script Template'
+        }
       >
         <div className='space-y-4 max-h-[70vh] overflow-y-auto px-1'>
           <div className='flex bg-secondary p-1 rounded-lg mb-6 sticky top-0 z-10'>

@@ -4,7 +4,7 @@ import {
   UpdateCompetitorDTO,
   BulkCreateCompetitorDTO,
 } from './model';
-import { scrapeUrl } from '../../lib/scraper';
+import { scrapeUrl, scrapeProfileFeed } from '../../lib/scraper';
 
 export class CompetitorsService {
   private formatCompetitor(competitor: any) {
@@ -172,6 +172,76 @@ export class CompetitorsService {
       where: { id },
     });
     return true;
+  }
+
+  async syncCompetitorVideos(competitorId: string, userId: string) {
+    const competitor = await prisma.competitor.findFirst({
+      where: { id: competitorId, userId },
+    });
+
+    if (!competitor) throw new Error('Competitor not found');
+
+    let url = competitor.handle;
+    if (!url.startsWith('http')) {
+      if (url.includes('tiktok')) {
+        url = `https://www.tiktok.com/@${competitor.handle.replace('@', '')}`;
+      } else if (url.includes('youtube')) {
+        url = `https://www.youtube.com/${competitor.handle}`;
+      } else {
+        url = `https://www.instagram.com/${competitor.handle.replace('@', '')}/`;
+      }
+    }
+
+    const videos = await scrapeProfileFeed(url);
+    const results = [];
+
+    for (const video of videos) {
+      // Check if exists by thumbnail or caption to avoid duplicates
+      // This is a naive check; ideally we'd have externalId or url in schema.
+      const existing = await prisma.competitorPost.findFirst({
+        where: {
+          competitorId,
+          OR: [
+            { thumbnailUrl: video.thumbnail },
+            { captionExcerpt: video.title?.substring(0, 100) || 'No caption' },
+          ],
+        },
+      });
+
+      if (!existing && video.thumbnail) {
+        const post = await prisma.competitorPost.create({
+          data: {
+            competitorId,
+            thumbnailUrl: video.thumbnail,
+            captionExcerpt: video.title || video.description || 'No caption',
+            postedAt: video.postedAt || new Date(),
+            metrics: {
+              views: video.views || '0',
+              likes: video.likes || '0',
+              comments: video.comments || '0',
+              url: video.url, // Storing URL in metrics for now
+            },
+            isViral: false,
+          },
+        });
+        results.push(post);
+      }
+    }
+    return results;
+  }
+
+  async syncAllCompetitors(userId: string) {
+    const competitors = await this.getAllCompetitors(userId);
+    const results = [];
+    for (const comp of competitors) {
+      try {
+        const videos = await this.syncCompetitorVideos(comp.id, userId);
+        results.push(...videos);
+      } catch (e) {
+        console.error(`Failed to sync competitor ${comp.handle}`, e);
+      }
+    }
+    return results;
   }
 }
 

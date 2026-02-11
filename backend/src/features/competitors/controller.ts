@@ -142,3 +142,39 @@ export const deleteCompetitor = async (req: any, res: Response) => {
     res.status(500).json({ error: 'Failed to delete competitor' });
   }
 };
+
+export const syncVideos = async (req: any, res: Response) => {
+  try {
+    const { id } = req.params;
+    // If ID is provided, sync that competitor.
+    // If we want to sync all, we might need a different route or check for special ID.
+    // For now, let's assume this is per-competitor sync.
+
+    const posts = await competitorsService.syncCompetitorVideos(
+      id,
+      req.user.id,
+    );
+
+    res.json({ success: true, count: posts.length, posts });
+  } catch (error: any) {
+    console.error('Sync Videos Error:', error);
+    res
+      .status(500)
+      .json({ error: 'Failed to sync videos', details: error.message });
+  }
+};
+
+export const syncAllCompetitors = async (req: any, res: Response) => {
+  try {
+    const posts = await competitorsService.syncAllCompetitors(req.user.id);
+    res.json({ success: true, count: posts.length, posts });
+  } catch (error: any) {
+    console.error('Sync All Error:', error);
+    res
+      .status(500)
+      .json({
+        error: 'Failed to sync all competitors',
+        details: error.message,
+      });
+  }
+};

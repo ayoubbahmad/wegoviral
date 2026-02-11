@@ -3,6 +3,185 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 chromium.use(StealthPlugin());
 
+import * as fs from 'fs';
+import * as path from 'path';
+// import * as cheerio from 'cheerio';
+
+export interface ScrapedVideo {
+  url: string;
+  thumbnail?: string;
+  title?: string;
+  description?: string;
+  views?: string;
+  likes?: string;
+  comments?: string;
+  postedAt?: Date;
+}
+
+export async function scrapeProfileFeed(
+  url: string,
+  limit = 10,
+): Promise<ScrapedVideo[]> {
+  console.log(`Scraping profile feed for: ${url}`);
+  const videos: ScrapedVideo[] = [];
+
+  // --- DEV MODE: Check for local HTML dumps ---
+  const projectRoot = path.resolve(__dirname, '../../..'); // Adjust path to root
+  const scrapesDir = path.join(projectRoot, 'backend/scrapes');
+
+  let htmlContent = '';
+  let platform = '';
+
+  if (url.includes('instagram.com')) {
+    platform = 'instagram';
+    const dumpPath = path.join(scrapesDir, 'instagram_profile.html');
+    if (fs.existsSync(dumpPath) && fs.statSync(dumpPath).size > 100) {
+      console.log('Using local Instagram dump:', dumpPath);
+      htmlContent = fs.readFileSync(dumpPath, 'utf-8');
+    }
+  } else if (url.includes('tiktok.com')) {
+    platform = 'tiktok';
+    const dumpPath = path.join(scrapesDir, 'tiktok_profile.html');
+    if (fs.existsSync(dumpPath) && fs.statSync(dumpPath).size > 100) {
+      console.log('Using local TikTok dump:', dumpPath);
+      htmlContent = fs.readFileSync(dumpPath, 'utf-8');
+    }
+  } else if (url.includes('youtube.com')) {
+    platform = 'youtube';
+    const dumpPath = path.join(scrapesDir, 'youtube_channel.html');
+    if (fs.existsSync(dumpPath) && fs.statSync(dumpPath).size > 100) {
+      console.log('Using local YouTube dump:', dumpPath);
+      htmlContent = fs.readFileSync(dumpPath, 'utf-8');
+    }
+  }
+
+  if (htmlContent) {
+    // Use Playwright to parse the local HTML content
+    const browser = await chromium.launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      await page.setContent(htmlContent);
+
+      if (platform === 'instagram') {
+        console.log('Instagram scraping paused per user request.');
+      } else if (platform === 'tiktok') {
+        // TikTok scraping logic
+        const scrapedVideos = await page.$$eval(
+          '[data-e2e="user-post-item"]',
+          (els, limit) => {
+            return els.slice(0, limit).map((el) => {
+              const link = el.querySelector('a')?.getAttribute('href');
+              const desc = el.querySelector(
+                '[data-e2e="user-post-item-desc"]',
+              )?.textContent;
+              const img = el.querySelector('img')?.getAttribute('src');
+              const views = el.querySelector(
+                '[data-e2e="video-views"]',
+              )?.textContent;
+              return {
+                url: link,
+                thumbnail: img,
+                title: desc || 'TikTok Video',
+                description: desc,
+                views,
+              };
+            });
+          },
+          limit,
+        );
+
+        scrapedVideos.forEach((v: any) =>
+          videos.push({ ...v, url: v.url || url }),
+        );
+
+        if (videos.length === 0) {
+          const fallbackVideos = await page.$$eval(
+            'a[href*="/video/"]',
+            (els, limit) => {
+              return els.slice(0, limit).map((el) => {
+                const href = el.getAttribute('href');
+                const img = el.querySelector('img')?.getAttribute('src');
+                const text = el.textContent;
+                return {
+                  url: href,
+                  thumbnail: img,
+                  title: text?.trim().substring(0, 50),
+                };
+              });
+            },
+            limit,
+          );
+          fallbackVideos.forEach((v: any) =>
+            videos.push({ ...v, url: v.url || url }),
+          );
+        }
+      } else if (platform === 'youtube') {
+        // YouTube Shorts scraping logic
+        // Verified selectors: ytd-compact-video-renderer -> a#thumbnail[href*="/shorts/"]
+        const scrapedVideos = await page.$$eval(
+          'ytd-compact-video-renderer, ytd-grid-video-renderer, ytd-rich-item-renderer',
+          (els, limit) => {
+            const results: any[] = [];
+            let count = 0;
+            for (const el of els) {
+              if (count >= limit) break;
+
+              const thumbnailEl = el.querySelector('a#thumbnail');
+              const href = thumbnailEl?.getAttribute('href');
+
+              if (!href) continue;
+
+              const img = el.querySelector('img')?.getAttribute('src');
+              let title = el.querySelector('#video-title')?.textContent?.trim();
+              // fallback for title
+              if (!title)
+                title = el
+                  .querySelector('span#video-title')
+                  ?.textContent?.trim();
+              if (!title) title = 'YouTube Video';
+
+              // Metadata line
+              const metadata =
+                el.querySelector('#metadata-line, .ytd-video-meta-block')
+                  ?.textContent || '';
+              const viewsMatch = metadata.match(/([\d.KMB]+)\s+views/);
+
+              results.push({
+                url: href,
+                title,
+                thumbnail: img,
+                views: viewsMatch ? viewsMatch[1] : undefined,
+                description: metadata,
+              });
+              count++;
+            }
+            return results;
+          },
+          limit,
+        );
+
+        scrapedVideos.forEach((v: any) => {
+          const validUrl = v.url.startsWith('http')
+            ? v.url
+            : `https://www.youtube.com${v.url}`;
+          videos.push({ ...v, url: validUrl });
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing local HTML with Playwright:', error);
+    } finally {
+      await browser.close();
+    }
+
+    return videos;
+  }
+
+  // If no local file or empty, we would fall back to Playwright (Stealth)
+  // For this task, we'll return empty or throw to prompt user
+  console.log('No local dump found or empty. Returning empty list.');
+  return [];
+}
+
 export interface ScrapedMetadata {
   title?: string;
   description?: string;

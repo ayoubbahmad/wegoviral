@@ -12,7 +12,9 @@ router.get('/preview', competitorsController.previewCompetitor);
 router.get('/:id', competitorsController.getCompetitor);
 router.post('/', competitorsController.createCompetitor);
 router.post('/bulk', competitorsController.bulkCreateCompetitors);
+router.post('/sync', competitorsController.syncAllCompetitors);
 router.patch('/:id', competitorsController.updateCompetitor);
 router.delete('/:id', competitorsController.deleteCompetitor);
+router.post('/:id/sync', competitorsController.syncVideos);
 
 export default router;

@@ -2,10 +2,14 @@ import { JsonValue } from '@prisma/client/runtime/library';
 
 export interface CompetitorPost {
   id: string;
-  type: string;
-  data: JsonValue;
-  postedAt: Date;
   competitorId: string;
+  thumbnailUrl: string;
+  captionExcerpt: string;
+  postedAt: Date;
+  metrics: JsonValue;
+  isViral: boolean;
+  analysis?: JsonValue;
+  createdAt: Date;
 }
 
 export interface Competitor {

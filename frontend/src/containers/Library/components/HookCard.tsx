@@ -1,10 +1,11 @@
 'use client';
 
 import { Hook } from '@/containers/Library/api/types';
-import { Edit2, Trash2, Copy, Star, Tag } from 'lucide-react';
+import { Trash2, Copy, Star, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Card } from '@/components/Card';
+import { Badge } from '@/components/Badge';
 
 interface HookCardProps {
   hook: Hook;
@@ -14,13 +15,7 @@ interface HookCardProps {
   onClick?: () => void;
 }
 
-export function HookCard({
-  hook,
-  onDelete,
-  onUpdate,
-  isActive,
-  onClick,
-}: HookCardProps) {
+export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -43,10 +38,10 @@ export function HookCard({
       hover
       onClick={onClick}
       className={cn(
-        'flex flex-col h-full transition-all duration-300 cursor-pointer border-2',
+        'flex flex-col h-full transition-all duration-300 cursor-pointer',
         isActive
           ? 'border-primary shadow-xl shadow-primary/10 -translate-y-1'
-          : 'border-transparent',
+          : '',
       )}
     >
       <Card.Header
@@ -60,18 +55,21 @@ export function HookCard({
                 ),
               )}
             </div>
-            <span
-              className={cn(
-                'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase',
+            <Badge
+              variant={
                 hook.type === 'Verbal'
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  ? 'info'
                   : hook.type === 'Visual'
-                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                    : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
+                    ? 'warning'
+                    : 'secondary'
+              }
+              className={cn(
+                hook.type === 'Visual' &&
+                  'bg-purple-500/10 text-purple-500 border-purple-500/20',
               )}
             >
               {hook.type}
-            </span>
+            </Badge>
           </div>
         }
       />
@@ -81,10 +79,9 @@ export function HookCard({
           "{hook.content}"
         </p>
         <div className='flex items-center gap-2 mb-4'>
-          <span className='px-2 py-1 rounded-md text-[10px] font-bold bg-secondary text-secondary-foreground flex items-center gap-1 uppercase tracking-wider'>
-            <Tag className='w-3 h-3' />
+          <Badge variant='secondary' icon={Tag}>
             {hook.emotion}
-          </span>
+          </Badge>
         </div>
       </Card.Content>
 

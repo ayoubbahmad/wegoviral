@@ -30,10 +30,10 @@ export function TemplateCard({
       hover
       padding='none'
       className={cn(
-        'flex flex-col h-full cursor-pointer transition-all duration-300 border-2',
+        'flex flex-col h-full cursor-pointer transition-all duration-300',
         isActive
           ? 'border-primary shadow-xl shadow-primary/10 -translate-y-1'
-          : 'border-transparent',
+          : '',
         'p-6',
         className,
       )}

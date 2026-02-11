@@ -24,8 +24,14 @@ export class YouTubeScraper implements BaseScraper {
             'a.reel-item-endpoint, a.shortsLockupViewModelHostEndpoint, a#video-title-link, a#thumbnail',
           ) as any;
           const href = anchor?.getAttribute('href');
+          if (!href) continue;
 
-          if (!href || !href.includes('/shorts/')) continue;
+          // If it's a shorts feed, we expect /shorts/
+          // But on some pages it might be /watch?v= (for regular videos)
+          const isShort = href.includes('/shorts/');
+          const isVideo = href.includes('/watch?v=');
+
+          if (!isShort && !isVideo) continue;
 
           const fullUrl = href.startsWith('http')
             ? href

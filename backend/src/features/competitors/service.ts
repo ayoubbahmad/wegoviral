@@ -112,6 +112,12 @@ export class CompetitorsService {
         watchlists: true,
       },
     });
+
+    // Trigger initial sync in background
+    this.syncCompetitorVideos(competitor.id, userId).catch((err) => {
+      console.error(`Failed to initial sync for ${competitor.handle}:`, err);
+    });
+
     return this.formatCompetitor(competitor);
   }
 
@@ -195,11 +201,17 @@ export class CompetitorsService {
     if (!url.startsWith('http')) {
       if (url.includes('tiktok')) {
         url = `https://www.tiktok.com/@${competitor.handle.replace('@', '')}`;
-      } else if (url.includes('youtube')) {
-        url = `https://www.youtube.com/${competitor.handle}`;
+      } else if (url.includes('youtube') || competitor.handle.startsWith('@')) {
+        const handle = competitor.handle.startsWith('@')
+          ? competitor.handle
+          : `@${competitor.handle.replace('youtube.com/', '').replace('www.', '')}`;
+        url = `https://www.youtube.com/${handle}/shorts`;
       } else {
         url = `https://www.instagram.com/${competitor.handle.replace('@', '')}/`;
       }
+    } else if (url.includes('youtube.com') && !url.includes('/shorts')) {
+      // If it's a full YouTube URL but doesn't target shorts, append it
+      url = url.endsWith('/') ? `${url}shorts` : `${url}/shorts`;
     }
 
     const videos = await scrapeProfileFeed(url, 10);
@@ -257,7 +269,7 @@ export class CompetitorsService {
         console.error(`Failed to sync competitor ${comp.handle}`, e);
       }
     }
-    return competitors.map((comp) => this.formatCompetitor(comp));
+    return results;
   }
 }
 

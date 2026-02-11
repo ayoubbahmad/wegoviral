@@ -2,8 +2,10 @@ import { apiClient } from '@/lib/api-client';
 import { Competitor } from '@/types/competitor';
 
 export const competitorsSharedApi = {
-  getAll: async () => {
-    return apiClient.get<any, Competitor[]>('/competitors');
+  getAll: async (watchlistId?: string) => {
+    return apiClient.get<any, Competitor[]>('/competitors', {
+      params: { watchlistId },
+    });
   },
   delete: async (id: string) => {
     return apiClient.delete(`/competitors/${id}`);

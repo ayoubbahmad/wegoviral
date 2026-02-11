@@ -32,6 +32,7 @@ export interface CreateCompetitorDTO {
   tags?: string[];
   stats?: any;
   socialAccountId?: string;
+  watchlistIds?: string[];
 }
 
 export interface UpdateCompetitorDTO {
@@ -42,10 +43,12 @@ export interface UpdateCompetitorDTO {
   tags?: string[];
   stats?: any;
   socialAccountId?: string;
+  watchlistIds?: string[];
 }
 
 export interface BulkCreateCompetitorDTO {
   handles: string[]; // Can be handle or URL
   tags?: string[];
   socialAccountId?: string;
+  watchlistId?: string;
 }

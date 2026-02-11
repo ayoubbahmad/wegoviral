@@ -10,6 +10,7 @@ export const competitorsApi = {
     handles: string[];
     tags?: string[];
     socialAccountId?: string;
+    watchlistId?: string;
   }) => {
     return apiClient.post<any, any>(COMPETITORS_ENDPOINTS.BULK, data);
   },

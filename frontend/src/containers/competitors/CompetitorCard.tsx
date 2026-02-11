@@ -8,11 +8,16 @@ import { useState } from 'react';
 interface CompetitorCardProps {
   competitor: Competitor;
   onDelete?: (id: string) => void;
+  variant?: 'full' | 'compact';
 }
 
 import { Card } from '@/components/Card';
 
-export function CompetitorCard({ competitor, onDelete }: CompetitorCardProps) {
+export function CompetitorCard({
+  competitor,
+  onDelete,
+  variant = 'full',
+}: CompetitorCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -26,6 +31,38 @@ export function CompetitorCard({ competitor, onDelete }: CompetitorCardProps) {
       setIsDeleting(false);
     }
   };
+
+  if (variant === 'compact') {
+    return (
+      <Link
+        href={`/competitors/${competitor.id}`}
+        className='group block h-full'
+      >
+        <Card hover className='flex items-center gap-3 p-3 overflow-hidden'>
+          <img
+            src={competitor.avatarUrl}
+            alt={competitor.name}
+            className='w-10 h-10 rounded-full border border-border flex-shrink-0'
+          />
+          <div className='min-w-0 flex-1'>
+            <h3 className='font-bold leading-tight truncate text-sm text-foreground group-hover:text-primary transition-colors'>
+              {competitor.name}
+            </h3>
+            <p className='text-[10px] text-muted-foreground font-medium truncate'>
+              {competitor.handle}
+            </p>
+          </div>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 transition-opacity'
+          >
+            <Trash2 className='w-3.5 h-3.5' />
+          </button>
+        </Card>
+      </Link>
+    );
+  }
 
   return (
     <Link href={`/competitors/${competitor.id}`} className='group block h-full'>

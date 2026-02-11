@@ -7,261 +7,210 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -- User Data (Custom Auth) --
 model UserProfile {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  username     String   @unique
-  passwordHash String
-  name         String?
-  avatarUrl    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  // Relations
-  hooks          Hook[]
-  competitors    Competitor[]
-  socialAccounts SocialAccount[]
+  id              String           @id @default(uuid())
+  email           String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  avatarUrl       String?
+  name            String?
+  passwordHash    String
+  username        String           @unique
+  automations     Automation[]
+  competitors     Competitor[]
+  hooks           Hook[]
+  scripts         Script[]
   scriptTemplates ScriptTemplate[]
-  scripts        Script[]
-  automations    Automation[]
+  socialAccounts  SocialAccount[]
+  watchlists      Watchlist[]
 }
 
-// -- Library (Hooks & Scripts) --
 model Hook {
-  id                String   @id @default(uuid())
+  id                String           @id @default(uuid())
   content           String
-  type              String   // Verbal, Visual
+  type              String
   emotion           String
   topic             String
-  performanceRating Int?     // 1-5
-  
-  // Usage Tracking
-  usageCount        Int      @default(0)
-  views             Int      @default(0)
+  performanceRating Int?
+  usageCount        Int              @default(0)
   lastUsed          DateTime?
-  
-  tags              String[] @default([])
-  sourceUrl         String?
-  sourceMetadata    Json?    // { url: string, title: string, thumbnail: string, handle: string }
-  
   userId            String
-  user              UserProfile @relation(fields: [userId], references: [id])
-  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
   socialAccountId   String?
-  socialAccount     SocialAccount? @relation(fields: [socialAccountId], references: [id])
-  
-  // Relations
+  sourceMetadata    Json?
+  tags              String[]         @default([])
+  views             Int              @default(0)
+  sourceUrl         String?
+  socialAccount     SocialAccount?   @relation(fields: [socialAccountId], references: [id])
+  user              UserProfile      @relation(fields: [userId], references: [id])
   scriptTemplates   ScriptTemplate[]
   userPosts         UserPost[]
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 }
 
 model ScriptTemplate {
-  id        String   @id @default(uuid())
-  title     String
-  content   Json     // Structure details (array of steps)
-  category  String
-  status    String   @default("Draft")
-  excerpt   String?
-  wordCount Int?     @default(0)
-  views     Int      @default(0)
-  tags      String[] @default([])
-  sourceUrl String?
-  sourceMetadata Json?  // { url: string, title: string, thumbnail: string, handle: string }
-  
-  userId    String
-  user      UserProfile @relation(fields: [userId], references: [id])
-  
-  hookId    String?
-  hook      Hook?       @relation(fields: [hookId], references: [id])
-  
-  // Relations
-  scripts   Script[]    // Scripts created using this template
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String      @id @default(uuid())
+  title          String
+  content        Json
+  category       String
+  userId         String
+  hookId         String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  excerpt        String?
+  status         String      @default("Draft")
+  wordCount      Int?        @default(0)
+  sourceMetadata Json?
+  tags           String[]    @default([])
+  views          Int         @default(0)
+  sourceUrl      String?
+  scripts        Script[]
+  hook           Hook?       @relation(fields: [hookId], references: [id])
+  user           UserProfile @relation(fields: [userId], references: [id])
 }
 
 model Script {
-  id        String   @id @default(uuid())
-  title     String
-  content   Json     // The actual script content
-  category  String
-  status    String   @default("Draft") // Draft, Completed
-  excerpt   String?
-  wordCount Int?     @default(0)
-
-  // Optional link to a template/blueprint
+  id         String          @id @default(uuid())
+  title      String
+  content    Json
+  category   String
+  status     String          @default("Draft")
+  excerpt    String?
+  wordCount  Int?            @default(0)
   templateId String?
-  template   ScriptTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
-
-  userId    String
-  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId     String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  template   ScriptTemplate? @relation(fields: [templateId], references: [id])
+  user       UserProfile     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// -- Competitor Tracking --
 model Competitor {
-  id        String   @id @default(uuid())
-  handle    String
-  name      String
-  avatarUrl String
-  bio       String?
-  tags      String[]
-  
-  // Snapshots of their stats
-  stats     Json     // { followers: string, avgLikes: string, engagementRate: string }
-  
-  userId    String
-  user      UserProfile @relation(fields: [userId], references: [id])
-  
+  id              String           @id @default(uuid())
+  handle          String
+  name            String
+  avatarUrl       String
+  bio             String?
+  tags            String[]
+  stats           Json
+  userId          String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   socialAccountId String?
-  socialAccount   SocialAccount? @relation(fields: [socialAccountId], references: [id])
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  socialAccount   SocialAccount?   @relation(fields: [socialAccountId], references: [id])
+  user            UserProfile      @relation(fields: [userId], references: [id])
+  posts           CompetitorPost[]
+  watchlists      Watchlist[]      @relation("CompetitorToWatchlist")
 
-  posts     CompetitorPost[]
-  
-  @@unique([userId, handle]) // User can't track same competitor twice
+  @@unique([userId, handle])
 }
 
-// -- Viral Posts Analysis --
+model Watchlist {
+  id          String       @id @default(uuid())
+  name        String
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        UserProfile  @relation(fields: [userId], references: [id])
+  competitors Competitor[] @relation("CompetitorToWatchlist")
+
+  @@unique([userId, name])
+}
+
 model CompetitorPost {
-  id             String   @id @default(uuid())
+  id             String     @id @default(uuid())
   competitorId   String
-  competitor     Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
-  
   thumbnailUrl   String
   captionExcerpt String
   postedAt       DateTime
-  
-  metrics        Json     // { likes: number, comments: number }
-  isViral        Boolean  @default(false)
-  
-  // Analysis Data
-  analysis       Json?    // { hook: string, structure: string, notes: string }
-  
-  createdAt      DateTime @default(now())
+  metrics        Json
+  isViral        Boolean    @default(false)
+  analysis       Json?
+  createdAt      DateTime   @default(now())
+  competitor     Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
 }
 
-// -- My Performance --
 model UserPost {
-  id              String   @id @default(uuid())
-  externalId      String?  // Platform ID
+  id              String        @id @default(uuid())
+  externalId      String?
   thumbnailUrl    String?
   caption         String?
   postedAt        DateTime
-  
-  metrics         Json     // { likes: number, comments: number, views: number, etc. }
-  
+  metrics         Json
   socialAccountId String
-  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
-  
   hookId          String?
-  hook            Hook?    @relation(fields: [hookId], references: [id])
-  
-  createdAt       DateTime @default(now())
+  createdAt       DateTime      @default(now())
+  hook            Hook?         @relation(fields: [hookId], references: [id])
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
 }
 
-// -- Community & Followers --
 model Follower {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   handle          String
   name            String?
   avatarUrl       String?
-  segment         String   // VIP, Superfan, New, etc.
-  
-  stats           Json     // { totalLikes: number, totalComments: number, lastActive: DateTime }
-  
+  segment         String
+  stats           Json
   socialAccountId String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
-  
   interactions    Interaction[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
   @@unique([socialAccountId, handle])
 }
 
 model Interaction {
-  id          String   @id @default(uuid())
-  followerId  String
-  follower    Follower @relation(fields: [followerId], references: [id], onDelete: Cascade)
-  
-  type        String   // LIKE, COMMENT, STORY_REPLY
-  content     String?  // Comment text
-  timestamp   DateTime @default(now())
-  
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  followerId String
+  type       String
+  content    String?
+  timestamp  DateTime @default(now())
+  createdAt  DateTime @default(now())
+  follower   Follower @relation(fields: [followerId], references: [id], onDelete: Cascade)
 }
 
-// -- Social Account Management --
 model SocialAccount {
-  id          String   @id @default(uuid())
-  userId      String
-  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  platform    String   // 'instagram', 'tiktok', 'youtube', etc.
-  username    String
-  accountId   String   // Platform-specific ID
-  avatarUrl   String?
-  
-  // OAuth / API Credentials
-  accessToken String?  // Store encrypted in production
+  id           String       @id @default(uuid())
+  userId       String
+  platform     String
+  username     String
+  accountId    String
+  avatarUrl    String?
+  accessToken  String?
   refreshToken String?
-  tokenExpiry DateTime?
-  
-  // Account Status
-  isActive    Boolean  @default(false) // Currently selected account
-  isConnected Boolean  @default(true)  // Connection is valid
-  
-  // Relations
-  hooks       Hook[]
-  competitors Competitor[]
-  userPosts   UserPost[]
-  followers   Follower[]
-  automations Automation[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@unique([userId, platform, accountId]) // One user can't connect same account twice
+  tokenExpiry  DateTime?
+  isActive     Boolean      @default(false)
+  isConnected  Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  automations  Automation[]
+  competitors  Competitor[]
+  followers    Follower[]
+  hooks        Hook[]
+  user         UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userPosts    UserPost[]
+
+  @@unique([userId, platform, accountId])
 }
 
-// -- Automations & Keyword Triggers --
 model Automation {
-  id              String   @id @default(uuid())
-  name            String
-  triggerKeyword  String
-  responseMessage String
-  platform        String?  // 'instagram', 'tiktok', etc.
-  active          Boolean  @default(true)
-  
-  // Monitoring & Stats
-  runCount        Int      @default(0)
-  lastRunAt       DateTime?
-  
-  // Multi-Action Support
-  commentReplyEnabled Boolean @default(false)
+  id                  String         @id @default(uuid())
+  name                String
+  triggerKeyword      String
+  responseMessage     String
+  platform            String?
+  active              Boolean        @default(true)
+  userId              String
+  socialAccountId     String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  commentReplyEnabled Boolean        @default(false)
   commentReplyMessage String?
-  
-  // Instagram Specific
-  instagramPostId String?
-  isGlobal        Boolean @default(true)
-  
-  userId          String
-  user            UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  socialAccountId String?
-  socialAccount   SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  lastRunAt           DateTime?
+  runCount            Int            @default(0)
+  instagramPostId     String?
+  isGlobal            Boolean        @default(true)
+  socialAccount       SocialAccount? @relation(fields: [socialAccountId], references: [id])
+  user                UserProfile    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

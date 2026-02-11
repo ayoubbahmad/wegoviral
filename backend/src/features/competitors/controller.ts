@@ -3,7 +3,11 @@ import { competitorsService } from './service';
 
 export const getCompetitors = async (req: any, res: Response) => {
   try {
-    const competitors = await competitorsService.getAllCompetitors(req.user.id);
+    const { watchlistId } = req.query;
+    const competitors = await competitorsService.getAllCompetitors(
+      req.user.id,
+      watchlistId as string,
+    );
     res.json(competitors);
   } catch (error) {
     console.error('Get Competitors Error:', error);
@@ -29,8 +33,16 @@ export const getCompetitor = async (req: any, res: Response) => {
 
 export const createCompetitor = async (req: any, res: Response) => {
   try {
-    const { handle, name, avatarUrl, bio, tags, stats, socialAccountId } =
-      req.body;
+    const {
+      handle,
+      name,
+      avatarUrl,
+      bio,
+      tags,
+      stats,
+      socialAccountId,
+      watchlistIds,
+    } = req.body;
     if (!handle || !name) {
       return res.status(400).json({ error: 'Handle and name are required' });
     }
@@ -43,6 +55,7 @@ export const createCompetitor = async (req: any, res: Response) => {
       tags,
       stats,
       socialAccountId,
+      watchlistIds,
     });
     res.status(201).json(competitor);
   } catch (error: any) {
@@ -55,7 +68,7 @@ export const createCompetitor = async (req: any, res: Response) => {
 
 export const bulkCreateCompetitors = async (req: any, res: Response) => {
   try {
-    const { handles, tags, socialAccountId } = req.body;
+    const { handles, tags, socialAccountId, watchlistId } = req.body;
     if (!handles || !Array.isArray(handles)) {
       return res.status(400).json({ error: 'Handles array is required' });
     }
@@ -66,6 +79,7 @@ export const bulkCreateCompetitors = async (req: any, res: Response) => {
         handles,
         tags,
         socialAccountId,
+        watchlistId,
       },
     );
     res.status(201).json(competitors);

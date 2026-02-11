@@ -47,6 +47,7 @@ export function useAddCompetitorController() {
       return competitorsApi.bulkCreate({
         handles: validUrls,
         tags: ['Watchlist'],
+        watchlistId: data.watchlistId,
       });
     },
     onSuccess: (result) => {

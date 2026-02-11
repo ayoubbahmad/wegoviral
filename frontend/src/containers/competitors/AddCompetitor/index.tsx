@@ -7,6 +7,9 @@ import { useWatchlistForm } from './forms/useWatchlistForm';
 import { WatchlistFormValues } from './forms/schema';
 import { useAddCompetitorController } from './controller';
 import { useAddCompetitorSlice } from './slice';
+import { useQuery } from '@tanstack/react-query';
+import { watchlistsApi as globalWatchlistsApi } from '../api/watchlists';
+import { FormSelect } from '@/components/forms/FormSelect';
 
 interface AddCompetitorModalProps {
   isOpen: boolean;
@@ -21,6 +24,12 @@ export function AddCompetitorModal({
   const { previewMutation, bulkCreateMutation, resetSlice } =
     useAddCompetitorController();
   const { prevStep, previews, setPrevStep } = useAddCompetitorSlice();
+
+  const { data: watchlists } = useQuery({
+    queryKey: ['watchlists'],
+    queryFn: globalWatchlistsApi.getAll,
+    enabled: isOpen,
+  });
 
   const {
     control,
@@ -51,6 +60,11 @@ export function AddCompetitorModal({
 
   const loading = previewMutation.isPending || bulkCreateMutation.isPending;
 
+  const watchlistOptions = [
+    { label: 'None (Uncategorized)', value: '' },
+    ...(watchlists?.map((w: any) => ({ label: w.name, value: w.id })) || []),
+  ];
+
   return (
     <Modal
       isOpen={isOpen}
@@ -60,6 +74,15 @@ export function AddCompetitorModal({
     >
       {!prevStep ? (
         <form onSubmit={handleSubmit(onFetchPreviews)} className='space-y-6'>
+          <div className='bg-secondary/10 p-4 rounded-2xl border border-border/50 mb-6'>
+            <FormSelect
+              name='watchlistId'
+              control={control}
+              label='Categorize under Watchlist'
+              options={watchlistOptions}
+            />
+          </div>
+
           <div className='max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2'>
             <div className='space-y-5'>
               {fields.map((field, index) => (

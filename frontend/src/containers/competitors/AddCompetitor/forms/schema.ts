@@ -9,6 +9,7 @@ export const watchlistSchema = z.object({
       }),
     )
     .min(1, 'At least one competitor is required'),
+  watchlistId: z.string().optional(),
 });
 
 export type WatchlistFormValues = z.infer<typeof watchlistSchema>;

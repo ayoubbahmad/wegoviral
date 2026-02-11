@@ -3,13 +3,17 @@ import { competitorsSharedApi } from '../api/shared';
 import { useToast } from '@/providers/Toast';
 import { Competitor } from '@/types/competitor';
 
+import { useCompetitorsPageSlice } from '../slice/pageSlice';
+
 export function useCompetitorsController() {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const { selectedWatchlistId } = useCompetitorsPageSlice();
 
   const competitorsQuery = useQuery({
-    queryKey: ['competitors'],
-    queryFn: competitorsSharedApi.getAll,
+    queryKey: ['competitors', { watchlistId: selectedWatchlistId }],
+    queryFn: () =>
+      competitorsSharedApi.getAll(selectedWatchlistId || undefined),
   });
 
   const deleteMutation = useMutation({

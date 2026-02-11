@@ -12,6 +12,8 @@ import {
   Plus,
   Check,
   Loader2,
+  FolderPlus,
+  Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -30,6 +32,9 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
     savedHooks,
     savedStructures,
     handleSave,
+    allWatchlists,
+    addToWatchlist,
+    removeFromWatchlist,
   } = useCompetitorDetailController(id);
 
   if (isLoading) {
@@ -103,7 +108,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                   Instagram <ExternalLink className='w-3 h-3' />
                 </a>
               </div>
-              <div className='flex gap-2 mt-3'>
+              <div className='flex flex-wrap gap-2 mt-3'>
                 {competitor.tags?.map((tag: any) => (
                   <span
                     key={tag}
@@ -112,6 +117,71 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     {tag}
                   </span>
                 ))}
+              </div>
+
+              {/* Watchlists */}
+              <div className='flex items-center gap-2 mt-4'>
+                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1'>
+                  Watchlists:
+                </span>
+                <div className='flex flex-wrap gap-2'>
+                  {competitor.watchlists?.map((wl: any) => (
+                    <span
+                      key={wl.id}
+                      className='text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold border border-primary/20 flex items-center gap-1'
+                    >
+                      <FolderPlus className='w-3 h-3' />
+                      {wl.name}
+                      <button
+                        onClick={() => removeFromWatchlist(wl.id)}
+                        className='ml-1 hover:text-red-500 transition-colors'
+                        title='Remove from watchlist'
+                      >
+                        <Trash2 className='w-2.5 h-2.5' />
+                      </button>
+                    </span>
+                  ))}
+                  <div className='relative group'>
+                    <button className='text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 flex items-center gap-1 font-bold transition-colors'>
+                      <Plus className='w-3 h-3' /> Manage
+                    </button>
+                    <div className='absolute left-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all'>
+                      <div className='px-3 py-1 border-b border-border/50 mb-1'>
+                        <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
+                          Select Watchlists
+                        </span>
+                      </div>
+                      <div className='max-h-48 overflow-y-auto custom-scrollbar px-1'>
+                        {allWatchlists.map((wl: any) => {
+                          const isMember = competitor.watchlists?.some(
+                            (w: any) => w.id === wl.id,
+                          );
+                          return (
+                            <button
+                              key={wl.id}
+                              onClick={() =>
+                                isMember
+                                  ? removeFromWatchlist(wl.id)
+                                  : addToWatchlist(wl.id)
+                              }
+                              className='w-full text-left px-3 py-2 rounded-lg text-xs font-medium hover:bg-secondary flex items-center justify-between transition-colors'
+                            >
+                              <span className='truncate'>{wl.name}</span>
+                              {isMember && (
+                                <Check className='w-3 h-3 text-primary' />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {allWatchlists.length === 0 && (
+                        <div className='px-3 py-2 text-xs text-muted-foreground italic'>
+                          No watchlists created.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

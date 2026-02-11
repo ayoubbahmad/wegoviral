@@ -5,13 +5,13 @@ import { competitorsSharedApi } from '@/containers/Competitors/api/shared';
 import { Competitor } from '@/types/competitor';
 import { useToast } from '@/providers/Toast';
 
-export function useCompetitors() {
+export function useCompetitors(watchlistId?: string) {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
   const competitorsQuery = useQuery({
-    queryKey: ['competitors'],
-    queryFn: competitorsSharedApi.getAll,
+    queryKey: ['competitors', { watchlistId }],
+    queryFn: () => competitorsSharedApi.getAll(watchlistId),
   });
 
   const deleteMutation = useMutation({

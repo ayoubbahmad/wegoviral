@@ -14,9 +14,19 @@ export class CompetitorsService {
     };
   }
 
-  async getAllCompetitors(userId: string) {
+  async getAllCompetitors(userId: string, watchlistId?: string) {
+    const where: any = { userId };
+    if (watchlistId) {
+      where.watchlists = {
+        some: { id: watchlistId },
+      };
+    }
+
     const competitors = await prisma.competitor.findMany({
-      where: { userId },
+      where,
+      include: {
+        watchlists: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
     return competitors.map((comp) => this.formatCompetitor(comp));
@@ -26,6 +36,7 @@ export class CompetitorsService {
     const competitor = await prisma.competitor.findFirst({
       where: { id, userId },
       include: {
+        watchlists: true,
         posts: {
           orderBy: { postedAt: 'desc' },
         },
@@ -70,18 +81,25 @@ export class CompetitorsService {
   }
 
   async createCompetitor(userId: string, data: CreateCompetitorDTO) {
+    const { watchlistIds, ...competitorData } = data;
+
     const competitor = await prisma.competitor.create({
       data: {
-        handle: data.handle,
-        name: data.name,
+        ...competitorData,
         avatarUrl:
-          data.avatarUrl ||
-          `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.handle}`,
-        bio: data.bio,
-        tags: data.tags || [],
-        stats: data.stats || {},
+          competitorData.avatarUrl ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${competitorData.handle}`,
+        tags: competitorData.tags || [],
+        stats: competitorData.stats || {},
         userId,
-        socialAccountId: data.socialAccountId,
+        watchlists: watchlistIds
+          ? {
+              connect: watchlistIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      include: {
+        watchlists: true,
       },
     });
     return this.formatCompetitor(competitor);
@@ -100,6 +118,7 @@ export class CompetitorsService {
           stats: preview.stats,
           tags: data.tags,
           socialAccountId: data.socialAccountId,
+          watchlistIds: data.watchlistId ? [data.watchlistId] : undefined,
         });
         results.push(competitor);
       } catch (error) {
@@ -123,9 +142,21 @@ export class CompetitorsService {
 
     if (!competitor) return null;
 
+    const { watchlistIds, ...updateData } = data;
+
     const updatedComp = await prisma.competitor.update({
       where: { id },
-      data,
+      data: {
+        ...updateData,
+        watchlists: watchlistIds
+          ? {
+              set: watchlistIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      include: {
+        watchlists: true,
+      },
     });
     return this.formatCompetitor(updatedComp);
   }

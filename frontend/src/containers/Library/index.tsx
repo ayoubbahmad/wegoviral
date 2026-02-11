@@ -9,7 +9,7 @@ import { DetailsPanel } from './components/DetailsPanel';
 import { SearchInput } from '@/components/SearchInput';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hash, Anchor, Palette, Video, Trash2 } from 'lucide-react';
+import { Anchor, Palette, Video, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/Badge';
 
 export const LibraryContainer = () => {
@@ -33,8 +33,10 @@ export const LibraryContainer = () => {
 
   const handleDeleteHook = async (id: string) => {
     try {
-      await removeHook(id);
-      if (selectedItemId === id) setSelectedItemId(null);
+      if (confirm('Are you sure you want to delete this hook?')) {
+        await removeHook(id);
+        if (selectedItemId === id) setSelectedItemId(null);
+      }
     } catch (error) {
       console.error('Failed to delete hook', error);
     }
@@ -42,8 +44,10 @@ export const LibraryContainer = () => {
 
   const handleDeleteTemplate = async (id: string) => {
     try {
-      await removeTemplate(id);
-      if (selectedItemId === id) setSelectedItemId(null);
+      if (confirm('Are you sure you want to delete this template?')) {
+        await removeTemplate(id);
+        if (selectedItemId === id) setSelectedItemId(null);
+      }
     } catch (error) {
       console.error('Failed to delete template', error);
     }
@@ -149,13 +153,7 @@ export const LibraryContainer = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (
-                                  confirm(
-                                    'Are you sure you want to delete this hook?',
-                                  )
-                                ) {
-                                  handleDeleteHook(hook.id);
-                                }
+                                handleDeleteHook(hook.id);
                               }}
                               className='p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100'
                             >

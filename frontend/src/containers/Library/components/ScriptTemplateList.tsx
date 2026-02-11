@@ -4,7 +4,6 @@ import { ScriptTemplate } from '@/containers/Library/api/types';
 import { FileText, ChevronRight, Trash2, Edit2 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/Card';
 
 import { TemplateCard } from './TemplateCard';
 

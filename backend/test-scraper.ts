@@ -13,7 +13,7 @@ import path from 'path';
  */
 
 async function test() {
-  const args = process.argv.slice(2).map((a) => a.toLowerCase());
+  const args = process.argv.slice(2).map((a: string) => a.toLowerCase());
 
   const platforms = [
     {
@@ -41,7 +41,9 @@ async function test() {
   // Filter based on arguments if provided
   const targetPlatforms =
     args.length > 0
-      ? platforms.filter((p) => args.some((arg) => p.name.includes(arg)))
+      ? platforms.filter((p) =>
+          args.some((arg: string) => p.name.includes(arg)),
+        )
       : platforms;
 
   if (targetPlatforms.length === 0 && args.length > 0) {

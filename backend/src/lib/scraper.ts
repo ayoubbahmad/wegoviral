@@ -201,7 +201,9 @@ export async function scrapeUrl(url: string): Promise<ScrapedMetadata> {
       }
 
       if (!result.handle) {
-        const handleMatch = desc.match(/-\s+([a-zA-Z0-9._]+)\s+on\s+/);
+        const handleMatch =
+          desc.match(/-\s+([a-zA-Z0-9._]+)\s+on\s+/) ||
+          desc.match(/\(@([a-zA-Z0-9._]+)\)/);
         if (handleMatch) result.handle = handleMatch[1];
       }
 

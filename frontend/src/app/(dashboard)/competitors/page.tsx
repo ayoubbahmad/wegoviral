@@ -1,24 +1,26 @@
 'use client';
 
-import { useCompetitors } from '@/hooks/useCompetitors';
 import { CompetitorCard } from '@/containers/Competitors/CompetitorCard';
 import { CompetitorsSkeleton } from '@/containers/Competitors/CompetitorsSkeleton';
 import { Plus, Search } from 'lucide-react';
-import { useState } from 'react';
 import { AddCompetitorModal } from '@/containers/Competitors/AddCompetitor';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { PageContainer } from '@/components/PageContainer';
+import { useCompetitorsController } from '@/containers/Competitors/controller';
+import { useCompetitorsPageSlice } from '@/containers/Competitors/slice/pageSlice';
 
 export default function CompetitorsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const {
-    competitors,
-    isLoading,
-    addCompetitor,
-    removeCompetitor,
-    updateCompetitor,
-  } = useCompetitors();
+  const { competitors, isLoading, deleteCompetitor } =
+    useCompetitorsController();
+  const { isModalOpen, setIsModalOpen, searchQuery, setSearchQuery } =
+    useCompetitorsPageSlice();
+
+  const filteredCompetitors = competitors.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.handle.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   if (isLoading) {
     return <CompetitorsSkeleton />;
@@ -44,7 +46,6 @@ export default function CompetitorsPage() {
         <AddCompetitorModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onAdd={addCompetitor}
         />
 
         <div className='flex items-center gap-2 p-3 bg-secondary/20 border border-border/50 rounded-2xl shadow-sm max-w-md focus-within:ring-1 focus-within:ring-primary/30 transition-all'>
@@ -52,16 +53,18 @@ export default function CompetitorsPage() {
           <input
             type='text'
             placeholder='Search competitors...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className='flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 font-medium'
           />
         </div>
 
         <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-          {competitors.map((competitor) => (
+          {filteredCompetitors.map((competitor) => (
             <CompetitorCard
               key={competitor.id}
               competitor={competitor}
-              onDelete={removeCompetitor}
+              onDelete={deleteCompetitor}
             />
           ))}
         </div>

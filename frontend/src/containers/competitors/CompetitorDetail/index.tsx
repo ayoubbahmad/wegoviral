@@ -96,7 +96,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                 <span>{competitor.handle}</span>
                 <span>•</span>
                 <a
-                  href={`https://instagram.com/${competitor.handle.replace('@', '')}`}
+                  href={`${competitor.handle.replace('@', '')}`}
                   target='_blank'
                   className='flex items-center gap-1 hover:text-primary hover:underline'
                 >

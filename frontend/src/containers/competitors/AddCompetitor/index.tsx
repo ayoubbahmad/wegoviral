@@ -1,11 +1,12 @@
 'use client';
 
 import { Modal } from '@/components/Modal';
-import { useToast } from '@/providers/Toast';
-import { useState } from 'react';
 import { Plus, Users, Search, Loader2 } from 'lucide-react';
 import { CompetitorSearchRow } from './components/CompetitorSearchRow';
-import { useCompetitors } from '@/hooks/useCompetitors';
+import { useWatchlistForm } from './forms/useWatchlistForm';
+import { WatchlistFormValues } from './forms/schema';
+import { useAddCompetitorController } from './controller';
+import { useAddCompetitorSlice } from './slice';
 
 interface AddCompetitorModalProps {
   isOpen: boolean;
@@ -17,125 +18,67 @@ export function AddCompetitorModal({
   isOpen,
   onClose,
 }: AddCompetitorModalProps) {
-  const { showToast } = useToast();
-  const { addCompetitorsBulk, previewCompetitor } = useCompetitors();
+  const { previewMutation, bulkCreateMutation, resetSlice } =
+    useAddCompetitorController();
+  const { prevStep, previews, setPrevStep } = useAddCompetitorSlice();
 
-  const [rows, setRows] = useState<Array<{ platform: string; value: string }>>([
-    { platform: 'instagram', value: '' },
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [prevStep, setPrevStep] = useState(false);
-  const [previews, setPreviews] = useState<any[]>([]);
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset: resetForm,
+    fields,
+    append,
+    remove,
+  } = useWatchlistForm();
 
-  const handleAddRow = () => {
-    setRows((prev) => [...prev, { platform: 'instagram', value: '' }]);
+  const onFetchPreviews = async (data: WatchlistFormValues) => {
+    previewMutation.mutate(data);
   };
 
-  const handleRemoveRow = (index: number) => {
-    setRows((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleValueChange = (index: number, value: string) => {
-    const newRows = [...rows];
-    newRows[index].value = value;
-    setRows(newRows);
-  };
-
-  const handlePlatformChange = (index: number, platform: string) => {
-    const newRows = [...rows];
-    newRows[index].platform = platform;
-    setRows(newRows);
-  };
-
-  const getUrlFromRow = (row: { platform: string; value: string }) => {
-    const val = row.value.trim().replace('@', '');
-    if (val.startsWith('http')) return val;
-
-    switch (row.platform) {
-      case 'instagram':
-        return `https://www.instagram.com/${val}/`;
-      case 'tiktok':
-        return `https://www.tiktok.com/@${val}`;
-      case 'youtube':
-        return `https://www.youtube.com/@${val}`;
-      default:
-        return val;
+  const onFinalSubmit = async () => {
+    const success = await bulkCreateMutation.mutateAsync(watch());
+    if (success) {
+      handleClose();
     }
   };
 
-  const handleFetchPreviews = async () => {
-    const validRows = rows.filter((r) => r.value.trim() !== '');
-    if (validRows.length === 0) {
-      showToast('Please enter at least one handle or URL', 'error');
-      return;
-    }
-
-    setLoading(true);
-    const results = await Promise.all(
-      validRows.map(async (row) => {
-        const url = getUrlFromRow(row);
-        const res = await previewCompetitor(url);
-        return res.success ? res.preview : null;
-      }),
-    );
-    setPreviews(results.filter((r) => r !== null));
-    setPrevStep(true);
-    setLoading(false);
+  const handleClose = () => {
+    resetForm();
+    resetSlice();
+    onClose();
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const validUrls = rows
-      .filter((r) => r.value.trim() !== '')
-      .map((r) => getUrlFromRow(r));
-
-    const result = await addCompetitorsBulk({
-      handles: validUrls,
-      tags: ['Watchlist'],
-    });
-
-    if (result?.success) {
-      showToast(
-        `${result.competitors.length} competitors added successfully!`,
-        'success',
-      );
-      setRows([{ platform: 'instagram', value: '' }]);
-      setPrevStep(false);
-      setPreviews([]);
-      onClose();
-    } else {
-      showToast(result?.error || 'Failed to add competitors', 'error');
-    }
-    setLoading(false);
-  };
+  const loading = previewMutation.isPending || bulkCreateMutation.isPending;
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={prevStep ? 'Review Watchlist' : 'Build Your Watchlist'}
       maxWidth='2xl'
     >
       {!prevStep ? (
-        <div className='space-y-6'>
-          <div className='space-y-4 max-h-[400px]  pr-2 custom-scrollbar'>
-            {rows.map((row, index) => (
-              <CompetitorSearchRow
-                key={index}
-                platform={row.platform}
-                value={row.value}
-                onPlatformChange={(val) => handlePlatformChange(index, val)}
-                onChange={(val) => handleValueChange(index, val)}
-                onRemove={() => handleRemoveRow(index)}
-                showRemove={rows.length > 1}
-              />
-            ))}
+        <form onSubmit={handleSubmit(onFetchPreviews)} className='space-y-6'>
+          <div className='max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2'>
+            <div className='space-y-5'>
+              {fields.map((field, index) => (
+                <CompetitorSearchRow
+                  key={field.id}
+                  control={control}
+                  platformName={`competitors.${index}.platform`}
+                  valueName={`competitors.${index}.value`}
+                  onRemove={() => remove(index)}
+                  showRemove={fields.length > 1}
+                />
+              ))}
+            </div>
           </div>
 
           <button
             type='button'
-            onClick={handleAddRow}
-            className='flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-2 rounded-xl border border-primary/20 w-full justify-center border-dashed'
+            onClick={() => append({ platform: 'instagram', value: '' })}
+            className='mt-4 flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-3 rounded-xl border border-primary/20 w-full justify-center border-dashed'
           >
             <Plus className='w-4 h-4' /> Add Another Channel
           </button>
@@ -143,15 +86,14 @@ export function AddCompetitorModal({
           <div className='flex justify-end gap-3 pt-4 border-t border-border/50'>
             <button
               type='button'
-              onClick={onClose}
+              onClick={handleClose}
               className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
             >
               Cancel
             </button>
             <button
-              type='button'
-              disabled={loading || rows.every((r) => !r.value.trim())}
-              onClick={handleFetchPreviews}
+              type='submit'
+              disabled={loading}
               className='flex items-center gap-2 px-6 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-primary/20'
             >
               {loading ? (
@@ -162,19 +104,19 @@ export function AddCompetitorModal({
               Preview Watchlist
             </button>
           </div>
-        </div>
+        </form>
       ) : (
         <div className='space-y-6'>
-          <p className='text-sm text-muted-foreground'>
+          <p className='text-sm text-muted-foreground font-medium'>
             We found {previews.length} channels. Review them below before adding
             to your watchlist.
           </p>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2'>
             {previews.map((preview, index) => (
               <div
                 key={index}
-                className='flex items-center gap-3 p-3 rounded-2xl bg-secondary/10 border border-border/50'
+                className='flex items-center gap-3 p-4 rounded-2xl bg-secondary/10 border border-border/50 hover:bg-secondary/20 transition-colors'
               >
                 <img
                   src={preview.avatarUrl}
@@ -182,9 +124,7 @@ export function AddCompetitorModal({
                   className='w-12 h-12 rounded-xl object-cover border border-border/50'
                 />
                 <div className='flex-1 min-w-0'>
-                  <h4 className='text-sm font-semibold truncate'>
-                    {preview.name}
-                  </h4>
+                  <h4 className='text-sm font-bold truncate'>{preview.name}</h4>
                   <p className='text-xs text-muted-foreground truncate'>
                     @{preview.handle}
                   </p>
@@ -204,7 +144,7 @@ export function AddCompetitorModal({
             <div className='flex gap-3'>
               <button
                 type='button'
-                onClick={onClose}
+                onClick={handleClose}
                 className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
               >
                 Cancel
@@ -212,7 +152,7 @@ export function AddCompetitorModal({
               <button
                 type='button'
                 disabled={loading}
-                onClick={handleSubmit}
+                onClick={onFinalSubmit}
                 className='flex items-center gap-2 px-6 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-primary/20'
               >
                 {loading ? (

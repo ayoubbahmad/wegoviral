@@ -1,14 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Link, Tags, Loader2, User } from 'lucide-react';
-import { Modal } from '@/components/Modal';
-import { libraryApi } from '../api';
-import { Badge } from '@/components/Badge';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus, Loader2, Trash2, Link, Tags } from 'lucide-react';
 
+import { Modal } from '@/components/Modal';
+import { Button } from '@/components/Button';
+import { Badge } from '@/components/Badge';
+import { FormInput } from '@/components/forms/FormInput';
+import { FormSelect } from '@/components/forms/FormSelect';
+import { FormTextarea } from '@/components/forms/FormTextarea';
+import { libraryApi } from '../api';
 import { useLibraryStore } from '../slice';
 import { Hook, ScriptTemplate } from '../api/types';
+import {
+  HookSchema,
+  ScriptTemplateSchema,
+  HookFormValues,
+  ScriptTemplateFormValues,
+} from './AddNewItem/schema';
+import Image from 'next/image';
 
 interface LibraryAssetModalProps {
   onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
@@ -33,36 +45,125 @@ export function LibraryAssetModal({
 }: LibraryAssetModalProps) {
   const { isAdding, setIsAdding, isEditing, setIsEditing } = useLibraryStore();
   const isOpen = isAdding || isEditing;
+  const [activeTab, setActiveTab] = useState<'hook' | 'script'>('hook');
 
-  const [type, setType] = useState<'hook' | 'script'>('hook');
-
-  // Form states
-  const [hookContent, setHookContent] = useState('');
-  const [hookType, setHookType] = useState('Verbal');
-  const [hookEmotion, setHookEmotion] = useState('Curiosity');
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [metadata, setMetadata] = useState<any>(null);
+  // Metadata fetching state
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
+  const [metadata, setMetadata] = useState<any>(null);
 
-  const [scriptTitle, setScriptTitle] = useState('');
-  const [scriptCategory, setScriptCategory] = useState('Educational');
-  const [scriptSteps, setScriptSteps] = useState([
-    { step: 'Hook', description: '' },
-  ]);
+  // Hook Form
+  const hookForm = useForm<HookFormValues>({
+    resolver: zodResolver(HookSchema),
+    defaultValues: {
+      content: '',
+      type: 'Verbal',
+      emotion: 'Curiosity',
+      topic: '',
+      sourceUrl: '',
+      tags: [],
+    },
+  });
 
-  const handleAddStep = () => {
-    setScriptSteps([...scriptSteps, { step: 'New Step', description: '' }]);
-  };
+  // Script Form
+  const scriptForm = useForm<ScriptTemplateFormValues>({
+    resolver: zodResolver(ScriptTemplateSchema),
+    defaultValues: {
+      title: '',
+      category: 'Educational',
+      content: [{ step: 'Hook', description: '' }],
+      sourceUrl: '',
+      tags: [],
+    },
+  });
 
-  const handleFetchMetadata = async () => {
-    if (!sourceUrl || !sourceUrl.startsWith('http')) return;
+  const {
+    fields: scriptSteps,
+    append: appendStep,
+    remove: removeStep,
+  } = useFieldArray({
+    control: scriptForm.control,
+    name: 'content',
+  });
+
+  // Reset and populate forms when opening/editing
+  useEffect(() => {
+    if (!isOpen) {
+      hookForm.reset();
+      scriptForm.reset();
+      setMetadata(null);
+      return;
+    }
+
+    if (isEditing && editItem) {
+      if ('content' in editItem && typeof editItem.content === 'string') {
+        // It's a Hook
+        const hook = editItem as Hook;
+        setActiveTab('hook');
+        hookForm.reset({
+          content: hook.content,
+          type: hook.type as any,
+          emotion: hook.emotion as any,
+          topic: hook.topic,
+          sourceUrl: hook.sourceUrl || '',
+          tags: hook.tags || [],
+          sourceMetadata: hook.sourceMetadata,
+        });
+        setMetadata(hook.sourceMetadata);
+      } else {
+        // It's a Script Template
+        const script = editItem as ScriptTemplate;
+        setActiveTab('script');
+        scriptForm.reset({
+          title: script.title,
+          category: script.category as any,
+          content: script.content,
+          sourceUrl: script.sourceUrl || '',
+          tags: script.tags || [],
+          sourceMetadata: script.sourceMetadata,
+        });
+        setMetadata(script.sourceMetadata);
+      }
+    } else {
+      // Adding new item - reset to defaults
+      hookForm.reset({
+        content: '',
+        type: 'Verbal',
+        emotion: 'Curiosity',
+        topic: '',
+        sourceUrl: '',
+        tags: [],
+      });
+      scriptForm.reset({
+        title: '',
+        category: 'Educational',
+        content: [{ step: 'Hook', description: '' }],
+        sourceUrl: '',
+        tags: [],
+      });
+      setMetadata(null);
+    }
+  }, [isOpen, isEditing, editItem, hookForm, scriptForm]);
+
+  const handleFetchMetadata = async (url: string) => {
+    if (!url || !url.startsWith('http')) return;
 
     setIsFetchingMetadata(true);
     try {
-      const data = await libraryApi.getMetadata(sourceUrl);
+      const data = await libraryApi.getMetadata(url);
       setMetadata(data);
+
+      // Auto-fill topic/title if empty
+      if (activeTab === 'hook') {
+        hookForm.setValue('sourceMetadata', data);
+        if (!hookForm.getValues('topic')) {
+          hookForm.setValue('topic', data.title || '');
+        }
+      } else {
+        scriptForm.setValue('sourceMetadata', data);
+        if (!scriptForm.getValues('title')) {
+          scriptForm.setValue('title', data.title || '');
+        }
+      }
     } catch (error) {
       console.error('Failed to fetch metadata', error);
     } finally {
@@ -70,297 +171,172 @@ export function LibraryAssetModal({
     }
   };
 
-  // Populate form for editing
-  useState(() => {
-    if (isEditing && editItem) {
-      if ('content' in editItem && typeof editItem.content === 'string') {
-        const hook = editItem as Hook;
-        setType('hook');
-        setHookContent(hook.content);
-        setHookType(hook.type);
-        setHookEmotion(hook.emotion);
-        setSourceUrl(hook.sourceUrl || '');
-        setTags(hook.tags || []);
-        setMetadata(hook.sourceMetadata || null);
+  const onHookSubmit = async (data: HookFormValues) => {
+    try {
+      if (isEditing && editItem) {
+        await onUpdateHook?.(editItem.id, data);
       } else {
-        const script = editItem as ScriptTemplate;
-        setType('script');
-        setScriptTitle(script.title);
-        setScriptCategory(script.category);
-        setScriptSteps(script.content || [{ step: 'Hook', description: '' }]);
-        setSourceUrl(script.sourceUrl || '');
-        setTags(script.tags || []);
-        setMetadata(script.sourceMetadata || null);
+        await onAddHook?.(data);
       }
-    }
-  });
-
-  const handleAddTag = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
-      e.preventDefault();
-      if (!tags.includes(tagInput.trim())) {
-        setTags([...tags, tagInput.trim()]);
-      }
-      setTagInput('');
+      handleClose();
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((t) => t !== tagToRemove));
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    let result;
-    if (type === 'hook') {
-      const hookData = {
-        content: hookContent,
-        type: hookType,
-        emotion: hookEmotion,
-        topic: metadata?.title || 'General',
-        sourceUrl: sourceUrl,
-        tags: tags,
-        sourceMetadata: metadata,
-      };
-
+  const onScriptSubmit = async (data: ScriptTemplateFormValues) => {
+    try {
       if (isEditing && editItem) {
-        result = await onUpdateHook?.(editItem.id, hookData);
+        await onUpdateScript?.(editItem.id, data);
       } else {
-        result = await onAddHook?.(hookData);
+        await onAddScript?.(data);
       }
-    } else {
-      const scriptData = {
-        title: scriptTitle,
-        category: scriptCategory,
-        content: scriptSteps,
-        tags: tags,
-        sourceUrl: sourceUrl,
-        sourceMetadata: metadata,
-      };
-
-      if (isEditing && editItem) {
-        result = await onUpdateScript?.(editItem.id, scriptData);
-      } else {
-        result = await onAddScript?.(scriptData);
-      }
+      handleClose();
+    } catch (error) {
+      console.error(error);
     }
-
-    if (result?.success) {
-      setIsAdding(false);
-      setIsEditing(false);
-
-      // Reset states
-      setHookContent('');
-      setScriptTitle('');
-      setScriptSteps([{ step: 'Hook', description: '' }]);
-      setSourceUrl('');
-      setTags([]);
-      setMetadata(null);
-    } else {
-      alert(result?.error || 'Failed to save item');
-    }
-    setIsLoading(false);
   };
 
   const handleClose = () => {
     setIsAdding(false);
     setIsEditing(false);
+    setMetadata(null);
+  };
+
+  // Tag handling helper
+  const [tagInput, setTagInput] = useState('');
+  const handleAddTag = (
+    e: React.KeyboardEvent,
+    form: any,
+    fieldName: 'tags',
+  ) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      const currentTags = form.getValues(fieldName) || [];
+      if (!currentTags.includes(tagInput.trim())) {
+        form.setValue(fieldName, [...currentTags, tagInput.trim()]);
+      }
+      setTagInput('');
+    }
   };
 
   return (
     <>
-      <button
+      <Button
         onClick={() => setIsAdding(true)}
-        className='flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
+        leftIcon={<Plus className='w-4 h-4' />}
       >
-        <Plus className='w-4 h-4' />
-        <span>Add New</span>
-      </button>
+        Add New
+      </Button>
 
       <Modal
         isOpen={isOpen}
         onClose={handleClose}
         title={
           isEditing
-            ? `Edit ${type === 'hook' ? 'Hook' : 'Script'}`
-            : type === 'hook'
+            ? `Edit ${activeTab === 'hook' ? 'Hook' : 'Script'}`
+            : activeTab === 'hook'
               ? 'Add New Hook'
               : 'Add Script Template'
         }
       >
-        <div className='space-y-4 max-h-[70vh] overflow-y-auto px-1'>
-          <div className='flex bg-secondary p-1 rounded-lg mb-6 sticky top-0 z-10'>
-            <button
-              onClick={() => setType('hook')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${type === 'hook' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Hook
-            </button>
-            <button
-              onClick={() => setType('script')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${type === 'script' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Script
-            </button>
-          </div>
+        <div className='max-h-[75vh] overflow-y-auto px-1'>
+          {!isEditing && (
+            <div className='flex bg-secondary p-1 rounded-lg mb-6 sticky top-0 z-10'>
+              <button
+                onClick={() => setActiveTab('hook')}
+                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+                  activeTab === 'hook'
+                    ? 'bg-background shadow-sm text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Hook
+              </button>
+              <button
+                onClick={() => setActiveTab('script')}
+                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+                  activeTab === 'script'
+                    ? 'bg-background shadow-sm text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Script
+              </button>
+            </div>
+          )}
 
-          <form className='space-y-4' onSubmit={handleSave}>
-            {type === 'hook' ? (
-              <>
-                <div>
-                  <label className='block text-sm font-medium mb-1.5'>
-                    Content
-                  </label>
-                  <textarea
-                    value={hookContent}
-                    onChange={(e) => setHookContent(e.target.value)}
-                    className='w-full min-h-[100px] p-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring'
-                    placeholder='Write your hook here...'
-                    required
-                  />
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label className='block text-sm font-medium mb-1.5'>
-                      Type
-                    </label>
-                    <select
-                      value={hookType}
-                      onChange={(e) => setHookType(e.target.value)}
-                      className='w-full p-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring'
-                    >
-                      <option>Verbal</option>
-                      <option>Visual</option>
-                      <option>Text</option>
-                      <option>Audio</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium mb-1.5'>
-                      Emotion
-                    </label>
-                    <select
-                      value={hookEmotion}
-                      onChange={(e) => setHookEmotion(e.target.value)}
-                      className='w-full p-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring'
-                    >
-                      <option>Curiosity</option>
-                      <option>Fear</option>
-                      <option>Humor</option>
-                      <option>Desire</option>
-                      <option>Surprise</option>
-                      <option>Inspiration</option>
-                    </select>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label className='block text-sm font-medium mb-1.5'>
-                    Script Title
-                  </label>
-                  <input
-                    type='text'
-                    value={scriptTitle}
-                    onChange={(e) => setScriptTitle(e.target.value)}
-                    className='w-full p-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring'
-                    placeholder='e.g. 1-Minute Educational Reel'
-                    required
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium mb-1.5'>
-                    Category
-                  </label>
-                  <select
-                    value={scriptCategory}
-                    onChange={(e) => setScriptCategory(e.target.value)}
-                    className='w-full p-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring'
-                  >
-                    <option>Educational</option>
-                    <option>Entertainment</option>
-                    <option>Sales</option>
-                    <option>Storytelling</option>
-                  </select>
-                </div>
-                <div className='space-y-3'>
-                  <div className='flex items-center justify-between'>
-                    <label className='block text-sm font-medium'>
-                      Structure Steps
-                    </label>
-                    <button
-                      type='button'
-                      onClick={handleAddStep}
-                      className='text-xs text-primary font-medium hover:underline'
-                    >
-                      + Add Step
-                    </button>
-                  </div>
-                  {scriptSteps.map((step, index) => (
-                    <div key={index} className='flex gap-3 items-start'>
-                      <input
-                        type='text'
-                        value={step.step}
-                        onChange={(e) => {
-                          const newSteps = [...scriptSteps];
-                          newSteps[index].step = e.target.value;
-                          setScriptSteps(newSteps);
-                        }}
-                        className='w-1/3 p-2 text-sm rounded-lg border border-input bg-background'
-                        placeholder='Step name'
-                      />
-                      <input
-                        type='text'
-                        value={step.description}
-                        onChange={(e) => {
-                          const newSteps = [...scriptSteps];
-                          newSteps[index].description = e.target.value;
-                          setScriptSteps(newSteps);
-                        }}
-                        className='flex-1 p-2 text-sm rounded-lg border border-input bg-background'
-                        placeholder='What happens in this step...'
-                      />
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+          {activeTab === 'hook' ? (
+            <form
+              onSubmit={hookForm.handleSubmit(onHookSubmit)}
+              className='space-y-6'
+            >
+              <FormTextarea
+                control={hookForm.control}
+                name='content'
+                label='Content'
+                placeholder='Write your hook here...'
+                className='min-h-[120px]'
+              />
 
-            <div className='space-y-4 pt-2 border-t border-border mt-4'>
-              <div className='flex flex-col gap-1.5'>
-                <label className='text-sm font-medium'>Source URL</label>
-                <div className='flex gap-2'>
-                  <div className='relative flex-1'>
-                    <Link className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-                    <input
-                      type='url'
-                      value={sourceUrl}
-                      onChange={(e) => setSourceUrl(e.target.value)}
-                      onBlur={handleFetchMetadata}
-                      className='w-full pl-9 pr-3 py-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-sm'
-                      placeholder='Paste TikTok, IG, or YT link...'
-                    />
-                  </div>
-                  <button
+              <div className='grid grid-cols-2 gap-4'>
+                <FormSelect
+                  control={hookForm.control}
+                  name='type'
+                  label='Type'
+                  options={[
+                    { value: 'Verbal', label: 'Verbal' },
+                    { value: 'Visual', label: 'Visual' },
+                    { value: 'Text', label: 'Text' },
+                    { value: 'Audio', label: 'Audio' },
+                  ]}
+                />
+                <FormSelect
+                  control={hookForm.control}
+                  name='emotion'
+                  label='Emotion'
+                  options={[
+                    { value: 'Curiosity', label: 'Curiosity' },
+                    { value: 'Fear', label: 'Fear' },
+                    { value: 'Humor', label: 'Humor' },
+                    { value: 'Desire', label: 'Desire' },
+                    { value: 'Surprise', label: 'Surprise' },
+                    { value: 'Inspiration', label: 'Inspiration' },
+                  ]}
+                />
+              </div>
+
+              {/* Source URL Section */}
+              <div className='space-y-1.5'>
+                <div className='flex gap-2 items-end'>
+                  <FormInput
+                    control={hookForm.control}
+                    name='sourceUrl'
+                    label='Source URL'
+                    placeholder='Paste TikTok, IG, or YT link...'
+                    leftIcon={<Link className='w-4 h-4' />}
+                    className='flex-1'
+                    onBlur={(e) => handleFetchMetadata(e.target.value)}
+                  />
+                  <Button
                     type='button'
-                    onClick={handleFetchMetadata}
-                    disabled={isFetchingMetadata || !sourceUrl}
-                    className='px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium hover:bg-secondary/80 disabled:opacity-50'
+                    variant='secondary'
+                    disabled={isFetchingMetadata}
+                    onClick={() =>
+                      handleFetchMetadata(hookForm.getValues('sourceUrl') || '')
+                    }
+                    className='mb-[6px]'
                   >
                     {isFetchingMetadata ? (
                       <Loader2 className='w-4 h-4 animate-spin' />
                     ) : (
                       'Fetch'
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
+              {/* Metadata Preview */}
               {metadata && (
                 <div className='p-4 rounded-xl bg-muted/30 border border-border flex gap-4 animate-in fade-in slide-in-from-top-2 duration-300'>
                   {metadata.thumbnail && (
@@ -374,81 +350,222 @@ export function LibraryAssetModal({
                     </div>
                   )}
                   <div className='flex flex-col gap-2 py-1 overflow-hidden'>
-                    {metadata.handle && (
-                      <div className='flex items-center gap-1.5 text-primary'>
-                        <User className='w-3 h-3' />
-                        <span className='text-[10px] font-black uppercase tracking-widest'>
-                          {metadata.handle}
-                        </span>
-                      </div>
-                    )}
                     <h5 className='text-sm font-bold line-clamp-2 leading-snug'>
                       {metadata.title || 'Untitled Video'}
                     </h5>
-                    {metadata.description && (
-                      <p className='text-[10px] text-muted-foreground line-clamp-2 leading-relaxed italic'>
-                        {metadata.description}
-                      </p>
-                    )}
+                    <p className='text-[10px] text-muted-foreground line-clamp-2 leading-relaxed italic'>
+                      {metadata.description}
+                    </p>
                   </div>
                 </div>
               )}
 
-              <div className='flex flex-col gap-1.5'>
-                <label className='text-sm font-medium'>Tags</label>
+              {/* Tags Section */}
+              <div className='space-y-2'>
                 <div className='relative'>
-                  <Tags className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-                  <input
-                    type='text'
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleAddTag}
-                    className='w-full pl-9 pr-3 py-2.5 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-sm'
-                    placeholder='Type and press Enter...'
-                  />
+                  <label className='text-sm font-medium mb-1.5 block'>
+                    Tags
+                  </label>
+                  <div className='relative'>
+                    <Tags className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+                    <input
+                      type='text'
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => handleAddTag(e, hookForm, 'tags')}
+                      className='flex h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0'
+                      placeholder='Type tag and press Enter...'
+                    />
+                  </div>
                 </div>
-                {tags.length > 0 && (
-                  <div className='flex flex-wrap gap-2 mt-2'>
-                    {tags.map((tag) => (
+                {hookForm.watch('tags')?.length ? (
+                  <div className='flex flex-wrap gap-2'>
+                    {hookForm.watch('tags')?.map((tag) => (
                       <Badge
                         key={tag}
                         variant='secondary'
-                        className='pl-2 pr-1 h-6 gap-1'
+                        className='gap-1 pr-1'
                       >
                         {tag}
                         <button
                           type='button'
-                          onClick={() => removeTag(tag)}
-                          className='hover:text-destructive p-0.5 rounded-full transition-colors'
+                          onClick={() => {
+                            const current = hookForm.getValues('tags') || [];
+                            hookForm.setValue(
+                              'tags',
+                              current.filter((t) => t !== tag),
+                            );
+                          }}
+                          className='hover:text-destructive transition-colors'
                         >
                           <Plus className='w-3 h-3 rotate-45' />
                         </button>
                       </Badge>
                     ))}
                   </div>
-                )}
+                ) : null}
               </div>
-            </div>
 
-            <div className='pt-4 sticky bottom-0 bg-background pb-2'>
-              <button
-                type='submit'
-                disabled={isLoading}
-                className='w-full py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20'
-              >
-                {isLoading ? (
-                  <div className='flex items-center justify-center gap-2'>
-                    <Loader2 className='w-4 h-4 animate-spin' />
-                    <span>Saving...</span>
+              <div className='pt-4 sticky bottom-0 bg-background pb-2 border-t border-border mt-6'>
+                <Button
+                  type='submit'
+                  className='w-full'
+                  disabled={hookForm.formState.isSubmitting}
+                >
+                  {hookForm.formState.isSubmitting && (
+                    <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                  )}
+                  Save Hook
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <form
+              onSubmit={scriptForm.handleSubmit(onScriptSubmit)}
+              className='space-y-6'
+            >
+              <FormInput
+                control={scriptForm.control}
+                name='title'
+                label='Script Title'
+                placeholder='e.g. 1-Minute Educational Reel'
+              />
+
+              <FormSelect
+                control={scriptForm.control}
+                name='category'
+                label='Category'
+                options={[
+                  { value: 'Educational', label: 'Educational' },
+                  { value: 'Entertainment', label: 'Entertainment' },
+                  { value: 'Sales', label: 'Sales' },
+                  { value: 'Storytelling', label: 'Storytelling' },
+                ]}
+              />
+
+              <div className='space-y-3'>
+                <div className='flex items-center justify-between'>
+                  <label className='text-sm font-medium'>Structure Steps</label>
+                  <button
+                    type='button'
+                    onClick={() =>
+                      appendStep({ step: 'New Step', description: '' })
+                    }
+                    className='text-xs text-primary font-bold hover:underline'
+                  >
+                    + Add Step
+                  </button>
+                </div>
+                <div className='space-y-3'>
+                  {scriptSteps.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className='flex gap-2 items-start group'
+                    >
+                      <div className='flex-1 grid grid-cols-12 gap-2'>
+                        <div className='col-span-4'>
+                          <FormInput
+                            control={scriptForm.control}
+                            name={`content.${index}.step`}
+                            placeholder='Step Name'
+                            className='mb-0'
+                          />
+                        </div>
+                        <div className='col-span-8'>
+                          <FormInput
+                            control={scriptForm.control}
+                            name={`content.${index}.description`}
+                            placeholder='Description...'
+                            className='mb-0'
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type='button'
+                        onClick={() => removeStep(index)}
+                        className='p-2 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100 mt-1'
+                      >
+                        <Trash2 className='w-4 h-4' />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Source URL Section */}
+              <div className='space-y-1.5'>
+                <div className='flex gap-2 items-end'>
+                  <FormInput
+                    control={scriptForm.control}
+                    name='sourceUrl'
+                    label='Source URL'
+                    placeholder='Link to inspiration...'
+                    leftIcon={<Link className='w-4 h-4' />}
+                    className='flex-1'
+                  />
+                </div>
+              </div>
+
+              {/* Tags Section */}
+              <div className='space-y-2'>
+                <div className='relative'>
+                  <label className='text-sm font-medium mb-1.5 block'>
+                    Tags
+                  </label>
+                  <div className='relative'>
+                    <Tags className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+                    <input
+                      type='text'
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => handleAddTag(e, scriptForm, 'tags')}
+                      className='flex h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0'
+                      placeholder='Type tag and press Enter...'
+                    />
                   </div>
-                ) : type === 'hook' ? (
-                  'Save Hook'
-                ) : (
-                  'Save Script Template'
-                )}
-              </button>
-            </div>
-          </form>
+                </div>
+                {scriptForm.watch('tags')?.length ? (
+                  <div className='flex flex-wrap gap-2'>
+                    {scriptForm.watch('tags')?.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant='secondary'
+                        className='gap-1 pr-1'
+                      >
+                        {tag}
+                        <button
+                          type='button'
+                          onClick={() => {
+                            const current = scriptForm.getValues('tags') || [];
+                            scriptForm.setValue(
+                              'tags',
+                              current.filter((t) => t !== tag),
+                            );
+                          }}
+                          className='hover:text-destructive transition-colors'
+                        >
+                          <Plus className='w-3 h-3 rotate-45' />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className='pt-4 sticky bottom-0 bg-background pb-2 border-t border-border mt-6'>
+                <Button
+                  type='submit'
+                  className='w-full'
+                  disabled={scriptForm.formState.isSubmitting}
+                >
+                  {scriptForm.formState.isSubmitting && (
+                    <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                  )}
+                  Save Template
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </Modal>
     </>

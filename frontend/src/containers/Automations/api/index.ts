@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 
 // Types
 export interface Automation {
@@ -51,28 +51,34 @@ export const automationsApi = {
   getAutomations: async (): Promise<Automation[]> => {
     return apiClient.get('/automations');
   },
-  
+
   getAutomation: async (id: string): Promise<Automation> => {
     return apiClient.get(`/automations/${id}`);
   },
-  
+
   createAutomation: async (data: CreateAutomationDTO): Promise<Automation> => {
     return apiClient.post('/automations', data);
   },
-  
-  updateAutomation: async ({ id, data }: { id: string, data: UpdateAutomationDTO }): Promise<Automation> => {
+
+  updateAutomation: async ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateAutomationDTO;
+  }): Promise<Automation> => {
     return apiClient.patch(`/automations/${id}`, data);
   },
-  
+
   deleteAutomation: async (id: string): Promise<void> => {
     return apiClient.delete(`/automations/${id}`);
-  }
+  },
 };
 
 // Hooks
 export const useGetAutomations = () => {
   return useQuery({
-    queryKey: ["automations"],
+    queryKey: ['automations'],
     queryFn: automationsApi.getAutomations,
   });
 };
@@ -82,8 +88,8 @@ export const useCreateAutomation = () => {
   return useMutation({
     mutationFn: automationsApi.createAutomation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["automations"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['automations'] });
+    },
   });
 };
 
@@ -92,8 +98,8 @@ export const useUpdateAutomation = () => {
   return useMutation({
     mutationFn: automationsApi.updateAutomation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["automations"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['automations'] });
+    },
   });
 };
 
@@ -102,7 +108,7 @@ export const useDeleteAutomation = () => {
   return useMutation({
     mutationFn: automationsApi.deleteAutomation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["automations"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['automations'] });
+    },
   });
 };

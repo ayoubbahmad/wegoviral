@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { CompetitorCalendar } from '@/containers/Competitors/CompetitorCalendar';
+import { BackNavigation } from '@/components/BackNavigation';
 
 interface CompetitorDetailProps {
   id: string;
@@ -79,12 +80,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
     <div className='space-y-8 animate-in fade-in duration-500'>
       {/* Header */}
       <div className='flex flex-col gap-6 border-b border-border pb-8'>
-        <Link
-          href='/competitors'
-          className='text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors w-fit'
-        >
-          <ArrowLeft className='w-4 h-4' /> Back to List
-        </Link>
+        <BackNavigation href='/competitors' label='Back to List' />
 
         <div className='flex flex-col md:flex-row md:items-start justify-between gap-6'>
           <div className='flex items-center gap-4'>

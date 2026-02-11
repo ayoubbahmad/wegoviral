@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { PageContainer } from '@/components/PageContainer';
+import { BackNavigation } from '@/components/BackNavigation';
 
 // Mock data for a project's videos
 const MOCK_PROJECT_VIDEOS = [
@@ -95,13 +96,7 @@ export default function ProjectDetailsPage() {
     <PageContainer>
       {/* Header / Breadcrumbs */}
       <div className='space-y-6'>
-        <Link
-          href='/projects'
-          className='inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all group'
-        >
-          <ChevronLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />{' '}
-          Back to projects
-        </Link>
+        <BackNavigation href='/projects' label='Back to projects' />
 
         <div className='flex items-end justify-between'>
           <div className='space-y-1'>

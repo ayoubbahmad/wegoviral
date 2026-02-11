@@ -3,7 +3,9 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
+import pinoHttp from 'pino-http';
+import logger from './lib/logger';
+
 import hooksRoutes from './features/hooks/routes';
 import competitorsRoutes from './features/competitors/routes';
 import scriptsRoutes from './features/scripts/routes';
@@ -26,7 +28,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(morgan('dev'));
+
+// app.use(morgan('dev')); // Removed morgan usage
+app.use(pinoHttp({ logger })); // Use pino-http middleware
+
 app.use(express.json());
 
 // Routes
@@ -50,19 +55,19 @@ app.get('/health', (req, res) => {
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  logger.info(`🚀 Backend server running on http://localhost:${PORT}`);
 });
 
 process.on('unhandledRejection', (err: any) => {
-  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.error(err.name, err.message, err.stack);
+  logger.error('UNHANDLED REJECTION! 💥 Shutting down...');
+  logger.error({ err }, err.message);
   server.close(() => {
     process.exit(1);
   });
 });
 
 process.on('uncaughtException', (err: any) => {
-  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-  console.error(err.name, err.message, err.stack);
+  logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  logger.error({ err }, err.message);
   process.exit(1);
 });

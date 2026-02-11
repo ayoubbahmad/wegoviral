@@ -112,7 +112,7 @@ export function AddCompetitorModal({
             to your watchlist.
           </p>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2 mb-2'>
             {previews.map((preview, index) => (
               <div
                 key={index}

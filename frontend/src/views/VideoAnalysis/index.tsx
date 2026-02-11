@@ -6,20 +6,32 @@ import {
   StructureAnalysis,
   StyleAnalysis,
 } from '@/containers/VideoAnalysis/AnalysisDetails';
-import { VideoHeader } from '@/containers/VideoAnalysis/components/VideoHeader';
 import { JumpNav } from '@/containers/VideoAnalysis/components/JumpNav';
 import {
   DescriptionSection,
   TranscriptSection,
 } from '@/containers/VideoAnalysis/components/ContentSections';
 import { PageContainer } from '@/components/PageContainer';
-import { BarChart2, LucideIcon } from 'lucide-react';
+import { PageHeader } from '@/components/PageHeader';
+import { SectionHeader } from '@/components/SectionHeader';
+import {
+  BarChart2,
+  LucideIcon,
+  AlignLeft,
+  FileText,
+  Anchor,
+  Layout,
+  Palette,
+  Sparkles,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface VideoAnalysisViewProps {
   video: any;
   activeSection: string;
   jumpLinks: { label: string; id: string; icon: LucideIcon }[];
   onScrollTo: (id: string) => void;
+  onBack: () => void;
 }
 
 export function VideoAnalysisView({
@@ -27,7 +39,15 @@ export function VideoAnalysisView({
   activeSection,
   jumpLinks,
   onScrollTo,
+  onBack,
 }: VideoAnalysisViewProps) {
+  const isYoutube = video.competitor.handle.includes('youtube');
+  const publishedDate = new Date(video.postedAt).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   return (
     <>
       <style>{`
@@ -36,16 +56,33 @@ export function VideoAnalysisView({
         }
       `}</style>
       <PageContainer className='pt-4'>
-        <VideoHeader
+        <PageHeader
           title={video.captionExcerpt}
-          channelName={video.competitor.name}
-          channelAvatar={video.competitor.avatarUrl}
-          isYoutube={video.competitor.handle.includes('youtube')}
-          publishedAt={new Date(video.postedAt).toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          })}
+          onClickBack={onBack}
+          backLabel='Back to Content'
+          description={
+            <div className='flex items-center gap-2 mt-2'>
+              <div className='flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/50 group cursor-pointer hover:border-primary/50 transition-colors'>
+                <img
+                  src={video.competitor.avatarUrl}
+                  alt='Channel'
+                  className='w-5 h-5 rounded-full border border-border/50'
+                />
+                <span className='text-sm font-bold text-foreground truncate'>
+                  {video.competitor.name}
+                </span>
+                <div
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full animate-pulse',
+                    isYoutube ? 'bg-red-500' : 'bg-pink-500',
+                  )}
+                />
+              </div>
+              <span className='text-sm font-bold text-muted-foreground uppercase tracking-widest text-[10px]'>
+                {publishedDate}
+              </span>
+            </div>
+          }
         />
 
         <div className='grid lg:grid-cols-[380px_1fr] gap-12 items-start'>
@@ -66,7 +103,8 @@ export function VideoAnalysisView({
             />
 
             {/* Actions Section */}
-            <section id='actions'>
+            <section id='actions' className='space-y-6'>
+              <SectionHeader title='Quick Actions' icon={Sparkles} />
               <AnalysisModals videoTitle={video.captionExcerpt} />
             </section>
 
@@ -75,28 +113,39 @@ export function VideoAnalysisView({
               id='metrics'
               className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
             >
-              <div className='flex items-center gap-2 text-blue-500'>
-                <BarChart2 className='w-5 h-5' />
-                <h3 className='font-bold text-xl tracking-tight uppercase'>
-                  Performance Metrics
-                </h3>
-              </div>
+              <SectionHeader title='Performance Metrics' icon={BarChart2} />
               <VideoMetrics metrics={video.metrics} />
             </section>
 
-            <DescriptionSection description={video.captionExcerpt} />
-            <TranscriptSection />
+            <section
+              id='description'
+              className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
+            >
+              <SectionHeader title='Description' icon={AlignLeft} />
+              <DescriptionSection description={video.captionExcerpt} />
+            </section>
+
+            <section
+              id='transcript'
+              className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
+            >
+              <SectionHeader title='Transcript' icon={FileText} />
+              <TranscriptSection />
+            </section>
 
             {/* Deep Analysis Details */}
-            <section id='hook'>
+            <section id='hook' className='space-y-6'>
+              <SectionHeader title='Hook Analysis' icon={Anchor} />
               <HookAnalysis analysis={video.analysis?.hook} />
             </section>
 
-            <section id='structure'>
+            <section id='structure' className='space-y-6'>
+              <SectionHeader title='Structure Analysis' icon={Layout} />
               <StructureAnalysis analysis={video.analysis?.structure} />
             </section>
 
-            <section id='style'>
+            <section id='style' className='space-y-6'>
+              <SectionHeader title='Style Analysis' icon={Palette} />
               <StyleAnalysis analysis={video.analysis?.style} />
             </section>
           </div>

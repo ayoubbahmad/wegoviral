@@ -14,9 +14,9 @@ export default function ProfilePage() {
 
   return (
     <div className='space-y-12 pb-32 animate-in fade-in duration-500'>
-      <PageHeader 
-        title="Your Profile"
-        description="Manage your account and preferences."
+      <PageHeader
+        title='Your Profile'
+        description='Manage your account and preferences.'
       />
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>

@@ -224,7 +224,7 @@ export function LibraryAssetModal({
     <>
       <Button
         onClick={() => setIsAdding(true)}
-        leftIcon={<Plus className='w-4 h-4' />}
+        leftSection={<Plus className='w-4 h-4' />}
       >
         Add New
       </Button>

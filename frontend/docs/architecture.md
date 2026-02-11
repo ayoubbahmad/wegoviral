@@ -3,6 +3,7 @@
 To ensure scalability and maintainability, CreatorOS follows a **Feature-Based** modular architecture combined with **Atomic Design** principles.
 
 ## 🧱 Atomic Design (Dumb Components)
+
 **Folder**: `src/components`
 
 We organize our reusable UI elements following [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/):
@@ -14,6 +15,7 @@ We organize our reusable UI elements following [Atomic Design](https://bradfrost
 **Rule**: These components are pure, logic-agnostic, and reusable across different "mini-applications".
 
 ## 🏗️ Feature-Based Modularity (Smart Containers)
+
 **Folder**: `src/containers`
 
 Each container is treated as a **self-contained "mini-application"** (Feature Module). Each module encapsulates its own UI, business logic, API communication, and form management.
@@ -36,34 +38,42 @@ Each container is treated as a **self-contained "mini-application"** (Feature Mo
     - **NO Global State**: Must not import from the store, `@/providers`, or business-logic hooks.
 
 ### 🏙️ View (Container)
+
 **File**: `src/containers/.../index.tsx`
 
 The Container is a **Smart Component**.
+
 - **Responsibility**: Composing multiple "atomic" components together and linking them to the feature-specific logic (the Controller).
 - **Rule**: Acts as the orchestrator of a specific feature.
 
 ## 🕹️ The 4-Layer Feature Pattern
+
 Within each feature module in `src/containers`, we follow a strict dependency flow:
 **File**: `controller/index.ts`
 
 The Controller is a custom hook that orchestrates the logic for a container.
+
 - **Responsibility**: Managing local state, coordinating data from the API layer, and preparing data/handlers for the View.
 - **Rule**: Consumes hooks from the `api` and `forms` folders.
 
 ## 🔌 3. API Layer
+
 **Folder**: `/api`
 **Files**: `index.ts`, `types.d.ts`
 
 Encapsulates everything related to data fetching for the container.
+
 - **`types.d.ts`**: Defines request payload and response interfaces.
 - **`index.ts`**: Contains endpoint constants and Tanstack Query hooks (`useQuery`, `useMutation`) that wrap the global `apiClient`.
 - **Rule**: Keeps types and data-fetching logic close to where they are used.
 
 ## 📝 4. Form Layer
+
 **Folder**: `/forms`
 **Files**: `index.ts`, `types.d.ts`
 
 Encapsulates form validation and state management using React Hook Form and Zod.
+
 - **`types.d.ts`**: Defines inferred TypeScript types.
 - **`index.ts`**: Custom hooks (e.g., `use[Feature]Form`) that initialize `useForm` with resolvers.
 - **`schemas.ts`**: Zod schemas for form validation.
@@ -74,36 +84,47 @@ Encapsulates form validation and state management using React Hook Form and Zod.
 To maintain a premium and consistent feel across the platform, all dashboard sub-pages (Scripts, Videos, Automations, etc.) should follow the same layout pattern.
 
 ### 1. Page Wrapper
+
 Always wrap the container content in a `PageContainer`. This ensures consistent padding, max-width, and responsive behavior across the entire dashboard.
 
 ### 2. Header & Actions
+
 Use the `PageHeader` component at the top of every page.
+
 - **Title**: Clear, concise page name.
 - **Description**: Brief explanation of what the user can do.
 - **Actions**: Primary actions (like "Create New") should be passed to the `actions` prop as a `Button`.
 
 ### 3. Controls Bar
+
 Directly below the header, include a controls bar for list management:
+
 - **Search**: Use `SearchInput` on the left.
 - **View Switching**: Use `ViewToggle` to switch between `grid` and `table` modes.
 - **Filters/Sort**: Add secondary `Button` components (variant="outline") for additional controls.
 
 ### 4. Empty States
+
 When no data is available, use the `EmptyState` component instead of basic text.
 
 ---
 
 ## Folder Structure Example
+
 ```text
 src/containers/FeatureName/
 ├── index.tsx              # View (Container) - Uses PageContainer & PageHeader
+├── constants.ts           # View Constants
 ├── controller/
+│   ├── constants.ts       # Controller Constants
 │   └── index.ts           # Controller Hook
 ├── api/
 │   ├── index.ts           # API Hooks & Endpoints
+│   ├── constants.ts       # API Constants
 │   └── types.d.ts         # Response/Payload Types
 └── forms/
     ├── index.ts           # Form Hooks
+    ├── constants.ts       # Form Constants
     ├── schemas.ts         # Zod Schemas
     └── types.d.ts         # Types
 ```

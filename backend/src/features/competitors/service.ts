@@ -14,7 +14,11 @@ export class CompetitorsService {
     };
   }
 
-  async getAllCompetitors(userId: string, watchlistId?: string) {
+  async getAllCompetitors(
+    userId: string,
+    watchlistId?: string,
+    includePosts?: boolean,
+  ) {
     const where: any = { userId };
     if (watchlistId) {
       where.watchlists = {
@@ -26,6 +30,12 @@ export class CompetitorsService {
       where,
       include: {
         watchlists: true,
+        posts: includePosts
+          ? {
+              orderBy: { postedAt: 'desc' },
+              take: 10, // Default to 10 latest posts
+            }
+          : false,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -192,7 +202,7 @@ export class CompetitorsService {
       }
     }
 
-    const videos = await scrapeProfileFeed(url);
+    const videos = await scrapeProfileFeed(url, 10);
     const results = [];
 
     for (const video of videos) {
@@ -227,7 +237,13 @@ export class CompetitorsService {
         results.push(post);
       }
     }
-    return results;
+
+    // After syncing, return the updated list of posts (up to 10)
+    return await prisma.competitorPost.findMany({
+      where: { competitorId },
+      orderBy: { postedAt: 'desc' },
+      take: 10,
+    });
   }
 
   async syncAllCompetitors(userId: string) {

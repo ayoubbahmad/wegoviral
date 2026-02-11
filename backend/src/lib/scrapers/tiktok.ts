@@ -1,58 +1,55 @@
 import { Page } from 'playwright';
-import { ScrapedVideo } from './types';
+import { ScrapedVideo, ScraperMetadata, BaseScraper } from './types';
 
-export const scrapeTikTok = async (
-  page: Page,
-  limit: number,
-  url: string,
-): Promise<ScrapedVideo[]> => {
-  const videos: ScrapedVideo[] = [];
+export class TikTokScraper implements BaseScraper {
+  async scrapeFeed(page: Page, limit: number): Promise<ScrapedVideo[]> {
+    const videos = await page.evaluate((limit) => {
+      const posts = Array.from(
+        document.querySelectorAll('[data-e2e="user-post-item"]'),
+      );
+      return posts.slice(0, limit).map((post) => {
+        const anchor = post.querySelector('a') as HTMLAnchorElement;
+        const img = post.querySelector('img') as HTMLImageElement;
+        const desc =
+          post.querySelector('[data-e2e="user-post-item-desc"]')?.textContent ||
+          '';
+        const views =
+          post.querySelector('[data-e2e="video-views"]')?.textContent || '0';
 
-  const scrapedVideos = await page.$$eval(
-    '[data-e2e="user-post-item"]',
-    (els: any[], limit: number) => {
-      return els.slice(0, limit).map((el: any) => {
-        const link = el.querySelector('a')?.getAttribute('href');
-        const desc = el.querySelector(
-          '[data-e2e="user-post-item-desc"]',
-        )?.textContent;
-        const img = el.querySelector('img')?.getAttribute('src');
-        const views = el.querySelector('[data-e2e="video-views"]')?.textContent;
         return {
-          url: link,
-          thumbnail: img,
-          title: desc || 'TikTok Video',
+          url: anchor?.href || '',
+          thumbnail: img?.src || '',
+          title: desc,
+          views: views,
           description: desc,
-          views,
         };
       });
-    },
-    limit,
-  );
+    }, limit);
 
-  scrapedVideos.forEach((v: any) => videos.push({ ...v, url: v.url || url }));
-
-  if (videos.length === 0) {
-    const fallbackVideos = await page.$$eval(
-      'a[href*="/video/"]',
-      (els: any[], limit: number) => {
-        return els.slice(0, limit).map((el: any) => {
-          const href = el.getAttribute('href');
-          const img = el.querySelector('img')?.getAttribute('src');
-          const text = el.textContent;
-          return {
-            url: href,
-            thumbnail: img,
-            title: text?.trim().substring(0, 50),
-          };
-        });
-      },
-      limit,
-    );
-    fallbackVideos.forEach((v: any) =>
-      videos.push({ ...v, url: v.url || url }),
-    );
+    return videos;
   }
 
-  return videos;
-};
+  async scrapeMetadata(page: Page, url: string): Promise<ScraperMetadata> {
+    return await page.evaluate((url) => {
+      const getMeta = (name: string) =>
+        document
+          .querySelector(`meta[name="${name}"]`)
+          ?.getAttribute('content') ||
+        document
+          .querySelector(`meta[property="og:${name}"]`)
+          ?.getAttribute('content');
+
+      return {
+        title: document.title,
+        description: getMeta('description') || '',
+        thumbnail: getMeta('image') || '',
+        handle: url.split('@')[1]?.split('/')[0] || '',
+        url,
+        likes: '0',
+        comments: '0',
+      };
+    }, url);
+  }
+}
+
+export const tiktokScraper = new TikTokScraper();

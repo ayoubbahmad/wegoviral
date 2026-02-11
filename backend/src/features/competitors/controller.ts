@@ -3,10 +3,11 @@ import { competitorsService } from './service';
 
 export const getCompetitors = async (req: any, res: Response) => {
   try {
-    const { watchlistId } = req.query;
+    const { watchlistId, includePosts } = req.query;
     const competitors = await competitorsService.getAllCompetitors(
       req.user.id,
       watchlistId as string,
+      includePosts === 'true',
     );
     res.json(competitors);
   } catch (error) {
@@ -170,11 +171,9 @@ export const syncAllCompetitors = async (req: any, res: Response) => {
     res.json({ success: true, count: posts.length, posts });
   } catch (error: any) {
     console.error('Sync All Error:', error);
-    res
-      .status(500)
-      .json({
-        error: 'Failed to sync all competitors',
-        details: error.message,
-      });
+    res.status(500).json({
+      error: 'Failed to sync all competitors',
+      details: error.message,
+    });
   }
 };

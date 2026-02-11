@@ -2,18 +2,19 @@ import { scrapeProfileFeed } from './src/lib/scraper';
 import path from 'path';
 
 async function testProfileScraper() {
+  const projectRoot = process.cwd();
   const profiles = [
     {
       platform: 'YouTube',
-      url: 'https://www.youtube.com/@MrBeast', // logic uses local dump if present
+      url: `file://${path.join(projectRoot, 'scrapes/youtube_shorts.html')}`,
     },
     {
       platform: 'TikTok',
-      url: 'https://www.tiktok.com/@mrbeast', // logic uses local dump if present
+      url: `file://${path.join(projectRoot, 'scrapes/tiktok_profile.html')}`,
     },
     {
       platform: 'Instagram',
-      url: 'https://www.instagram.com/mrbeast', // logic uses local dump if present
+      url: `file://${path.join(projectRoot, 'scrapes/instagram_profile.html')}`,
     },
   ];
 

@@ -20,7 +20,7 @@ export interface Video {
 
 export const activeVideosApi = {
   getVideos: async (params?: any) => {
-    const response = await apiClient.get('/competitors?includePosts=true');
+    const response = await apiClient.get('/videos', { params });
     return response.data;
   },
 

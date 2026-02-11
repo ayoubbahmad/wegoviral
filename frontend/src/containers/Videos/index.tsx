@@ -20,43 +20,27 @@ export const VideosContainer = () => {
     queryKey: ['videos'],
     queryFn: activeVideosApi.getVideos,
     // Optional: select specific fields if backend returns complex object
-    select: (data: any) => {
-      // Backend returns competitors with nested posts. We need to flatten.
-      // data structure: [{ posts: [CompetitorPost] }]
-      // We need to map CompetitorPost to Video interface
-      const allPosts: Video[] = [];
-
-      if (Array.isArray(data)) {
-        data.forEach((comp: any) => {
-          if (comp.posts) {
-            comp.posts.forEach((post: any) => {
-              allPosts.push({
-                id: post.id,
-                title: post.captionExcerpt || 'No Title',
-                thumbnailUrl: post.thumbnailUrl,
-                channelName: comp.handle,
-                channelAvatarUrl: comp.avatarUrl,
-                publishedAt: new Date(post.postedAt).toLocaleDateString(),
-                views: post.metrics?.views || '0',
-                likes: post.metrics?.likes || '0',
-                platform: post.metrics?.url?.includes('tiktok')
-                  ? 'tiktok'
-                  : post.metrics?.url?.includes('instagram')
-                    ? 'instagram'
-                    : 'youtube',
-                metrics: {
-                  views: post.metrics?.views || '0',
-                  url: post.metrics?.url,
-                },
-              });
-            });
-          }
-        });
-      }
-      return allPosts.sort(
-        (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-      );
+    select: (posts: any[]) => {
+      // Backend now returns flattened posts with competitor context
+      return posts.map((post: any) => ({
+        id: post.id,
+        title: post.captionExcerpt || 'No Title',
+        thumbnailUrl: post.thumbnailUrl,
+        channelName: post.competitor?.handle || 'Unknown',
+        channelAvatarUrl: post.competitor?.avatarUrl,
+        publishedAt: new Date(post.postedAt).toLocaleDateString(),
+        views: post.metrics?.views || '0',
+        likes: post.metrics?.likes || '0',
+        platform: (post.metrics?.url?.includes('tiktok')
+          ? 'tiktok'
+          : post.metrics?.url?.includes('instagram')
+            ? 'instagram'
+            : 'youtube') as Video['platform'],
+        metrics: {
+          views: post.metrics?.views || '0',
+          url: post.metrics?.url,
+        },
+      }));
     },
   });
 

@@ -257,7 +257,7 @@ export class CompetitorsService {
         console.error(`Failed to sync competitor ${comp.handle}`, e);
       }
     }
-    return results;
+    return competitors.map((comp) => this.formatCompetitor(comp));
   }
 }
 

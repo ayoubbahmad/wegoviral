@@ -23,6 +23,20 @@ export class VideosService {
       take: limit,
     });
   }
+
+  async getVideoById(userId: string, videoId: string) {
+    return await prisma.competitorPost.findFirst({
+      where: {
+        id: videoId,
+        competitor: {
+          userId,
+        },
+      },
+      include: {
+        competitor: true,
+      },
+    });
+  }
 }
 
 export const videosService = new VideosService();

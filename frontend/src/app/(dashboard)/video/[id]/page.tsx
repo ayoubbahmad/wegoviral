@@ -2,6 +2,8 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { activeVideosApi } from '@/containers/Videos/api';
 import { VideoPlayer } from '@/containers/VideoAnalysis/VideoPlayer';
 import { VideoMetrics } from '@/containers/VideoAnalysis/VideoMetrics';
 import { AnalysisModals } from '@/containers/VideoAnalysis/AnalysisModals';
@@ -15,41 +17,22 @@ import {
   AlignLeft,
   Zap,
   BarChart2,
-  Hash,
-  Type,
+  FileText as FileIcon,
+  Zap as ActionIcon,
   Anchor,
   Layout,
   Palette,
   ArrowUpRight,
-  Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageContainer } from '@/components/PageContainer';
 
-// Mock data for the specific video
-const MOCK_VIDEO_DATA = {
-  id: '1',
-  title:
-    "Fast for 30 Days during Ramadan ? Fasting isn't just about skipping meals—it rewires your metabolism, burns fat, and...",
-  fullTitle:
-    "Fast for 30 Days during Ramadan ? Fasting isn't just about skipping meals—it rewires your metabolism, burns fat, and optimizes your body for peak health.",
-  channelName: '@zack.chug',
-  channelAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zack',
-  publishedAt: '11mo ago',
-  thumbnailUrl:
-    'https://images.unsplash.com/photo-1541534741688-6078c65b5a33?w=800&q=400',
-  description:
-    "Fast for 30 Days during Ramadan ? Fasting isn't just about skipping meals—it rewires your metabolism, burns fat, and optimizes your body for peak health. Here's what happens when you fast daily for 12 hours over 30 days: ⏳ First Few Days (Days 1-3): 🔹 Blood sugar stabilizes – No more energy crashes. 🔹 Glycogen stores deplete – Your body starts burning stored energy. 🔹 Insulin drops – Fat becomes more accessible as a fuel source. 🔹 Hunger hormones adjust ...",
-  transcript:
-    "It happens when you fast for 30 days during Ramadan.\n\nThe changes are shocking but beneficial.\n\nIn the first few days your blood sugar drops because there's no more glucose spike and this lowers your insulin and makes fat more accessible to be burned.\n\nNow after one week, autophagy kicks in where damaged cells are repaired and removed.",
-};
-
 // Jump links configuration
 const JUMP_LINKS = [
-  { label: 'Actions', id: 'actions', icon: Zap },
+  { label: 'Actions', id: 'actions', icon: ActionIcon },
   { label: 'Metrics', id: 'metrics', icon: BarChart2 },
   { label: 'Description', id: 'description', icon: AlignLeft },
-  { label: 'Transcript', id: 'transcript', icon: FileText },
+  { label: 'Transcript', id: 'transcript', icon: FileIcon },
   { label: 'Hook', id: 'hook', icon: Anchor },
   { label: 'Structure', id: 'structure', icon: Layout },
   { label: 'Style', id: 'style', icon: Palette },
@@ -57,7 +40,14 @@ const JUMP_LINKS = [
 
 export default function VideoAnalysisPage() {
   const params = useParams();
+  const id = params.id as string;
   const [activeSection, setActiveSection] = useState<string>('actions');
+
+  const { data: video, isLoading } = useQuery({
+    queryKey: ['video', id],
+    queryFn: () => activeVideosApi.getVideoDetails(id),
+    enabled: !!id,
+  });
 
   useEffect(() => {
     // Track which section is visible while scrolling
@@ -83,8 +73,7 @@ export default function VideoAnalysisPage() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      // Get the height of the sticky navigation and other offsets
-      const navHeight = 140; // Approximate height of sticky nav + padding
+      const navHeight = 140;
       const elementPosition =
         element.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition - navHeight;
@@ -97,6 +86,21 @@ export default function VideoAnalysisPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <PageContainer className='pt-8 flex items-center justify-center min-h-[50vh]'>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin' />
+          <p className='text-muted-foreground font-medium animate-pulse'>
+            Analyzing video content...
+          </p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!video) return null;
+
   return (
     <>
       <style>{`
@@ -108,22 +112,33 @@ export default function VideoAnalysisPage() {
         {/* Header Content Area */}
         <div className='flex flex-col gap-4'>
           <h1 className='text-2xl font-black leading-tight tracking-tight text-foreground max-w-4xl'>
-            {MOCK_VIDEO_DATA.fullTitle}
+            {video.captionExcerpt}
           </h1>
           <div className='flex items-center gap-4'>
             <div className='flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/50 group cursor-pointer hover:border-primary/50 transition-colors'>
               <img
-                src={MOCK_VIDEO_DATA.channelAvatar}
+                src={video.competitor.avatarUrl}
                 alt='Channel'
                 className='w-5 h-5 rounded-full border border-border/50'
               />
               <span className='text-sm font-bold text-foreground truncate'>
-                {MOCK_VIDEO_DATA.channelName}
+                {video.competitor.name}
               </span>
-              <div className='w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse' />
+              <div
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full animate-pulse',
+                  video.competitor.handle.includes('youtube')
+                    ? 'bg-red-500'
+                    : 'bg-pink-500',
+                )}
+              />
             </div>
             <span className='text-sm font-bold text-muted-foreground uppercase tracking-widest text-[10px]'>
-              {MOCK_VIDEO_DATA.publishedAt}
+              {new Date(video.postedAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </span>
           </div>
         </div>
@@ -131,7 +146,10 @@ export default function VideoAnalysisPage() {
         <div className='grid lg:grid-cols-[380px_1fr] gap-12 items-start'>
           {/* Left Column: Video Sticky Preview */}
           <div className='sticky top-8 space-y-6'>
-            <VideoPlayer thumbnailUrl={MOCK_VIDEO_DATA.thumbnailUrl} />
+            <VideoPlayer
+              thumbnailUrl={video.thumbnailUrl}
+              videoUrl={video.metrics.url}
+            />
           </div>
 
           {/* Right Column: Deep Analysis Content */}
@@ -139,9 +157,6 @@ export default function VideoAnalysisPage() {
             {/* Jump Navigation */}
             <div className='sticky top-8 z-20 flex justify-center'>
               <div className='flex items-center gap-3 px-4 py-3 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50'>
-                {/* <span className='text-xs font-black text-muted-foreground shrink-0 uppercase tracking-widest'>
-                  Jump to:
-                </span> */}
                 <div
                   className='flex items-center gap-2 overflow-x-auto hide-scrollbar'
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -167,7 +182,7 @@ export default function VideoAnalysisPage() {
 
             {/* Actions Section */}
             <section id='actions'>
-              <AnalysisModals />
+              <AnalysisModals videoTitle={video.captionExcerpt} />
             </section>
 
             {/* Metrics Section */}
@@ -181,7 +196,7 @@ export default function VideoAnalysisPage() {
                   Performance Metrics
                 </h3>
               </div>
-              <VideoMetrics />
+              <VideoMetrics metrics={video.metrics} />
             </section>
 
             {/* Description Section */}
@@ -196,7 +211,7 @@ export default function VideoAnalysisPage() {
                 </h3>
               </div>
               <p className='text-sm leading-[1.8] text-muted-foreground font-medium whitespace-pre-wrap'>
-                {MOCK_VIDEO_DATA.description}
+                {video.captionExcerpt}
               </p>
               <button className='mt-6 flex items-center gap-2 p-2 px-4 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-secondary transition-all'>
                 Show full description
@@ -211,45 +226,42 @@ export default function VideoAnalysisPage() {
             >
               <div className='flex items-center justify-between border-b border-border/50 pb-6'>
                 <div className='flex items-center gap-2 text-purple-500'>
-                  <FileText className='w-5 h-5' />
+                  <FileIcon className='w-5 h-5' />
                   <h3 className='font-bold text-xl tracking-tight uppercase'>
                     Transcript
                   </h3>
                 </div>
                 <div className='flex items-center gap-4'>
                   <span className='text-[10px] font-black text-muted-foreground uppercase bg-secondary/50 px-3 py-1 rounded-full'>
-                    127 words
+                    Extracting...
                   </span>
-                  <button className='p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-all'>
-                    <FileText className='w-4 h-4' />
-                  </button>
                 </div>
               </div>
-              <div className='space-y-6 mt-4 max-w-2xl'>
-                {MOCK_VIDEO_DATA.transcript
-                  .split('\n\n')
-                  .map((paragraph, i) => (
-                    <p
-                      key={i}
-                      className='text-sm leading-[2] text-muted-foreground font-medium border-l-2 border-purple-500/20 pl-6 py-1'
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
+              <div className='p-12 rounded-2xl bg-secondary/10 border border-dashed border-border flex flex-col items-center gap-4 text-center'>
+                <ActionIcon className='w-8 h-8 text-primary animate-pulse' />
+                <div>
+                  <h4 className='font-bold text-foreground mb-1'>
+                    Transcript processing
+                  </h4>
+                  <p className='text-xs text-muted-foreground max-w-[280px]'>
+                    We're currently extracting the transcript for this video.
+                    This usually takes a few seconds.
+                  </p>
+                </div>
               </div>
             </section>
 
             {/* Deep Analysis Details */}
             <section id='hook'>
-              <HookAnalysis />
+              <HookAnalysis analysis={video.analysis?.hook} />
             </section>
 
             <section id='structure'>
-              <StructureAnalysis />
+              <StructureAnalysis analysis={video.analysis?.structure} />
             </section>
 
             <section id='style'>
-              <StyleAnalysis />
+              <StyleAnalysis analysis={video.analysis?.style} />
             </section>
           </div>
         </div>

@@ -15,3 +15,17 @@ export const getVideos = async (req: any, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch videos' });
   }
 };
+
+export const getVideo = async (req: any, res: Response) => {
+  try {
+    const { id } = req.params;
+    const video = await videosService.getVideoById(req.user.id, id);
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    res.json(video);
+  } catch (error) {
+    console.error('Get Video Error:', error);
+    res.status(500).json({ error: 'Failed to fetch video details' });
+  }
+};

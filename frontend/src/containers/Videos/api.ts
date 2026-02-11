@@ -28,4 +28,9 @@ export const activeVideosApi = {
     const response = await apiClient.post('/competitors/sync');
     return response.data;
   },
+
+  getVideoDetails: async (id: string) => {
+    const response = await apiClient.get(`/videos/${id}`);
+    return response.data;
+  },
 };

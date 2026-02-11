@@ -8,5 +8,6 @@ const router = Router();
 router.use(protect);
 
 router.get('/', videosController.getVideos);
+router.get('/:id', videosController.getVideo);
 
 export default router;

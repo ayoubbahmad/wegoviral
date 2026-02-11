@@ -70,52 +70,50 @@ function AnalysisCard({
   );
 }
 
-export function HookAnalysis() {
+export function HookAnalysis({ analysis }: { analysis?: any }) {
   return (
     <AnalysisCard
       title='Hook'
       icon={Anchor}
       iconColor='text-blue-500'
-      type='Secret Reveal'
-      description="Suggests unknown insight or future implication that the viewer doesn't know but would inform what is happening. Teases a feeling that the speaker knows something the viewer doesn't."
-      bullets={[
-        '"X is going to change Y"',
-        '"Nobody is aware that X is happening, but I think it might change Y"',
-      ]}
+      type={analysis?.type || 'Secret Reveal'}
+      description={
+        analysis?.description ||
+        "Suggests unknown insight or future implication that the viewer doesn't know but would inform what is happening."
+      }
+      bullets={analysis?.bullets || ['Hook line 1', 'Hook line 2']}
     />
   );
 }
 
-export function StructureAnalysis() {
+export function StructureAnalysis({ analysis }: { analysis?: any }) {
   return (
     <AnalysisCard
       title='Structure'
       icon={Layout}
       iconColor='text-purple-500'
-      type='Breakdown'
-      description='Explains the foundational principles and building blocks of a topic. Useful for identifying and investigating the core elements of a larger topic.'
-      bullets={[
-        'Foundational principles',
-        'Identifies core elements',
-        'Investigative approach',
-      ]}
+      type={analysis?.type || 'Breakdown'}
+      description={
+        analysis?.description ||
+        'Explains the foundational principles and building blocks of a topic.'
+      }
+      bullets={analysis?.bullets || ['Point 1', 'Point 2']}
     />
   );
 }
 
-export function StyleAnalysis() {
+export function StyleAnalysis({ analysis }: { analysis?: any }) {
   return (
     <AnalysisCard
       title='Style'
       icon={Palette}
       iconColor='text-amber-500'
-      type='Educational/Instructive'
-      description='Professional and authoritative delivery designed to foster trust and establish expertise in a specific niche.'
-      bullets={[
-        'Tone: High energy and enthusiasm',
-        'Voice: Confident and commanding',
-        'Pacing: Rapid-fire delivery',
-      ]}
+      type={analysis?.type || 'Educational/Instructive'}
+      description={
+        analysis?.description ||
+        'Professional and authoritative delivery designed to foster trust and establish expertise.'
+      }
+      bullets={analysis?.bullets || ['Tone: Professional', 'Pacing: Steady']}
     />
   );
 }

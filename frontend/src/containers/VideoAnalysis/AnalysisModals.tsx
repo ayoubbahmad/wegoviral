@@ -68,7 +68,7 @@ function Modal({
   );
 }
 
-export function AnalysisModals() {
+export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
   const actions = [
@@ -137,7 +137,7 @@ export function AnalysisModals() {
             Source Video
           </div>
           <div className='text-sm font-semibold truncate leading-none'>
-            Fast for 30 Days during Ramadan...
+            {videoTitle || 'Source Video'}
           </div>
         </div>
       </Modal>

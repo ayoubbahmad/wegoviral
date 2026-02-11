@@ -13,6 +13,7 @@ import {
   Edit2,
   Check,
   X,
+  Folder,
 } from 'lucide-react';
 import { useCompetitorsPageSlice } from '../slice/pageSlice';
 import { useWatchlistSlice } from '../slice/watchlistSlice';
@@ -168,7 +169,7 @@ export function WatchlistSidebar() {
                       )}
                     >
                       <div className='flex items-center gap-3 min-w-0'>
-                        <FolderPlus
+                        <Folder
                           className={cn(
                             'w-4 h-4 transition-colors flex-shrink-0',
                             selectedWatchlistId === watchlist.id
@@ -181,7 +182,7 @@ export function WatchlistSidebar() {
                       {watchlist._count && watchlist._count.competitors > 0 && (
                         <span
                           className={cn(
-                            'text-[10px] px-1.5 py-0.5 rounded-md font-bold',
+                            'text-[10px] px-1.5 py-0.5 rounded-md font-bold mr-6',
                             selectedWatchlistId === watchlist.id
                               ? 'bg-primary/20 text-primary'
                               : 'bg-secondary text-muted-foreground',
@@ -193,7 +194,7 @@ export function WatchlistSidebar() {
                     </button>
 
                     {/* Action Menu Trigger */}
-                    <div className='absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity'>
+                    <div className='absolute right-1 top-1/2 -translate-y-1/2'>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

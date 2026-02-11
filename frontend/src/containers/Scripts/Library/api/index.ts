@@ -1,29 +1,44 @@
-import { apiClient } from "@/lib/api-client";
-import { Script, CreateScriptDTO, UpdateScriptDTO } from "./types";
+import { apiClient } from '@/lib/api-client';
+import { Script, CreateScriptDTO, UpdateScriptDTO } from './types';
 
 export const SCRIPTS_ENDPOINTS = {
-  BASE: "/scripts",
+  BASE: '/scripts',
   DETAIL: (id: string) => `/scripts/${id}`,
 };
 
 export const scriptsApi = {
   getScripts: async () => {
-    return apiClient.get<any, Script[]>(SCRIPTS_ENDPOINTS.BASE);
+    const response = await apiClient.get<any, { data: Script[] }>(
+      SCRIPTS_ENDPOINTS.BASE,
+    );
+    return response.data;
   },
-  
+
   getScript: async (id: string) => {
-    return apiClient.get<any, Script>(SCRIPTS_ENDPOINTS.DETAIL(id));
+    const response = await apiClient.get<any, { data: Script }>(
+      SCRIPTS_ENDPOINTS.DETAIL(id),
+    );
+    return response.data;
   },
-  
+
   createScript: async (data: CreateScriptDTO) => {
-    return apiClient.post<any, Script>(SCRIPTS_ENDPOINTS.BASE, data);
+    const response = await apiClient.post<any, { data: Script }>(
+      SCRIPTS_ENDPOINTS.BASE,
+      data,
+    );
+    return response.data;
   },
-  
+
   updateScript: async (id: string, data: UpdateScriptDTO) => {
-    return apiClient.patch<any, Script>(SCRIPTS_ENDPOINTS.DETAIL(id), data);
+    const response = await apiClient.patch<any, { data: Script }>(
+      SCRIPTS_ENDPOINTS.DETAIL(id),
+      data,
+    );
+    return response.data;
   },
-  
+
   deleteScript: async (id: string) => {
-    return apiClient.delete(SCRIPTS_ENDPOINTS.DETAIL(id));
+    const response = await apiClient.delete(SCRIPTS_ENDPOINTS.DETAIL(id));
+    return response.data;
   },
 };

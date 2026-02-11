@@ -49,15 +49,18 @@ export interface UpdateAutomationDTO {
 // API Functions
 export const automationsApi = {
   getAutomations: async (): Promise<Automation[]> => {
-    return apiClient.get('/automations');
+    const response = await apiClient.get<Automation[]>('/automations');
+    return response.data;
   },
 
   getAutomation: async (id: string): Promise<Automation> => {
-    return apiClient.get(`/automations/${id}`);
+    const response = await apiClient.get<Automation>(`/automations/${id}`);
+    return response.data;
   },
 
   createAutomation: async (data: CreateAutomationDTO): Promise<Automation> => {
-    return apiClient.post('/automations', data);
+    const response = await apiClient.post<Automation>('/automations', data);
+    return response.data;
   },
 
   updateAutomation: async ({
@@ -67,11 +70,15 @@ export const automationsApi = {
     id: string;
     data: UpdateAutomationDTO;
   }): Promise<Automation> => {
-    return apiClient.patch(`/automations/${id}`, data);
+    const response = await apiClient.patch<Automation>(
+      `/automations/${id}`,
+      data,
+    );
+    return response.data;
   },
 
   deleteAutomation: async (id: string): Promise<void> => {
-    return apiClient.delete(`/automations/${id}`);
+    await apiClient.delete(`/automations/${id}`);
   },
 };
 

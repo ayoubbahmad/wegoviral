@@ -32,8 +32,8 @@ export const handleOAuthCallback = async (code: string) => {
 
 export const getMySocialAccounts = async (): Promise<SocialAccount[]> => {
   const token = localStorage.getItem('token');
-  const data = await apiClient.get(`${API_URL}/social-accounts/me`, {
+  const response = await apiClient.get(`${API_URL}/social-accounts/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return data;
+  return response.data;
 };

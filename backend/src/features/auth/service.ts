@@ -20,11 +20,16 @@ export class AuthService {
       username: user.username,
       name: user.name,
       avatarUrl: user.avatarUrl,
-      socialAccounts: user.socialAccounts
+      socialAccounts: user?.socialAccounts,
     };
   }
 
-  async registerUser(data: { email: string; password: string; username: string; name?: string }) {
+  async registerUser(data: {
+    email: string;
+    password: string;
+    username: string;
+    name?: string;
+  }) {
     const passwordHash = await bcrypt.hash(data.password, 12);
 
     const user = await prisma.userProfile.create({
@@ -39,13 +44,13 @@ export class AuthService {
             username: data.username,
             accountId: `mock-${data.username}-IG`,
             isActive: true,
-            isConnected: true
-          }
-        }
+            isConnected: true,
+          },
+        },
       },
       include: {
-        socialAccounts: true
-      }
+        socialAccounts: true,
+      },
     });
 
     const token = this.signToken(user.id);
@@ -55,7 +60,7 @@ export class AuthService {
   async loginUser(email: string, password: string) {
     const user = await prisma.userProfile.findUnique({
       where: { email },
-      include: { socialAccounts: true }
+      include: { socialAccounts: true },
     });
 
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
@@ -69,7 +74,7 @@ export class AuthService {
   async getUserById(id: string) {
     const user = await prisma.userProfile.findUnique({
       where: { id },
-      include: { socialAccounts: true }
+      include: { socialAccounts: true },
     });
 
     if (!user) return null;
@@ -79,8 +84,8 @@ export class AuthService {
   async isEmailOrUsernameTaken(email: string, username: string) {
     const existingUser = await prisma.userProfile.findFirst({
       where: {
-        OR: [{ email }, { username }]
-      }
+        OR: [{ email }, { username }],
+      },
     });
     return !!existingUser;
   }

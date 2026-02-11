@@ -10,19 +10,25 @@ export interface Watchlist {
 
 export const watchlistsApi = {
   getAll: async () => {
-    return apiClient.get<Watchlist[]>('/watchlists') as any;
+    const response = await apiClient.get<Watchlist[]>('/watchlists');
+    return response.data;
   },
 
   getById: async (id: string) => {
-    return apiClient.get<Watchlist>(`/watchlists/${id}`) as any;
+    const response = await apiClient.get<Watchlist>(`/watchlists/${id}`);
+    return response.data;
   },
 
   create: async (name: string) => {
-    return apiClient.post<Watchlist>('/watchlists', { name }) as any;
+    const response = await apiClient.post<Watchlist>('/watchlists', { name });
+    return response.data;
   },
 
   update: async (id: string, name: string) => {
-    return apiClient.patch<Watchlist>(`/watchlists/${id}`, { name }) as any;
+    const response = await apiClient.patch<Watchlist>(`/watchlists/${id}`, {
+      name,
+    });
+    return response.data;
   },
 
   delete: async (id: string) => {
@@ -30,16 +36,18 @@ export const watchlistsApi = {
   },
 
   addCompetitor: async (watchlistId: string, competitorId: string) => {
-    await apiClient.post('/watchlists/add-competitor', {
+    const response = await apiClient.post('/watchlists/add-competitor', {
       watchlistId,
       competitorId,
     });
+    return response.data;
   },
 
   removeCompetitor: async (watchlistId: string, competitorId: string) => {
-    await apiClient.post('/watchlists/remove-competitor', {
+    const response = await apiClient.post('/watchlists/remove-competitor', {
       watchlistId,
       competitorId,
     });
+    return response.data;
   },
 };

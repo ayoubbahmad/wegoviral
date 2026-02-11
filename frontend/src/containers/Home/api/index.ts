@@ -1,24 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { 
-  Users, 
-  Activity, 
-  Eye, 
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import {
+  Users,
+  Activity,
+  Eye,
   ArrowUpRight,
   Globe,
   Flame,
-  Trophy
-} from "lucide-react";
+  Trophy,
+} from 'lucide-react';
 
 // Standard icon mapping
 const ICON_MAP: Record<string, any> = {
-    Users,
-    Activity,
-    Eye,
-    ArrowUpRight,
-    Globe,
-    Flame,
-    Trophy
+  Users,
+  Activity,
+  Eye,
+  ArrowUpRight,
+  Globe,
+  Flame,
+  Trophy,
 };
 
 // Types
@@ -30,36 +30,37 @@ export interface HomeStats {
 }
 
 export interface HomeSummary {
-    stats: any[];
-    scripts: any[];
-    videos: any[];
-    projects: any[];
-    challenges: any[];
+  stats: any[];
+  scripts: any[];
+  videos: any[];
+  projects: any[];
+  challenges: any[];
 }
 
 // API Functions
 export const homeApi = {
-    getSummary: async (): Promise<HomeSummary> => {
-        return apiClient.get('/home/summary');
-    }
+  getSummary: async (): Promise<HomeSummary> => {
+    const response = await apiClient.get('/home/summary');
+    return response.data;
+  },
 };
 
 // Tanstack Query Hooks
 export const useGetHomeSummary = () => {
-    return useQuery({
-        queryKey: ["home-summary"],
-        queryFn: homeApi.getSummary,
-    });
+  return useQuery({
+    queryKey: ['home-summary'],
+    queryFn: homeApi.getSummary,
+  });
 };
 
 // Legacy support or specific stat hook
 export const useGetHomeStats = () => {
-    const { data: summary, isLoading, error } = useGetHomeSummary();
-    
-    const stats = (summary?.stats || []).map(stat => ({
-        ...stat,
-        icon: ICON_MAP[stat.icon] || Globe
-    }));
+  const { data: summary, isLoading, error } = useGetHomeSummary();
 
-    return { data: stats, isLoading, error };
+  const stats = (summary?.stats || []).map((stat) => ({
+    ...stat,
+    icon: ICON_MAP[stat.icon] || Globe,
+  }));
+
+  return { data: stats, isLoading, error };
 };

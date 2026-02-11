@@ -3,14 +3,20 @@ import { Competitor } from '@/types/competitor';
 
 export const competitorsSharedApi = {
   getAll: async (watchlistId?: string) => {
-    return apiClient.get<any, Competitor[]>('/competitors', {
+    const response = await apiClient.get<Competitor[]>('/competitors', {
       params: { watchlistId },
     });
+    return response.data;
   },
   delete: async (id: string) => {
-    return apiClient.delete(`/competitors/${id}`);
+    const response = await apiClient.delete(`/competitors/${id}`);
+    return response.data;
   },
   update: async (id: string, updates: Partial<Competitor>) => {
-    return apiClient.patch<any, Competitor>(`/competitors/${id}`, updates);
+    const response = await apiClient.patch<Competitor>(
+      `/competitors/${id}`,
+      updates,
+    );
+    return response.data;
   },
 };

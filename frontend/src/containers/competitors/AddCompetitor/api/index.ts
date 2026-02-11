@@ -12,11 +12,16 @@ export const competitorsApi = {
     socialAccountId?: string;
     watchlistId?: string;
   }) => {
-    return apiClient.post<any, any>(COMPETITORS_ENDPOINTS.BULK, data);
+    const response = await apiClient.post<any, any>(
+      COMPETITORS_ENDPOINTS.BULK,
+      data,
+    );
+    return response.data;
   },
   preview: async (handle: string) => {
-    return apiClient.get<any, any>(
+    const response = await apiClient.get<any, any>(
       `${COMPETITORS_ENDPOINTS.PREVIEW}?handle=${encodeURIComponent(handle)}`,
     );
+    return response.data;
   },
 };

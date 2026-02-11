@@ -19,27 +19,43 @@ export const LIBRARY_ENDPOINTS = {
 export const libraryApi = {
   // Hooks
   getHooks: async () => {
-    return apiClient.get<any, Hook[]>(LIBRARY_ENDPOINTS.HOOKS);
+    const response = await apiClient.get<any, { data: Hook[] }>(
+      LIBRARY_ENDPOINTS.HOOKS,
+    );
+    return response.data;
   },
   createHook: async (data: CreateHookDTO) => {
-    return apiClient.post<any, Hook>(LIBRARY_ENDPOINTS.HOOKS, data);
+    const response = await apiClient.post<any, { data: Hook }>(
+      LIBRARY_ENDPOINTS.HOOKS,
+      data,
+    );
+    return response.data;
   },
   updateHook: async (id: string, data: UpdateHookDTO) => {
-    return apiClient.patch<any, Hook>(LIBRARY_ENDPOINTS.HOOK_DETAIL(id), data);
+    const response = await apiClient.patch<any, { data: Hook }>(
+      LIBRARY_ENDPOINTS.HOOK_DETAIL(id),
+      data,
+    );
+    return response.data;
   },
   deleteHook: async (id: string) => {
-    return apiClient.delete(LIBRARY_ENDPOINTS.HOOK_DETAIL(id));
+    const response = await apiClient.delete(LIBRARY_ENDPOINTS.HOOK_DETAIL(id));
+    return response.data;
   },
 
   // Script Templates
   getTemplates: async () => {
-    return apiClient.get<any, ScriptTemplate[]>(LIBRARY_ENDPOINTS.TEMPLATES);
+    const response = await apiClient.get<any, { data: ScriptTemplate[] }>(
+      LIBRARY_ENDPOINTS.TEMPLATES,
+    );
+    return response.data;
   },
   createTemplate: async (data: CreateScriptTemplateDTO) => {
-    return apiClient.post<any, ScriptTemplate>(
+    const response = await apiClient.post<any, { data: ScriptTemplate }>(
       LIBRARY_ENDPOINTS.TEMPLATES,
       data,
     );
+    return response.data;
   },
   updateTemplate: async (id: string, data: UpdateScriptTemplateDTO) => {
     const response = await apiClient.patch(
@@ -57,6 +73,9 @@ export const libraryApi = {
     return response.data;
   },
   deleteTemplate: async (id: string) => {
-    return apiClient.delete(LIBRARY_ENDPOINTS.TEMPLATE_DETAIL(id));
+    const response = await apiClient.delete(
+      LIBRARY_ENDPOINTS.TEMPLATE_DETAIL(id),
+    );
+    return response.data;
   },
 };

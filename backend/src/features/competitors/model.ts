@@ -1,4 +1,4 @@
-import { JsonValue } from "@prisma/client/runtime/library";
+import { JsonValue } from '@prisma/client/runtime/library';
 
 export interface CompetitorPost {
   id: string;
@@ -41,5 +41,11 @@ export interface UpdateCompetitorDTO {
   bio?: string;
   tags?: string[];
   stats?: any;
+  socialAccountId?: string;
+}
+
+export interface BulkCreateCompetitorDTO {
+  handles: string[]; // Can be handle or URL
+  tags?: string[];
   socialAccountId?: string;
 }

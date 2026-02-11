@@ -8,8 +8,10 @@ const router = Router();
 router.use(protect);
 
 router.get('/', competitorsController.getCompetitors);
+router.get('/preview', competitorsController.previewCompetitor);
 router.get('/:id', competitorsController.getCompetitor);
 router.post('/', competitorsController.createCompetitor);
+router.post('/bulk', competitorsController.bulkCreateCompetitors);
 router.patch('/:id', competitorsController.updateCompetitor);
 router.delete('/:id', competitorsController.deleteCompetitor);
 

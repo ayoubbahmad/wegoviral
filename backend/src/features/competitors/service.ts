@@ -207,7 +207,7 @@ export class CompetitorsService {
           : `@${competitor.handle.replace('youtube.com/', '').replace('www.', '')}`;
         url = `https://www.youtube.com/${handle}/shorts`;
       } else {
-        url = `https://www.instagram.com/${competitor.handle.replace('@', '')}/`;
+        url = `https://www.instagram.com/${competitor.handle.replace('@', '')}/reels/`;
       }
     } else if (url.includes('youtube.com') && !url.includes('/shorts')) {
       // If it's a full YouTube URL but doesn't target shorts, append it

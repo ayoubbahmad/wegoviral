@@ -25,6 +25,7 @@ export class BrowserEngine {
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-blink-features=AutomationControlled',
+          '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         ],
       });
     }
@@ -33,7 +34,10 @@ export class BrowserEngine {
 
   async createPage(): Promise<Page> {
     const browser = await this.getBrowser();
-    return await browser.newPage();
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+    return await context.newPage();
   }
 
   async close() {

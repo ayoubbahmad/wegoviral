@@ -22,7 +22,10 @@ export async function scrapeProfileFeed(
       );
       await page.setContent(html);
     } else {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      const waitCondition = url.includes('instagram.com')
+        ? 'networkidle'
+        : 'domcontentloaded';
+      await page.goto(url, { waitUntil: waitCondition, timeout: 60000 });
     }
 
     const scraper = scraperRegistry.getScraper(url);

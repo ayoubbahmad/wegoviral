@@ -1,31 +1,22 @@
 'use client';
 
-import { ScriptTemplate } from '@/containers/Library/api/types';
-import { FileText, ChevronRight, Trash2, Edit2 } from 'lucide-react';
+import { FileText, Trash2, Edit2 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { TemplateCard } from './components/TemplateCard';
+import { useScriptTemplatesListController } from './controller';
 
-import { TemplateCard } from './TemplateCard';
+export function ScriptTemplatesList() {
+  const {
+    scripts,
+    isLoading,
+    viewType,
+    selectedItemId,
+    setSelectedItemId,
+    handleDeleteTemplate,
+  } = useScriptTemplatesListController();
 
-interface ScriptTemplateListProps {
-  scripts: ScriptTemplate[];
-  viewType?: 'grid' | 'table';
-  onDelete?: (id: string) => void;
-  onUpdate?: (id: string, updates: Partial<ScriptTemplate>) => void;
-  selectedId?: string | null;
-  onSelect?: (id: string) => void;
-}
-
-export function ScriptTemplateList({
-  scripts,
-  viewType = 'table',
-  onDelete,
-  onUpdate,
-  selectedId,
-  onSelect,
-}: ScriptTemplateListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const handleCopy = (id: string, structure: any[]) => {
     const text = structure.map((s) => `${s.step}: ${s.description}`).join('\n');
@@ -34,15 +25,13 @@ export function ScriptTemplateList({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-
-    if (confirm('Are you sure you want to delete this script template?')) {
-      setIsDeleting(id);
-      await onDelete?.(id);
-      setIsDeleting(null);
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin' />
+      </div>
+    );
+  }
 
   if (viewType === 'grid') {
     return (
@@ -51,11 +40,9 @@ export function ScriptTemplateList({
           <TemplateCard
             key={script.id}
             template={script}
-            isActive={selectedId === script.id}
-            onClick={() => onSelect?.(script.id)}
-            onDelete={() =>
-              handleDelete({ stopPropagation: () => {} } as any, script.id)
-            }
+            isActive={selectedItemId === script.id}
+            onClick={() => setSelectedItemId(script.id)}
+            onDelete={() => handleDeleteTemplate(script.id)}
           />
         ))}
       </div>
@@ -87,10 +74,10 @@ export function ScriptTemplateList({
               key={script.id}
               className={cn(
                 'group hover:bg-muted/5 transition-colors cursor-pointer',
-                selectedId === script.id &&
+                selectedItemId === script.id &&
                   'bg-primary/5 border-l-2 border-primary',
               )}
-              onClick={() => onSelect?.(script.id)}
+              onClick={() => setSelectedItemId(script.id)}
             >
               <td className='px-6 py-4'>
                 <div className='flex items-center gap-3'>
@@ -125,7 +112,10 @@ export function ScriptTemplateList({
                     {copiedId === script.id ? 'Copied' : 'Use'}
                   </button>
                   <button
-                    onClick={(e) => handleDelete(e, script.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTemplate(script.id);
+                    }}
                     className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors'
                   >
                     <Trash2 className='w-4 h-4' />

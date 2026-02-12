@@ -8,7 +8,7 @@ import { Button } from '@/components/Button';
 import { Tabs } from '@/components/Tabs';
 import { SearchInput } from '@/components/SearchInput';
 import { ViewToggle } from '@/components/ViewToggle';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { scriptListApi } from '@/containers/Library/ScriptTemplatesList/api';
 import { cn } from '@/lib/utils';
 import { Hook, ScriptTemplate } from '@/containers/Library/types';
@@ -48,12 +48,51 @@ export const LibraryView = () => {
     setIsEditing,
   } = useLibraryStore();
 
+  const queryClient = useQueryClient();
+
+  // Mutations for Hooks
+  const createHookMutation = useMutation({
+    mutationFn: hookApi.createHook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hooks'] });
+    },
+  });
+
+  const updateHookMutation = useMutation({
+    mutationFn: (data: { id: string; hook: any }) =>
+      hookApi.updateHook(data.id, data.hook),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hooks'] });
+    },
+  });
+
+  // Mutations for Scripts
+  const createScriptMutation = useMutation({
+    mutationFn: scriptApi.createTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+    },
+  });
+
+  const updateScriptMutation = useMutation({
+    mutationFn: (data: { id: string; script: any }) =>
+      scriptApi.updateTemplate(data.id, data.script),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+    },
+  });
+
   const selectedItem =
     activeTab === 'hooks'
       ? hooks.find((h: Hook) => h.id === selectedItemId)
       : (templates as ScriptTemplate[]).find(
           (t: ScriptTemplate) => t.id === selectedItemId,
         );
+
+  const handleAddNew = () => {
+    setSelectedItemId(null);
+    setIsAdding(true);
+  };
 
   return (
     <PageContainer>
@@ -62,7 +101,7 @@ export const LibraryView = () => {
         description='Manage your creative assets, hooks, and script structures.'
         actions={
           <Button
-            onClick={() => setIsAdding(true)}
+            onClick={handleAddNew}
             leftSection={<Plus className='w-4 h-4' />}
           >
             Add New Asset
@@ -74,7 +113,7 @@ export const LibraryView = () => {
         <AddHookForm
           onAddHook={async (data) => {
             try {
-              await hookApi.createHook(data);
+              await createHookMutation.mutateAsync(data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -82,7 +121,7 @@ export const LibraryView = () => {
           }}
           onUpdateHook={async (id, data) => {
             try {
-              await hookApi.updateHook(id, data);
+              await updateHookMutation.mutateAsync({ id, hook: data });
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -96,7 +135,7 @@ export const LibraryView = () => {
         <AddScriptForm
           onAddScript={async (data) => {
             try {
-              await scriptApi.createTemplate(data);
+              await createScriptMutation.mutateAsync(data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -104,7 +143,7 @@ export const LibraryView = () => {
           }}
           onUpdateScript={async (id, data) => {
             try {
-              await scriptApi.updateTemplate(id, data);
+              await updateScriptMutation.mutateAsync({ id, script: data });
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };

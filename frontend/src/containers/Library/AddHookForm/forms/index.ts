@@ -12,16 +12,18 @@ export function useAddHookForm(editItem?: Hook | null, isOpen?: boolean) {
   const [metadata, setMetadata] = useState<any>(null);
   const [tagInput, setTagInput] = useState('');
 
+  const defaultValues = {
+    content: '',
+    type: 'Verbal' as const,
+    emotion: 'Curiosity' as const,
+    topic: '',
+    sourceUrl: '',
+    tags: [],
+  };
+
   const form = useForm<HookFormValues>({
     resolver: zodResolver(HookSchema),
-    defaultValues: {
-      content: '',
-      type: 'Verbal',
-      emotion: 'Curiosity',
-      topic: '',
-      sourceUrl: '',
-      tags: [],
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -42,6 +44,10 @@ export function useAddHookForm(editItem?: Hook | null, isOpen?: boolean) {
         sourceMetadata: editItem.sourceMetadata,
       });
       setMetadata(editItem.sourceMetadata);
+    } else {
+      form.reset(defaultValues);
+      setMetadata(null);
+      setTagInput('');
     }
   }, [isOpen, editItem, form]);
 

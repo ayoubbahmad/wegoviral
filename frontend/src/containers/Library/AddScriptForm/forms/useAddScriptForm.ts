@@ -12,15 +12,17 @@ export function useAddScriptForm(
 ) {
   const [tagInput, setTagInput] = useState('');
 
+  const defaultValues = {
+    title: '',
+    category: 'Educational' as const,
+    content: [{ step: 'Hook', description: '' }],
+    sourceUrl: '',
+    tags: [],
+  };
+
   const form = useForm<ScriptTemplateFormValues>({
     resolver: zodResolver(ScriptTemplateSchema),
-    defaultValues: {
-      title: '',
-      category: 'Educational',
-      content: [{ step: 'Hook', description: '' }],
-      sourceUrl: '',
-      tags: [],
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -41,6 +43,9 @@ export function useAddScriptForm(
         tags: editItem.tags || [],
         sourceMetadata: editItem.sourceMetadata,
       });
+    } else {
+      form.reset(defaultValues);
+      setTagInput('');
     }
   }, [isOpen, editItem, form]);
 

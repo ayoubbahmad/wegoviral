@@ -101,7 +101,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                   target='_blank'
                   className='flex items-center gap-1 hover:text-primary hover:underline'
                 >
-                  Instagram <ExternalLink className='w-3 h-3' />
+                  {competitor.handle} <ExternalLink className='w-3 h-3' />
                 </a>
               </div>
               <div className='flex flex-wrap gap-2 mt-3'>

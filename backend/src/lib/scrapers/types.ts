@@ -18,6 +18,8 @@ export interface ScraperMetadata {
   handle?: string;
   likes?: string | number;
   comments?: string | number;
+  followers?: string | number;
+  following?: string | number;
   url: string;
 }
 

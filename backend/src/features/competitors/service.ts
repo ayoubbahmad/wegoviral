@@ -76,6 +76,8 @@ export class CompetitorsService {
         stats: {
           likes: metadata.likes || '0',
           comments: metadata.comments || '0',
+          followers: metadata.followers || '0',
+          following: metadata.following || '0',
         },
       };
     } catch (error) {

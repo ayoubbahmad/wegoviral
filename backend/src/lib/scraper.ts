@@ -22,9 +22,10 @@ export async function scrapeProfileFeed(
       );
       await page.setContent(html);
     } else {
-      const waitCondition = url.includes('instagram.com')
-        ? 'networkidle'
-        : 'domcontentloaded';
+      const waitCondition =
+        url.includes('instagram.com') || url.includes('tiktok.com')
+          ? 'networkidle'
+          : 'domcontentloaded';
       await page.goto(url, { waitUntil: waitCondition, timeout: 60000 });
     }
 
@@ -49,7 +50,11 @@ export async function scrapeUrl(url: string): Promise<ScraperMetadata> {
 
   const page = await browserEngine.createPage();
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const waitCondition =
+      url.includes('instagram.com') || url.includes('tiktok.com')
+        ? 'networkidle'
+        : 'domcontentloaded';
+    await page.goto(url, { waitUntil: waitCondition, timeout: 60000 });
 
     const scraper = scraperRegistry.getScraper(url);
     return await scraper.scrapeMetadata(page, url);

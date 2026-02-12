@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { Hook, CreateHookDTO, UpdateHookDTO } from '../types';
+import { Hook, CreateHookDTO, UpdateHookDTO } from '../../types';
 
 export const HOOK_ENDPOINTS = {
   HOOKS: '/hooks',

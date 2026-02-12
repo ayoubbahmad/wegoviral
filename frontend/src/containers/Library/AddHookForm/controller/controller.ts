@@ -2,7 +2,8 @@
 
 import { useLibraryStore } from '../../HooksList/logic';
 import { Hook } from '../../types';
-import { useAddHookForm, HookFormValues } from '../forms';
+import { useAddHookForm } from '../forms';
+import { HookFormValues } from '../forms/schema';
 
 interface UseAddHookControllerProps {
   editItem?: Hook | null;

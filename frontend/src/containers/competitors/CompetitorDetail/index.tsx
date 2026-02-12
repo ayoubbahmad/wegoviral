@@ -94,14 +94,15 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                 {competitor.name}
               </h1>
               <div className='flex items-center gap-2 text-muted-foreground mt-1'>
-                <span>{competitor.handle}</span>
+                <span className='capitalize'>{competitor.platform}</span>
                 <span>•</span>
                 <a
-                  href={`${competitor.handle.replace('@', '')}`}
+                  href={competitor.externalUrl}
                   target='_blank'
+                  rel='noopener noreferrer'
                   className='flex items-center gap-1 hover:text-primary hover:underline'
                 >
-                  {competitor.handle} <ExternalLink className='w-3 h-3' />
+                  @{competitor.handle} <ExternalLink className='w-3 h-3' />
                 </a>
               </div>
               <div className='flex flex-wrap gap-2 mt-3'>

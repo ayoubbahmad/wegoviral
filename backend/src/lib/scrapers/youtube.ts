@@ -121,12 +121,20 @@ export class YouTubeScraper implements BaseScraper {
           .querySelector(`meta[property="og:${name}"]`)
           ?.getAttribute('content');
 
+      const title = document.title;
+      const description = getMeta('description') || '';
+      const thumbnail = getMeta('image') || '';
+      const handle =
+        url.split('@')[1]?.split('/')[0] || url.split('/').pop() || '';
+
       return {
-        title: document.title,
-        description: getMeta('description') || '',
-        thumbnail: getMeta('image') || '',
-        handle: url.split('@')[1]?.split('/')[0] || '',
+        title: title || '',
+        description: description || '',
+        thumbnail: thumbnail || '',
+        handle,
         url,
+        platform: 'youtube',
+        externalUrl: `https://www.youtube.com/@${handle}`,
         likes: '0',
         comments: '0',
       };

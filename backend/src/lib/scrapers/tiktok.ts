@@ -89,15 +89,20 @@ export class TikTokScraper implements BaseScraper {
           .querySelector('[data-e2e="likes-count"]')
           ?.textContent?.trim() || '0';
 
+      // Standardize handle: remove @ prefix if present
+      const cleanHandle = handle.replace('@', '');
+
       return {
-        title,
-        description: bio,
-        thumbnail: avatar,
-        handle,
+        title: title || '',
+        description: bio || '',
+        thumbnail: avatar || '',
+        handle: cleanHandle,
         url,
-        followers,
-        following,
-        likes,
+        platform: 'tiktok',
+        externalUrl: `https://www.tiktok.com/@${cleanHandle}`,
+        followers: followers || '0',
+        following: following || '0',
+        likes: likes || '0',
         comments: '0',
       };
     }, url);

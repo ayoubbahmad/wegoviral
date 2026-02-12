@@ -103,22 +103,19 @@ export class InstagramScraper implements BaseScraper {
       const description = getMeta('description') || '';
       const thumbnail = getMeta('image') || '';
 
-      // Extract handle from URL or meta
-      let handle = url.split('instagram.com/')[1]?.split('/')[0] || '';
-      if (handle === 'reels' || handle === 'p') {
-        // Fallback for direct reel links
-        const ogUrl = getMeta('url');
-        if (ogUrl)
-          handle = ogUrl.split('instagram.com/')[1]?.split('/')[0] || handle;
-      }
+      // Standardize handle: clean from URL or title
+      const handleMatch = url.match(/instagram\.com\/([^\/?#]+)/);
+      const handle = handleMatch ? handleMatch[1] : '';
 
       return {
-        title,
-        description,
-        thumbnail,
+        title: title || '',
+        description: description || '',
+        thumbnail: thumbnail || '',
         handle,
         url,
-        likes: '0', // These will be enriched by individual post scrapes if needed
+        platform: 'instagram',
+        externalUrl: `https://www.instagram.com/${handle}/`,
+        likes: '0',
         comments: '0',
       };
     }, url);

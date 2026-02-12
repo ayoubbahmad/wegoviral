@@ -20,6 +20,9 @@ export interface Competitor {
   bio: string | null;
   tags: string[];
   stats: JsonValue;
+  platform: string;
+  externalUrl: string;
+  originUrl: string | null;
   userId: string;
   socialAccountId: string | null;
   createdAt: Date;
@@ -31,6 +34,9 @@ export interface Competitor {
 export interface CreateCompetitorDTO {
   handle: string;
   name: string;
+  platform: string;
+  externalUrl: string;
+  originUrl?: string;
   avatarUrl?: string;
   bio?: string;
   tags?: string[];

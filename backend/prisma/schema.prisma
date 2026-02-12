@@ -87,12 +87,15 @@ model Script {
 
 model Competitor {
   id              String           @id @default(uuid())
-  handle          String
+  handle          String           // Standardized username
   name            String
   avatarUrl       String
   bio             String?
   tags            String[]
   stats           Json
+  platform        String           // e.g., "youtube", "tiktok", "instagram"
+  externalUrl     String           // Link to the creator's profile
+  originUrl       String?          // The URL used to initiate the scrape
   userId          String
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt

@@ -11,7 +11,17 @@ export class CompetitorsService {
     return {
       ...competitor,
       isFollowing: true,
+      // Ensure handle is clean in response if it wasn't already
+      handle: competitor.handle.replace('@', ''),
     };
+  }
+
+  private getPlatform(url: string): string {
+    const lowercaseUrl = url.toLowerCase();
+    if (lowercaseUrl.includes('youtube.com')) return 'youtube';
+    if (lowercaseUrl.includes('tiktok.com')) return 'tiktok';
+    if (lowercaseUrl.includes('instagram.com')) return 'instagram';
+    return 'instagram'; // Default
   }
 
   async getAllCompetitors(
@@ -60,8 +70,12 @@ export class CompetitorsService {
   async previewCompetitor(handle: string) {
     let url = handle;
     if (!handle.startsWith('http')) {
-      // Basic heuristic: if no platform specified, assume IG
-      url = `https://www.instagram.com/${handle.replace('@', '')}/`;
+      // If just a handle is provided, we default to Instagram or try to guess
+      if (handle.startsWith('@')) {
+        url = `https://www.youtube.com/${handle}/shorts`;
+      } else {
+        url = `https://www.instagram.com/${handle.replace('@', '')}/`;
+      }
     }
 
     try {
@@ -73,6 +87,9 @@ export class CompetitorsService {
           metadata.thumbnail ||
           `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
         bio: metadata.description || '',
+        platform: metadata.platform || this.getPlatform(url),
+        externalUrl: metadata.externalUrl || url,
+        originUrl: url,
         stats: {
           likes: metadata.likes || '0',
           comments: metadata.comments || '0',
@@ -82,12 +99,17 @@ export class CompetitorsService {
       };
     } catch (error) {
       console.error('Preview Competitor Error:', error);
+      const cleanHandle = handle.replace('@', '');
+      const platform = this.getPlatform(url);
       return {
-        handle: handle.replace('@', ''),
-        name: handle.replace('@', ''),
-        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`,
+        handle: cleanHandle,
+        name: cleanHandle,
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${cleanHandle}`,
         bio: '',
-        stats: { likes: '0', comments: '0' },
+        platform,
+        externalUrl: url,
+        originUrl: url,
+        stats: { likes: '0', comments: '0', followers: '0', following: '0' },
       };
     }
   }
@@ -133,6 +155,9 @@ export class CompetitorsService {
           name: preview.name,
           avatarUrl: preview.avatarUrl,
           bio: preview.bio,
+          platform: preview.platform,
+          externalUrl: preview.externalUrl,
+          originUrl: preview.originUrl,
           stats: preview.stats,
           tags: data.tags,
           socialAccountId: data.socialAccountId,
@@ -199,21 +224,14 @@ export class CompetitorsService {
 
     if (!competitor) throw new Error('Competitor not found');
 
-    let url = competitor.handle;
-    if (!url.startsWith('http')) {
-      if (url.includes('tiktok')) {
-        url = `https://www.tiktok.com/@${competitor.handle.replace('@', '')}`;
-      } else if (url.includes('youtube') || competitor.handle.startsWith('@')) {
-        const handle = competitor.handle.startsWith('@')
-          ? competitor.handle
-          : `@${competitor.handle.replace('youtube.com/', '').replace('www.', '')}`;
-        url = `https://www.youtube.com/${handle}/shorts`;
-      } else {
-        url = `https://www.instagram.com/${competitor.handle.replace('@', '')}/reels/`;
-      }
-    } else if (url.includes('youtube.com') && !url.includes('/shorts')) {
-      // If it's a full YouTube URL but doesn't target shorts, append it
+    // Use the reliable externalUrl for syncing
+    let url = competitor.externalUrl;
+
+    // Platform specific path additions if needed
+    if (competitor.platform === 'youtube' && !url.includes('/shorts')) {
       url = url.endsWith('/') ? `${url}shorts` : `${url}/shorts`;
+    } else if (competitor.platform === 'instagram' && !url.includes('/reels')) {
+      url = url.endsWith('/') ? `${url}reels/` : `${url}/reels/`;
     }
 
     const videos = await scrapeProfileFeed(url, 10);

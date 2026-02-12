@@ -43,13 +43,27 @@ export const createCompetitor = async (req: any, res: Response) => {
       stats,
       socialAccountId,
       watchlistIds,
+      platform,
+      externalUrl,
     } = req.body;
+
     if (!handle || !name) {
       return res.status(400).json({ error: 'Handle and name are required' });
     }
 
+    // Heuristics for manual creation if fields are missing
+    const finalPlatform =
+      platform || (handle.startsWith('@') ? 'youtube' : 'instagram');
+    const finalExternalUrl =
+      externalUrl ||
+      (finalPlatform === 'tiktok'
+        ? `https://www.tiktok.com/@${handle.replace('@', '')}`
+        : finalPlatform === 'youtube'
+          ? `https://www.youtube.com/${handle}/shorts`
+          : `https://www.instagram.com/${handle.replace('@', '')}/`);
+
     const competitor = await competitorsService.createCompetitor(req.user.id, {
-      handle,
+      handle: handle.replace('@', ''),
       name,
       avatarUrl,
       bio,
@@ -57,6 +71,8 @@ export const createCompetitor = async (req: any, res: Response) => {
       stats,
       socialAccountId,
       watchlistIds,
+      platform: finalPlatform,
+      externalUrl: finalExternalUrl,
     });
     res.status(201).json(competitor);
   } catch (error: any) {

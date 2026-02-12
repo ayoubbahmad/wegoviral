@@ -72,10 +72,12 @@ export const MOCK_SCRIPTS: ScriptTemplate[] = [
 export const MOCK_COMPETITORS: Competitor[] = [
   {
     id: '1',
-    handle: '@techguru',
+    handle: 'techguru',
     name: 'Alex Tech',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
     bio: 'Helping you master the modern stack. Ex-Google.',
+    platform: 'instagram',
+    externalUrl: 'https://www.instagram.com/techguru/',
     stats: {
       followers: '145k',
       avgLikes: '12k',
@@ -86,10 +88,12 @@ export const MOCK_COMPETITORS: Competitor[] = [
   },
   {
     id: '2',
-    handle: '@creativeflow',
+    handle: 'creativeflow',
     name: 'Sarah Creates',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     bio: 'Design thinking for non-designers.',
+    platform: 'instagram',
+    externalUrl: 'https://www.instagram.com/creativeflow/',
     stats: {
       followers: '89k',
       avgLikes: '5.4k',
@@ -100,10 +104,12 @@ export const MOCK_COMPETITORS: Competitor[] = [
   },
   {
     id: '3',
-    handle: '@money_master',
+    handle: 'money_master',
     name: 'Rich Minds',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rich',
     bio: 'Financial freedom is a mindset.',
+    platform: 'instagram',
+    externalUrl: 'https://www.instagram.com/money_master/',
     stats: {
       followers: '210k',
       avgLikes: '15k',

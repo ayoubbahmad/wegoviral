@@ -4,6 +4,8 @@ export interface Competitor {
   name: string;
   avatarUrl: string;
   bio: string;
+  platform: string;
+  externalUrl: string;
   stats: {
     followers: string;
     avgLikes: string;

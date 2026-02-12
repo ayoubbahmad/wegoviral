@@ -21,6 +21,8 @@ export interface ScraperMetadata {
   followers?: string | number;
   following?: string | number;
   url: string;
+  platform: string;
+  externalUrl: string;
 }
 
 export interface ScraperOptions {

@@ -1,9 +1,9 @@
 import { Modal } from '@/components/Modal';
 import { HookForm } from './components/HookForm';
 import { useAddHookController } from './controller';
-import { Hook } from '../api/types';
+import { Hook } from '../types';
 
-interface AddHookContainerProps {
+interface AddHookFormProps {
   onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
   onUpdateHook?: (
     id: string,
@@ -12,7 +12,7 @@ interface AddHookContainerProps {
   editItem?: Hook | null;
 }
 
-export function AddHookContainer(props: AddHookContainerProps) {
+export function AddHookForm(props: AddHookFormProps) {
   const {
     isOpen,
     isEditing,

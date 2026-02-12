@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
 import { FormInput } from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
-import { ScriptTemplateFormValues } from '../schema';
+import { ScriptTemplateFormValues } from '../forms';
 
 interface ScriptFormProps {
   form: UseFormReturn<ScriptTemplateFormValues>;

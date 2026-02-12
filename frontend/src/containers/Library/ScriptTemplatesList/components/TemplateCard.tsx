@@ -2,7 +2,7 @@ import { FileText, Clock, Layers, Trash2, Anchor, Palette } from 'lucide-react';
 import { cn, formatRelativeDate } from '@/lib/utils';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
-import { ScriptTemplate } from '../api/types';
+import { ScriptTemplate } from '../../types';
 
 interface TemplateCardProps {
   template: ScriptTemplate;

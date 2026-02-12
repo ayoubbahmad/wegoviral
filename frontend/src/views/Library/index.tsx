@@ -1,27 +1,41 @@
+'use client';
+
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Anchor, Palette, Video } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
-import { HooksList } from '@/containers/Library/HooksList';
-import { ScriptTemplatesList } from '@/containers/Library/ScriptTemplatesList';
-import { AddHookContainer } from '@/containers/Library/AddHook';
-import { AddScriptContainer } from '@/containers/Library/AddScript';
-import { DetailsPanel } from '@/containers/Library/components/DetailsPanel';
-import { useLibraryController } from '@/containers/Library/controller';
-import { useLibraryStore } from '@/containers/Library/slice';
 import { Button } from '@/components/Button';
 import { Tabs } from '@/components/Tabs';
-import { ViewToggle } from '@/components/ViewToggle';
 import { SearchInput } from '@/components/SearchInput';
-import { Plus, Anchor, Palette, Video } from 'lucide-react';
+import { ViewToggle } from '@/components/ViewToggle';
+import { useQuery } from '@tanstack/react-query';
+import { scriptListApi } from '@/containers/Library/ScriptTemplatesList/api';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Hook, ScriptTemplate } from '@/containers/Library/types';
+
+// New Granular Containers
+import { HooksList } from '@/containers/Library/HooksList';
+import { ScriptTemplatesList } from '@/containers/Library/ScriptTemplatesList';
+import { AddHookForm } from '@/containers/Library/AddHookForm';
+import { AddScriptForm } from '@/containers/Library/AddScriptForm';
+import { AssetDetailsPanel } from '@/containers/Library/AssetDetailsPanel';
+
+// Shared Logic (now hosted in HooksList for orchestration)
+import { useHooksListController } from '@/containers/Library/HooksList/controller';
+import { useLibraryStore } from '@/containers/Library/HooksList/logic';
+import { hookApi } from '@/containers/Library/AddHookForm/api';
+import { scriptApi } from '@/containers/Library/AddScriptForm/api';
 
 export const LibraryView = () => {
+  const { hooks = [], isLoading: hooksLoading } = useHooksListController();
+
+  // We need to fetch templates for orchestration as well
+  const { data: templates = [], isLoading: templatesLoading } = useQuery({
+    queryKey: ['templates'],
+    queryFn: scriptListApi.getTemplates,
+  });
+
   const {
-    addHook,
-    updateHook,
-    addTemplate,
-    updateTemplate,
-    selectedItem,
     activeTab,
     setActiveTab,
     viewType,
@@ -32,7 +46,14 @@ export const LibraryView = () => {
     setSearchTerm,
     setIsAdding,
     setIsEditing,
-  } = useLibraryController();
+  } = useLibraryStore();
+
+  const selectedItem =
+    activeTab === 'hooks'
+      ? hooks.find((h: Hook) => h.id === selectedItemId)
+      : (templates as ScriptTemplate[]).find(
+          (t: ScriptTemplate) => t.id === selectedItemId,
+        );
 
   return (
     <PageContainer>
@@ -42,7 +63,7 @@ export const LibraryView = () => {
         actions={
           <Button
             onClick={() => setIsAdding(true)}
-            leftIcon={<Plus className='w-4 h-4' />}
+            leftSection={<Plus className='w-4 h-4' />}
           >
             Add New Asset
           </Button>
@@ -50,10 +71,10 @@ export const LibraryView = () => {
       />
 
       {activeTab === 'hooks' && (
-        <AddHookContainer
+        <AddHookForm
           onAddHook={async (data) => {
             try {
-              await addHook(data);
+              await hookApi.createHook(data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -61,7 +82,7 @@ export const LibraryView = () => {
           }}
           onUpdateHook={async (id, data) => {
             try {
-              await updateHook({ id, data });
+              await hookApi.updateHook(id, data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -72,10 +93,10 @@ export const LibraryView = () => {
       )}
 
       {activeTab === 'scripts' && (
-        <AddScriptContainer
+        <AddScriptForm
           onAddScript={async (data) => {
             try {
-              await addTemplate(data);
+              await scriptApi.createTemplate(data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -83,7 +104,7 @@ export const LibraryView = () => {
           }}
           onUpdateScript={async (id, data) => {
             try {
-              await updateTemplate({ id, data });
+              await scriptApi.updateTemplate(id, data);
               return { success: true };
             } catch (error: any) {
               return { success: false, error: error.message };
@@ -98,9 +119,9 @@ export const LibraryView = () => {
         <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
           <div className='w-full md:max-w-md'>
             <SearchInput
-              placeholder='Search assets...'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={`Search ${activeTab}...`}
             />
           </div>
 
@@ -114,8 +135,8 @@ export const LibraryView = () => {
           {/* Content Column */}
           <div
             className={cn(
-              'flex-1 w-full transition-all duration-300',
-              selectedItemId ? 'lg:w-[calc(100%-380px)]' : 'w-full',
+              'flex-1 w-full transition-all duration-500',
+              selectedItemId ? 'lg:w-[calc(100%-432px)]' : 'w-full',
             )}
           >
             <Tabs
@@ -125,7 +146,7 @@ export const LibraryView = () => {
                 { id: 'videos', label: 'Videos', icon: Video },
               ]}
               activeId={activeTab}
-              onChange={(id) => setActiveTab(id as any)}
+              onChange={(id: any) => setActiveTab(id)}
               className='mb-8'
             />
 
@@ -135,13 +156,7 @@ export const LibraryView = () => {
               ) : activeTab === 'scripts' ? (
                 <ScriptTemplatesList />
               ) : (
-                <div className='flex flex-col items-center justify-center p-20 border-2 border-dashed border-border rounded-3xl bg-muted/20'>
-                  <Video className='w-12 h-12 text-muted-foreground/30 mb-4' />
-                  <h3 className='text-lg font-bold'>Videos Tab Coming Soon</h3>
-                  <p className='text-sm text-muted-foreground'>
-                    Save viral videos directly to your library.
-                  </p>
-                </div>
+                <div>Videos Tab Coming Soon</div>
               )}
             </div>
           </div>
@@ -150,13 +165,13 @@ export const LibraryView = () => {
           <AnimatePresence>
             {selectedItemId && (
               <motion.div
-                initial={{ x: 400, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 400, opacity: 0 }}
-                className='w-full lg:w-[380px] lg:sticky lg:top-8 shrink-0 z-20'
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className='w-full lg:w-auto'
               >
-                <DetailsPanel
-                  item={selectedItem || null}
+                <AssetDetailsPanel
+                  item={(selectedItem as any) || null}
                   type={activeTab}
                   onClose={() => setSelectedItemId(null)}
                   onEdit={() => setIsEditing(true)}

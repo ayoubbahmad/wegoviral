@@ -75,7 +75,7 @@ Encapsulates everything related to data fetching for the container.
 Encapsulates form validation and state management using React Hook Form and Zod.
 
 - **`types.d.ts`**: Defines inferred TypeScript types.
-- **`index.ts`**: Custom hooks (e.g., `use[Feature]Form`) that initialize `useForm` with resolvers.
+- **`index.ts`**: Custom hooks (e.g., `use[FeatureName]Form`) that initialize `useForm` with resolvers.
 - **`schemas.ts`**: Zod schemas for form validation.
 - **Rule**: Validation logic never leaks into the UI or Controller.
 

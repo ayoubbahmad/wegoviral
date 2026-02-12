@@ -1,6 +1,6 @@
 'use client';
 
-import { Hook } from '@/containers/Library/api/types';
+import { Hook } from '../../types';
 import { Trash2, Copy, Star, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

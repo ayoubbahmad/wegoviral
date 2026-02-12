@@ -3,29 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { libraryApi } from '../../api';
-import { useLibraryStore } from '../../slice';
-import { Hook } from '../../api/types';
-import { HookSchema, HookFormValues } from '../schema';
+import { Hook } from '../../types';
+import { HookSchema, HookFormValues } from './schema';
+import { hookApi } from '../api';
 
-interface UseAddHookControllerProps {
-  editItem?: Hook | null;
-  onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
-  onUpdateHook?: (
-    id: string,
-    hook: any,
-  ) => Promise<{ success: boolean; error?: string }>;
-}
-
-export function useAddHookController({
-  editItem,
-  onAddHook,
-  onUpdateHook,
-}: UseAddHookControllerProps) {
-  const { isAdding, setIsAdding, isEditing, setIsEditing } = useLibraryStore();
-  const isOpen =
-    (isAdding || isEditing) && (!editItem || 'content' in editItem);
-
+export function useAddHookForm(editItem?: Hook | null, isOpen?: boolean) {
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const [metadata, setMetadata] = useState<any>(null);
   const [tagInput, setTagInput] = useState('');
@@ -49,43 +31,36 @@ export function useAddHookController({
       return;
     }
 
-    if (isEditing && editItem && 'content' in editItem) {
-      const hook = editItem as Hook;
+    if (editItem) {
       form.reset({
-        content: hook.content,
-        type: hook.type as any,
-        emotion: hook.emotion as any,
-        topic: hook.topic,
-        sourceUrl: hook.sourceUrl || '',
-        tags: hook.tags || [],
-        sourceMetadata: hook.sourceMetadata,
+        content: editItem.content,
+        type: editItem.type as any,
+        emotion: editItem.emotion as any,
+        topic: editItem.topic,
+        sourceUrl: editItem.sourceUrl || '',
+        tags: editItem.tags || [],
+        sourceMetadata: editItem.sourceMetadata,
       });
-      setMetadata(hook.sourceMetadata);
+      setMetadata(editItem.sourceMetadata);
     }
-  }, [isOpen, isEditing, editItem, form]);
+  }, [isOpen, editItem, form]);
 
   const handleFetchMetadata = async (url: string) => {
     if (!url || !url.startsWith('http')) return;
 
     setIsFetchingMetadata(true);
     try {
-      const data = await libraryApi.getMetadata(url);
+      const data = (await hookApi.getMetadata(url)) as any;
       setMetadata(data);
       form.setValue('sourceMetadata', data);
       if (!form.getValues('topic')) {
-        form.setValue('topic', data.title || '');
+        form.setValue('topic', (data && data.title) || '');
       }
     } catch (error) {
       console.error('Failed to fetch metadata', error);
     } finally {
       setIsFetchingMetadata(false);
     }
-  };
-
-  const handleClose = () => {
-    setIsAdding(false);
-    setIsEditing(false);
-    setMetadata(null);
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
@@ -107,31 +82,14 @@ export function useAddHookController({
     );
   };
 
-  const onSubmit = async (data: HookFormValues) => {
-    try {
-      if (isEditing && editItem) {
-        await onUpdateHook?.(editItem.id, data);
-      } else {
-        await onAddHook?.(data);
-      }
-      handleClose();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return {
-    isOpen,
-    isEditing,
+    form,
     metadata,
     isFetchingMetadata,
-    handleFetchMetadata,
     tagInput,
     setTagInput,
+    handleFetchMetadata,
     handleAddTag,
     handleRemoveTag,
-    handleClose,
-    form,
-    onSubmit,
   };
 }

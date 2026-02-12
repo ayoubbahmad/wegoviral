@@ -8,7 +8,7 @@ import { Badge } from '@/components/Badge';
 import { FormInput } from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
 import { FormTextarea } from '@/components/forms/FormTextarea';
-import { HookFormValues } from '../schema';
+import { HookFormValues } from '../forms';
 
 interface HookFormProps {
   form: UseFormReturn<HookFormValues>;

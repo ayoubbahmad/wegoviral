@@ -46,8 +46,8 @@ export function AddCompetitorModal({
   };
 
   const onFinalSubmit = async () => {
-    const success = await bulkCreateMutation.mutateAsync(watch());
-    if (success) {
+    const result = await bulkCreateMutation.mutateAsync(watch());
+    if (result?.success) {
       handleClose();
     }
   };

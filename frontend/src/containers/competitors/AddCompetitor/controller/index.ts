@@ -57,10 +57,11 @@ export function useAddCompetitorController() {
           'success',
         );
         queryClient.invalidateQueries({ queryKey: ['competitors'] });
-        return true;
+        queryClient.invalidateQueries({ queryKey: ['watchlists'] });
+        return result;
       } else {
         showToast(result?.error || 'Failed to add competitors', 'error');
-        return false;
+        return result;
       }
     },
     onError: () => {

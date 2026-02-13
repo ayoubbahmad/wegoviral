@@ -238,35 +238,43 @@ export class CompetitorsService {
     const results = [];
 
     for (const video of videos) {
-      // Check if exists by thumbnail or caption to avoid duplicates
-      // This is a naive check; ideally we'd have externalId or url in schema.
-      const existing = await prisma.competitorPost.findFirst({
-        where: {
-          competitorId,
-          OR: [
-            { thumbnailUrl: video.thumbnail },
-            { captionExcerpt: video.title?.substring(0, 100) || 'No caption' },
-          ],
-        },
-      });
+      // Use the video URL as the unique external identification
+      const externalUrl = video.url;
 
-      if (!existing && video.thumbnail) {
-        const post = await prisma.competitorPost.create({
-          data: {
+      try {
+        const post = await prisma.competitorPost.upsert({
+          where: {
+            competitorId_externalUrl: {
+              competitorId,
+              externalUrl,
+            },
+          },
+          update: {
+            metrics: {
+              views: video.views || '0',
+              likes: video.likes || '0',
+              comments: video.comments || '0',
+              url: video.url,
+            },
+          },
+          create: {
             competitorId,
-            thumbnailUrl: video.thumbnail,
+            externalUrl,
+            thumbnailUrl: video.thumbnail || '',
             captionExcerpt: video.title || video.description || 'No caption',
             postedAt: video.postedAt || new Date(),
             metrics: {
               views: video.views || '0',
               likes: video.likes || '0',
               comments: video.comments || '0',
-              url: video.url, // Storing URL in metrics for now
+              url: video.url,
             },
             isViral: false,
           },
         });
         results.push(post);
+      } catch (error) {
+        console.error(`Failed to upsert video ${externalUrl}:`, error);
       }
     }
 
@@ -275,6 +283,80 @@ export class CompetitorsService {
       where: { competitorId },
       orderBy: { postedAt: 'desc' },
       take: 10,
+    });
+  }
+
+  // Creator Management
+  async getCreators(userId: string) {
+    return prisma.creator.findMany({
+      where: { userId },
+      include: {
+        competitors: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async getCreatorById(id: string, userId: string) {
+    return prisma.creator.findFirst({
+      where: { id, userId },
+      include: {
+        competitors: {
+          include: {
+            posts: {
+              orderBy: { postedAt: 'desc' },
+              take: 5,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async createCreator(userId: string, name: string) {
+    return prisma.creator.create({
+      data: {
+        name,
+        userId,
+      },
+    });
+  }
+
+  async linkCompetitorToCreator(
+    competitorId: string,
+    creatorId: string,
+    userId: string,
+  ) {
+    // Verify ownership
+    const competitor = await prisma.competitor.findFirst({
+      where: { id: competitorId, userId },
+    });
+    const creator = await prisma.creator.findFirst({
+      where: { id: creatorId, userId },
+    });
+
+    if (!competitor || !creator) {
+      throw new Error('Competitor or Creator not found or not owned by user');
+    }
+
+    return prisma.competitor.update({
+      where: { id: competitorId },
+      data: { creatorId },
+    });
+  }
+
+  async unlinkCompetitorFromCreator(competitorId: string, userId: string) {
+    const competitor = await prisma.competitor.findFirst({
+      where: { id: competitorId, userId },
+    });
+
+    if (!competitor) {
+      throw new Error('Competitor not found');
+    }
+
+    return prisma.competitor.update({
+      where: { id: competitorId },
+      data: { creatorId: null },
     });
   }
 

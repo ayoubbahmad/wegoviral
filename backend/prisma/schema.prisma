@@ -18,6 +18,7 @@ model UserProfile {
   username        String           @unique
   automations     Automation[]
   competitors     Competitor[]
+  creators        Creator[]
   hooks           Hook[]
   scripts         Script[]
   scriptTemplates ScriptTemplate[]
@@ -100,12 +101,26 @@ model Competitor {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   socialAccountId String?
+  creatorId       String?
+  creator         Creator?         @relation(fields: [creatorId], references: [id])
   socialAccount   SocialAccount?   @relation(fields: [socialAccountId], references: [id])
   user            UserProfile      @relation(fields: [userId], references: [id])
   posts           CompetitorPost[]
   watchlists      Watchlist[]      @relation("CompetitorToWatchlist")
 
   @@unique([userId, handle])
+}
+
+model Creator {
+  id          String       @id @default(uuid())
+  name        String
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        UserProfile  @relation(fields: [userId], references: [id])
+  competitors Competitor[]
+
+  @@unique([userId, name])
 }
 
 model Watchlist {
@@ -129,8 +144,11 @@ model CompetitorPost {
   metrics        Json
   isViral        Boolean    @default(false)
   analysis       Json?
+  externalUrl    String?    // Unique identifier from platform (e.g., video ID or URL)
   createdAt      DateTime   @default(now())
   competitor     Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@unique([competitorId, externalUrl])
 }
 
 model UserPost {

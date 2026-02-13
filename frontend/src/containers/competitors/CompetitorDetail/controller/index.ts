@@ -4,6 +4,13 @@ import { Competitor } from '@/types/competitor';
 import { useGetCompetitor } from '../api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { watchlistsApi } from '../../api/watchlists';
+import {
+  useGetCreators,
+  useLinkCompetitor,
+  useUnlinkCompetitor,
+  useCreateCreator,
+  useGetCreator,
+} from '../../api/creators';
 
 export const useCompetitorDetailController = (id: string) => {
   const { showToast } = useToast();
@@ -12,6 +19,14 @@ export const useCompetitorDetailController = (id: string) => {
   const [savedStructures, setSavedStructures] = useState<string[]>([]);
 
   const { data: competitor, isLoading, error } = useGetCompetitor(id);
+
+  // Creator data
+  const { data: allCreators } = useGetCreators();
+  const { data: linkedCreator } = useGetCreator(competitor?.creatorId || null);
+
+  const { mutate: linkCompetitor } = useLinkCompetitor();
+  const { mutate: unlinkCompetitor } = useUnlinkCompetitor();
+  const { mutate: createCreator } = useCreateCreator();
 
   const { data: allWatchlists } = useQuery({
     queryKey: ['watchlists'],
@@ -52,8 +67,33 @@ export const useCompetitorDetailController = (id: string) => {
     }
   };
 
+  const handleLinkCreator = (creatorId: string) => {
+    linkCompetitor(
+      { competitorId: id, creatorId },
+      {
+        onSuccess: () => showToast('Linked to creator successfully', 'success'),
+      },
+    );
+  };
+
+  const handleUnlinkCreator = () => {
+    unlinkCompetitor(id, {
+      onSuccess: () => showToast('Unlinked from creator', 'success'),
+    });
+  };
+
+  const handleCreateAndLinkCreator = (name: string) => {
+    createCreator(name, {
+      onSuccess: (newCreator) => {
+        handleLinkCreator(newCreator.id);
+      },
+    });
+  };
+
   return {
     competitor,
+    linkedCreator,
+    allCreators: allCreators || [],
     posts,
     isLoading,
     error,
@@ -64,5 +104,8 @@ export const useCompetitorDetailController = (id: string) => {
     addToWatchlist: addMutation.mutate,
     removeFromWatchlist: removeMutation.mutate,
     isUpdatingWatchlist: addMutation.isPending || removeMutation.isPending,
+    linkCreator: handleLinkCreator,
+    unlinkCreator: handleUnlinkCreator,
+    createAndLinkCreator: handleCreateAndLinkCreator,
   };
 };

@@ -45,6 +45,7 @@ export const createCompetitor = async (req: any, res: Response) => {
       watchlistIds,
       platform,
       externalUrl,
+      creatorId,
     } = req.body;
 
     if (!handle || !name) {
@@ -73,6 +74,7 @@ export const createCompetitor = async (req: any, res: Response) => {
       watchlistIds,
       platform: finalPlatform,
       externalUrl: finalExternalUrl,
+      creatorId,
     });
     res.status(201).json(competitor);
   } catch (error: any) {
@@ -163,10 +165,6 @@ export const deleteCompetitor = async (req: any, res: Response) => {
 export const syncVideos = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
-    // If ID is provided, sync that competitor.
-    // If we want to sync all, we might need a different route or check for special ID.
-    // For now, let's assume this is per-competitor sync.
-
     const posts = await competitorsService.syncCompetitorVideos(
       id,
       req.user.id,
@@ -191,5 +189,80 @@ export const syncAllCompetitors = async (req: any, res: Response) => {
       error: 'Failed to sync all competitors',
       details: error.message,
     });
+  }
+};
+
+// Creator Endpoints
+export const getCreators = async (req: any, res: Response) => {
+  try {
+    const creators = await competitorsService.getCreators(req.user.id);
+    res.json(creators);
+  } catch (error) {
+    console.error('Get Creators Error:', error);
+    res.status(500).json({ error: 'Failed to fetch creators' });
+  }
+};
+
+export const getCreator = async (req: any, res: Response) => {
+  try {
+    const creator = await competitorsService.getCreatorById(
+      req.params.id,
+      req.user.id,
+    );
+    if (!creator) {
+      return res.status(404).json({ error: 'Creator not found' });
+    }
+    res.json(creator);
+  } catch (error) {
+    console.error('Get Creator Error:', error);
+    res.status(500).json({ error: 'Failed to fetch creator' });
+  }
+};
+
+export const createCreator = async (req: any, res: Response) => {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+    const creator = await competitorsService.createCreator(req.user.id, name);
+    res.status(201).json(creator);
+  } catch (error) {
+    console.error('Create Creator Error:', error);
+    res.status(500).json({ error: 'Failed to create creator' });
+  }
+};
+
+export const linkCompetitor = async (req: any, res: Response) => {
+  try {
+    const { competitorId, creatorId } = req.body;
+    if (!competitorId || !creatorId) {
+      return res
+        .status(400)
+        .json({ error: 'competitorId and creatorId are required' });
+    }
+    const updated = await competitorsService.linkCompetitorToCreator(
+      competitorId,
+      creatorId,
+      req.user.id,
+    );
+    res.json(updated);
+  } catch (error: any) {
+    console.error('Link Competitor Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const unlinkCompetitor = async (req: any, res: Response) => {
+  try {
+    const { id } = req.params; // competitorId
+    const updated = await competitorsService.unlinkCompetitorFromCreator(
+      id,
+      req.user.id,
+    );
+    res.json(updated);
+  } catch (error: any) {
+    console.error('Unlink Competitor Error:', error);
+    res.status(500).json({ error: error.message });
   }
 };

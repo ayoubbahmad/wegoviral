@@ -15,6 +15,16 @@ export interface Competitor {
   isFollowing?: boolean;
   watchlists?: { id: string; name: string }[];
   posts?: CompetitorPost[];
+  creatorId?: string | null;
+}
+
+export interface Creator {
+  id: string;
+  name: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  competitors?: Competitor[];
 }
 
 export interface CompetitorPost {

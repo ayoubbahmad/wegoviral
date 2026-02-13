@@ -1,5 +1,4 @@
-'use client';
-
+import { useState } from 'react';
 import { useCompetitorDetailController } from './controller';
 import {
   ArrowLeft,
@@ -14,6 +13,9 @@ import {
   Loader2,
   FolderPlus,
   Trash2,
+  Users,
+  Link as LinkIcon,
+  Unlink,
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -36,7 +38,15 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
     allWatchlists,
     addToWatchlist,
     removeFromWatchlist,
+    linkedCreator,
+    allCreators,
+    linkCreator,
+    unlinkCreator,
+    createAndLinkCreator,
   } = useCompetitorDetailController(id);
+
+  const [isLinkingModalOpen, setIsLinkingModalOpen] = useState(false);
+  const [newCreatorName, setNewCreatorName] = useState('');
 
   if (isLoading) {
     return (
@@ -179,6 +189,35 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Creator Linking */}
+              <div className='flex items-center gap-2 mt-4 pt-4 border-t border-border/40'>
+                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1'>
+                  Creator Brand:
+                </span>
+                {linkedCreator ? (
+                  <div className='flex items-center gap-2'>
+                    <span className='text-xs font-bold px-3 py-1 bg-indigo-500/10 text-indigo-600 rounded-full border border-indigo-500/20 flex items-center gap-1.5'>
+                      <Users className='w-3 h-3' />
+                      {linkedCreator.name}
+                    </span>
+                    <button
+                      onClick={() => unlinkCreator()}
+                      className='p-1 hover:bg-red-500/10 hover:text-red-500 rounded transition-colors'
+                      title='Unlink from creator'
+                    >
+                      <Unlink className='w-3 h-3' />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsLinkingModalOpen(true)}
+                    className='text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 flex items-center gap-1 font-bold transition-colors'
+                  >
+                    <LinkIcon className='w-3 h-3' /> Link Creator
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -372,6 +411,90 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
           </div>
         </div>
       </div>
+
+      {/* Linking Modal */}
+      {isLinkingModalOpen && (
+        <div className='fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200'>
+          <div className='bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-6 animate-in zoom-in-95 duration-200'>
+            <div className='flex items-center justify-between'>
+              <h3 className='text-lg font-bold'>Link to Creator Brand</h3>
+              <button
+                onClick={() => setIsLinkingModalOpen(false)}
+                className='p-1 hover:bg-secondary rounded-lg transition-colors'
+              >
+                <Plus className='w-5 h-5 rotate-45' />
+              </button>
+            </div>
+
+            <p className='text-sm text-muted-foreground'>
+              Group multiple platform profiles (YouTube, TikTok, Instagram)
+              under one Brand name.
+            </p>
+
+            <div className='space-y-4'>
+              {/* Existing Creators */}
+              {allCreators.length > 0 && (
+                <div className='space-y-2'>
+                  <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
+                    Select Existing
+                  </span>
+                  <div className='grid gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1'>
+                    {allCreators.map((creator: any) => (
+                      <button
+                        key={creator.id}
+                        onClick={() => {
+                          linkCreator(creator.id);
+                          setIsLinkingModalOpen(false);
+                        }}
+                        className='flex items-center justify-between w-full px-4 py-3 bg-secondary/50 hover:bg-secondary rounded-xl text-left transition-colors group'
+                      >
+                        <span className='font-medium'>{creator.name}</span>
+                        <LinkIcon className='w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity' />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className='relative'>
+                <div className='absolute inset-0 flex items-center'>
+                  <span className='w-full border-t border-border' />
+                </div>
+                <div className='relative flex justify-center text-xs uppercase'>
+                  <span className='bg-card px-2 text-muted-foreground'>or</span>
+                </div>
+              </div>
+
+              {/* Create New */}
+              <div className='space-y-2'>
+                <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
+                  Create New Brand
+                </span>
+                <div className='flex gap-2'>
+                  <input
+                    type='text'
+                    placeholder='Brand Name (e.g., MrBeast)'
+                    value={newCreatorName}
+                    onChange={(e) => setNewCreatorName(e.target.value)}
+                    className='flex-1 bg-secondary border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all'
+                  />
+                  <button
+                    disabled={!newCreatorName.trim()}
+                    onClick={() => {
+                      createAndLinkCreator(newCreatorName);
+                      setNewCreatorName('');
+                      setIsLinkingModalOpen(false);
+                    }}
+                    className='px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all'
+                  >
+                    Create
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

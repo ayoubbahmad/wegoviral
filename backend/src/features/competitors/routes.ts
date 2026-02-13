@@ -9,6 +9,14 @@ router.use(protect);
 
 router.get('/', competitorsController.getCompetitors);
 router.get('/preview', competitorsController.previewCompetitor);
+
+// Creator routes
+router.get('/creators', competitorsController.getCreators);
+router.post('/creators', competitorsController.createCreator);
+router.get('/creators/:id', competitorsController.getCreator);
+router.post('/creators/link', competitorsController.linkCompetitor);
+router.post('/creators/unlink/:id', competitorsController.unlinkCompetitor);
+
 router.get('/:id', competitorsController.getCompetitor);
 router.post('/', competitorsController.createCompetitor);
 router.post('/bulk', competitorsController.bulkCreateCompetitors);

@@ -24,6 +24,7 @@ model UserProfile {
   scriptTemplates ScriptTemplate[]
   socialAccounts  SocialAccount[]
   watchlists      Watchlist[]
+  projects        Project[]
 }
 
 model Hook {
@@ -234,4 +235,38 @@ model Automation {
   isGlobal            Boolean        @default(true)
   socialAccount       SocialAccount? @relation(fields: [socialAccountId], references: [id])
   user                UserProfile    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ProjectType {
+  GENERAL
+  CASE_STUDY
+  CONTENT_SERIES
+  COLLABORATIVE
+}
+
+model Project {
+  id           String        @id @default(uuid())
+  name         String
+  type         ProjectType   @default(GENERAL)
+  description  String?
+  status       String        @default("Active")
+  metadata     Json?         // Type-specific global data
+  userId       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        ProjectItem[]
+}
+
+model ProjectItem {
+  id        String   @id @default(uuid())
+  projectId String
+  type      String   // e.g., "video", "episode", "note"
+  title     String
+  content   Json?
+  status    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

@@ -1,0 +1,6 @@
+export const ProjectType = {
+  CASE_STUDY: 'CASE_STUDY',
+  CONTENT_SERIES: 'CONTENT_SERIES',
+  COLLABORATIVE: 'COLLABORATIVE',
+  GENERAL: 'GENERAL',
+} as const;

@@ -1,7 +1,6 @@
 'use client';
 
 import { Folder, MoreHorizontal, FileText, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 interface ProjectCardProps {
@@ -59,20 +58,18 @@ export function ProjectCard({
   );
 }
 
-export function NewProjectCard({ onClick }: { onClick?: () => void }) {
+export const NewProjectCard = ({ onClick }: { onClick?: () => void }) => {
   return (
-    <Card
+    <button
       onClick={onClick}
-      hover
-      variant='glass'
-      className='flex flex-col items-center justify-center h-[220px] border-2 border-dashed border-border/50 bg-transparent group'
+      className='flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-200 aspect-[4/3] group'
     >
       <div className='p-4 rounded-full bg-secondary/30 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-all mb-4'>
         <Folder className='w-8 h-8' />
       </div>
-      <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors'>
+      <p className='text-sm text-text-secondary group-hover:text-primary transition-colors'>
         Create New Project
-      </span>
-    </Card>
+      </p>
+    </button>
   );
-}
+};

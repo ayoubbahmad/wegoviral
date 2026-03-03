@@ -7,6 +7,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   hoverScale?: boolean;
   leftSection?: React.ReactNode;
   rightSection?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 /**
@@ -19,6 +20,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       size = 'md',
       hoverScale = false,
+      isLoading = false,
+      children,
+      disabled,
       ...props
     },
     ref,
@@ -58,8 +62,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           hoverScale && 'hover:scale-105',
           className,
         )}
+        disabled={disabled || isLoading}
         {...props}
-      />
+      >
+        {isLoading ? (
+          <div className='flex items-center gap-2'>
+            <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
+            <span>Loading...</span>
+          </div>
+        ) : (
+          children
+        )}
+      </button>
     );
   },
 );

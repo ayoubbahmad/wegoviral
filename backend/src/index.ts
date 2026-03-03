@@ -19,6 +19,7 @@ import socialAccountRoutes from './features/social-accounts/routes';
 import libraryRoutes from './features/library/routes';
 import watchlistsRoutes from './features/watchlists/routes';
 import videosRoutes from './features/videos/routes';
+import projectsRoutes from './features/projects/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -49,6 +50,7 @@ app.use('/api/social-accounts', socialAccountRoutes);
 app.use('/api/library', libraryRoutes);
 app.use('/api/watchlists', watchlistsRoutes);
 app.use('/api/videos', videosRoutes);
+app.use('/api/projects', projectsRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

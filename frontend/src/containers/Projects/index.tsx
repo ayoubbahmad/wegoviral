@@ -1,15 +1,24 @@
 'use client';
 
-import { ProjectCard, NewProjectCard } from './components/ProjectCard';
 import { Plus } from 'lucide-react';
-import { useProjectsController } from './controller';
+
 import { ProjectsSkeleton } from '@/views/Projects/skeleton';
 import { Button } from '@/components/Button';
 import { PageHeader } from '@/components/PageHeader';
 import { PageContainer } from '@/components/PageContainer';
 
+import { ProjectCard, NewProjectCard, NewProjectModal } from './components';
+import { useProjectsController } from './controller';
+
 export const ProjectsContainer = () => {
-  const { projects, isLoading, handleNewProject } = useProjectsController();
+  const {
+    projects,
+    isLoading,
+    isCreating,
+    isModalOpen,
+    setIsModalOpen,
+    handleCreateProject,
+  } = useProjectsController();
 
   if (isLoading) {
     return <ProjectsSkeleton />;
@@ -21,14 +30,25 @@ export const ProjectsContainer = () => {
         title='Projects'
         description='Organize your content into dedicated project folders.'
         actions={
-          <Button variant='primary' size='md' onClick={handleNewProject}>
+          <Button
+            variant='primary'
+            size='md'
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus className='w-4 h-4' /> New Project
           </Button>
         }
       />
 
+      <NewProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateProject}
+        isSubmitting={isCreating}
+      />
+
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        <NewProjectCard />
+        <NewProjectCard onClick={() => setIsModalOpen(true)} />
         {projects.map((project, i) => (
           <ProjectCard
             key={project.id}

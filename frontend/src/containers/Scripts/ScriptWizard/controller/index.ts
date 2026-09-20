@@ -2,16 +2,22 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useGetHookTemplates, useGetStyleTemplates } from '../api';
-import { useScriptTopicForm, useScriptRefinementForm, ScriptTopicValues, ScriptRefinementValues } from '../forms';
+import {
+  useScriptTopicForm,
+  useScriptRefinementForm,
+  ScriptTopicValues,
+  ScriptRefinementValues,
+} from '../forms';
 import { scriptsApi } from '../../Library/api';
 import { Script } from '../../Library/api/types';
 
 // Types
-export type Step = 'topic' | 'research' | 'hook' | 'style' | 'script';
+export type Step = 'topic' | 'research' | 'angle' | 'hook' | 'style' | 'script';
 
 export const STEPS = [
   { id: 'topic', label: 'Topic' },
   { id: 'research', label: 'Research' },
+  { id: 'angle', label: 'Angle' },
   { id: 'hook', label: 'Hook' },
   { id: 'style', label: 'Style' },
   { id: 'script', label: 'Script' },
@@ -21,7 +27,7 @@ export const useScriptWizardController = (scriptId?: string) => {
   const router = useRouter();
   const { data: hookTemplates = [] } = useGetHookTemplates();
   const { data: styleTemplates = [] } = useGetStyleTemplates();
-  
+
   const topicForm = useScriptTopicForm();
   const refinementForm = useScriptRefinementForm();
 
@@ -31,8 +37,10 @@ export const useScriptWizardController = (scriptId?: string) => {
   const [selectedHooks, setSelectedHooks] = useState<number[]>([]);
   const [selectedStyle, setSelectedStyle] = useState<number | null>(null);
   const [scriptGenerated, setScriptGenerated] = useState(false);
-  const [editableContent, setEditableContent] = useState("");
+  const [editableContent, setEditableContent] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedAngle, setSelectedAngle] = useState<string | null>(null);
+  const [angles, setAngles] = useState<any[]>([]);
 
   // Fetch script data if editing
   const { data: scriptData, isLoading: isLoadingScript } = useQuery({
@@ -47,7 +55,7 @@ export const useScriptWizardController = (scriptId?: string) => {
       topicForm.reset({ topic: scriptData.content?.topic || '' });
       setSelectedHooks(scriptData.content?.hooks || []);
       setSelectedStyle(scriptData.content?.style || null);
-      setEditableContent((scriptData.content as any)?.generatedContent || "");
+      setEditableContent((scriptData.content as any)?.generatedContent || '');
       setResearchComplete(true);
       setScriptGenerated(true);
       setActiveStep('script');
@@ -59,20 +67,23 @@ export const useScriptWizardController = (scriptId?: string) => {
     mutationFn: scriptsApi.createScript,
     onSuccess: () => {
       router.push('/scripts');
-    }
+    },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => scriptsApi.updateScript(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      scriptsApi.updateScript(id, data),
     onSuccess: () => {
       router.push('/scripts');
-    }
+    },
   });
 
   // Scroll visibility tracking
   useEffect(() => {
     const handleScroll = () => {
-      const sections = STEPS.map((step) => document.getElementById(step.id)).filter(Boolean);
+      const sections = STEPS.map((step) =>
+        document.getElementById(step.id),
+      ).filter(Boolean);
       for (const section of sections) {
         if (section) {
           const rect = section.getBoundingClientRect();
@@ -91,7 +102,8 @@ export const useScriptWizardController = (scriptId?: string) => {
     const element = document.getElementById(id);
     if (element) {
       const navHeight = 140;
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const elementPosition =
+        element.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition - navHeight;
 
       window.scrollTo({
@@ -102,46 +114,81 @@ export const useScriptWizardController = (scriptId?: string) => {
     }
   }, []);
 
-  const handleTopicSubmit = useCallback((values: ScriptTopicValues) => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setResearchComplete(true);
-      scrollToSection('research');
-    }, 2000);
-  }, [scrollToSection]);
+  const handleTopicSubmit = useCallback(
+    (values: ScriptTopicValues) => {
+      setIsProcessing(true);
+      setTimeout(() => {
+        setIsProcessing(false);
+        setResearchComplete(true);
+        // MOCK: Generate angles after research
+        setAngles(
+          [
+            {
+              id: 'angle-1',
+              title: 'The Scientific Approach',
+              icon: 'Sparkles',
+              description: 'Focus on technical breakdown and facts.',
+              shockScore: 8.5,
+            },
+            {
+              id: 'angle-2',
+              title: 'The Personal Journey',
+              icon: 'Users',
+              description: 'Human experience and emotional narrative.',
+              shockScore: 7.2,
+            },
+            {
+              id: 'angle-3',
+              title: 'The Disruptor',
+              icon: 'Zap',
+              description: 'Challenging status quo and bold predictions.',
+              shockScore: 9.8,
+            },
+          ].sort((a, b) => b.shockScore - a.shockScore),
+        );
+        scrollToSection('research');
+      }, 2000);
+    },
+    [scrollToSection],
+  );
 
   const toggleHookSelection = useCallback((id: number) => {
-    setSelectedHooks((prev) => 
-      prev.includes(id) ? prev.filter((h) => h !== id) : [...prev, id]
+    setSelectedHooks((prev) =>
+      prev.includes(id) ? prev.filter((h) => h !== id) : [...prev, id],
     );
   }, []);
 
   const handleGenerateScript = useCallback(() => {
-    const defaultContent = "This is a revolutionary AI project from Google...\n\nIt's called Nano Banana Impact.\n\nAnd this thing is like Photoshop with superpowers.\n\nGoogle created this to completely transform how we edit and generate images.";
+    const defaultContent =
+      "This is a revolutionary AI project from Google...\n\nIt's called Nano Banana Impact.\n\nAnd this thing is like Photoshop with superpowers.\n\nGoogle created this to completely transform how we edit and generate images.";
     setEditableContent(defaultContent);
     setScriptGenerated(true);
     scrollToSection('script');
   }, [scrollToSection]);
 
-  const handleRefinementSubmit = useCallback((values: ScriptRefinementValues) => {
-    console.log("Refining script with:", values.refinement);
-    // Simulate AI refinement by appending text for now
-    setEditableContent(prev => prev + `\n\n[AI Refinement: ${values.refinement}]`);
-    refinementForm.reset();
-  }, [refinementForm]);
+  const handleRefinementSubmit = useCallback(
+    (values: ScriptRefinementValues) => {
+      console.log('Refining script with:', values.refinement);
+      // Simulate AI refinement by appending text for now
+      setEditableContent(
+        (prev) => prev + `\n\n[AI Refinement: ${values.refinement}]`,
+      );
+      refinementForm.reset();
+    },
+    [refinementForm],
+  );
 
   const handleSaveScript = async () => {
     const values = topicForm.getValues();
     const payload = {
-      title: values.topic.substring(0, 50) + "...",
+      title: values.topic.substring(0, 50) + '...',
       content: {
         topic: values.topic,
         hooks: selectedHooks,
         style: selectedStyle,
-        generatedContent: editableContent
+        generatedContent: editableContent,
       },
-      category: "General"
+      category: 'General',
     };
 
     try {
@@ -151,8 +198,8 @@ export const useScriptWizardController = (scriptId?: string) => {
         await saveMutation.mutateAsync(payload);
       }
     } catch (err) {
-      console.error("Failed to save script:", err);
-      alert("Failed to save script. Please try again.");
+      console.error('Failed to save script:', err);
+      alert('Failed to save script. Please try again.');
     }
   };
 
@@ -161,6 +208,9 @@ export const useScriptWizardController = (scriptId?: string) => {
     setActiveStep,
     isProcessing: isProcessing || isLoadingScript,
     researchComplete,
+    angles,
+    selectedAngle,
+    setSelectedAngle,
     selectedHooks,
     toggleHookSelection,
     selectedStyle,
@@ -180,6 +230,6 @@ export const useScriptWizardController = (scriptId?: string) => {
     styleTemplates,
     topicForm,
     refinementForm,
-    scriptData
+    scriptData,
   };
 };

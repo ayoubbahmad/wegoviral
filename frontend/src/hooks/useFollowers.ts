@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/providers/Auth';
 
-export function useCommunity() {
+export function useFollowers() {
   const { activeSocialAccount } = useAuth();
   const [followers, setFollowers] = useState<any[]>([]);
   const [summary, setSummary] = useState({
@@ -21,6 +21,8 @@ export function useCommunity() {
     }
     setIsLoading(true);
     try {
+      // NOTE: backend route is still /api/community/* (backend/src/features/community/).
+      // Rename this to /api/followers/* once the backend "Follower/Community" feature is renamed.
       const [fData, sData] = await Promise.all([
         apiClient
           .get(`/community/followers?socialAccountId=${activeSocialAccount.id}`)
@@ -32,7 +34,7 @@ export function useCommunity() {
       setFollowers(fData);
       setSummary(sData);
     } catch (error) {
-      console.error('Error fetching community data:', error);
+      console.error('Error fetching follower data:', error);
     } finally {
       setIsLoading(false);
     }

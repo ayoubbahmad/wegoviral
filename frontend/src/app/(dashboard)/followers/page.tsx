@@ -1,26 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { useCommunity } from '@/hooks/useCommunity';
-import { FollowerList } from '@/containers/Community/FollowerList';
+import { useFollowers } from '@/hooks/useFollowers';
+import { FollowerList } from '@/containers/Followers/FollowerList';
 import { Users, UserCheck, UserPlus, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MOCK_COMMUNITY } from '@/lib/mock-data';
+import { MOCK_FOLLOWERS } from '@/lib/mock-data';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { Tabs } from '@/components/Tabs';
 import { PageContainer } from '@/components/PageContainer';
 import { StatCard } from '@/components/StatCard';
 
-export default function CommunityPage() {
-  const { followers, summary, isLoading } = useCommunity();
+export default function FollowersPage() {
+  const { followers, summary, isLoading } = useFollowers();
   const [filter, setFilter] = useState<'All' | 'VIP' | 'New' | 'TopLikers'>(
     'All',
   );
 
   // Fallback to mock data if no followers yet to show the UI value
   const dataToUse =
-    followers && followers.length > 0 ? followers : MOCK_COMMUNITY;
+    followers && followers.length > 0 ? followers : MOCK_FOLLOWERS;
 
   const getFilteredAndSortedFollowers = () => {
     let result = [...dataToUse];
@@ -47,14 +47,14 @@ export default function CommunityPage() {
   return (
     <PageContainer>
       <PageHeader
-        title='Community Intelligence'
+        title='Follower Intelligence'
         description='Identify your most valuable fans and understand who is engaging with you.'
       />
 
       {/* Health Stats */}
       <div className='grid gap-6 md:grid-cols-3'>
         <StatCard
-          label='Total Community'
+          label='Total Followers'
           value={summary.total || '12,345'}
           icon={Users}
           trend={summary.total ? undefined : 12}
@@ -93,7 +93,7 @@ export default function CommunityPage() {
       {/* List */}
       {isLoading ? (
         <div className='p-12 text-center text-muted-foreground'>
-          Loading community data...
+          Loading follower data...
         </div>
       ) : (
         <FollowerList followers={displayedFollowers} />

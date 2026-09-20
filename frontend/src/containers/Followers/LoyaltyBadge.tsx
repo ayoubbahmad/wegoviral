@@ -1,4 +1,4 @@
-import { Segment } from "@/types/community";
+import { Segment } from "@/types/followers";
 import { cn } from "@/lib/utils";
 import { Crown, Star, User, Sparkles } from "lucide-react";
 

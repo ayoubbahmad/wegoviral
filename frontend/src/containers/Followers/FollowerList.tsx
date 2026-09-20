@@ -1,6 +1,6 @@
 "use client";
 
-import { Follower } from "@/types/community";
+import { Follower } from "@/types/followers";
 import { LoyaltyBadge } from "./LoyaltyBadge";
 import { Heart, MessageCircle, Send, ExternalLink } from "lucide-react";
 import { useState } from "react";

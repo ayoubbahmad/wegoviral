@@ -65,7 +65,7 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                     >
                         <div className="min-w-0">
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none mb-1">
-                                We Go Viral
+                                WeGoViral
                             </p>
                             <p className="text-sm font-bold tracking-tight truncate leading-none">
                                 {current.label}

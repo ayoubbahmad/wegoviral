@@ -1,7 +1,7 @@
 import { CommunityEventsContainer } from '@/containers/Community/Events';
 
 export const metadata = {
-  title: 'Events | Community',
+  title: 'Events',
 };
 
 export default function CommunityEventsPage() {

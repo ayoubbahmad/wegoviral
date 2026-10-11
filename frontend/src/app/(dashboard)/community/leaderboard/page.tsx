@@ -1,7 +1,7 @@
 import { CommunityLeaderboardContainer } from '@/containers/Community/Leaderboard';
 
 export const metadata = {
-  title: 'Leaderboard | Community',
+  title: 'Leaderboard',
 };
 
 export default function CommunityLeaderboardPage() {

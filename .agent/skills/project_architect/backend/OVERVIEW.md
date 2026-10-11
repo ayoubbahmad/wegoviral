@@ -1,6 +1,6 @@
 # Backend Architecture Overview
 
-The CreatorOS backend is built with **Node.js**, **Express**, and **Prisma**. It follows a **4-Layer Modular Architecture** designed for scalability and clean separation of business logic from data access.
+The WeGoViral backend is built with **Node.js**, **Express**, and **Prisma**. It follows a **4-Layer Modular Architecture** designed for scalability and clean separation of business logic from data access.
 
 ## 🏗️ The 4-Layer System
 

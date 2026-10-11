@@ -1,12 +1,12 @@
-# Meta App Setup Guide for CreatorOS
+# Meta App Setup Guide for WeGoViral
 
-To connect your Instagram account to CreatorOS, you need to create a Meta App and obtain the necessary credentials. Follow these steps:
+To connect your Instagram account to WeGoViral, you need to create a Meta App and obtain the necessary credentials. Follow these steps:
 
 ## 1. Create a Meta App
 1. Go to the [Meta for Developers](https://developers.facebook.com/) portal and log in.
 2. Click **My Apps** -> **Create App**.
 3. Select **Other** -> **Consumer** (or Business if you have a business verification).
-4. Give your app a name (e.g., "CreatorOS") and click **Create App**.
+4. Give your app a name (e.g., "WeGoViral") and click **Create App**.
 
 ## 2. Add Products
 1. In the App Dashboard, click **Add Product** in the left sidebar.

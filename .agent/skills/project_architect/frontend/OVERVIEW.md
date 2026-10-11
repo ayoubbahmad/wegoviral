@@ -1,6 +1,6 @@
 # Frontend Architecture Overview
 
-CreatorOS follows a modular feature-based architecture combined with **Atomic Design** principles. This structure ensures that features are self-contained, portable, and easy to maintain.
+WeGoViral follows a modular feature-based architecture combined with **Atomic Design** principles. This structure ensures that features are self-contained, portable, and easy to maintain.
 
 ## 🏗️ The 6-Layer System
 

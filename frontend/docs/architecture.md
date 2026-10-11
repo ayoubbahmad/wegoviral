@@ -1,6 +1,6 @@
 # Architecture Guide: Feature-Based & Atomic Design
 
-To ensure scalability and maintainability, CreatorOS follows a **Feature-Based** modular architecture combined with **Atomic Design** principles.
+To ensure scalability and maintainability, WeGoViral follows a **Feature-Based** modular architecture combined with **Atomic Design** principles.
 
 ## 🧱 Atomic Design (Dumb Components)
 

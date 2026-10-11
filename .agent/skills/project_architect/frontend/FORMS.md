@@ -1,6 +1,6 @@
 # Forms & Validation
 
-CreatorOS uses a standardized approach to form management using **React Hook Form** and **Zod** for validation.
+WeGoViral uses a standardized approach to form management using **React Hook Form** and **Zod** for validation.
 
 ## 🏗️ The Form Layer Structure
 

@@ -22,7 +22,7 @@ export class HomeService {
     // 3. Mock Projects & Challenges
     const projects = [
       { name: "30-Day Growth Challenge", progress: 65, color: "bg-amber-500" },
-      { name: "Creator OS Launch", progress: 92, color: "bg-emerald-500" }
+      { name: "WeGoViral Launch", progress: 92, color: "bg-emerald-500" }
     ];
 
     const challenges = [

@@ -1,6 +1,6 @@
-# CreatorOS - Backend Architecture Guide
+# WeGoViral - Backend Architecture Guide
 
-Welcome to the CreatorOS backend! This document outlines our 4-layer modular architecture, designed for scalability, maintainability, and clean separation of concerns.
+Welcome to the WeGoViral backend! This document outlines our 4-layer modular architecture, designed for scalability, maintainability, and clean separation of concerns.
 
 ## 🏗️ Architectural Pattern: 4-Layer Modular System
 

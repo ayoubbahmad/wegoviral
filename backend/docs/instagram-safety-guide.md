@@ -13,11 +13,11 @@ Instagram enforces a strict limit of **200 automated Direct Messages per hour**.
 
 ## 🛡️ Best Practices for Safety
 - **Vary Your Keywords**: Don't use the same response message for every single automation. Subtle variations help avoid "bot-like" behavior patterns.
-- **Official APIs Only**: CreatorOS uses the official Instagram Graph API. Never use third-party apps that require your password, as these use "scraping" or "unauthorized agents" which are the #1 cause of bans.
+- **Official APIs Only**: WeGoViral uses the official Instagram Graph API. Never use third-party apps that require your password, as these use "scraping" or "unauthorized agents" which are the #1 cause of bans.
 - **Engagement-First**: Automations should be used to *start* a conversation or deliver a promised resource, not for mass unsolicited outreach (spam).
 
 ## 🚫 Prohibited Behaviors
-- Mass liking or Mass following via automation (Not supported by CreatorOS).
+- Mass liking or Mass following via automation (Not supported by WeGoViral).
 - Sending links that redirect to prohibited sites (gambling, fraud, etc.).
 - Using "DM Groups" or "Engagement Pods" in conjunction with automations.
 

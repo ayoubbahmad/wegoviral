@@ -1,6 +1,6 @@
 # State Management Guide
 
-In CreatorOS, we use three distinct patterns for managing state, each suited for different types of data.
+In WeGoViral, we use three distinct patterns for managing state, each suited for different types of data.
 
 ---
 

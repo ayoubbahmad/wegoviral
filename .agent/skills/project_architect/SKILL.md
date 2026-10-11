@@ -1,15 +1,15 @@
 ---
 name: project_architect
-description: Expert in the CreatorOS architecture, providing granular guidance for both frontend and backend systems.
+description: Expert in the WeGoViral architecture, providing granular guidance for both frontend and backend systems.
 ---
 
 # Project Architect Skill
 
-Use this skill to navigate and enforce the architectural standards of the CreatorOS project. This is a multi-layered skill designed to provide precise guidance based on the component or layer you are working on.
+Use this skill to navigate and enforce the architectural standards of the WeGoViral project. This is a multi-layered skill designed to provide precise guidance based on the component or layer you are working on.
 
 ## 🗺️ Project Overview
 
-CreatorOS is a full-stack platform consisting of a modular Next.js frontend and a feature-based Node.js backend.
+WeGoViral is a full-stack platform consisting of a modular Next.js frontend and a feature-based Node.js backend.
 
 ### 🏛️ Architecture Tree
 

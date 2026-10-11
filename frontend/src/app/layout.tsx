@@ -18,8 +18,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Creator OS',
-  description: 'Centralized dashboard for creators.',
+  // Pages set their own title, e.g. "Timeline" -> "Timeline | WeGoViral"
+  title: {
+    default: 'WeGoViral',
+    template: '%s | WeGoViral',
+  },
+  description: 'The WeGoViral creator community and workspace.',
 };
 
 export default function RootLayout({

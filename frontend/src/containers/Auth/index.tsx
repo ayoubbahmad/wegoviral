@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuthController, AuthMode } from "./controller";
 
 const HEADINGS: Record<AuthMode, { title: string; subtitle: string }> = {
-    login: { title: "Welcome back", subtitle: "Log in to the We Go Viral community" },
-    signup: { title: "Create account", subtitle: "Join the We Go Viral community today" },
+    login: { title: "Welcome back", subtitle: "Log in to the WeGoViral community" },
+    signup: { title: "Create account", subtitle: "Join the WeGoViral community today" },
     forgot: { title: "Reset password", subtitle: "We'll email you a link to choose a new one" },
 };
 

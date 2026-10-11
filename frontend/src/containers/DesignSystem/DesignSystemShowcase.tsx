@@ -54,7 +54,7 @@ export function DesignSystemShowcase() {
       <div className='space-y-1'>
         <h1 className='text-3xl font-bold tracking-tight'>Design System</h1>
         <p className='text-muted-foreground'>
-          Our consolidated design language for CreatorOS. Consistently premium,
+          Our consolidated design language for WeGoViral. Consistently premium,
           high-contrast, and glassmorphic.
         </p>
       </div>

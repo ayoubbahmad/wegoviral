@@ -24,7 +24,7 @@ export function FormShowcase() {
                 <Input
                   id='email'
                   type='email'
-                  placeholder='hello@creatoros.ai'
+                  placeholder='hello@wegoviral.com'
                 />
               </div>
               <div className='space-y-2'>

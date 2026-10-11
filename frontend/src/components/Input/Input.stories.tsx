@@ -21,14 +21,14 @@ export const Default: Story = {
 
 export const WithValue: Story = {
   args: {
-    value: 'Hello CreatorOS',
+    value: 'Hello WeGoViral',
   },
 };
 
 export const Email: Story = {
   args: {
     type: 'email',
-    placeholder: 'hello@creatoros.ai',
+    placeholder: 'hello@wegoviral.com',
   },
 };
 

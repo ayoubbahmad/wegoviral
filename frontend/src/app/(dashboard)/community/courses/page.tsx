@@ -1,7 +1,7 @@
 import { CommunityCoursesContainer } from '@/containers/Community/Courses';
 
 export const metadata = {
-  title: 'Courses | Community',
+  title: 'Courses',
 };
 
 export default function CommunityCoursesPage() {

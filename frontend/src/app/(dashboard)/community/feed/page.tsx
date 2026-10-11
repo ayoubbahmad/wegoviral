@@ -1,7 +1,7 @@
 import { CommunityFeedContainer } from '@/containers/Community/Feed';
 
 export const metadata = {
-  title: 'Timeline | Community',
+  title: 'Timeline',
 };
 
 export default function CommunityFeedPage() {

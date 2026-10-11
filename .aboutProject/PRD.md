@@ -2,7 +2,7 @@
 
 ## Product Name
 
-## **Creator OS**
+## **WeGoViral**
 
 ## 1. Overview
 
@@ -12,7 +12,7 @@ Managing social media creation at scale requires tracking performance, competito
 
 ### 1.2 Solution
 
-Creator OS is a centralized dashboard for creators to **understand performance, analyze competitors, structure creative insights, and strengthen community awareness**, without replacing existing tools like Notion.
+WeGoViral is a centralized dashboard for creators to **understand performance, analyze competitors, structure creative insights, and strengthen community awareness**, without replacing existing tools like Notion.
 
 ### 1.3 Why Now
 

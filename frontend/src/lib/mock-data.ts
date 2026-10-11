@@ -295,7 +295,7 @@ export const MOCK_COMMUNITY_SPACES: CommunitySpace[] = [
     id: 'announcements',
     name: 'Announcements',
     emoji: '📣',
-    description: 'News and updates from the We Go Viral team.',
+    description: 'News and updates from the WeGoViral team.',
     adminOnly: true,
   },
   {
@@ -369,12 +369,12 @@ export const MOCK_COMMUNITY_SPACES: CommunitySpace[] = [
 export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   {
     id: 'p0',
-    title: 'Welcome to the new We Go Viral community 🚀',
+    title: 'Welcome to the new WeGoViral community 🚀',
     coverUrl: 'https://picsum.photos/seed/wegoviral-welcome/1200/500',
     spaceId: 'announcements',
     author: MOCK_USER_SAM,
     content:
-      'Welcome to the new We Go Viral community space! Pick a space above to filter the feed, and choose where your post goes when you share.',
+      'Welcome to the new WeGoViral community space! Pick a space above to filter the feed, and choose where your post goes when you share.',
     createdAt: '2023-10-28T08:00:00Z',
     likeCount: 92,
     commentCount: 17,

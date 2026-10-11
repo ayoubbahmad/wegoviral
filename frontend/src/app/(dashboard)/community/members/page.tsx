@@ -1,7 +1,7 @@
 import { CommunityMembersContainer } from '@/containers/Community/Members';
 
 export const metadata = {
-  title: 'Members | Community',
+  title: 'Members',
 };
 
 export default function CommunityMembersPage() {

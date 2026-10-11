@@ -1,6 +1,6 @@
-# CreatorOS - Frontend Documentation
+# WeGoViral - Frontend Documentation
 
-Welcome to the CreatorOS frontend!
+Welcome to the WeGoViral frontend!
 
 ## 🚀 Core Technologies
 

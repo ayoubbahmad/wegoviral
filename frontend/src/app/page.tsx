@@ -36,7 +36,7 @@ export default function LandingPage() {
                         <div className="p-1.5 bg-primary rounded-md">
                             <Zap className="w-5 h-5 text-primary-foreground" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight">Creator OS</span>
+                        <span className="text-xl font-bold tracking-tight">WeGoViral</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
                         <a href="#features" className="hover:text-foreground transition-colors">Features</a>
@@ -205,7 +205,7 @@ export default function LandingPage() {
                                         href="/login?tab=signup"
                                         className="bg-white text-primary px-10 py-5 rounded-2xl font-black text-xl hover:scale-105 transition-transform"
                                     >
-                                        Get Creator OS Now
+                                        Join WeGoViral
                                     </Link>
                                 </div>
                             </div>
@@ -218,9 +218,9 @@ export default function LandingPage() {
                 <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex items-center gap-2">
                         <Zap className="w-5 h-5 text-primary" />
-                        <span className="font-bold">Creator OS</span>
+                        <span className="font-bold">WeGoViral</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">© 2024 Creator OS. All rights reserved.</p>
+                    <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} WeGoViral. All rights reserved.</p>
                     <div className="flex gap-6 text-sm text-muted-foreground font-medium">
                         <a href="#" className="hover:text-foreground">Privacy</a>
                         <a href="#" className="hover:text-foreground">Terms</a>

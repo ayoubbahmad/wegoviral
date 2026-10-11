@@ -1,6 +1,6 @@
 # Forms & Validation: React Hook Form + Zod
 
-Forms in CreatorOS are managed using **React Hook Form** for performance and **Zod** for schema-based validation.
+Forms in WeGoViral are managed using **React Hook Form** for performance and **Zod** for schema-based validation.
 
 ## 📝 Layer Structure
 Each container with forms has a dedicated `/forms` folder.

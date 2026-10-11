@@ -1,0 +1,10 @@
+# Railway builds backend/ (Root Directory); keep everything else out of uploads
+/frontend
+/inspiration
+/docs
+/*.md
+**/node_modules
+**/dist
+**/.env*
+/backend/scrapes
+/backend/samples

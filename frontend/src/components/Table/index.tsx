@@ -7,7 +7,7 @@ interface TableProps {
 }
 
 /**
- * Standardized Table component for the CreatorOS design system.
+ * Standardized Table component for the WeGoViral design system.
  * Optimized for luxury spacing, readability, and consistent row styling.
  */
 export const Table = ({ children, className }: TableProps) => {

@@ -24,9 +24,15 @@ import projectsRoutes from './features/projects/routes';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// FRONTEND_URL can hold several comma-separated origins (e.g. production + preview)
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true,
   }),
 );

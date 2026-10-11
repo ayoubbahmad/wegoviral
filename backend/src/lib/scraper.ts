@@ -1,7 +1,21 @@
 import fs from 'fs';
-import { browserEngine } from './scrapers/browser-engine';
 import { scraperRegistry } from './scrapers/registry';
 import { ScrapedVideo, ScraperMetadata } from './scrapers/types';
+
+/**
+ * Server-side scraping is off unless SCRAPERS_ENABLED=true (scraping will move
+ * to a Chrome extension). Playwright is loaded lazily so the server never
+ * needs a browser installed when scraping is disabled.
+ */
+const scrapersEnabled = process.env.SCRAPERS_ENABLED === 'true';
+
+async function getBrowserEngine() {
+  if (!scrapersEnabled) {
+    throw new Error('Scraping is disabled on this server');
+  }
+  const { browserEngine } = await import('./scrapers/browser-engine');
+  return browserEngine;
+}
 
 /**
  * Main entry point for scraping a profile feed (e.g., MrBeast Shorts)
@@ -10,7 +24,7 @@ export async function scrapeProfileFeed(
   url: string,
   limit = 10,
 ): Promise<ScrapedVideo[]> {
-  const page = await browserEngine.createPage();
+  const page = await (await getBrowserEngine()).createPage();
   try {
     if (url.startsWith('file://')) {
       const filePath = url.replace('file://', '');
@@ -48,7 +62,7 @@ export async function scrapeProfileFeed(
 export async function scrapeUrl(url: string): Promise<ScraperMetadata> {
   console.log(`[Scraper] Scraping metadata for: ${url}`);
 
-  const page = await browserEngine.createPage();
+  const page = await (await getBrowserEngine()).createPage();
   try {
     const waitCondition =
       url.includes('instagram.com') || url.includes('tiktok.com')

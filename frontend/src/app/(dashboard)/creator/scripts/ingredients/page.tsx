@@ -69,7 +69,7 @@ export default function ScriptingIngredientsPage() {
   return (
     <div className="space-y-12 pb-32 pt-8">
       <Link 
-        href="/scripts" 
+        href="/creator/scripts" 
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Writer

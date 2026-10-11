@@ -25,7 +25,7 @@ export default function ProtectedDashboardLayout({
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                    <p className="text-sm font-medium text-muted-foreground">Initializing Creator OS...</p>
+                    <p className="text-sm font-medium text-muted-foreground">Loading...</p>
                 </div>
             </div>
         );

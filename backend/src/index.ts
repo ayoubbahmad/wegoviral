@@ -24,11 +24,19 @@ import projectsRoutes from './features/projects/routes';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// FRONTEND_URL can hold several comma-separated origins (e.g. production + preview)
+// FRONTEND_URL holds comma-separated origins; "*" matches one subdomain segment,
+// e.g. https://wegoviral-*-team.vercel.app for Vercel preview deployments
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
   .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean)
+  .map((origin) =>
+    origin.includes('*')
+      ? new RegExp(
+          `^${origin.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[a-z0-9-]+')}$`,
+        )
+      : origin,
+  );
 
 app.use(
   cors({

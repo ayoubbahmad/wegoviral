@@ -28,10 +28,12 @@ apiClient.interceptors.response.use(
       await supabase.auth.signOut();
       window.location.href = '/login';
     }
-    const message =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      'API request failed';
+    // No response at all means the server is unreachable or blocked by CORS
+    const message = !error.response
+      ? "Can't reach the server. Check your connection and try again."
+      : error.response.data?.error ||
+        error.response.data?.message ||
+        'API request failed';
     return Promise.reject(new Error(message));
   },
 );

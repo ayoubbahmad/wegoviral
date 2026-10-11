@@ -1,0 +1,8 @@
+# Vercel only builds frontend/ (Root Directory); keep everything else out of uploads
+/backend
+/inspiration
+/docs
+/*.md
+**/node_modules
+**/.next
+**/.env*

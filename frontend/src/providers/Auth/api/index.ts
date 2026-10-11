@@ -7,23 +7,10 @@ export const authApi = {
     return response.data;
   },
 
-  login: async (data: { email: string; password: string }) => {
-    const response = await apiClient.post<{ token: string; user: User }>(
-      '/auth/login',
-      data,
-    );
-    return response.data;
-  },
-
-  register: async (data: {
-    email: string;
-    username: string;
-    password: string;
-    name?: string;
-  }) => {
-    const response = await apiClient.post<{ token: string; user: User }>(
-      '/auth/register',
-      data,
+  checkUsername: async (username: string) => {
+    const response = await apiClient.get<{ available: boolean; reason?: string }>(
+      '/auth/username-available',
+      { params: { username } },
     );
     return response.data;
   },

@@ -1,21 +1,52 @@
 "use client";
 
-import { Zap, Mail, Lock, User, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
+import { forwardRef, InputHTMLAttributes, ReactNode } from "react";
+import { Zap, Mail, Lock, User, AlertCircle, Loader2, ArrowLeft, MailCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuthController } from "./controller";
+import { useAuthController, AuthMode } from "./controller";
+
+const HEADINGS: Record<AuthMode, { title: string; subtitle: string }> = {
+    login: { title: "Welcome back", subtitle: "Log in to the We Go Viral community" },
+    signup: { title: "Create account", subtitle: "Join the We Go Viral community today" },
+    forgot: { title: "Reset password", subtitle: "We'll email you a link to choose a new one" },
+};
 
 export function AuthContainer() {
-    const { 
-        mode, 
-        toggleMode, 
-        error, 
-        isSubmitting, 
-        loginForm, 
-        signupForm, 
-        handleLoginSubmit, 
-        handleSignupSubmit 
+    const {
+        mode,
+        changeMode,
+        error,
+        isSubmitting,
+        isGoogleLoading,
+        emailSent,
+        loginForm,
+        signupForm,
+        forgotForm,
+        handleLoginSubmit,
+        handleSignupSubmit,
+        handleForgotSubmit,
+        handleGoogleLogin,
     } = useAuthController();
+
+    const onSubmit =
+        mode === "login"
+            ? loginForm.handleSubmit(handleLoginSubmit)
+            : mode === "signup"
+              ? signupForm.handleSubmit(handleSignupSubmit)
+              : forgotForm.handleSubmit(handleForgotSubmit);
+
+    const emailField =
+        mode === "login"
+            ? { props: loginForm.register("email"), error: loginForm.formState.errors.email?.message }
+            : mode === "signup"
+              ? { props: signupForm.register("email"), error: signupForm.formState.errors.email?.message }
+              : { props: forgotForm.register("email"), error: forgotForm.formState.errors.email?.message };
+
+    const passwordField =
+        mode === "login"
+            ? { props: loginForm.register("password"), error: loginForm.formState.errors.password?.message }
+            : { props: signupForm.register("password"), error: signupForm.formState.errors.password?.message };
 
     return (
         <div className="w-full max-w-[440px] z-10">
@@ -29,168 +60,206 @@ export function AuthContainer() {
                     <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20">
                         <Zap className="w-8 h-8 text-primary-foreground" />
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        {mode === "login" ? "Welcome back" : "Create account"}
-                    </h1>
-                    <p className="text-muted-foreground mt-2">
-                        {mode === "login"
-                            ? "Enter your details to access your dashboard"
-                            : "Start your journey with Creator OS today"}
-                    </p>
+                    <h1 className="text-3xl font-bold tracking-tight">{HEADINGS[mode].title}</h1>
+                    <p className="text-muted-foreground mt-2">{HEADINGS[mode].subtitle}</p>
                 </div>
 
-                <form 
-                    onSubmit={mode === "login" 
-                        ? loginForm.handleSubmit(handleLoginSubmit) 
-                        : signupForm.handleSubmit(handleSignupSubmit)
-                    } 
-                    className="space-y-5"
-                >
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={mode}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="space-y-4"
+                {emailSent ? (
+                    <div className="text-center space-y-4">
+                        <div className="inline-flex p-4 rounded-2xl bg-primary/10 text-primary">
+                            <MailCheck className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-lg font-bold">{emailSent.title}</h2>
+                        <p className="text-sm text-muted-foreground">{emailSent.message}</p>
+                        <button
+                            type="button"
+                            onClick={() => changeMode("login")}
+                            className="text-sm font-bold text-primary hover:underline"
                         >
-                            {mode === "signup" && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold ml-1">Full Name</label>
-                                        <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                            <input
+                            Back to log in
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <form onSubmit={onSubmit} className="space-y-5">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={mode}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="space-y-4"
+                                >
+                                    {mode === "signup" && (
+                                        <>
+                                            <Field
+                                                label="Full Name"
+                                                icon={<User className="w-4 h-4" />}
+                                                error={signupForm.formState.errors.name?.message}
                                                 type="text"
-                                                {...signupForm.register("name")}
+                                                autoComplete="name"
                                                 placeholder="John Doe"
-                                                className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                                {...signupForm.register("name")}
                                             />
-                                        </div>
-                                        {signupForm.formState.errors.name && (
-                                            <p className="text-xs text-destructive ml-1">{signupForm.formState.errors.name.message}</p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold ml-1">Username</label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
-                                            <input
+                                            <Field
+                                                label="Username"
+                                                icon={<span className="font-medium">@</span>}
+                                                error={signupForm.formState.errors.username?.message}
                                                 type="text"
-                                                {...signupForm.register("username")}
+                                                autoComplete="username"
                                                 placeholder="johndoe"
-                                                className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                                {...signupForm.register("username")}
                                             />
-                                        </div>
-                                        {signupForm.formState.errors.username && (
-                                            <p className="text-xs text-destructive ml-1">{signupForm.formState.errors.username.message}</p>
-                                        )}
-                                    </div>
-                                </>
+                                        </>
+                                    )}
+
+                                    <Field
+                                        label="Email address"
+                                        icon={<Mail className="w-4 h-4" />}
+                                        error={emailField.error}
+                                        type="email"
+                                        autoComplete="email"
+                                        placeholder="name@company.com"
+                                        {...emailField.props}
+                                    />
+
+                                    {mode !== "forgot" && (
+                                        <Field
+                                            label="Password"
+                                            labelAction={
+                                                mode === "login" && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => changeMode("forgot")}
+                                                        className="text-xs text-primary font-bold hover:underline"
+                                                    >
+                                                        Forgot?
+                                                    </button>
+                                                )
+                                            }
+                                            icon={<Lock className="w-4 h-4" />}
+                                            error={passwordField.error}
+                                            type="password"
+                                            autoComplete={mode === "login" ? "current-password" : "new-password"}
+                                            placeholder="••••••••"
+                                            {...passwordField.props}
+                                        />
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
+
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex items-center gap-2 p-3.5 rounded-xl bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20"
+                                >
+                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                    {error}
+                                </motion.div>
                             )}
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold ml-1">Email address</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <input
-                                        type="email"
-                                        {...(mode === "login" ? loginForm.register("email") : signupForm.register("email"))}
-                                        placeholder="name@company.com"
-                                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                    />
-                                </div>
-                                {mode === "login" ? (
-                                    loginForm.formState.errors.email && (
-                                        <p className="text-xs text-destructive ml-1">{loginForm.formState.errors.email.message}</p>
-                                    )
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full py-4 px-4 bg-primary text-primary-foreground font-black rounded-2xl hover:opacity-90 transition-all shadow-xl shadow-primary/25 disabled:opacity-70 flex items-center justify-center"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : mode === "login" ? (
+                                    "Sign In"
+                                ) : mode === "signup" ? (
+                                    "Create Free Account"
                                 ) : (
-                                    signupForm.formState.errors.email && (
-                                        <p className="text-xs text-destructive ml-1">{signupForm.formState.errors.email.message}</p>
-                                    )
+                                    "Send reset link"
                                 )}
-                            </div>
+                            </button>
+                        </form>
 
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center ml-1">
-                                    <label className="text-sm font-semibold">Password</label>
-                                    {mode === "login" && (
-                                        <button type="button" className="text-xs text-primary font-bold hover:underline">
-                                            Forgot?
-                                        </button>
-                                    )}
-                                </div>
+                        {mode !== "forgot" && (
+                            <>
                                 <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <input
-                                        type="password"
-                                        {...(mode === "login" ? loginForm.register("password") : signupForm.register("password"))}
-                                        placeholder="••••••••"
-                                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                    />
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t border-border" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-card px-2 text-muted-foreground font-bold">Or continue with</span>
+                                    </div>
                                 </div>
-                                {mode === "login" ? (
-                                    loginForm.formState.errors.password && (
-                                        <p className="text-xs text-destructive ml-1">{loginForm.formState.errors.password.message}</p>
-                                    )
-                                ) : (
-                                    signupForm.formState.errors.password && (
-                                        <p className="text-xs text-destructive ml-1">{signupForm.formState.errors.password.message}</p>
-                                    )
-                                )}
-                            </div>
-                        </motion.div>
-                    </AnimatePresence>
 
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex items-center gap-2 p-3.5 rounded-xl bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20"
-                        >
-                            <AlertCircle className="w-4 h-4" />
-                            {error}
-                        </motion.div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full py-4 px-4 bg-primary text-primary-foreground font-black rounded-2xl hover:opacity-90 transition-all shadow-xl shadow-primary/25 disabled:opacity-70 flex items-center justify-center"
-                    >
-                        {isSubmitting ? (
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                        ) : (
-                            mode === "login" ? "Sign In" : "Create Free Account"
+                                <button
+                                    type="button"
+                                    onClick={handleGoogleLogin}
+                                    disabled={isGoogleLoading}
+                                    className="w-full py-3.5 px-4 flex items-center justify-center gap-3 rounded-2xl border border-border bg-background font-semibold hover:bg-secondary/50 transition-colors disabled:opacity-70"
+                                >
+                                    {isGoogleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
+                                    Google
+                                </button>
+                            </>
                         )}
-                    </button>
-                </form>
 
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground font-bold">Or continue with</span>
-                    </div>
-                </div>
-
-                <div className="text-center">
-                    <button
-                        type="button"
-                        onClick={toggleMode}
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        {mode === "login"
-                            ? "New here? "
-                            : "Already have an account? "}
-                        <span className="text-primary font-bold">
-                            {mode === "login" ? "Create an account" : "Log in"}
-                        </span>
-                    </button>
-                </div>
+                        <div className="text-center">
+                            {mode === "forgot" ? (
+                                <button
+                                    type="button"
+                                    onClick={() => changeMode("login")}
+                                    className="text-sm font-bold text-primary hover:underline"
+                                >
+                                    Back to log in
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => changeMode(mode === "login" ? "signup" : "login")}
+                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {mode === "login" ? "New here? " : "Already have an account? "}
+                                    <span className="text-primary font-bold">
+                                        {mode === "login" ? "Create an account" : "Log in"}
+                                    </span>
+                                </button>
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
 }
+
+interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+    icon: ReactNode;
+    error?: string;
+    labelAction?: ReactNode;
+}
+
+const Field = forwardRef<HTMLInputElement, FieldProps>(({ label, icon, error, labelAction, ...inputProps }, ref) => (
+    <div className="space-y-2">
+        <div className="flex justify-between items-center ml-1">
+            <label className="text-sm font-semibold">{label}</label>
+            {labelAction}
+        </div>
+        <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</span>
+            <input
+                ref={ref}
+                {...inputProps}
+                className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+        </div>
+        {error && <p className="text-xs text-destructive ml-1">{error}</p>}
+    </div>
+));
+Field.displayName = "Field";
+
+const GoogleIcon = () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z" />
+        <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.06H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.94l3.66-2.84z" />
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z" />
+    </svg>
+);

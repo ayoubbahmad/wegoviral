@@ -3,8 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { 
     loginSchema, 
     signupSchema, 
+    forgotPasswordSchema,
     LoginFormValues, 
-    SignupFormValues 
+    SignupFormValues,
+    ForgotPasswordFormValues
 } from "./types";
 
 export * from "./types";
@@ -27,6 +29,15 @@ export const useSignupForm = () => {
       username: "",
       email: "",
       password: "",
+    },
+  });
+};
+
+export const useForgotPasswordForm = () => {
+  return useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
     },
   });
 };

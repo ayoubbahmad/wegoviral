@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from './supabase';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -10,11 +11,10 @@ const apiClient = axios.create({
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token =
-    typeof window !== 'undefined'
-      ? localStorage.getItem('creator_os_token')
-      : null;
+apiClient.interceptors.request.use(async (config) => {
+  // Supabase refreshes the access token automatically; always send the current one
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,9 +23,9 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('creator_os_token');
+      await supabase.auth.signOut();
       window.location.href = '/login';
     }
     const message =

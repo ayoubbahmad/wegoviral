@@ -58,7 +58,7 @@ export function useAuthController(): AuthContextType {
         setActiveSocialAccount(active);
       }
 
-      router.push('/home');
+      router.push('/community/feed');
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message || 'Login failed' };
@@ -86,7 +86,7 @@ export function useAuthController(): AuthContextType {
         setActiveSocialAccount(active);
       }
 
-      router.push('/home');
+      router.push('/community/feed');
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message || 'Registration failed' };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { competitorsSharedApi } from '@/containers/Competitors/api/shared';
+import { competitorsSharedApi } from '@/containers/competitors/api/shared';
 import { Competitor } from '@/types/competitor';
 import { useToast } from '@/providers/Toast';
 

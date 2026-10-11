@@ -1,6 +1,6 @@
 'use client';
 
-import { CompetitorDetail } from '@/containers/Competitors/CompetitorDetail';
+import { CompetitorDetail } from '@/containers/competitors/CompetitorDetail';
 
 interface CompetitorDetailPageProps {
   id: string;

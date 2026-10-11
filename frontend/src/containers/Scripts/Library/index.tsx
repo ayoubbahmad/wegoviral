@@ -51,7 +51,7 @@ export const ScriptsLibraryContainer = () => {
         title='Scripts Library'
         description='Manage and organize all your video scripts in one place.'
         actions={
-          <Link href='/scripts/new'>
+          <Link href='/creator/scripts/new'>
             <Button variant='primary' size='md'>
               <Plus className='w-4 h-4' />
               Create New Script
@@ -66,7 +66,7 @@ export const ScriptsLibraryContainer = () => {
           <div className='flex items-center gap-3'>
             <ViewToggle mode={viewMode} onChange={setViewMode} />
             <Link
-              href='/scripts/ingredients'
+              href='/creator/scripts/ingredients'
               className='text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-secondary/50'
             >
               <Calendar className='w-3.5 h-3.5' />
@@ -88,7 +88,7 @@ export const ScriptsLibraryContainer = () => {
                   script={script as any}
                   variant='full'
                   onDelete={() => handleDeleteScript(script.id)}
-                  onClick={() => router.push(`/scripts/${script.id}`)}
+                  onClick={() => router.push(`/creator/scripts/${script.id}`)}
                 />
               ))}
             </div>
@@ -117,7 +117,7 @@ export const ScriptsLibraryContainer = () => {
                     <tr
                       key={script.id}
                       className='border-b border-border/30 last:border-0 hover:bg-secondary/20 transition-colors group cursor-pointer'
-                      onClick={() => router.push(`/scripts/${script.id}`)}
+                      onClick={() => router.push(`/creator/scripts/${script.id}`)}
                     >
                       <td className='p-4'>
                         <div className='flex items-center gap-3'>

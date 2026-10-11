@@ -124,7 +124,7 @@ export function ScriptWizard() {
           <p className="text-muted-foreground">Create high-performing video scripts with AI.</p>
         </div>
         <Link 
-          href="/scripts/ingredients" 
+          href="/creator/scripts/ingredients" 
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all mb-1"
         >
           <Sparkles className="w-3.5 h-3.5" /> View 7 Core Variables
@@ -181,7 +181,7 @@ export function ScriptWizard() {
               <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
                 How to write the best prompt <ExternalLink className="w-3.5 h-3.5" />
               </button>
-              {/* <Link href="/scripts/ingredients" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-pink-500 transition-colors">
+              {/* <Link href="/creator/scripts/ingredients" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-pink-500 transition-colors">
                 The 7 Core Variables <Sparkles className="w-3.5 h-3.5" />
               </Link> */}
             </div>

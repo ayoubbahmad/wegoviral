@@ -1,17 +1,17 @@
 'use client';
 
 import { LayoutGrid, List, Search, Plus } from 'lucide-react';
-import { AddCompetitorModal } from '@/containers/Competitors/AddCompetitor';
+import { AddCompetitorModal } from '@/containers/competitors/AddCompetitor';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { PageContainer } from '@/components/PageContainer';
-import { useCompetitorsController } from '@/containers/Competitors/controller';
-import { useCompetitorsPageSlice } from '@/containers/Competitors/slice/pageSlice';
-import { CompetitorGridView } from '@/containers/Competitors/components/CompetitorGridView';
-import { CompetitorTableView } from '@/containers/Competitors/components/CompetitorTableView';
-import { WatchlistSidebar } from '@/containers/Competitors/components/WatchlistSidebar';
-import { CreateWatchlistModal } from '@/containers/Competitors/components/CreateWatchlistModal';
-import { CompetitorsSkeleton } from '@/containers/Competitors/CompetitorsSkeleton';
+import { useCompetitorsController } from '@/containers/competitors/controller';
+import { useCompetitorsPageSlice } from '@/containers/competitors/slice/pageSlice';
+import { CompetitorGridView } from '@/containers/competitors/components/CompetitorGridView';
+import { CompetitorTableView } from '@/containers/competitors/components/CompetitorTableView';
+import { WatchlistSidebar } from '@/containers/competitors/components/WatchlistSidebar';
+import { CreateWatchlistModal } from '@/containers/competitors/components/CreateWatchlistModal';
+import { CompetitorsSkeleton } from '@/containers/competitors/CompetitorsSkeleton';
 
 export default function CompetitorsPage() {
   const { competitors, isLoading, deleteCompetitor } =

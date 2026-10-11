@@ -54,7 +54,7 @@ function VideoTableRow({ video }: { video: Video }) {
     <>
       <tr className='border-b border-border/50 hover:bg-secondary/30 transition-colors group cursor-pointer relative'>
         <td className='p-4'>
-          <Link href={`/video/${video.id}`} className='flex items-center gap-3'>
+          <Link href={`/creator/video/${video.id}`} className='flex items-center gap-3'>
             <div className='relative w-10 h-14 rounded-md overflow-hidden bg-muted flex-shrink-0'>
               <img
                 src={video.thumbnailUrl}

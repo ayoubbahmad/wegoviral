@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { CompetitorCalendar } from '@/containers/Competitors/CompetitorCalendar';
+import { CompetitorCalendar } from '@/containers/competitors/CompetitorCalendar';
 import { BackNavigation } from '@/components/BackNavigation';
 
 interface CompetitorDetailProps {
@@ -77,7 +77,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
           </p>
         </div>
         <Link
-          href='/competitors'
+          href='/creator/competitors'
           className='px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
         >
           Return to List
@@ -90,7 +90,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
     <div className='space-y-8 animate-in fade-in duration-500'>
       {/* Header */}
       <div className='flex flex-col gap-6 border-b border-border pb-8'>
-        <BackNavigation href='/competitors' label='Back to List' />
+        <BackNavigation href='/creator/competitors' label='Back to List' />
 
         <div className='flex flex-col md:flex-row md:items-start justify-between gap-6'>
           <div className='flex items-center gap-4'>

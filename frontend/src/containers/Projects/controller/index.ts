@@ -19,7 +19,7 @@ export const useProjectsController = () => {
       const project = await createProject.mutateAsync(data);
       setIsModalOpen(false);
       // Redirect to project detail page
-      router.push(`/projects/${project.id}`);
+      router.push(`/creator/projects/${project.id}`);
     } catch (error) {
       console.error('Failed to create project:', error);
     }

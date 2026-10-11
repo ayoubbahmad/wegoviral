@@ -33,7 +33,7 @@ export function VideoCard({ video }: VideoCardProps) {
   return (
     <>
       <div className='group block relative h-full'>
-        <Link href={`/video/${video.id}`} className='block h-full'>
+        <Link href={`/creator/video/${video.id}`} className='block h-full'>
           <Card
             padding='none'
             variant='default'

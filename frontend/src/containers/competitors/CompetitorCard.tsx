@@ -35,7 +35,7 @@ export function CompetitorCard({
   if (variant === 'compact') {
     return (
       <Link
-        href={`/competitors/${competitor.id}`}
+        href={`/creator/competitors/${competitor.id}`}
         className='group block h-full'
       >
         <Card hover className='flex items-center gap-3 p-3 overflow-hidden'>
@@ -65,7 +65,7 @@ export function CompetitorCard({
   }
 
   return (
-    <Link href={`/competitors/${competitor.id}`} className='group block h-full'>
+    <Link href={`/creator/competitors/${competitor.id}`} className='group block h-full'>
       <Card hover className='flex flex-col h-full overflow-hidden'>
         <Card.Header
           actions={

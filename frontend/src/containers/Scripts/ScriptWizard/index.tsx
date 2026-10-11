@@ -77,7 +77,7 @@ export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
           </p>
         </div>
         <Link
-          href='/scripts/ingredients'
+          href='/creator/scripts/ingredients'
           className='flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all mb-1'
         >
           <Sparkles className='w-3.5 h-3.5' /> View 7 Core Variables
@@ -186,7 +186,7 @@ export function ScriptWizardContainer({ scriptId }: { scriptId?: string }) {
           <div className='flex items-center justify-between pt-4'>
             <div className='flex items-center gap-6'>
               <Link
-                href='/scripts/ingredients'
+                href='/creator/scripts/ingredients'
                 className='flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors'
               >
                 How to write the best prompt{' '}

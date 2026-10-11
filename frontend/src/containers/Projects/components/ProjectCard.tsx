@@ -22,7 +22,7 @@ export function ProjectCard({
 
   return (
     <Card
-      onClick={() => router.push(`/projects/${id}`)}
+      onClick={() => router.push(`/creator/projects/${id}`)}
       hover
       className='flex flex-col h-[220px]'
     >

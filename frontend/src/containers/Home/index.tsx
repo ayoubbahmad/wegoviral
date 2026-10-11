@@ -58,7 +58,7 @@ export const HomeContainer = () => {
           <SectionHeader
             title='Videos'
             icon={Video}
-            href='/videos'
+            href='/creator/videos'
             titleClassName='text-primary'
           />
 
@@ -97,11 +97,11 @@ export const HomeContainer = () => {
           <SectionHeader
             title='Scripts'
             icon={FileText}
-            href='/scripts'
+            href='/creator/scripts'
             titleClassName='text-purple-500'
           />
 
-          <Link href='/scripts/new' className='block w-full'>
+          <Link href='/creator/scripts/new' className='block w-full'>
             <Button
               variant='outline'
               className='w-full border-dashed border-purple-500/20 text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/50 group'
@@ -127,7 +127,7 @@ export const HomeContainer = () => {
                   lastUpdated: script.updatedAt || 'Just now',
                   wordCount: script.wordCount || 0,
                 }}
-                onClick={() => router.push(`/scripts/${script.id}`)}
+                onClick={() => router.push(`/creator/scripts/${script.id}`)}
               />
             ))}
           </div>
@@ -138,7 +138,7 @@ export const HomeContainer = () => {
           <SectionHeader
             title='Projects'
             icon={FolderOpen}
-            href='/projects'
+            href='/creator/projects'
             titleClassName='text-amber-500'
           />
 
@@ -174,7 +174,7 @@ export const HomeContainer = () => {
           <SectionHeader
             title='Challenges'
             icon={Trophy}
-            href='/challenges'
+            href='/community/challenges'
             titleClassName='text-emerald-500'
           />
 

@@ -66,7 +66,7 @@ export const useScriptWizardController = (scriptId?: string) => {
   const saveMutation = useMutation({
     mutationFn: scriptsApi.createScript,
     onSuccess: () => {
-      router.push('/scripts');
+      router.push('/creator/scripts');
     },
   });
 
@@ -74,7 +74,7 @@ export const useScriptWizardController = (scriptId?: string) => {
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       scriptsApi.updateScript(id, data),
     onSuccess: () => {
-      router.push('/scripts');
+      router.push('/creator/scripts');
     },
   });
 

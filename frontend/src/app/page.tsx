@@ -22,7 +22,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         if (!isLoading && user) {
-            router.push("/home");
+            router.push("/community/feed");
         }
     }, [user, isLoading, router]);
 

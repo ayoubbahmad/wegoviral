@@ -44,7 +44,7 @@ export function CompetitorTableView({
               >
                 <td className='px-6 py-4'>
                   <Link
-                    href={`/competitors/${competitor.id}`}
+                    href={`/creator/competitors/${competitor.id}`}
                     className='flex items-center gap-3'
                   >
                     <img
@@ -80,7 +80,7 @@ export function CompetitorTableView({
                 <td className='px-6 py-4 text-right'>
                   <div className='flex items-center justify-end gap-2'>
                     <Link
-                      href={`/competitors/${competitor.id}`}
+                      href={`/creator/competitors/${competitor.id}`}
                       className='p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors'
                       title='View details'
                     >

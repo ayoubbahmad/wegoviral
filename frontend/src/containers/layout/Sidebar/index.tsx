@@ -1,22 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    LayoutDashboard,
-    BarChart2,
-    Users,
-    Users2,
-    Target,
-    Library,
-    Trophy,
     Settings,
-    Zap,
     LogOut,
-    Video,
-    FileText,
-    FolderOpen,
-    Paintbrush,
     ChevronLeft,
     ChevronRight
 } from "lucide-react";
@@ -24,27 +13,22 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/Auth";
 import { useSidebarStore } from "./slice";
-
-const navItems = [
-    { name: "Home", href: "/home", icon: LayoutDashboard },
-    { name: "Videos", href: "/videos", icon: Video },
-    { name: "Scripts", href: "/scripts", icon: FileText },
-    { name: "Projects", href: "/projects", icon: FolderOpen },
-    { name: "Performance", href: "/performance", icon: BarChart2 },
-    { name: "Followers", href: "/followers", icon: Users },
-    { name: "Community", href: "/community", icon: Users2 },
-    { name: "Automations", href: "/automations", icon: Zap },
-    { name: "Competitors", href: "/competitors", icon: Target },
-    // { name: "Channels", href: "/channels", icon: Target },
-    { name: "Library", href: "/library", icon: Library },
-    { name: "Challenges", href: "/challenges", icon: Trophy },
-    { name: "Design System", href: "/design-system", icon: Paintbrush },
-];
+import { SPACES, getSpaceFromPath } from "./spaces";
+import { SpaceSwitcher } from "./SpaceSwitcher";
 
 export function Sidebar() {
     const pathname = usePathname();
     const { user, logout } = useAuth();
-    const { sidebarCollapsed, toggleSidebar } = useSidebarStore();
+    const { sidebarCollapsed, toggleSidebar, lastSpace, setLastSpace } = useSidebarStore();
+
+    // The URL decides the space; shared pages (e.g. /settings) keep the last one used
+    const pathSpace = getSpaceFromPath(pathname);
+    const activeSpace = pathSpace ?? lastSpace;
+    const navItems = SPACES[activeSpace].navItems;
+
+    useEffect(() => {
+        if (pathSpace && pathSpace !== lastSpace) setLastSpace(pathSpace);
+    }, [pathSpace, lastSpace, setLastSpace]);
 
     return (
         <aside
@@ -57,21 +41,7 @@ export function Sidebar() {
                 "flex h-16 items-center border-b border-border/50 transition-all",
                 sidebarCollapsed ? "justify-center" : "justify-between px-4"
             )}>
-                <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-primary rounded-lg shrink-0 shadow-lg shadow-primary/20">
-                        <Zap className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    {!sidebarCollapsed && (
-                        <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            className="text-xl font-bold tracking-tight whitespace-nowrap"
-                        >
-                            Creator OS
-                        </motion.span>
-                    )}
-                </div>
+                <SpaceSwitcher activeSpace={activeSpace} collapsed={sidebarCollapsed} />
                 {!sidebarCollapsed && (
                     <button
                         onClick={toggleSidebar}
@@ -90,9 +60,9 @@ export function Sidebar() {
                 )}
             </div>
 
-            <nav className="flex flex-col gap-2 p-4">
+            <nav key={activeSpace} className="flex flex-col gap-2 p-4 animate-in fade-in duration-300">
                 {navItems.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                     const Icon = item.icon;
 
                     return (

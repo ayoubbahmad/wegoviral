@@ -75,7 +75,7 @@ export function useVideoAnalysisController(id: string) {
     if (window.history.length > 1) {
       router.back();
     } else {
-      router.push('/videos');
+      router.push('/creator/videos');
     }
   };
 

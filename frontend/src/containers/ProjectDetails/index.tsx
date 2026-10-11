@@ -17,7 +17,7 @@ export const ProjectDetailsContainer = ({ id }: { id: string }) => {
   if (isLoading) {
     return (
       <PageContainer>
-        <BackNavigation href='/projects' label='Back to projects' />
+        <BackNavigation href='/creator/projects' label='Back to projects' />
         <div className='mt-8 space-y-4'>
           <Skeleton className='h-10 w-1/3' />
           <Skeleton className='h-64 w-full' />
@@ -29,7 +29,7 @@ export const ProjectDetailsContainer = ({ id }: { id: string }) => {
   if (error || !project) {
     return (
       <PageContainer>
-        <BackNavigation href='/projects' label='Back to projects' />
+        <BackNavigation href='/creator/projects' label='Back to projects' />
         <div className='mt-20 text-center'>
           <h2 className='text-2xl font-bold text-text-primary'>
             Project not found
@@ -58,7 +58,7 @@ export const ProjectDetailsContainer = ({ id }: { id: string }) => {
 
   return (
     <PageContainer>
-      <BackNavigation href='/projects' label='Back to projects' />
+      <BackNavigation href='/creator/projects' label='Back to projects' />
       {renderView()}
     </PageContainer>
   );

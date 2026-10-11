@@ -4,8 +4,11 @@ import {
   CommunityEvent,
   CommunityPost,
   CommunitySpace,
+  CommunityUser,
+  NewPostInput,
 } from '@/types/communityFeed';
-import { PostComposer } from './PostComposer';
+import { StartPostCard } from './StartPostCard';
+import { CreatePostModal } from './CreatePostModal';
 import { PostCard } from './PostCard';
 import { SpaceChips } from './SpaceChips';
 import { UpcomingEventsCard } from './UpcomingEventsCard';
@@ -21,8 +24,15 @@ interface FeedTabProps {
   activeSpaceId: string;
   postCountBySpace: Record<string, number>;
   setActiveSpaceId: (spaceId: string) => void;
-  handleCreatePost: (content: string, spaceId: string) => void;
+  currentUser?: CommunityUser;
+  isCreatePostOpen: boolean;
+  setIsCreatePostOpen: (open: boolean) => void;
+  handleCreatePost: (input: NewPostInput) => void;
+  handleDeletePost: (postId: string) => void;
+  handleCopyPostLink: (post: CommunityPost) => void;
   handleLikePost: (postId: string) => void;
+  handleBookmarkPost: (postId: string) => void;
+  handleVotePoll: (postId: string, optionId: string) => void;
 }
 
 export const FeedTab = ({
@@ -34,8 +44,15 @@ export const FeedTab = ({
   activeSpaceId,
   postCountBySpace,
   setActiveSpaceId,
+  currentUser,
+  isCreatePostOpen,
+  setIsCreatePostOpen,
   handleCreatePost,
+  handleDeletePost,
+  handleCopyPostLink,
   handleLikePost,
+  handleBookmarkPost,
+  handleVotePoll,
 }: FeedTabProps) => {
   const spacesById = Object.fromEntries(
     spaces.map((space) => [space.id, space]),
@@ -67,10 +84,9 @@ export const FeedTab = ({
         )}
 
         {!activeSpace?.adminOnly && (
-          <PostComposer
-            spaces={spaces}
-            activeSpace={activeSpace}
-            onCreatePost={handleCreatePost}
+          <StartPostCard
+            currentUser={currentUser}
+            onOpen={() => setIsCreatePostOpen(true)}
           />
         )}
 
@@ -86,7 +102,12 @@ export const FeedTab = ({
               <PostCard
                 post={post}
                 space={spacesById[post.spaceId]}
+                isOwn={post.author.id === currentUser?.id}
                 onLike={handleLikePost}
+                onBookmark={handleBookmarkPost}
+                onVote={handleVotePoll}
+                onCopyLink={handleCopyPostLink}
+                onDelete={handleDeletePost}
                 onSpaceClick={setActiveSpaceId}
               />
             </div>
@@ -102,6 +123,14 @@ export const FeedTab = ({
           onSelect={handleSelectTopPost}
         />
       </aside>
+
+      <CreatePostModal
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+        spaces={spaces}
+        activeSpace={activeSpace}
+        onSubmit={handleCreatePost}
+      />
     </div>
   );
 };

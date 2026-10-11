@@ -1,5 +1,7 @@
 'use client';
 
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/Button';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { useCommunityController } from '../controller';
@@ -15,8 +17,15 @@ export const CommunityFeedContainer = () => {
     activeSpaceId,
     postCountBySpace,
     setActiveSpaceId,
+    currentUser,
+    isCreatePostOpen,
+    setIsCreatePostOpen,
     handleCreatePost,
+    handleDeletePost,
+    handleCopyPostLink,
     handleLikePost,
+    handleBookmarkPost,
+    handleVotePoll,
   } = useCommunityController();
 
   return (
@@ -24,6 +33,11 @@ export const CommunityFeedContainer = () => {
       <PageHeader
         title="Timeline"
         description="Share updates, wins and questions with the community."
+        actions={
+          <Button variant="primary" onClick={() => setIsCreatePostOpen(true)}>
+            <Plus className="w-4 h-4" /> New post
+          </Button>
+        }
       />
       <FeedTab
         posts={posts}
@@ -34,8 +48,15 @@ export const CommunityFeedContainer = () => {
         activeSpaceId={activeSpaceId}
         postCountBySpace={postCountBySpace}
         setActiveSpaceId={setActiveSpaceId}
+        currentUser={currentUser}
+        isCreatePostOpen={isCreatePostOpen}
+        setIsCreatePostOpen={setIsCreatePostOpen}
         handleCreatePost={handleCreatePost}
+        handleDeletePost={handleDeletePost}
+        handleCopyPostLink={handleCopyPostLink}
         handleLikePost={handleLikePost}
+        handleBookmarkPost={handleBookmarkPost}
+        handleVotePoll={handleVotePoll}
       />
     </PageContainer>
   );

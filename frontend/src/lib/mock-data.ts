@@ -369,6 +369,8 @@ export const MOCK_COMMUNITY_SPACES: CommunitySpace[] = [
 export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   {
     id: 'p0',
+    title: 'Welcome to the new We Go Viral community 🚀',
+    coverUrl: 'https://picsum.photos/seed/wegoviral-welcome/1200/500',
     spaceId: 'announcements',
     author: MOCK_USER_SAM,
     content:
@@ -380,6 +382,7 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p1',
+    title: '100k views on a Reel I almost deleted',
     spaceId: 'wins',
     author: MOCK_USER_MAYA,
     content:
@@ -413,6 +416,7 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p4',
+    title: 'Collab: food or fitness creator for a duet series',
     spaceId: 'collabs',
     author: MOCK_USER_LEO,
     content:
@@ -435,6 +439,8 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p6',
+    title: 'This hook took my 3s retention from 41% to 63%',
+    coverUrl: 'https://picsum.photos/seed/wegoviral-hook/1200/500',
     spaceId: 'hooks',
     author: MOCK_USER_MAYA,
     content:
@@ -457,6 +463,7 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p8',
+    title: 'First brand deal at 8k followers 🎉',
     spaceId: 'monetization',
     author: MOCK_USER_SAM,
     content:
@@ -479,6 +486,10 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p10',
+    images: [
+      'https://picsum.photos/seed/wegoviral-mic-1/800/600',
+      'https://picsum.photos/seed/wegoviral-mic-2/800/600',
+    ],
     spaceId: 'gear',
     author: MOCK_USER_MAYA,
     content:
@@ -490,6 +501,14 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p11',
+    title: 'Posting across time zones?',
+    poll: {
+      options: [
+        { id: 'o1', label: 'Post for the US audience', votes: 18 },
+        { id: 'o2', label: 'Post for the EU audience', votes: 9 },
+        { id: 'o3', label: 'Alternate days', votes: 14 },
+      ],
+    },
     spaceId: 'questions',
     author: MOCK_USER_SAM,
     content:

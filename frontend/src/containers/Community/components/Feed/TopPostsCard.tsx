@@ -30,7 +30,7 @@ export const TopPostsCard = ({ posts, spacesById, onSelect }: TopPostsCardProps)
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-medium leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                    {post.content}
+                    {post.title || post.content}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground truncate">
                     @{post.author.username}

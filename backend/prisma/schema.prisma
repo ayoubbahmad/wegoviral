@@ -16,7 +16,8 @@ model UserProfile {
   updatedAt       DateTime         @updatedAt
   avatarUrl       String?
   name            String?
-  passwordHash    String
+  passwordHash    String?  // Unused since Supabase Auth; kept nullable for old rows
+  authUserId      String?          @unique // Supabase Auth user id (JWT "sub")
   username        String           @unique
   automations     Automation[]
   competitors     Competitor[]

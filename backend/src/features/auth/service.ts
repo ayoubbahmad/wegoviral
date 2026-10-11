@@ -1,17 +1,19 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { prisma } from '../../lib/prisma';
+import { SupabaseClaims } from '../../lib/supabase-auth';
 import { AuthUser } from './model';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const USERNAME_PATTERN = /^[a-z0-9_]{3,30}$/;
+
+const toUsernameBase = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '')
+    .slice(0, 24)
+    .padEnd(3, '0');
 
 export class AuthService {
-  private signToken(id: string) {
-    return jwt.sign({ id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN as any,
-    });
-  }
+  // Supabase user id -> profile id, so most requests skip the database lookup
+  private profileIdCache = new Map<string, string>();
 
   private formatUser(user: any): AuthUser {
     return {
@@ -24,51 +26,87 @@ export class AuthService {
     };
   }
 
-  async registerUser(data: {
-    email: string;
-    password: string;
-    username: string;
-    name?: string;
-  }) {
-    const passwordHash = await bcrypt.hash(data.password, 12);
-
-    const user = await prisma.userProfile.create({
-      data: {
-        email: data.email,
-        username: data.username,
-        passwordHash,
-        name: data.name || data.username,
-        socialAccounts: {
-          create: {
-            platform: 'Instagram',
-            username: data.username,
-            accountId: `mock-${data.username}-IG`,
-            isActive: true,
-            isConnected: true,
-          },
-        },
-      },
-      include: {
-        socialAccounts: true,
-      },
-    });
-
-    const token = this.signToken(user.id);
-    return { token, user: this.formatUser(user) };
+  isValidUsername(username: string) {
+    return USERNAME_PATTERN.test(username);
   }
 
-  async loginUser(email: string, password: string) {
-    const user = await prisma.userProfile.findUnique({
-      where: { email },
-      include: { socialAccounts: true },
-    });
+  async isUsernameAvailable(username: string) {
+    const existing = await prisma.userProfile.findUnique({ where: { username } });
+    return !existing;
+  }
 
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return null;
+  private async generateUsername(preferred: string | undefined, email: string) {
+    const base = toUsernameBase(preferred || email.split('@')[0]);
+    if (await this.isUsernameAvailable(base)) return base;
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const candidate = `${base}${Math.floor(1000 + Math.random() * 9000)}`;
+      if (await this.isUsernameAvailable(candidate)) return candidate;
+    }
+    return `${base}${Date.now().toString(36)}`;
+  }
+
+  /**
+   * Finds the profile for a Supabase user, creating it on first login.
+   * Existing profiles with the same verified email are linked instead of duplicated.
+   */
+  async resolveProfileId(claims: SupabaseClaims): Promise<string> {
+    const cached = this.profileIdCache.get(claims.sub);
+    if (cached) return cached;
+
+    const profile =
+      (await prisma.userProfile.findUnique({ where: { authUserId: claims.sub } })) ??
+      (await this.linkOrCreateProfile(claims));
+
+    this.profileIdCache.set(claims.sub, profile.id);
+    return profile.id;
+  }
+
+  private async linkOrCreateProfile(claims: SupabaseClaims) {
+    const email = claims.email?.toLowerCase();
+    if (!email) throw new Error('Supabase user has no email');
+
+    const metadata = claims.user_metadata ?? {};
+    const existing = await prisma.userProfile.findUnique({ where: { email } });
+    if (existing && !existing.authUserId && metadata.email_verified !== false) {
+      return prisma.userProfile.update({
+        where: { id: existing.id },
+        data: { authUserId: claims.sub },
+      });
     }
 
-    const token = this.signToken(user.id);
-    return { token, user: this.formatUser(user) };
+    const username = await this.generateUsername(metadata.username, email);
+    const name = metadata.full_name || metadata.name || username;
+
+    try {
+      return await prisma.userProfile.create({
+        data: {
+          authUserId: claims.sub,
+          email,
+          username,
+          name,
+          avatarUrl: metadata.avatar_url || metadata.picture || null,
+          // Placeholder account until real Instagram connection is built
+          socialAccounts: {
+            create: {
+              platform: 'Instagram',
+              username,
+              accountId: `mock-${username}-IG`,
+              isActive: true,
+              isConnected: true,
+            },
+          },
+        },
+      });
+    } catch (error: any) {
+      // Two parallel first requests can race to create the same profile
+      if (error?.code === 'P2002') {
+        const profile = await prisma.userProfile.findUnique({
+          where: { authUserId: claims.sub },
+        });
+        if (profile) return profile;
+      }
+      throw error;
+    }
   }
 
   async getUserById(id: string) {
@@ -79,15 +117,6 @@ export class AuthService {
 
     if (!user) return null;
     return this.formatUser(user);
-  }
-
-  async isEmailOrUsernameTaken(email: string, username: string) {
-    const existingUser = await prisma.userProfile.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
-    return !!existingUser;
   }
 }
 

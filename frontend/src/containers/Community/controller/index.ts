@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { MOCK_COMMUNITY_SPACES, MOCK_LEADERBOARD } from '@/lib/mock-data';
 import { ALL_SPACES_ID, useCommunityStore } from '../slice';
 
@@ -35,6 +35,28 @@ export const useCommunityController = () => {
     [posts, activeSpaceId],
   );
 
+  // Captured once per mount: "upcoming" doesn't need to tick live
+  const [now] = useState(() => Date.now());
+
+  const upcomingEvents = useMemo(() => {
+    return events
+      .filter((event) => new Date(event.date).getTime() >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3);
+  }, [events, now]);
+
+  // Comments weigh more than likes: they signal a real conversation
+  const topPosts = useMemo(
+    () =>
+      [...posts]
+        .sort(
+          (a, b) =>
+            b.likeCount + b.commentCount * 2 - (a.likeCount + a.commentCount * 2),
+        )
+        .slice(0, 5),
+    [posts],
+  );
+
   const activeSpace = spaces.find((space) => space.id === activeSpaceId) ?? null;
 
   return {
@@ -47,6 +69,8 @@ export const useCommunityController = () => {
     handleCreatePost: createPost,
     handleLikePost: toggleLikePost,
     events,
+    upcomingEvents,
+    topPosts,
     handleCreateEvent: createEvent,
     isCreateEventModalOpen,
     setIsCreateEventModalOpen,

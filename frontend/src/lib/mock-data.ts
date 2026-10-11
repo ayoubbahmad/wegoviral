@@ -501,13 +501,21 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
 ];
 
+// Event dates are relative to today so "upcoming" always has content in the mock
+const daysFromNow = (days: number, hourUtc: number) => {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() + days);
+  date.setUTCHours(hourUtc, 0, 0, 0);
+  return date.toISOString();
+};
+
 export const MOCK_COMMUNITY_EVENTS: CommunityEvent[] = [
   {
     id: 'e1',
     title: 'Live Hook Workshop',
     description:
       'A live session breaking down what makes a hook actually stop the scroll, with real examples.',
-    date: '2023-11-05T17:00:00Z',
+    date: daysFromNow(2, 17),
     attendeeCount: 128,
     createdBy: MOCK_USER_PRIYA,
   },
@@ -515,15 +523,23 @@ export const MOCK_COMMUNITY_EVENTS: CommunityEvent[] = [
     id: 'e2',
     title: 'Creator Q&A: Editing on a Budget',
     description: 'Ask your editing questions, tool recommendations included.',
-    date: '2023-11-12T19:00:00Z',
+    date: daysFromNow(9, 19),
     attendeeCount: 64,
     createdBy: MOCK_USER_LEO,
   },
   {
     id: 'e3',
-    title: 'November Content Sprint Kickoff',
-    date: '2023-11-01T15:00:00Z',
+    title: 'Monthly Content Sprint Kickoff',
+    date: daysFromNow(16, 15),
     attendeeCount: 41,
+    createdBy: MOCK_USER_SAM,
+  },
+  {
+    id: 'e4',
+    title: 'Brand Deals 101 with the Founders',
+    description: 'How to pitch brands, price your work and read a contract.',
+    date: daysFromNow(-5, 18),
+    attendeeCount: 203,
     createdBy: MOCK_USER_SAM,
   },
 ];

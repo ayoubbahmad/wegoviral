@@ -8,6 +8,8 @@ import { FeedTab } from '../components';
 export const CommunityFeedContainer = () => {
   const {
     posts,
+    topPosts,
+    upcomingEvents,
     spaces,
     activeSpace,
     activeSpaceId,
@@ -25,6 +27,8 @@ export const CommunityFeedContainer = () => {
       />
       <FeedTab
         posts={posts}
+        topPosts={topPosts}
+        upcomingEvents={upcomingEvents}
         spaces={spaces}
         activeSpace={activeSpace}
         activeSpaceId={activeSpaceId}

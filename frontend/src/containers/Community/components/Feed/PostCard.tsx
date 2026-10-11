@@ -7,12 +7,15 @@ import {
   Link2,
   MessageCircle,
   MoreHorizontal,
+  Pin,
+  PinOff,
   Trash2,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
-import { cn, formatRelativeDate } from '@/lib/utils';
-import { CommunityPost, CommunitySpace } from '@/types/communityFeed';
+import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
+import { CommunityPost, CommunitySpace, CommunityUser } from '@/types/communityFeed';
 import { PostPoll } from './PostPoll';
+import { CommentsThread } from './CommentsThread';
 
 // Longer posts are clamped with a "See more" toggle
 const CLAMP_CHARACTERS = 280;
@@ -21,11 +24,13 @@ const CLAMP_LINES = 5;
 interface PostCardProps {
   post: CommunityPost;
   space?: CommunitySpace;
-  isOwn?: boolean;
-  onLike: (postId: string) => void;
-  onBookmark: (postId: string) => void;
+  currentUser?: CommunityUser;
+  isStaff: boolean;
+  onLike: (post: CommunityPost) => void;
+  onBookmark: (post: CommunityPost) => void;
   onVote: (postId: string, optionId: string) => void;
   onCopyLink: (post: CommunityPost) => void;
+  onPin: (post: CommunityPost) => void;
   onDelete: (postId: string) => void;
   onSpaceClick?: (spaceId: string) => void;
 }
@@ -33,21 +38,37 @@ interface PostCardProps {
 export const PostCard = ({
   post,
   space,
-  isOwn = false,
+  currentUser,
+  isStaff,
   onLike,
   onBookmark,
   onVote,
   onCopyLink,
+  onPin,
   onDelete,
   onSpaceClick,
 }: PostCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const isLong =
     post.content.length > CLAMP_CHARACTERS ||
     post.content.split('\n').length > CLAMP_LINES;
+  const canDelete = isStaff || post.author.id === currentUser?.id;
+
+  const actions = (
+    <PostActions
+      post={post}
+      canPin={isStaff}
+      canDelete={canDelete}
+      onBookmark={onBookmark}
+      onCopyLink={onCopyLink}
+      onPin={onPin}
+      onDelete={onDelete}
+    />
+  );
 
   return (
-    <Card padding="none" className="overflow-hidden">
+    <Card padding="none" className={cn('overflow-hidden', post.pinned && 'border-primary/40')}>
       {post.coverUrl && (
         <img
           src={post.coverUrl}
@@ -57,28 +78,33 @@ export const PostCard = ({
       )}
 
       <div className="p-6 space-y-4">
+        {post.pinned && (
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+            <Pin className="w-3.5 h-3.5" /> Pinned
+          </div>
+        )}
+
         {post.title && (
           <div className="flex items-start justify-between gap-4">
             <h2 className="text-xl font-bold tracking-tight leading-snug">{post.title}</h2>
-            <PostActions
-              post={post}
-              isOwn={isOwn}
-              onBookmark={onBookmark}
-              onCopyLink={onCopyLink}
-              onDelete={onDelete}
-            />
+            {actions}
           </div>
         )}
 
         <div className="flex items-center gap-3">
           <img
-            src={post.author.avatarUrl}
+            src={avatarFor(post.author)}
             alt={post.author.username}
             className="w-10 h-10 rounded-full border border-border shrink-0"
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm truncate">@{post.author.username}</span>
+              {post.author.role && post.author.role !== 'MEMBER' && (
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {post.author.role === 'ADMIN' ? 'Team' : 'Mod'}
+                </span>
+              )}
               <span className="text-xs text-muted-foreground shrink-0">
                 {formatRelativeDate(post.createdAt)}
               </span>
@@ -92,22 +118,14 @@ export const PostCard = ({
               </button>
             )}
           </div>
-          {!post.title && (
-            <PostActions
-              post={post}
-              isOwn={isOwn}
-              onBookmark={onBookmark}
-              onCopyLink={onCopyLink}
-              onDelete={onDelete}
-            />
-          )}
+          {!post.title && actions}
         </div>
 
         {post.content && (
           <div>
             <p
               className={cn(
-                'text-sm leading-relaxed whitespace-pre-wrap',
+                'text-sm leading-relaxed whitespace-pre-wrap break-words',
                 isLong && !isExpanded && 'line-clamp-5',
               )}
             >
@@ -132,7 +150,8 @@ export const PostCard = ({
 
         <div className="flex items-center gap-5 pt-1 text-xs text-muted-foreground">
           <button
-            onClick={() => onLike(post.id)}
+            onClick={() => onLike(post)}
+            aria-pressed={post.likedByMe}
             className="flex items-center gap-1.5 hover:text-foreground transition-colors"
           >
             <Heart
@@ -140,11 +159,22 @@ export const PostCard = ({
             />
             <span className="font-medium">{post.likeCount}</span>
           </button>
-          <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setIsCommentsOpen((open) => !open)}
+            aria-expanded={isCommentsOpen}
+            className={cn(
+              'flex items-center gap-1.5 hover:text-foreground transition-colors',
+              isCommentsOpen && 'text-foreground',
+            )}
+          >
             <MessageCircle className="w-4 h-4" />
             <span className="font-medium">{post.commentCount}</span>
-          </div>
+          </button>
         </div>
+
+        {isCommentsOpen && (
+          <CommentsThread postId={post.id} currentUser={currentUser} isStaff={isStaff} />
+        )}
       </div>
     </Card>
   );
@@ -162,16 +192,20 @@ const PostImages = ({ images }: { images: string[] }) => {
       )}
     >
       {visible.map((src, index) => (
-        <div
+        <a
           key={src}
+          href={src}
+          target="_blank"
+          rel="noreferrer"
           className={cn(
-            'relative bg-secondary/30',
+            'relative block bg-secondary/30',
             visible.length === 3 && index === 0 && 'row-span-2',
           )}
         >
           <img
             src={src}
             alt=""
+            loading="lazy"
             className={cn(
               'h-full w-full object-cover',
               visible.length === 1 ? 'max-h-96' : 'aspect-[4/3]',
@@ -182,7 +216,7 @@ const PostImages = ({ images }: { images: string[] }) => {
               +{hidden}
             </div>
           )}
-        </div>
+        </a>
       ))}
     </div>
   );
@@ -190,13 +224,23 @@ const PostImages = ({ images }: { images: string[] }) => {
 
 interface PostActionsProps {
   post: CommunityPost;
-  isOwn: boolean;
-  onBookmark: (postId: string) => void;
+  canPin: boolean;
+  canDelete: boolean;
+  onBookmark: (post: CommunityPost) => void;
   onCopyLink: (post: CommunityPost) => void;
+  onPin: (post: CommunityPost) => void;
   onDelete: (postId: string) => void;
 }
 
-const PostActions = ({ post, isOwn, onBookmark, onCopyLink, onDelete }: PostActionsProps) => {
+const PostActions = ({
+  post,
+  canPin,
+  canDelete,
+  onBookmark,
+  onCopyLink,
+  onPin,
+  onDelete,
+}: PostActionsProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -209,11 +253,28 @@ const PostActions = ({ post, isOwn, onBookmark, onCopyLink, onDelete }: PostActi
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
+  const menuItem = (label: string, icon: React.ReactNode, onClick: () => void, danger = false) => (
+    <button
+      role="menuitem"
+      onClick={() => {
+        onClick();
+        setIsMenuOpen(false);
+      }}
+      className={cn(
+        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
+        danger ? 'text-red-500 hover:bg-red-500/10' : 'hover:bg-secondary/50',
+      )}
+    >
+      {icon} {label}
+    </button>
+  );
+
   return (
     <div className="flex items-center gap-1 shrink-0">
       <button
-        onClick={() => onBookmark(post.id)}
+        onClick={() => onBookmark(post)}
         title={post.bookmarkedByMe ? 'Remove bookmark' : 'Bookmark'}
+        aria-pressed={post.bookmarkedByMe}
         className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
       >
         <Bookmark
@@ -226,6 +287,7 @@ const PostActions = ({ post, isOwn, onBookmark, onCopyLink, onDelete }: PostActi
           onClick={() => setIsMenuOpen((open) => !open)}
           aria-haspopup="menu"
           aria-expanded={isMenuOpen}
+          aria-label="Post options"
           className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
         >
           <MoreHorizontal className="w-4 h-4" />
@@ -235,28 +297,15 @@ const PostActions = ({ post, isOwn, onBookmark, onCopyLink, onDelete }: PostActi
             role="menu"
             className="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150"
           >
-            <button
-              role="menuitem"
-              onClick={() => {
-                onCopyLink(post);
-                setIsMenuOpen(false);
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary/50 transition-colors"
-            >
-              <Link2 className="w-4 h-4" /> Copy link
-            </button>
-            {isOwn && (
-              <button
-                role="menuitem"
-                onClick={() => {
-                  onDelete(post.id);
-                  setIsMenuOpen(false);
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" /> Delete post
-              </button>
-            )}
+            {menuItem('Copy link', <Link2 className="w-4 h-4" />, () => onCopyLink(post))}
+            {canPin &&
+              menuItem(
+                post.pinned ? 'Unpin post' : 'Pin post',
+                post.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />,
+                () => onPin(post),
+              )}
+            {canDelete &&
+              menuItem('Delete post', <Trash2 className="w-4 h-4" />, () => onDelete(post.id), true)}
           </div>
         )}
       </div>

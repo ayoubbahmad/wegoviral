@@ -3,31 +3,37 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   // Direct (non-pooled) connection, used by migrations
   directUrl = env("DIRECT_URL")
 }
 
 model UserProfile {
-  id              String           @id @default(uuid())
-  email           String           @unique
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  avatarUrl       String?
-  name            String?
-  passwordHash    String?  // Unused since Supabase Auth; kept nullable for old rows
-  authUserId      String?          @unique // Supabase Auth user id (JWT "sub")
-  username        String           @unique
-  automations     Automation[]
-  competitors     Competitor[]
-  creators        Creator[]
-  hooks           Hook[]
-  scripts         Script[]
-  scriptTemplates ScriptTemplate[]
-  socialAccounts  SocialAccount[]
-  watchlists      Watchlist[]
-  projects        Project[]
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  avatarUrl          String?
+  name               String?
+  passwordHash       String? // Unused since Supabase Auth; kept nullable for old rows
+  authUserId         String?             @unique // Supabase Auth user id (JWT "sub")
+  username           String              @unique
+  role               UserRole            @default(MEMBER)
+  automations        Automation[]
+  competitors        Competitor[]
+  creators           Creator[]
+  hooks              Hook[]
+  scripts            Script[]
+  scriptTemplates    ScriptTemplate[]
+  socialAccounts     SocialAccount[]
+  watchlists         Watchlist[]
+  projects           Project[]
+  communityPosts     CommunityPost[]
+  communityComments  CommunityComment[]
+  communityLikes     CommunityPostLike[]
+  communityBookmarks CommunityBookmark[]
+  communityVotes     CommunityPollVote[]
 }
 
 model Hook {
@@ -92,15 +98,15 @@ model Script {
 
 model Competitor {
   id              String           @id @default(uuid())
-  handle          String           // Standardized username
+  handle          String // Standardized username
   name            String
   avatarUrl       String
   bio             String?
   tags            String[]
   stats           Json
-  platform        String           // e.g., "youtube", "tiktok", "instagram"
-  externalUrl     String           // Link to the creator's profile
-  originUrl       String?          // The URL used to initiate the scrape
+  platform        String // e.g., "youtube", "tiktok", "instagram"
+  externalUrl     String // Link to the creator's profile
+  originUrl       String? // The URL used to initiate the scrape
   userId          String
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -148,7 +154,7 @@ model CompetitorPost {
   metrics        Json
   isViral        Boolean    @default(false)
   analysis       Json?
-  externalUrl    String?    // Unique identifier from platform (e.g., video ID or URL)
+  externalUrl    String? // Unique identifier from platform (e.g., video ID or URL)
   createdAt      DateTime   @default(now())
   competitor     Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
 
@@ -248,23 +254,23 @@ enum ProjectType {
 }
 
 model Project {
-  id           String        @id @default(uuid())
-  name         String
-  type         ProjectType   @default(GENERAL)
-  description  String?
-  status       String        @default("Active")
-  metadata     Json?         // Type-specific global data
-  userId       String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  user         UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items        ProjectItem[]
+  id          String        @id @default(uuid())
+  name        String
+  type        ProjectType   @default(GENERAL)
+  description String?
+  status      String        @default("Active")
+  metadata    Json? // Type-specific global data
+  userId      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       ProjectItem[]
 }
 
 model ProjectItem {
   id        String   @id @default(uuid())
   projectId String
-  type      String   // e.g., "video", "episode", "note"
+  type      String // e.g., "video", "episode", "note"
   title     String
   content   Json?
   status    String?
@@ -272,4 +278,117 @@ model ProjectItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ─── Community feed ──────────────────────────────────────────────────────────
+
+enum UserRole {
+  MEMBER
+  MODERATOR
+  ADMIN
+}
+
+model CommunitySpace {
+  id          String          @id @default(uuid())
+  name        String
+  emoji       String
+  description String
+  adminOnly   Boolean         @default(false) // only moderators/admins can post
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now())
+  posts       CommunityPost[]
+
+  @@map("community_spaces")
+}
+
+model CommunityPost {
+  id           String                @id @default(uuid())
+  spaceId      String
+  authorId     String
+  title        String?
+  content      String
+  coverUrl     String?
+  images       String[]
+  pinned       Boolean               @default(false)
+  // Denormalized counters, kept in sync in the same transaction as the write
+  likeCount    Int                   @default(0)
+  commentCount Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  deletedAt    DateTime?
+  space        CommunitySpace        @relation(fields: [spaceId], references: [id])
+  author       UserProfile           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes        CommunityPostLike[]
+  bookmarks    CommunityBookmark[]
+  comments     CommunityComment[]
+  pollOptions  CommunityPollOption[]
+  pollVotes    CommunityPollVote[]
+
+  @@index([deletedAt, pinned, createdAt])
+  @@index([spaceId, deletedAt, pinned, createdAt])
+  @@map("community_posts")
+}
+
+model CommunityPostLike {
+  postId    String
+  userId    String
+  createdAt DateTime      @default(now())
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@map("community_post_likes")
+}
+
+model CommunityBookmark {
+  postId    String
+  userId    String
+  createdAt DateTime      @default(now())
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+  @@map("community_bookmarks")
+}
+
+model CommunityPollOption {
+  id        String              @id @default(uuid())
+  postId    String
+  label     String
+  position  Int
+  voteCount Int                 @default(0)
+  post      CommunityPost       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  votes     CommunityPollVote[]
+
+  @@index([postId])
+  @@map("community_poll_options")
+}
+
+model CommunityPollVote {
+  postId    String
+  userId    String
+  optionId  String
+  createdAt DateTime            @default(now())
+  post      CommunityPost       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      UserProfile         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  option    CommunityPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  // One vote per member per poll
+  @@id([postId, userId])
+  @@map("community_poll_votes")
+}
+
+model CommunityComment {
+  id        String        @id @default(uuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime      @default(now())
+  deletedAt DateTime?
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    UserProfile   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@map("community_comments")
 }

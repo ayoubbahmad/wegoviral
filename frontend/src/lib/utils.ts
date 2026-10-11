@@ -27,3 +27,8 @@ export function formatRelativeDate(date: string | Date | undefined): string {
     const diffInWeeks = Math.floor(diffInDays / 7);
     return `${diffInWeeks}w ago`;
 }
+
+/** Avatar URL with a generated fallback for users without a photo. */
+export function avatarFor(user: { username: string; avatarUrl?: string | null }) {
+    return user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.username)}`;
+}

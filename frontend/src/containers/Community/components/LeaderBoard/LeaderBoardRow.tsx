@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, avatarFor } from '@/lib/utils';
 import { LeaderboardEntry } from '@/types/communityFeed';
 
 interface LeaderBoardRowProps {
@@ -26,7 +26,7 @@ export const LeaderBoardRow = ({ entry }: LeaderBoardRowProps) => {
         {entry.rank}
       </span>
       <img
-        src={entry.user.avatarUrl}
+        src={avatarFor(entry.user)}
         alt={entry.user.username}
         className="w-8 h-8 rounded-full border border-border"
       />

@@ -9,24 +9,41 @@ import {
   Maximize2,
   Minimize2,
   Plus,
+  Loader2,
   Smile,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Select } from '@/components/Select';
 import { cn } from '@/lib/utils';
-import { CommunitySpace, NewPostInput } from '@/types/communityFeed';
+import { CommunitySpace, NewPostDraft } from '@/types/communityFeed';
 
 const EMOJIS = ['🔥', '🚀', '💯', '🎉', '🙌', '👏', '😂', '😍', '🤯', '🤔', '👀', '💡', '🎬', '📈', '💰', '🏆', '❤️', '✨', '✅', '🙏'];
 const MAX_IMAGES = 8;
 const MAX_POLL_OPTIONS = 5;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+
+interface PickedImage {
+  file: File;
+  url: string; // local preview
+}
+
+/** Returns an error message, or null when the file can be uploaded. */
+const validateImage = (file: File) => {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return `${file.name}: use PNG, JPG, WebP or GIF`;
+  if (file.size > MAX_IMAGE_BYTES) return `${file.name} is larger than 5 MB`;
+  return null;
+};
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
   spaces: CommunitySpace[];
   activeSpace: CommunitySpace | null;
-  onSubmit: (input: NewPostInput) => void;
+  /** Moderators and admins can also post in team-only spaces */
+  canPostInAdminSpaces: boolean;
+  onSubmit: (draft: NewPostDraft) => Promise<void>;
 }
 
 export const CreatePostModal = ({ isOpen, ...props }: CreatePostModalProps) => {
@@ -38,16 +55,27 @@ export const CreatePostModal = ({ isOpen, ...props }: CreatePostModalProps) => {
 
 type CreatePostFormProps = Omit<CreatePostModalProps, 'isOpen'>;
 
-const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFormProps) => {
-  const postableSpaces = spaces.filter((space) => !space.adminOnly);
+const CreatePostForm = ({
+  onClose,
+  spaces,
+  activeSpace,
+  canPostInAdminSpaces,
+  onSubmit,
+}: CreatePostFormProps) => {
+  const canPostIn = (space: CommunitySpace) => !space.adminOnly || canPostInAdminSpaces;
+  const postableSpaces = spaces.filter(canPostIn);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [coverUrl, setCoverUrl] = useState<string>();
-  const [images, setImages] = useState<string[]>([]);
+  const [cover, setCover] = useState<PickedImage>();
+  const [pickedImages, setPickedImages] = useState<PickedImage[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const coverUrl = cover?.url;
+  const images = pickedImages.map((image) => image.url);
   const [pollOptions, setPollOptions] = useState<string[] | null>(null);
   const [spaceId, setSpaceId] = useState(
-    activeSpace && !activeSpace.adminOnly ? activeSpace.id : '',
+    activeSpace && canPostIn(activeSpace) ? activeSpace.id : '',
   );
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
@@ -61,14 +89,15 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
   const isPollValid = !pollOptions || filledPollOptions.length >= 2;
   const hasBody = Boolean(title.trim() || content.trim());
   const isDirty = hasBody || Boolean(coverUrl) || images.length > 0 || Boolean(pollOptions);
-  const canPublish = hasBody && Boolean(spaceId) && isPollValid;
+  const canPublish = hasBody && Boolean(spaceId) && isPollValid && !isSubmitting;
 
-  // Uploads are local previews until the backend handles media
+  // Free the local preview URLs
   const releaseUploads = () => {
     [coverUrl, ...images].forEach((url) => url && URL.revokeObjectURL(url));
   };
 
   const handleClose = () => {
+    if (isSubmitting) return;
     if (isDirty && !window.confirm('Discard this post?')) return;
     releaseUploads();
     onClose();
@@ -91,21 +120,30 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
 
   const handleCoverChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-    if (coverUrl) URL.revokeObjectURL(coverUrl);
-    setCoverUrl(URL.createObjectURL(file));
     event.target.value = '';
+    if (!file) return;
+    const invalid = validateImage(file);
+    if (invalid) return setError(invalid);
+    setError(null);
+    if (coverUrl) URL.revokeObjectURL(coverUrl);
+    setCover({ file, url: URL.createObjectURL(file) });
   };
 
   const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []).slice(0, MAX_IMAGES - images.length);
-    setImages((prev) => [...prev, ...files.map((file) => URL.createObjectURL(file))]);
     event.target.value = '';
+    const invalid = files.map(validateImage).find(Boolean);
+    setError(invalid ?? null);
+    const valid = files.filter((file) => !validateImage(file));
+    setPickedImages((prev) => [
+      ...prev,
+      ...valid.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    ]);
   };
 
   const removeImage = (url: string) => {
     URL.revokeObjectURL(url);
-    setImages((prev) => prev.filter((image) => image !== url));
+    setPickedImages((prev) => prev.filter((image) => image.url !== url));
   };
 
   const insertEmoji = (emoji: string) => {
@@ -120,16 +158,24 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
     });
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!canPublish) return;
-    onSubmit({
-      spaceId,
-      title,
-      content,
-      coverUrl,
-      images,
-      pollOptions: pollOptions ?? undefined,
-    });
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        spaceId,
+        title,
+        content,
+        coverFile: cover?.file,
+        imageFiles: pickedImages.map((image) => image.file),
+        pollOptions: pollOptions ? filledPollOptions : undefined,
+      });
+      releaseUploads();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not publish the post');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -176,7 +222,7 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
               <button
                 onClick={() => {
                   URL.revokeObjectURL(coverUrl);
-                  setCoverUrl(undefined);
+                  setCover(undefined);
                 }}
                 className="absolute right-3 top-3 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
               >
@@ -311,6 +357,12 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
           )}
         </div>
 
+        {error && (
+          <div role="alert" className="border-t border-red-500/20 bg-red-500/10 px-6 py-2.5 text-sm font-medium text-red-500">
+            {error}
+          </div>
+        )}
+
         {/* Footer */}
         <div className="flex flex-col gap-3 border-t border-border bg-secondary/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full sm:w-60">
@@ -333,7 +385,13 @@ const CreatePostForm = ({ onClose, spaces, activeSpace, onSubmit }: CreatePostFo
               Cancel
             </Button>
             <Button variant="primary" onClick={handlePublish} disabled={!canPublish}>
-              Publish
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Publishing…
+                </>
+              ) : (
+                'Publish'
+              )}
             </Button>
           </div>
         </div>

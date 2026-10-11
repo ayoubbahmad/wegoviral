@@ -1,11 +1,11 @@
 import { Flame } from 'lucide-react';
 import { Card } from '@/components/Card';
-import { CommunityPost, CommunitySpace } from '@/types/communityFeed';
+import { CommunitySpace, TopPost } from '@/types/communityFeed';
 
 interface TopPostsCardProps {
-  posts: CommunityPost[];
+  posts: TopPost[];
   spacesById: Record<string, CommunitySpace>;
-  onSelect: (post: CommunityPost) => void;
+  onSelect: (post: TopPost) => void;
 }
 
 export const TopPostsCard = ({ posts, spacesById, onSelect }: TopPostsCardProps) => {
@@ -15,6 +15,10 @@ export const TopPostsCard = ({ posts, spacesById, onSelect }: TopPostsCardProps)
         <Flame className="w-4 h-4 text-primary" />
         Top posts
       </h3>
+
+      {posts.length === 0 && (
+        <p className="text-sm text-muted-foreground">No trending posts yet. Likes and comments bring posts here.</p>
+      )}
 
       <ol className="space-y-4">
         {posts.map((post, index) => {

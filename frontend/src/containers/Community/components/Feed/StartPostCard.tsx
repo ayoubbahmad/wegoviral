@@ -1,5 +1,6 @@
 import { BarChart3, ImageIcon, Plus } from 'lucide-react';
 import { Card } from '@/components/Card';
+import { avatarFor } from '@/lib/utils';
 import { CommunityUser } from '@/types/communityFeed';
 
 interface StartPostCardProps {
@@ -12,7 +13,7 @@ export const StartPostCard = ({ currentUser, onOpen }: StartPostCardProps) => {
     <Card padding="sm" className="flex items-center gap-3">
       {currentUser && (
         <img
-          src={currentUser.avatarUrl}
+          src={avatarFor(currentUser)}
           alt={currentUser.username}
           className="w-10 h-10 rounded-full border border-border shrink-0"
         />

@@ -1,3 +1,4 @@
+import { avatarFor } from '@/lib/utils';
 import { CalendarDays, Users as UsersIcon } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { CommunityEvent } from '@/types/communityFeed';
@@ -36,7 +37,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         actions={
           <div className="flex items-center gap-2">
             <img
-              src={event.createdBy.avatarUrl}
+              src={avatarFor(event.createdBy)}
               alt={event.createdBy.username}
               className="w-5 h-5 rounded-full border border-border"
             />

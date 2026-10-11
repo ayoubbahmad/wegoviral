@@ -1,4 +1,4 @@
-import { SocialAccount } from "@prisma/client";
+import { SocialAccount, UserRole } from "@prisma/client";
 
 export interface AuthUser {
   id: string;
@@ -6,5 +6,6 @@ export interface AuthUser {
   username: string;
   name: string;
   avatarUrl?: string | null;
+  role: UserRole;
   socialAccounts?: SocialAccount[];
 }

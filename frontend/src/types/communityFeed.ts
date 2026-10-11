@@ -1,7 +1,11 @@
+export type UserRole = 'MEMBER' | 'MODERATOR' | 'ADMIN';
+
 export interface CommunityUser {
     id: string;
     username: string;
-    avatarUrl: string;
+    name?: string | null;
+    avatarUrl?: string | null;
+    role?: UserRole;
 }
 
 export interface CommunitySpace {
@@ -9,7 +13,9 @@ export interface CommunitySpace {
     name: string;
     emoji: string;
     description: string;
-    adminOnly?: boolean; // only founders/admins can post here
+    adminOnly: boolean; // only moderators/admins can post here
+    position: number;
+    postCount: number;
 }
 
 export interface CommunityPollOption {
@@ -32,19 +38,53 @@ export interface CommunityPost {
     coverUrl?: string;
     images?: string[];
     poll?: CommunityPoll;
+    pinned: boolean;
     createdAt: string; // ISO date
     likeCount: number;
     commentCount: number;
-    likedByMe?: boolean;
-    bookmarkedByMe?: boolean;
+    likedByMe: boolean;
+    bookmarkedByMe: boolean;
 }
 
-export interface NewPostInput {
+export interface FeedPage {
+    posts: CommunityPost[];
+    nextCursor: string | null;
+}
+
+export interface TopPost {
+    id: string;
+    spaceId: string;
+    title: string | null;
+    content: string;
+    likeCount: number;
+    commentCount: number;
+    author: { username: string };
+}
+
+export interface CommunityComment {
+    id: string;
+    postId: string;
+    content: string;
+    createdAt: string;
+    author: CommunityUser;
+}
+
+/** What the create-post modal hands over; files are uploaded before the post is saved. */
+export interface NewPostDraft {
+    spaceId: string;
+    title?: string;
+    content: string;
+    coverFile?: File;
+    imageFiles: File[];
+    pollOptions?: string[];
+}
+
+export interface CreatePostPayload {
     spaceId: string;
     title?: string;
     content: string;
     coverUrl?: string;
-    images?: string[];
+    images: string[];
     pollOptions?: string[];
 }
 

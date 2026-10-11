@@ -1,65 +1,64 @@
-import { MessageSquare } from 'lucide-react';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { AlertCircle, Loader2, MessageSquare } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
-import {
-  CommunityEvent,
-  CommunityPost,
-  CommunitySpace,
-  CommunityUser,
-  NewPostInput,
-} from '@/types/communityFeed';
+import { Skeleton } from '@/components/Skeleton';
+import { Card } from '@/components/Card';
+import { TopPost } from '@/types/communityFeed';
+import type { FeedController } from '../../Feed/controller';
+import { ALL_SPACES_ID } from '../../slice';
 import { StartPostCard } from './StartPostCard';
 import { CreatePostModal } from './CreatePostModal';
 import { PostCard } from './PostCard';
 import { SpaceChips } from './SpaceChips';
 import { UpcomingEventsCard } from './UpcomingEventsCard';
 import { TopPostsCard } from './TopPostsCard';
-import { ALL_SPACES_ID } from '../../slice';
 
 interface FeedTabProps {
-  posts: CommunityPost[];
-  topPosts: CommunityPost[];
-  upcomingEvents: CommunityEvent[];
-  spaces: CommunitySpace[];
-  activeSpace: CommunitySpace | null;
-  activeSpaceId: string;
-  postCountBySpace: Record<string, number>;
-  setActiveSpaceId: (spaceId: string) => void;
-  currentUser?: CommunityUser;
-  isCreatePostOpen: boolean;
-  setIsCreatePostOpen: (open: boolean) => void;
-  handleCreatePost: (input: NewPostInput) => void;
-  handleDeletePost: (postId: string) => void;
-  handleCopyPostLink: (post: CommunityPost) => void;
-  handleLikePost: (postId: string) => void;
-  handleBookmarkPost: (postId: string) => void;
-  handleVotePoll: (postId: string, optionId: string) => void;
+  feed: FeedController;
 }
 
-export const FeedTab = ({
-  posts,
-  topPosts,
-  upcomingEvents,
-  spaces,
-  activeSpace,
-  activeSpaceId,
-  postCountBySpace,
-  setActiveSpaceId,
-  currentUser,
-  isCreatePostOpen,
-  setIsCreatePostOpen,
-  handleCreatePost,
-  handleDeletePost,
-  handleCopyPostLink,
-  handleLikePost,
-  handleBookmarkPost,
-  handleVotePoll,
-}: FeedTabProps) => {
-  const spacesById = Object.fromEntries(
-    spaces.map((space) => [space.id, space]),
-  );
+export const FeedTab = ({ feed }: FeedTabProps) => {
+  const {
+    spaces,
+    activeSpace,
+    activeSpaceId,
+    setActiveSpaceId,
+    postCountBySpace,
+    posts,
+    isLoadingPosts,
+    postsError,
+    retryPosts,
+    hasMorePosts,
+    isLoadingMorePosts,
+    loadMorePosts,
+    topPosts,
+    upcomingEvents,
+    currentUser,
+    isStaff,
+  } = feed;
 
-  // Show the post in the full feed, then bring it into view
-  const handleSelectTopPost = (post: CommunityPost) => {
+  const spacesById = Object.fromEntries(spaces.map((space) => [space.id, space]));
+  const canPostHere = !activeSpace?.adminOnly || isStaff;
+
+  // Load the next page when the sentinel below the list scrolls into view
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMorePosts) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isLoadingMorePosts) loadMorePosts();
+      },
+      { rootMargin: '600px' },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMorePosts, isLoadingMorePosts, loadMorePosts]);
+
+  // Show the post in the full feed, then bring it into view if it's loaded
+  const handleSelectTopPost = (post: TopPost) => {
     setActiveSpaceId(ALL_SPACES_ID);
     requestAnimationFrame(() => {
       document
@@ -78,59 +77,102 @@ export const FeedTab = ({
           onChange={setActiveSpaceId}
         />
         {activeSpace && (
-          <p className="px-1 text-sm text-muted-foreground">
-            {activeSpace.description}
-          </p>
+          <p className="px-1 text-sm text-muted-foreground">{activeSpace.description}</p>
         )}
 
-        {!activeSpace?.adminOnly && (
+        {canPostHere && (
           <StartPostCard
             currentUser={currentUser}
-            onOpen={() => setIsCreatePostOpen(true)}
+            onOpen={() => feed.setIsCreatePostOpen(true)}
           />
         )}
 
-        {posts.length === 0 ? (
+        {isLoadingPosts ? (
+          <PostSkeletons />
+        ) : postsError ? (
+          <Card className="flex flex-col items-center gap-3 text-center">
+            <AlertCircle className="w-6 h-6 text-red-500" />
+            <p className="text-sm text-muted-foreground">{postsError.message}</p>
+            <button
+              onClick={() => retryPosts()}
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Try again
+            </button>
+          </Card>
+        ) : posts.length === 0 ? (
           <EmptyState
             icon={MessageSquare}
             title="No posts here yet"
-            description="Be the first to start the conversation in this space."
+            description={
+              canPostHere
+                ? 'Be the first to start the conversation in this space.'
+                : 'The team will post updates here soon.'
+            }
           />
         ) : (
-          posts.map((post) => (
-            <div key={post.id} id={`post-${post.id}`} className="scroll-mt-8">
-              <PostCard
-                post={post}
-                space={spacesById[post.spaceId]}
-                isOwn={post.author.id === currentUser?.id}
-                onLike={handleLikePost}
-                onBookmark={handleBookmarkPost}
-                onVote={handleVotePoll}
-                onCopyLink={handleCopyPostLink}
-                onDelete={handleDeletePost}
-                onSpaceClick={setActiveSpaceId}
-              />
-            </div>
-          ))
+          <>
+            {posts.map((post) => (
+              <div key={post.id} id={`post-${post.id}`} className="scroll-mt-8">
+                <PostCard
+                  post={post}
+                  space={spacesById[post.spaceId]}
+                  currentUser={currentUser}
+                  isStaff={isStaff}
+                  onLike={feed.handleLikePost}
+                  onBookmark={feed.handleBookmarkPost}
+                  onVote={feed.handleVotePoll}
+                  onCopyLink={feed.handleCopyPostLink}
+                  onPin={feed.handlePinPost}
+                  onDelete={feed.handleDeletePost}
+                  onSpaceClick={setActiveSpaceId}
+                />
+              </div>
+            ))}
+            <div ref={sentinelRef} />
+            {isLoadingMorePosts && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            {!hasMorePosts && posts.length > 5 && (
+              <p className="py-4 text-center text-xs text-muted-foreground">You&apos;re all caught up ✨</p>
+            )}
+          </>
         )}
       </div>
 
       <aside className="hidden lg:block sticky top-8 space-y-6">
         <UpcomingEventsCard events={upcomingEvents} />
-        <TopPostsCard
-          posts={topPosts}
-          spacesById={spacesById}
-          onSelect={handleSelectTopPost}
-        />
+        <TopPostsCard posts={topPosts} spacesById={spacesById} onSelect={handleSelectTopPost} />
       </aside>
 
       <CreatePostModal
-        isOpen={isCreatePostOpen}
-        onClose={() => setIsCreatePostOpen(false)}
+        isOpen={feed.isCreatePostOpen}
+        onClose={() => feed.setIsCreatePostOpen(false)}
         spaces={spaces}
         activeSpace={activeSpace}
-        onSubmit={handleCreatePost}
+        canPostInAdminSpaces={isStaff}
+        onSubmit={feed.handleCreatePost}
       />
     </div>
   );
 };
+
+const PostSkeletons = () => (
+  <>
+    {[0, 1, 2].map((index) => (
+      <Card key={index} className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-10 h-10 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </Card>
+    ))}
+  </>
+);

@@ -5,6 +5,8 @@ import {
 } from '@/lib/mock-data';
 import { CommunityPost, CommunityEvent } from '@/types/communityFeed';
 
+export const ALL_SPACES_ID = 'all';
+
 const ME = {
   id: 'me',
   username: 'you',
@@ -14,9 +16,11 @@ const ME = {
 interface CommunityState {
   posts: CommunityPost[];
   events: CommunityEvent[];
+  activeSpaceId: string;
   isCreateEventModalOpen: boolean;
-  createPost: (content: string) => void;
+  createPost: (content: string, spaceId: string) => void;
   toggleLikePost: (postId: string) => void;
+  setActiveSpaceId: (spaceId: string) => void;
   createEvent: (data: { title: string; date: string; description?: string }) => void;
   setIsCreateEventModalOpen: (open: boolean) => void;
 }
@@ -25,11 +29,13 @@ interface CommunityState {
 export const useCommunityStore = create<CommunityState>((set) => ({
   posts: MOCK_COMMUNITY_POSTS,
   events: MOCK_COMMUNITY_EVENTS,
+  activeSpaceId: ALL_SPACES_ID,
   isCreateEventModalOpen: false,
-  createPost: (content) => {
+  createPost: (content, spaceId) => {
     if (!content.trim()) return;
     const newPost: CommunityPost = {
       id: `local-${Date.now()}`,
+      spaceId,
       author: ME,
       content,
       createdAt: new Date().toISOString(),
@@ -51,6 +57,7 @@ export const useCommunityStore = create<CommunityState>((set) => ({
           : post,
       ),
     })),
+  setActiveSpaceId: (spaceId) => set({ activeSpaceId: spaceId }),
   createEvent: (data) => {
     if (!data.title.trim() || !data.date) return;
     const newEvent: CommunityEvent = {

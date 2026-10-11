@@ -4,8 +4,17 @@ export interface CommunityUser {
     avatarUrl: string;
 }
 
+export interface CommunitySpace {
+    id: string;
+    name: string;
+    emoji: string;
+    description: string;
+    adminOnly?: boolean; // only founders/admins can post here
+}
+
 export interface CommunityPost {
     id: string;
+    spaceId: string;
     author: CommunityUser;
     content: string;
     createdAt: string; // ISO date

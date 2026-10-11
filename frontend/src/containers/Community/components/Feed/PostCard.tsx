@@ -3,14 +3,16 @@
 import { Heart, MessageCircle } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { cn, formatRelativeDate } from '@/lib/utils';
-import { CommunityPost } from '@/types/communityFeed';
+import { CommunityPost, CommunitySpace } from '@/types/communityFeed';
 
 interface PostCardProps {
   post: CommunityPost;
+  space?: CommunitySpace;
   onLike: (postId: string) => void;
+  onSpaceClick?: (spaceId: string) => void;
 }
 
-export const PostCard = ({ post, onLike }: PostCardProps) => {
+export const PostCard = ({ post, space, onLike, onSpaceClick }: PostCardProps) => {
   return (
     <Card>
       <div className="flex items-start gap-3">
@@ -25,6 +27,14 @@ export const PostCard = ({ post, onLike }: PostCardProps) => {
             <span className="text-xs text-muted-foreground">
               {formatRelativeDate(post.createdAt)}
             </span>
+            {space && (
+              <button
+                onClick={() => onSpaceClick?.(space.id)}
+                className="ml-auto shrink-0 rounded-full bg-secondary/60 px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {space.emoji} {space.name}
+              </button>
+            )}
           </div>
           <p className="text-sm mt-1 whitespace-pre-wrap">{post.content}</p>
 

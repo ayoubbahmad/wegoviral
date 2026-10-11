@@ -6,7 +6,16 @@ import { useCommunityController } from '../controller';
 import { FeedTab } from '../components';
 
 export const CommunityFeedContainer = () => {
-  const { posts, handleCreatePost, handleLikePost } = useCommunityController();
+  const {
+    posts,
+    spaces,
+    activeSpace,
+    activeSpaceId,
+    postCountBySpace,
+    setActiveSpaceId,
+    handleCreatePost,
+    handleLikePost,
+  } = useCommunityController();
 
   return (
     <PageContainer>
@@ -16,6 +25,11 @@ export const CommunityFeedContainer = () => {
       />
       <FeedTab
         posts={posts}
+        spaces={spaces}
+        activeSpace={activeSpace}
+        activeSpaceId={activeSpaceId}
+        postCountBySpace={postCountBySpace}
+        setActiveSpaceId={setActiveSpaceId}
         handleCreatePost={handleCreatePost}
         handleLikePost={handleLikePost}
       />

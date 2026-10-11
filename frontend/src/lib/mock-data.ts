@@ -5,6 +5,7 @@ import { Follower } from '@/types/followers';
 import { PerformancePost, PostingTimeAnalysis } from '@/types/performance';
 import {
   CommunityPost,
+  CommunitySpace,
   CommunityEvent,
   LeaderboardEntry,
 } from '@/types/communityFeed';
@@ -289,9 +290,97 @@ const MOCK_USER_SAM = {
   avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
 };
 
+export const MOCK_COMMUNITY_SPACES: CommunitySpace[] = [
+  {
+    id: 'announcements',
+    name: 'Announcements',
+    emoji: '📣',
+    description: 'News and updates from the We Go Viral team.',
+    adminOnly: true,
+  },
+  {
+    id: 'introductions',
+    name: 'Introduce Yourself',
+    emoji: '👋',
+    description: 'New here? Tell us who you are, what you create and where.',
+  },
+  {
+    id: 'wins',
+    name: 'Wins',
+    emoji: '🏆',
+    description: 'Share your milestones, viral moments and small victories.',
+  },
+  {
+    id: 'feedback',
+    name: 'Feedback',
+    emoji: '🎬',
+    description: 'Post a hook, script or video and get honest feedback.',
+  },
+  {
+    id: 'collabs',
+    name: 'Collabs',
+    emoji: '🤝',
+    description: 'Find creators to collaborate with.',
+  },
+  {
+    id: 'questions',
+    name: 'Questions',
+    emoji: '💬',
+    description: 'Ask anything about growth, editing, tools or monetization.',
+  },
+  {
+    id: 'hooks',
+    name: 'Hooks & Scripts',
+    emoji: '✍️',
+    description: 'Share hooks that worked and workshop your scripts together.',
+  },
+  {
+    id: 'editing',
+    name: 'Editing',
+    emoji: '🎞️',
+    description: 'Editing workflows, transitions, captions and software tips.',
+  },
+  {
+    id: 'monetization',
+    name: 'Monetization',
+    emoji: '💰',
+    description: 'Brand deals, creator funds, products and pricing your work.',
+  },
+  {
+    id: 'challenges',
+    name: 'Challenges',
+    emoji: '🔥',
+    description: 'Join community challenges and post your progress.',
+  },
+  {
+    id: 'gear',
+    name: 'Tools & Gear',
+    emoji: '🎙️',
+    description: 'Cameras, mics, lighting, apps — what are you using?',
+  },
+  {
+    id: 'offtopic',
+    name: 'Off-topic',
+    emoji: '☕',
+    description: 'Everything else. Take a break and hang out.',
+  },
+];
+
 export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   {
+    id: 'p0',
+    spaceId: 'announcements',
+    author: MOCK_USER_SAM,
+    content:
+      'Welcome to the new We Go Viral community space! Pick a space above to filter the feed, and choose where your post goes when you share.',
+    createdAt: '2023-10-28T08:00:00Z',
+    likeCount: 92,
+    commentCount: 17,
+    likedByMe: false,
+  },
+  {
     id: 'p1',
+    spaceId: 'wins',
     author: MOCK_USER_MAYA,
     content:
       'Just hit 100k on a Reel I almost didn\'t post — the hook was "Nobody tells you this about..." Anyone else notice curiosity hooks outperforming everything else lately?',
@@ -302,6 +391,7 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p2',
+    spaceId: 'feedback',
     author: MOCK_USER_LEO,
     content:
       'Sharing my editing workflow for fast-turnaround Reels — cut everything on beat, keep captions under 4 words per line, and never let a shot sit longer than 2 seconds.',
@@ -312,12 +402,101 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'p3',
+    spaceId: 'wins',
     author: MOCK_USER_PRIYA,
     content:
       'PSA: posting consistency still beats virality chasing. Three months of daily posting did more for my growth than any single viral hit.',
     createdAt: '2023-10-25T12:00:00Z',
     likeCount: 57,
     commentCount: 14,
+    likedByMe: false,
+  },
+  {
+    id: 'p4',
+    spaceId: 'collabs',
+    author: MOCK_USER_LEO,
+    content:
+      'Looking for a fitness or food creator (10k–50k) for a duet series next month. I handle editing, you bring the recipes. DM me!',
+    createdAt: '2023-10-24T16:40:00Z',
+    likeCount: 12,
+    commentCount: 6,
+    likedByMe: false,
+  },
+  {
+    id: 'p5',
+    spaceId: 'introductions',
+    author: MOCK_USER_PRIYA,
+    content:
+      "Hi everyone 👋 I'm Priya, I make productivity content on TikTok and YouTube Shorts. Currently trying to crack long-form. Happy to be here!",
+    createdAt: '2023-10-23T10:05:00Z',
+    likeCount: 40,
+    commentCount: 11,
+    likedByMe: false,
+  },
+  {
+    id: 'p6',
+    spaceId: 'hooks',
+    author: MOCK_USER_MAYA,
+    content:
+      'Hook I tested this week: "I wasted 2 years doing this wrong so you don\'t have to." Retention at 3s went from 41% to 63%. Steal it 👀',
+    createdAt: '2023-10-22T14:20:00Z',
+    likeCount: 58,
+    commentCount: 19,
+    likedByMe: false,
+  },
+  {
+    id: 'p7',
+    spaceId: 'editing',
+    author: MOCK_USER_LEO,
+    content:
+      'CapCut vs Premiere for short-form in 2023 — I switched to CapCut for anything under 60s and cut my editing time in half. Fight me.',
+    createdAt: '2023-10-21T20:10:00Z',
+    likeCount: 33,
+    commentCount: 27,
+    likedByMe: false,
+  },
+  {
+    id: 'p8',
+    spaceId: 'monetization',
+    author: MOCK_USER_SAM,
+    content:
+      'Got my first brand deal at 8k followers! They found me through a niche hashtag. Rate was $350 for 1 Reel + 3 stories. Was that fair?',
+    createdAt: '2023-10-20T11:45:00Z',
+    likeCount: 71,
+    commentCount: 34,
+    likedByMe: false,
+  },
+  {
+    id: 'p9',
+    spaceId: 'challenges',
+    author: MOCK_USER_PRIYA,
+    content:
+      'Day 12/30 of the posting challenge ✅ Haven\'t missed a day yet. Who else is still in?',
+    createdAt: '2023-10-19T09:00:00Z',
+    likeCount: 45,
+    commentCount: 22,
+    likedByMe: false,
+  },
+  {
+    id: 'p10',
+    spaceId: 'gear',
+    author: MOCK_USER_MAYA,
+    content:
+      'Upgraded from my phone mic to a cheap lavalier ($25) and comments about audio quality disappeared overnight. Best investment so far.',
+    createdAt: '2023-10-18T17:30:00Z',
+    likeCount: 29,
+    commentCount: 9,
+    likedByMe: false,
+  },
+  {
+    id: 'p11',
+    spaceId: 'questions',
+    author: MOCK_USER_SAM,
+    content:
+      'How do you all handle posting times across time zones? My audience is split between the US and Europe.',
+    createdAt: '2023-10-17T13:15:00Z',
+    likeCount: 14,
+    commentCount: 12,
     likedByMe: false,
   },
 ];

@@ -11,7 +11,11 @@ export type Permission =
   | 'members.ban'
   | 'roles.manage'
   | 'roles.manage_admins'
-  | 'activity.view';
+  | 'activity.view'
+  | 'members.approve'
+  | 'members.exempt'
+  | 'invites.manage'
+  | 'community.settings';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

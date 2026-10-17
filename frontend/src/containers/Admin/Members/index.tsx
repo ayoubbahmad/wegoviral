@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Star, Users } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { Select } from '@/components/Select';
@@ -152,7 +152,10 @@ export const AdminMembersContainer = () => {
                     <div className="flex items-center gap-3">
                       <img src={avatarFor(member)} alt="" className="w-9 h-9 rounded-full border border-border" />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{member.name || `@${member.username}`}</p>
+                        <p className="flex items-center gap-1.5 text-sm font-semibold truncate">
+                          {member.name || `@${member.username}`}
+                          {member.specialMember && <Star className="w-3.5 h-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label="Special member" />}
+                        </p>
                         <p className="text-xs text-muted-foreground truncate">
                           @{member.username} · {member.email}
                         </p>
@@ -160,7 +163,15 @@ export const AdminMembersContainer = () => {
                     </div>
                   </td>
                   <td className="px-8 py-4"><RoleBadge role={member.role} /></td>
-                  <td className="px-8 py-4"><StatusBadge status={member.status} /></td>
+                  <td className="px-8 py-4">
+                    {member.joinStatus === 'APPROVED' ? (
+                      <StatusBadge status={member.status} />
+                    ) : (
+                      <span className="inline-flex rounded-full bg-secondary/60 px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground">
+                        {member.joinStatus === 'PENDING' ? 'Not approved yet' : 'Not approved'}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-8 py-4 text-right text-sm tabular-nums">{member.postCount}</td>
                   <td className="px-8 py-4 text-right text-sm tabular-nums">{member.commentCount}</td>
                   <td className="px-8 py-4 text-right text-sm text-muted-foreground whitespace-nowrap">

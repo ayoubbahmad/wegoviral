@@ -10,35 +10,50 @@ datasource db {
 }
 
 model UserProfile {
-  id                 String              @id @default(uuid())
-  email              String              @unique
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  avatarUrl          String?
-  name               String?
-  passwordHash       String? // Unused since Supabase Auth; kept nullable for old rows
-  authUserId         String?             @unique // Supabase Auth user id (JWT "sub")
-  username           String              @unique
-  role               UserRole            @default(MEMBER)
+  id                   String              @id @default(uuid())
+  email                String              @unique
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  avatarUrl            String?
+  name                 String?
+  passwordHash         String? // Unused since Supabase Auth; kept nullable for old rows
+  authUserId           String?             @unique // Supabase Auth user id (JWT "sub")
+  username             String              @unique
+  role                 UserRole            @default(MEMBER)
   // Restrictions: MUTED can read but not interact; SUSPENDED and BANNED can't use the community
-  status             MemberStatus        @default(ACTIVE)
-  statusReason       String?
-  statusUntil        DateTime? // null = until lifted by staff
-  automations        Automation[]
-  competitors        Competitor[]
-  creators           Creator[]
-  hooks              Hook[]
-  scripts            Script[]
-  scriptTemplates    ScriptTemplate[]
-  socialAccounts     SocialAccount[]
-  watchlists         Watchlist[]
-  projects           Project[]
-  communityPosts     CommunityPost[]
-  communityComments  CommunityComment[]
-  communityLikes     CommunityPostLike[]
-  communityBookmarks CommunityBookmark[]
-  communityVotes     CommunityPollVote[]
-  adminActivity      AdminActivity[]
+  status               MemberStatus        @default(ACTIVE)
+  statusReason         String?
+  statusUntil          DateTime? // null = until lifted by staff
+  // Joining: application → approval → rules acceptance (see docs/ADMIN_ROADMAP.md, Phase 2)
+  joinStatus           JoinStatus          @default(PENDING)
+  phone                String?
+  specialMember        Boolean             @default(false) // skips approval, the guide and probation
+  referralCode         String?             @unique
+  referredById         String?
+  referredBy           UserProfile?        @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals            UserProfile[]       @relation("Referrals")
+  rulesAcceptedVersion Int?
+  rulesAcceptedAt      DateTime?
+  quizPassedVersion    Int?
+  automations          Automation[]
+  competitors          Competitor[]
+  creators             Creator[]
+  hooks                Hook[]
+  scripts              Script[]
+  scriptTemplates      ScriptTemplate[]
+  socialAccounts       SocialAccount[]
+  watchlists           Watchlist[]
+  projects             Project[]
+  communityPosts       CommunityPost[]
+  communityComments    CommunityComment[]
+  communityLikes       CommunityPostLike[]
+  communityBookmarks   CommunityBookmark[]
+  communityVotes       CommunityPollVote[]
+  adminActivity        AdminActivity[]
+  application          MemberApplication?  @relation("Applicant")
+  reviewedApplications MemberApplication[] @relation("ApplicationReviewer")
+  rulesAcceptances     RulesAcceptance[]
+  createdInvites       InviteLink[]
 }
 
 model Hook {
@@ -423,4 +438,104 @@ model CommunityComment {
 
   @@index([postId, createdAt])
   @@map("community_comments")
+}
+
+// ─── Joining (Phase 2a) ──────────────────────────────────────────────────────
+
+enum JoinStatus {
+  PENDING // hasn't applied yet, or waiting for review
+  APPROVED
+  REJECTED
+}
+
+/**
+ * Single row (id "default") with the community's joining rules.
+ */
+model CommunitySettings {
+  id                 String   @id @default("default")
+  requireApproval    Boolean  @default(true)
+  requireRules       Boolean  @default(true)
+  requireQuiz        Boolean  @default(false)
+  quizPassPercent    Int      @default(80)
+  probationPostCount Int      @default(3)
+  guideVersion       Int      @default(0) // 0 = no guide published yet
+  updatedAt          DateTime @updatedAt
+
+  @@map("community_settings")
+}
+
+model MemberApplication {
+  id            String       @id @default(uuid())
+  userId        String       @unique
+  fullName      String
+  phone         String
+  niche         String
+  platforms     Json // [{ platform, handle }]
+  followerRange String?
+  about         String?
+  inviteId      String?
+  submittedAt   DateTime     @default(now())
+  reviewedById  String?
+  reviewedAt    DateTime?
+  reviewNote    String? // shown to the applicant when rejected
+  user          UserProfile  @relation("Applicant", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy    UserProfile? @relation("ApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  invite        InviteLink?  @relation(fields: [inviteId], references: [id], onDelete: SetNull)
+
+  @@index([submittedAt])
+  @@map("member_applications")
+}
+
+model GuideSection {
+  id        String   @id @default(uuid())
+  position  Int
+  title     String
+  body      String // plain text with line breaks
+  mediaUrl  String?
+  updatedAt DateTime @updatedAt
+
+  @@map("guide_sections")
+}
+
+model QuizQuestion {
+  id           String   @id @default(uuid())
+  position     Int
+  question     String
+  options      String[]
+  correctIndex Int
+  updatedAt    DateTime @updatedAt
+
+  @@map("quiz_questions")
+}
+
+/**
+ * Audit trail: every time a member accepted the rules, and which version.
+ */
+model RulesAcceptance {
+  id         String      @id @default(uuid())
+  userId     String
+  version    Int
+  acceptedAt DateTime    @default(now())
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, acceptedAt])
+  @@map("rules_acceptances")
+}
+
+model InviteLink {
+  id            String              @id @default(uuid())
+  code          String              @unique
+  label         String
+  autoApprove   Boolean             @default(true)
+  specialMember Boolean             @default(false)
+  expiresAt     DateTime?
+  maxUses       Int?
+  useCount      Int                 @default(0)
+  revokedAt     DateTime?
+  createdById   String?
+  createdAt     DateTime            @default(now())
+  createdBy     UserProfile?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  applications  MemberApplication[]
+
+  @@map("invite_links")
 }

@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/providers/Auth";
 import { DashboardLayout } from "@/containers/layout/DashboardLayout";
 import { Loader2 } from "lucide-react";
 import { RestrictedNotice } from "@/containers/Auth/RestrictedNotice";
+import { ApplicationForm } from "@/containers/Onboarding/ApplicationForm";
+import { JoinStatusScreen } from "@/containers/Onboarding/JoinStatusScreen";
 
 export default function ProtectedDashboardLayout({
     children,
@@ -14,6 +16,7 @@ export default function ProtectedDashboardLayout({
 }) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (!isLoading && !user) {
@@ -38,6 +41,16 @@ export default function ProtectedDashboardLayout({
 
     if (user.status === "SUSPENDED" || user.status === "BANNED") {
         return <RestrictedNotice />;
+    }
+
+    // Joining journey: apply → wait for approval (the guide is readable meanwhile)
+    const step = user.onboarding.step;
+    if (step === "APPLICATION") return <ApplicationForm />;
+    if (step === "PENDING" || step === "REJECTED") {
+        if (step === "PENDING" && pathname === "/community/guide") {
+            return <div className="min-h-screen bg-background p-8">{children}</div>;
+        }
+        return <JoinStatusScreen />;
     }
 
     return <DashboardLayout>{children}</DashboardLayout>;

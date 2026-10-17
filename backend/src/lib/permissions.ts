@@ -33,6 +33,14 @@ export const PERMISSIONS = {
   /** Appoint Admins and Super Admins */
   'roles.manage_admins': atLeast('SUPER_ADMIN'),
   'activity.view': atLeast('MODERATOR'),
+  /** Approve or reject applications */
+  'members.approve': atLeast('MODERATOR'),
+  /** Mark special members (skip approval, guide and probation) */
+  'members.exempt': atLeast('MODERATOR'),
+  /** Create and revoke staff invite links */
+  'invites.manage': atLeast('ADMIN'),
+  /** Joining rules, community guide and quiz */
+  'community.settings': atLeast('ADMIN'),
 } satisfies Record<string, UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

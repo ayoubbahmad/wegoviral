@@ -1,12 +1,20 @@
 import { Response } from 'express';
 import { ZodError } from 'zod';
 import * as adminService from './service';
+import * as joiningService from './joining.service';
 import {
   AdminError,
   ChangeRoleSchema,
   ListActivityQuerySchema,
   ListMembersQuerySchema,
   RestrictMemberSchema,
+  ListApplicationsQuerySchema,
+  RejectApplicationSchema,
+  SpecialMemberSchema,
+  UpdateSettingsSchema,
+  GuideSectionsSchema,
+  QuizSchema,
+  CreateInviteSchema,
 } from './model';
 
 /** Maps validation and permission errors to proper status codes. */
@@ -55,4 +63,60 @@ export const liftRestriction = handle('lift restriction', async (req, res) => {
 
 export const listActivity = handle('load activity', async (req, res) => {
   res.json(await adminService.listActivity(ListActivityQuerySchema.parse(req.query)));
+});
+
+// ─── Joining ─────────────────────────────────────────────────────────────────
+
+export const listApplications = handle('load applications', async (req, res) => {
+  res.json(await joiningService.listApplications(ListApplicationsQuerySchema.parse(req.query)));
+});
+
+export const approveApplication = handle('approve application', async (req, res) => {
+  res.json(await joiningService.reviewApplication(req.user, req.params.userId, 'APPROVED'));
+});
+
+export const rejectApplication = handle('reject application', async (req, res) => {
+  const { note } = RejectApplicationSchema.parse(req.body ?? {});
+  res.json(await joiningService.reviewApplication(req.user, req.params.userId, 'REJECTED', note));
+});
+
+export const setSpecialMember = handle('update special member', async (req, res) => {
+  const { specialMember } = SpecialMemberSchema.parse(req.body);
+  res.json(await joiningService.setSpecialMember(req.user, req.params.id, specialMember));
+});
+
+export const getSettings = handle('load settings', async (_req, res) => {
+  res.json(await joiningService.getCommunitySettings());
+});
+
+export const updateSettings = handle('update settings', async (req, res) => {
+  res.json(await joiningService.updateCommunitySettings(req.user, UpdateSettingsSchema.parse(req.body)));
+});
+
+export const getGuide = handle('load guide', async (_req, res) => {
+  res.json(await joiningService.getGuideForAdmin());
+});
+
+export const saveGuideSections = handle('save guide', async (req, res) => {
+  res.json(await joiningService.saveGuideSections(req.user, GuideSectionsSchema.parse(req.body)));
+});
+
+export const saveQuiz = handle('save quiz', async (req, res) => {
+  res.json(await joiningService.saveQuiz(req.user, QuizSchema.parse(req.body)));
+});
+
+export const publishGuide = handle('publish guide', async (req, res) => {
+  res.json(await joiningService.publishGuide(req.user));
+});
+
+export const listInvites = handle('load invite links', async (_req, res) => {
+  res.json(await joiningService.listInvites());
+});
+
+export const createInvite = handle('create invite link', async (req, res) => {
+  res.status(201).json(await joiningService.createInvite(req.user, CreateInviteSchema.parse(req.body)));
+});
+
+export const revokeInvite = handle('turn off invite link', async (req, res) => {
+  res.json(await joiningService.revokeInvite(req.user, req.params.id));
 });

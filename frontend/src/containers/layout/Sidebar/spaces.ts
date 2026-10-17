@@ -18,6 +18,9 @@ import {
     Shield,
     Gauge,
     History,
+    UserCheck,
+    BookOpenCheck,
+    Link2,
     type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/lib/roles";
@@ -28,6 +31,8 @@ export interface NavItem {
     name: string;
     href: string;
     icon: LucideIcon;
+    /** Hidden unless the user has this permission */
+    requires?: Permission;
 }
 
 export interface Space {
@@ -90,7 +95,10 @@ export const SPACES: Record<SpaceId, Space> = {
         requires: "admin.access",
         navItems: [
             { name: "Overview", href: "/admin/overview", icon: Gauge },
+            { name: "Approvals", href: "/admin/approvals", icon: UserCheck, requires: "members.approve" },
             { name: "Members", href: "/admin/members", icon: Users },
+            { name: "Onboarding", href: "/admin/onboarding", icon: BookOpenCheck, requires: "community.settings" },
+            { name: "Invite links", href: "/admin/invites", icon: Link2, requires: "invites.manage" },
             { name: "Activity log", href: "/admin/activity", icon: History },
         ],
     },

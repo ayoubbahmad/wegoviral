@@ -2,6 +2,18 @@
 
 import type { MemberStatus, Permission, UserRole } from "@/lib/roles";
 
+/** Where a member is in the joining journey (APPLICATION → PENDING → RULES → QUIZ → DONE). */
+export type OnboardingStep = "APPLICATION" | "PENDING" | "REJECTED" | "RULES" | "QUIZ" | "DONE";
+
+export interface Onboarding {
+    step: OnboardingStep;
+    joinStatus: "PENDING" | "APPROVED" | "REJECTED";
+    specialMember: boolean;
+    guideVersion: number;
+    rulesAcceptedVersion: number | null;
+    rejectionNote: string | null;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -15,6 +27,7 @@ export interface User {
     statusUntil: string | null;
     /** Everything this user may do, computed by the backend */
     permissions: Permission[];
+    onboarding: Onboarding;
     socialAccounts?: SocialAccount[];
 }
 
@@ -42,6 +55,7 @@ export interface AuthContextType {
     requestPasswordReset: (email: string) => Promise<AuthResult>;
     updatePassword: (password: string) => Promise<AuthResult>;
     logout: () => void;
+    refreshUser: () => Promise<void>;
     activeSocialAccount: SocialAccount | null;
     socialAccounts: SocialAccount[];
     switchAccount: (accountId: string) => void;

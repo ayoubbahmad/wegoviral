@@ -14,6 +14,7 @@ import { useAdminMember, useChangeRole, useLiftRestriction, useRestrictMember } 
 import { RoleBadge, StatusBadge } from '../components/Badges';
 import { describeActivity } from '../components/describeActivity';
 import { MemberDetail, RestrictionInput } from '../types';
+import { JoiningSection } from './JoiningSection';
 
 const DURATIONS = [1, 3, 7, 30, 90];
 
@@ -70,7 +71,7 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
   const { user } = useAuth();
   const { allowedActions } = member;
   const isSelf = user?.id === member.id;
-  const canAct = allowedActions.changeRole || allowedActions.restrict;
+  const canAct = allowedActions.changeRole || allowedActions.restrict || allowedActions.setSpecial;
 
   return (
     <div className="space-y-6 p-6">
@@ -105,6 +106,8 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
           <dd className="font-semibold">{new Date(member.createdAt).toLocaleDateString()}</dd>
         </div>
       </dl>
+
+      <JoiningSection member={member} />
 
       {member.status !== 'ACTIVE' && <CurrentRestriction member={member} />}
 

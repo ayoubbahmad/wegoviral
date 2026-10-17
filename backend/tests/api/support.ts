@@ -65,7 +65,14 @@ export async function callApi<T = any>(
 /** Creates a confirmed Supabase user, signs in, and loads its profile through the API. */
 export async function createTestUser(
   tag: string,
-  { role }: { role?: UserRole } = {},
+  {
+    role,
+    joined = true,
+  }: {
+    role?: UserRole;
+    /** true: already approved and up to date with the guide/quiz, like an existing member */
+    joined?: boolean;
+  } = {},
 ): Promise<TestUser> {
   const unique = `${tag}${Date.now()}${Math.floor(Math.random() * 1000)}`;
   const email = `${unique}@${TEST_EMAIL_DOMAIN}`;
@@ -95,6 +102,14 @@ export async function createTestUser(
     await prisma.userProfile.update({ where: { id: me.data.user.id }, data: { role } });
     profileRole = role;
   }
+  if (joined) {
+    const settings = await prisma.communitySettings.findUnique({ where: { id: 'default' } });
+    const version = settings?.guideVersion ?? 0;
+    await prisma.userProfile.update({
+      where: { id: me.data.user.id },
+      data: { joinStatus: 'APPROVED', rulesAcceptedVersion: version, quizPassedVersion: version },
+    });
+  }
 
   return {
     email,
@@ -120,8 +135,14 @@ export async function cleanupTestData() {
   await prisma.adminActivity.deleteMany({
     where: { OR: [{ actorId: { in: ids } }, { targetId: { in: ids } }] },
   });
+  // Invite links made by test users (applications using them cascade with the profiles)
+  await prisma.memberApplication.deleteMany({ where: { userId: { in: ids } } });
+  await prisma.inviteLink.deleteMany({ where: { createdById: { in: ids } } });
   await prisma.userProfile.deleteMany({ where: { id: { in: ids } } });
-  for (const id of created.authUserIds.splice(0)) {
+  // Also catches logins left behind by an interrupted earlier run
+  const { data } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+  const leftovers = data.users.filter((user) => user.email?.endsWith(`@${TEST_EMAIL_DOMAIN}`)).map((user) => user.id);
+  for (const id of new Set([...created.authUserIds.splice(0), ...leftovers])) {
     await supabaseAdmin.auth.admin.deleteUser(id);
   }
   const paths = created.storagePaths.splice(0);

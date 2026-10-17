@@ -73,7 +73,7 @@ Until launch, development and testing use the **production database** (the commu
 
 ## Phase 1 — Roles, Admin space & members
 
-Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests (42 in total).
+Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests.
 
 - ✅ **Roles**: `SUPER_ADMIN` and `INSTRUCTOR` added; existing admins became Super Admins.
   - *Accept:* the permission table above holds for every endpoint (automated checks per role).
@@ -91,15 +91,38 @@ Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests (42
 
 ## Phase 2 — New member onboarding
 
-- ⬜ **Community settings**: toggles for "require community guide" and "require admin approval".
-- ⬜ **Community guide builder**: admin writes the guide as ordered steps (text, image or video, optional "I agree" checkbox or short quiz).
-- ⬜ **Guide gate**: until a member finishes the guide, they can read but not post, comment, react or vote. A progress banner shows how much is left.
-  - *Accept:* the API refuses interactions until the guide is complete, and finishing it unlocks them instantly.
-- ⬜ **Approval queue**: new members wait as "pending"; staff approve or reject with an optional message.
-- ⬜ **Application questions** (optional) shown at sign-up, e.g. "What do you create? Which platforms?", visible in the approval queue.
-- ⬜ **Exemptions**: staff can mark a member as "skip guide" and/or pre-approve them.
-- ⬜ **Invite links / codes**: optionally pre-approved, with expiry and usage limits.
-- ⬜ **Welcome**: auto-follow Introduce Yourself and prompt a first post once onboarding is done.
+The journey (agreed 2026-10-17):
+
+```
+Sign up → Sign-up form → Pending approval → Approved → Probation → Full member
+          name, phone,   can already read   reminded if  first 3 posts   courses/spaces unlock
+          what & where   the guide and      rules aren't reviewed before by level or time (Phase 4)
+          they create    accept the rules   accepted yet they go live
+```
+
+### 2a — Joining
+
+Shipped; **acceptance pending** (Ayoub). 15 automated onboarding tests (57 in total).
+
+- ✅ **Community settings**: toggles for "require approval", "require accepting the guide" and "require passing the quiz"; number of reviewed posts during probation (default 3).
+- ✅ **Sign-up form**: full name, phone (**required**), what they create (niche) and where (platforms + handles, follower range). Shown to staff in the approval queue; phone and email are visible to staff only.
+- ✅ **Pending state**: until approved, a member sees a "your request is being reviewed" screen and can read the community guide, but not the community.
+- ✅ **Approval queue** (Admin → Approvals): sign-up answers, referrer, approve or reject with an optional message; every decision is logged.
+- ✅ **Community guide**: staff write the rules and policy as ordered sections (text, image or video), with a version number.
+- ✅ **Rules acceptance, logged**: "I've read and accept" is stored with the guide version and date. Members who are approved without having accepted are reminded and can't interact until they do; when the guide changes (new version), everyone is asked to accept again.
+  - *Accept:* the member panel shows when and which version each member accepted.
+- ✅ **Quiz (optional, off by default)**: a few multiple-choice questions after the guide with a pass mark; retries allowed. Correct answers never leave the server.
+- ✅ **Exemptions / special members**: staff can mark someone as a special member (instructor, guest, successful creator…) who skips approval, the guide and probation. Badges for them come in Phase 6.
+- ✅ **Invite links (staff)**: a link that can auto-approve and/or grant special-member exemptions, with an expiry date and maximum uses, e.g. "Instagram followers, 7 days, first 100".
+- ✅ **Referral links (members)**: every approved member has a personal link; new members who join through it are **approved automatically**, marked "referred by @member", and the referrer is recorded as responsible for them.
+- ⬜ **Welcome**: once a member can interact, prompt a first post in Introduce Yourself.
+
+### 2b — Probation & post review
+
+- ⬜ **Reviewed first posts**: a new member's first N posts (default 3) wait for review before they appear in the feed; the author sees "waiting for review".
+- ⬜ **Review queue**: staff and trusted members approve or reject waiting posts (with a reason); the reviewer's name is stored with the post and takes responsibility for it.
+- ⬜ **Peer reviewers**: staff, plus trusted members (finished their own probation, in the community for 30+ days, not restricted). Never their own posts.
+- ⬜ **Responsibility trail**: a referrer's and reviewer's history shows when someone they vouched for, or a post they approved, was removed or restricted. *Recorded only for now; automatic consequences (points, losing review/referral rights) come with Phase 6.*
 
 ## Phase 3 — Moderation & spaces
 
@@ -109,7 +132,6 @@ Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests (42
 - ⬜ **Recently deleted**: restore within 30 days.
 - ⬜ **Spaces management**: create, edit (name, emoji, description, cover), reorder, archive; who can post (everyone / staff only).
 - ⬜ **Space access rules** (uses Phase 4): e.g. a paid-only space, or one unlocked at Level 5.
-- ⬜ **First-post approval** (optional setting): new members' first post waits for staff approval.
 - ⬜ **Flagged words list**: matching posts/comments are held for review.
 
 ## Phase 4 — Access rules engine
@@ -194,8 +216,8 @@ One shared system used by spaces, courses, events and challenges.
 ## Open questions
 
 1. **Super Admins**: who are they (the founders)? Can there be several?
-2. **Community guide format**: read-only steps, or a short quiz members must pass?
-3. **Order of gates**: approval first, then the guide? Or the guide while waiting for approval?
+2. ~~Community guide format~~ — rules and policy, plus an optional quiz (off by default).
+3. ~~Order of gates~~ — sign-up form → approval (guide readable while waiting, acceptance logged) → probation.
 4. **Moderator suspensions**: maximum length? *Set to 7 days for now (`MODERATOR_MAX_RESTRICTION_DAYS`).*
 5. **Instructors**: can they see the members enrolled in their courses (names/emails), or only numbers?
 6. **Stripe**: account details, currency, test-mode keys, and whether existing subscribers need migrating.

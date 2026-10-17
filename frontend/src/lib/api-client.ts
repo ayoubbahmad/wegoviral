@@ -28,9 +28,9 @@ apiClient.interceptors.response.use(
       await supabase.auth.signOut();
       window.location.href = '/login';
     }
-    // Suspended or banned mid-session: reload once so the app shows the notice
+    // Suspended, banned or no longer approved mid-session: reload once so the app shows why
     if (
-      error.response?.data?.code === 'ACCOUNT_RESTRICTED' &&
+      ['ACCOUNT_RESTRICTED', 'NOT_JOINED'].includes(error.response?.data?.code) &&
       typeof window !== 'undefined' &&
       !sessionStorage.getItem('wgv_restricted_reload')
     ) {

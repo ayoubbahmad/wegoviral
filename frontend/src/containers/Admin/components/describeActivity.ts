@@ -31,6 +31,26 @@ export function describeActivity(entry: ActivityEntry): string {
       return `unpinned a post: “${target}”`;
     case 'comment.deleted':
       return `deleted a comment: “${target}”`;
+    case 'member.approved': {
+      const via = details.via === 'invite' ? ` via the invite “${details.invite}”` : details.via === 'referral' ? ' through their referral link' : details.via === 'open_signup' ? ' (approval was off)' : '';
+      return `approved ${target}${via}`;
+    }
+    case 'member.rejected':
+      return `didn't approve ${target}${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
+    case 'member.special_granted':
+      return `made ${target} a special member`;
+    case 'member.special_removed':
+      return `removed special-member status from ${target}`;
+    case 'settings.updated':
+      return `changed the joining rules (${Object.keys(details).join(', ')})`;
+    case 'guide.published':
+      return `published ${target}`;
+    case 'quiz.updated':
+      return `updated the community quiz (${details.questions} questions)`;
+    case 'invite.created':
+      return `created the invite link “${target}”${details.specialMember ? ' for special members' : ''}`;
+    case 'invite.revoked':
+      return `turned off the invite link “${target}”`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

@@ -14,6 +14,7 @@ import { PostCard } from './PostCard';
 import { SpaceChips } from './SpaceChips';
 import { UpcomingEventsCard } from './UpcomingEventsCard';
 import { TopPostsCard } from './TopPostsCard';
+import { ReferralCard } from '@/containers/Onboarding/ReferralCard';
 
 interface FeedTabProps {
   feed: FeedController;
@@ -38,12 +39,13 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
     currentUser,
     isStaff,
     isMuted,
+    canInteract: feedCanInteract,
     muteReason,
     mutedUntil,
   } = feed;
 
   const spacesById = Object.fromEntries(spaces.map((space) => [space.id, space]));
-  const canPostHere = (!activeSpace?.adminOnly || isStaff) && !isMuted;
+  const canPostHere = (!activeSpace?.adminOnly || isStaff) && feedCanInteract;
 
   // Load the next page when the sentinel below the list scrolls into view
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -163,6 +165,7 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
       <aside className="hidden lg:block sticky top-8 space-y-6">
         <UpcomingEventsCard events={upcomingEvents} />
         <TopPostsCard posts={topPosts} spacesById={spacesById} onSelect={handleSelectTopPost} />
+        <ReferralCard />
       </aside>
 
       <CreatePostModal

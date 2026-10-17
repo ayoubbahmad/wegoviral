@@ -53,6 +53,8 @@ Railway PR environments are **off** on purpose: they'd share the production data
 
 Local equivalents live in `backend/.env` and `frontend/.env.local` (both gitignored; see `backend/.env.example`).
 
+**Local `DATABASE_URL`:** use Supabase's session pooler (port 5432) with `?connection_limit=4`. The session pooler allows only 15 clients in total, and a local backend, a test backend and the test runner share them; without a cap you get `max clients reached in session mode`. Production uses the transaction pooler (port 6543), which has no such limit but adds latency from far away.
+
 ## Branch workflow
 
 1. One branch per roadmap item, e.g. `feat/admin-members`.
@@ -72,7 +74,7 @@ yarn test:api                 # API test suite against it
 API_URL=https://backend-production-ab0be.up.railway.app/api yarn test:api   # against production
 ```
 
-The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest.wegoviral.test`) and deletes everything it created afterwards. It needs `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` and `DATABASE_URL` in `backend/.env`.
+The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest.wegoviral.test`) and deletes everything it created afterwards, including logins left by an interrupted run. The onboarding tests temporarily change the guide, quiz and joining settings and restore them at the end; if a run is killed midway, the next run detects the leftover `[test]` content and restores a clean state. It needs `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` and `DATABASE_URL` in `backend/.env`.
 
 ## Demo data
 

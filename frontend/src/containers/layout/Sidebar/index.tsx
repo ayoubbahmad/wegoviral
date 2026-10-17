@@ -27,7 +27,7 @@ export function Sidebar() {
     // A remembered space the user can no longer open falls back to Community
     const rememberedSpace = SPACES[lastSpace]?.requires && !can(SPACES[lastSpace].requires!) ? "community" : lastSpace;
     const activeSpace = pathSpace ?? rememberedSpace;
-    const navItems = SPACES[activeSpace].navItems;
+    const navItems = SPACES[activeSpace].navItems.filter((item) => !item.requires || can(item.requires));
 
     useEffect(() => {
         if (pathSpace && pathSpace !== lastSpace) setLastSpace(pathSpace);

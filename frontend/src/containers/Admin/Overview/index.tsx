@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Activity, MessageCircle, MessageSquare, UserPlus, Users } from 'lucide-react';
+import { Activity, MessageCircle, MessageSquare, UserCheck, UserPlus, Users } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
@@ -36,6 +36,17 @@ export const AdminOverviewContainer = () => {
         </Card>
       ) : (
         <>
+          {data.pendingApprovals > 0 && (
+            <Link
+              href="/admin/approvals"
+              className="flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm font-semibold hover:bg-primary/10"
+            >
+              <UserCheck className="w-5 h-5 text-primary" />
+              {data.pendingApprovals} new member{data.pendingApprovals === 1 ? '' : 's'} waiting for approval
+              <span className="ml-auto text-primary">Review →</span>
+            </Link>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <StatCard label="Members" value={data.members.total} icon={Users} />
             <StatCard label="New this week" value={data.members.newThisWeek} icon={UserPlus} />
@@ -101,9 +112,7 @@ export const AdminOverviewContainer = () => {
             </Card>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            Pending approvals and open reports will appear here with onboarding (Phase 2) and moderation (Phase 3).
-          </p>
+          <p className="text-xs text-muted-foreground">Open reports will appear here with moderation (Phase 3).</p>
         </>
       )}
     </PageContainer>

@@ -1,6 +1,7 @@
 import { Sidebar } from "@/containers/layout/Sidebar";
 import { useSidebarStore } from "@/containers/layout/Sidebar/slice";
 import { cn } from "@/lib/utils";
+import { OnboardingBanner } from "@/containers/Onboarding/OnboardingBanner";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { sidebarCollapsed } = useSidebarStore();
@@ -13,6 +14,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 sidebarCollapsed ? "pl-20" : "pl-64"
             )}>
                 <div className="mx-auto p-8 max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <OnboardingBanner />
                     {children}
                 </div>
             </main>

@@ -60,6 +60,15 @@ export function useAuthController(): AuthContextType {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const { user } = await authApi.me();
+      setUser(user);
+    } catch (error) {
+      console.error('Failed to refresh profile:', error);
+    }
+  };
+
   const login = async (email: string, password: string): Promise<AuthResult> => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return failure(error, 'Login failed');
@@ -145,6 +154,7 @@ export function useAuthController(): AuthContextType {
     requestPasswordReset,
     updatePassword,
     logout,
+    refreshUser,
     activeSocialAccount,
     socialAccounts,
     switchAccount,

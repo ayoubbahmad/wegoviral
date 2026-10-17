@@ -91,6 +91,8 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
 
       {user?.status === 'MUTED' ? (
         <p className="text-xs text-muted-foreground">You&apos;re muted, so you can&apos;t comment for now.</p>
+      ) : user?.onboarding.step !== 'DONE' ? (
+        <p className="text-xs text-muted-foreground">Accept the community guide to join the conversation.</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           {currentUser && (

@@ -3,6 +3,8 @@ import { MemberStatus, UserRole } from '@prisma/client';
 import { verifySupabaseToken } from '../lib/supabase-auth';
 import { prisma } from '../lib/prisma';
 import { can, effectiveStatus, Permission } from '../lib/permissions';
+import { getSettings } from '../lib/settings';
+import { NOT_JOINED_STEPS, onboardingStep, OnboardingStep } from '../lib/onboarding';
 import { authService } from '../features/auth/service';
 
 export interface AuthenticatedUser {
@@ -12,6 +14,7 @@ export interface AuthenticatedUser {
   status: MemberStatus;
   statusReason: string | null;
   statusUntil: Date | null;
+  onboarding: OnboardingStep;
 }
 
 const restrictionError = (user: AuthenticatedUser) => ({
@@ -25,7 +28,7 @@ const restrictionError = (user: AuthenticatedUser) => ({
  * so role changes and restrictions apply immediately.
  */
 const authenticate =
-  ({ allowRestricted }: { allowRestricted: boolean }) =>
+  ({ allowRestricted, allowNotJoined }: { allowRestricted: boolean; allowNotJoined: boolean }) =>
   async (req: any, res: Response, next: NextFunction) => {
     const header = req.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.slice(7) : undefined;
@@ -45,10 +48,23 @@ const authenticate =
     try {
       // Every route keeps using our own profile id, not the Supabase user id
       const profileId = await authService.resolveProfileId(claims);
-      const profile = await prisma.userProfile.findUniqueOrThrow({
-        where: { id: profileId },
-        select: { role: true, status: true, statusReason: true, statusUntil: true },
-      });
+      const [profile, settings] = await Promise.all([
+        prisma.userProfile.findUniqueOrThrow({
+          where: { id: profileId },
+          select: {
+            role: true,
+            status: true,
+            statusReason: true,
+            statusUntil: true,
+            joinStatus: true,
+            specialMember: true,
+            rulesAcceptedVersion: true,
+            quizPassedVersion: true,
+            application: { select: { id: true } },
+          },
+        }),
+        getSettings(),
+      ]);
       const status = effectiveStatus(profile.status, profile.statusUntil);
       user = {
         id: profileId,
@@ -57,6 +73,7 @@ const authenticate =
         status,
         statusReason: status === 'ACTIVE' ? null : profile.statusReason,
         statusUntil: status === 'ACTIVE' ? null : profile.statusUntil,
+        onboarding: onboardingStep({ ...profile, hasApplication: Boolean(profile.application) }, settings),
       };
     } catch (error) {
       req.log?.error({ err: error }, 'Failed to resolve user profile');
@@ -74,18 +91,44 @@ const authenticate =
       });
     }
 
+    if (!allowNotJoined && NOT_JOINED_STEPS.includes(user.onboarding)) {
+      return res.status(403).json({
+        error:
+          user.onboarding === 'APPLICATION'
+            ? 'Please complete your application first.'
+            : user.onboarding === 'PENDING'
+              ? 'Your application is waiting for approval.'
+              : 'Your application was not approved.',
+        code: 'NOT_JOINED',
+        onboarding: user.onboarding,
+      });
+    }
+
     req.user = user;
     next();
   };
 
-export const protect = authenticate({ allowRestricted: false });
+export const protect = authenticate({ allowRestricted: false, allowNotJoined: false });
 
-/** For /auth/me: restricted members can still load their profile to see why. */
-export const protectAllowRestricted = authenticate({ allowRestricted: true });
+/** For /auth/me: restricted or not-yet-approved members can still load their profile. */
+export const protectAllowRestricted = authenticate({ allowRestricted: true, allowNotJoined: true });
 
-/** Blocks muted members from posting, commenting, reacting and voting. */
+/** For the joining flow (application, guide): signed in, not restricted, not necessarily approved. */
+export const protectJoining = authenticate({ allowRestricted: false, allowNotJoined: true });
+
+/** Blocks muted members, and members who still have to accept the rules or pass the quiz. */
 export const requireCanInteract = (req: any, res: Response, next: NextFunction) => {
   const user: AuthenticatedUser = req.user;
+  if (user.onboarding === 'RULES' || user.onboarding === 'QUIZ') {
+    return res.status(403).json({
+      error:
+        user.onboarding === 'RULES'
+          ? 'Please read and accept the community guide first.'
+          : 'Please pass the community quiz first.',
+      code: 'ONBOARDING_REQUIRED',
+      onboarding: user.onboarding,
+    });
+  }
   if (user.status === 'MUTED') {
     return res.status(403).json({
       error: 'You are muted and can only read the community for now.',

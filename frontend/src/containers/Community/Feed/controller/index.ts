@@ -58,6 +58,8 @@ export const useFeedController = () => {
   const activeSpace = spaces.find((space) => space.id === activeSpaceId) ?? null;
   const isStaff = can('community.moderate');
   const isMuted = user?.status === 'MUTED';
+  // Members who still have to accept the guide or pass the quiz can read but not post
+  const canInteract = !isMuted && user?.onboarding.step === 'DONE';
 
   const currentUser: CommunityUser | undefined = user
     ? { id: user.id, username: user.username, avatarUrl: user.avatarUrl, role: user.role }
@@ -139,6 +141,7 @@ export const useFeedController = () => {
     currentUser,
     isStaff,
     isMuted,
+    canInteract,
     muteReason: user?.statusReason ?? null,
     mutedUntil: user?.statusUntil ?? null,
     isCreatePostOpen,

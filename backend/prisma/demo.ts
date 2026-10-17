@@ -119,6 +119,8 @@ async function seedDemo() {
           username: member.username,
           name: member.name,
           avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.username}`,
+          // Demo members are already part of the community
+          joinStatus: 'APPROVED',
         },
       }),
     );

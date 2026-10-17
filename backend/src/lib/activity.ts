@@ -2,9 +2,9 @@ import { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 
 export interface ActivityEntry {
-  actorId: string;
+  actorId: string | null; // null for automatic actions (e.g. approval through an invite link)
   action: string; // e.g. "member.role_changed"
-  targetType: 'member' | 'post' | 'comment' | 'space';
+  targetType: 'member' | 'post' | 'comment' | 'space' | 'settings' | 'guide' | 'invite';
   targetId?: string;
   targetLabel?: string;
   details?: Prisma.InputJsonValue;

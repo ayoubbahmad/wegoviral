@@ -34,6 +34,8 @@ const memberSelect = {
   statusReason: true,
   statusUntil: true,
   createdAt: true,
+  joinStatus: true,
+  specialMember: true,
   _count: { select: { communityPosts: { where: { deletedAt: null } }, communityComments: { where: { deletedAt: null } } } },
 } satisfies Prisma.UserProfileSelect;
 
@@ -53,6 +55,8 @@ const toMemberDto = (member: MemberRow) => {
     statusReason: status === 'ACTIVE' ? null : member.statusReason,
     statusUntil: status === 'ACTIVE' ? null : member.statusUntil,
     createdAt: member.createdAt,
+    joinStatus: member.joinStatus,
+    specialMember: member.specialMember,
     postCount: member._count.communityPosts,
     commentCount: member._count.communityComments,
   };
@@ -91,6 +95,7 @@ export async function getOverview() {
     activeLikers,
     restricted,
     recentMembers,
+    pendingApprovals,
   ] = await Promise.all([
     prisma.userProfile.count(),
     prisma.userProfile.count({ where: { createdAt: { gte: weekAgo } } }),
@@ -105,6 +110,7 @@ export async function getOverview() {
       select: { status: true },
     }),
     prisma.userProfile.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: memberSelect }),
+    prisma.userProfile.count({ where: { joinStatus: 'PENDING', application: { isNot: null } } }),
   ]);
 
   // Active = posted, commented or liked in the last 7 days
@@ -127,6 +133,7 @@ export async function getOverview() {
       },
     },
     content: { postsThisWeek, commentsThisWeek },
+    pendingApprovals,
     recentMembers: recentMembers.map(toMemberDto),
   };
 }
@@ -172,7 +179,7 @@ export async function listMembers(query: ListMembersQuery) {
 
 export async function getMember(actor: Actor, id: string) {
   const member = await getMemberOrThrow(id);
-  const [likesGiven, likesReceived, history] = await Promise.all([
+  const [likesGiven, likesReceived, history, joining] = await Promise.all([
     prisma.communityPostLike.count({ where: { userId: id } }),
     prisma.communityPostLike.count({ where: { post: { authorId: id } } }),
     prisma.adminActivity.findMany({
@@ -180,6 +187,19 @@ export async function getMember(actor: Actor, id: string) {
       orderBy: { createdAt: 'desc' },
       take: 20,
       include: { actor: { select: { id: true, username: true, avatarUrl: true } } },
+    }),
+    prisma.userProfile.findUniqueOrThrow({
+      where: { id },
+      select: {
+        phone: true,
+        rulesAcceptedVersion: true,
+        rulesAcceptedAt: true,
+        quizPassedVersion: true,
+        referredBy: { select: { id: true, username: true, name: true } },
+        _count: { select: { referrals: true } },
+        application: { include: { invite: { select: { label: true } }, reviewedBy: { select: { username: true } } } },
+        rulesAcceptances: { orderBy: { acceptedAt: 'desc' }, take: 10, select: { version: true, acceptedAt: true } },
+      },
     }),
   ]);
 
@@ -190,6 +210,16 @@ export async function getMember(actor: Actor, id: string) {
     likesGiven,
     likesReceived,
     history,
+    joining: {
+      phone: joining.phone,
+      application: joining.application,
+      referredBy: joining.referredBy,
+      referralCount: joining._count.referrals,
+      rulesAcceptedVersion: joining.rulesAcceptedVersion,
+      rulesAcceptedAt: joining.rulesAcceptedAt,
+      quizPassedVersion: joining.quizPassedVersion,
+      rulesAcceptances: joining.rulesAcceptances,
+    },
     // What the current staff member may do here, so the UI only offers allowed actions
     allowedActions: {
       changeRole: manageable && can(actor.role, 'roles.manage'),
@@ -198,6 +228,8 @@ export async function getMember(actor: Actor, id: string) {
       ban: manageable && can(actor.role, 'members.ban'),
       indefinite: manageable && can(actor.role, 'members.ban'),
       maxRestrictionDays: can(actor.role, 'members.ban') ? null : MODERATOR_MAX_RESTRICTION_DAYS,
+      setSpecial: !isSelf && can(actor.role, 'members.exempt'),
+      reviewApplication: member.joinStatus === 'PENDING' && can(actor.role, 'members.approve'),
     },
   };
 }

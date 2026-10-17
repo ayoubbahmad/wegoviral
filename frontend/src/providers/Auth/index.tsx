@@ -16,6 +16,7 @@ const defaultContext: AuthContextType = {
   requestPasswordReset: async () => ({ success: false }),
   updatePassword: async () => ({ success: false }),
   logout: () => {},
+  refreshUser: async () => {},
   activeSocialAccount: null,
   socialAccounts: [],
   switchAccount: () => {},
@@ -37,4 +38,9 @@ export function useAuth() {
 export function useCan() {
   const { user } = useContext(AuthContext);
   return (permission: Permission) => Boolean(user?.permissions.includes(permission));
+}
+
+/** Re-reads the profile, e.g. after applying or accepting the rules. */
+export function useRefreshUser() {
+  return useContext(AuthContext).refreshUser;
 }

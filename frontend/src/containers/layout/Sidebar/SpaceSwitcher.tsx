@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useCan } from "@/providers/Auth";
 import { SPACES, SPACE_LIST, type SpaceId } from "./spaces";
 
 interface SpaceSwitcherProps {
@@ -14,6 +15,8 @@ interface SpaceSwitcherProps {
 
 export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
     const router = useRouter();
+    const can = useCan();
+    const availableSpaces = SPACE_LIST.filter((space) => !space.requires || can(space.requires));
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const current = SPACES[activeSpace];
@@ -92,7 +95,7 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                         <p className="px-2.5 pt-1.5 pb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                             Switch space
                         </p>
-                        {SPACE_LIST.map((space) => {
+                        {availableSpaces.map((space) => {
                             const Icon = space.icon;
                             const isActive = space.id === activeSpace;
 

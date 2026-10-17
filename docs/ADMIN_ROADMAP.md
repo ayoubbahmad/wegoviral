@@ -57,12 +57,12 @@ Until launch, development and testing use the **production database** (the commu
 
 - ✅ **Railway deploy settings**: build, pre-deploy migrations (`yarn migrate:deploy`), start, `/health` check and restart-on-failure are set on the service. Railway's `railway.json` is deprecated and was being ignored, so it's removed.
   - *Verified:* a fresh deploy's manifest shows the pre-deploy command and health check.
-- 🟦 **Branch workflow**: one branch per item, PR to `main` with a checklist template. Vercel posts a preview URL per PR (uses the production backend).
+- ✅ **Branch workflow**: one branch per item, PR to `main` with a checklist template. Vercel posts a preview URL per PR (uses the production backend).
   - Railway PR environments stay **off**: with a shared database, a PR's migration would hit production before merge. Backend changes are tested locally instead.
-- 🟦 **Automated checks on each PR** (GitHub Actions): frontend typecheck, lint of changed files, build; backend typecheck, build, and "migrations match the schema".
-  - *Accept:* the checks run on this PR and pass.
-- 🟦 **API test suite** in the repo (`yarn test:api`, 25 tests for auth and the feed), run locally before merging; cleans up after itself.
-- 🟦 **Demo data script** (`yarn demo:seed` / `yarn demo:clear`): 6 members, 11 posts with covers, images, a poll, likes and comments. Clearing leaves real data untouched. Events and courses get added to it in their own phases.
+- ✅ **Automated checks on each PR** (GitHub Actions): frontend typecheck, lint of changed files, build; backend typecheck, build, and "migrations match the schema".
+  - *Verified:* CI passed on `main` after the merge.
+- ✅ **API test suite** in the repo (`yarn test:api`, 25 tests for auth and the feed), run locally before merging; cleans up after itself.
+- ✅ **Demo data script** (`yarn demo:seed` / `yarn demo:clear`): 6 members, 11 posts with covers, images, a poll, likes and comments. Clearing leaves real data untouched. Events and courses get added to it in their own phases.
 
 ## Before launch (do not skip)
 
@@ -73,19 +73,21 @@ Until launch, development and testing use the **production database** (the commu
 
 ## Phase 1 — Roles, Admin space & members
 
-- ⬜ **Roles**: add `SUPER_ADMIN` and `INSTRUCTOR`; make the current admin a Super Admin.
+Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests (42 in total).
+
+- ✅ **Roles**: `SUPER_ADMIN` and `INSTRUCTOR` added; existing admins became Super Admins.
   - *Accept:* the permission table above holds for every endpoint (automated checks per role).
-- ⬜ **Permission system**: one shared `can(user, action, resource?)` check on the backend, mirrored in a frontend hook that hides buttons the user can't use.
-- ⬜ **Admin space**: 🛡️ Admin entry in the space switcher, own sidebar, and route guard.
+- ✅ **Permission system**: one list in `backend/src/lib/permissions.ts`; `/auth/me` returns each user's permissions and the frontend's `useCan()` hides what they can't use. Role and status are re-read on every request, so changes apply immediately.
+- ✅ **Admin space**: 🛡️ Admin in the space switcher (staff only), Overview / Members / Activity log, route guard.
   - *Accept:* members never see the entry; typing `/admin` as a member redirects away.
-- ⬜ **Members list**: search, filters (role, tier, status, join date), sorting, pagination.
-- ⬜ **Member profile panel**: details, join date, activity counts, role, badges, status history.
-- ⬜ **Change roles**, following the permission table and safety rules.
+- ✅ **Members list**: search (name, username, email), filters (role, status), sorting, pagination; filters are kept in the URL. *Tier and join-date filters come with Phase 4/9.*
+- ✅ **Member profile panel**: details, join date, posts/comments/likes, role, status and history. *Badges come with Phase 6.*
+- ✅ **Change roles**, following the permission table and safety rules (no self-changes, only manage lower ranks, last Super Admin protected).
   - *Accept:* an Admin can't create another Admin; a Super Admin can; nobody can demote themselves.
-- ⬜ **Suspend / mute / ban** with a reason and duration (moderators: temporary only). Enforced by the API, not just hidden in the UI.
+- ✅ **Mute / suspend / ban** with a reason and duration, enforced by the API. Moderators: mute or suspend for up to **7 days**; only admins ban, lift bans or restrict indefinitely. Suspended/banned members see a notice with the reason; muted members see a banner and can only read.
   - *Accept:* a muted member can read but every post/comment/react call returns 403 with a clear message; the restriction lifts automatically when it expires.
-- ⬜ **Activity log**: who did what and when (role changes, suspensions, deletions, approvals…), filterable.
-- ⬜ **Overview page (basic)**: total members, new this week, posts this week, pending approvals, open reports.
+- ✅ **Activity log**: role changes, restrictions, and staff deleting/pinning content, with actor and time; filter by type.
+- ✅ **Overview page (basic)**: members, new and active this week, posts and comments this week, team breakdown, restricted members, newest members. *Pending approvals and open reports arrive with Phases 2 and 3.*
 
 ## Phase 2 — New member onboarding
 
@@ -194,6 +196,6 @@ One shared system used by spaces, courses, events and challenges.
 1. **Super Admins**: who are they (the founders)? Can there be several?
 2. **Community guide format**: read-only steps, or a short quiz members must pass?
 3. **Order of gates**: approval first, then the guide? Or the guide while waiting for approval?
-4. **Moderator suspensions**: maximum length (e.g. 7 days)?
+4. **Moderator suspensions**: maximum length? *Set to 7 days for now (`MODERATOR_MAX_RESTRICTION_DAYS`).*
 5. **Instructors**: can they see the members enrolled in their courses (names/emails), or only numbers?
 6. **Stripe**: account details, currency, test-mode keys, and whether existing subscribers need migrating.

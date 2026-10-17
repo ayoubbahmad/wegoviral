@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     return [
       { source: '/community', destination: '/community/feed', permanent: false },
       { source: '/creator', destination: '/creator/home', permanent: false },
+      { source: '/admin', destination: '/admin/overview', permanent: false },
       ...CREATOR_ROUTES.flatMap((route) => [
         { source: `/${route}`, destination: `/creator/${route}`, permanent: false },
         { source: `/${route}/:path*`, destination: `/creator/${route}/:path*`, permanent: false },

@@ -1,12 +1,20 @@
 "use client";
 
+import type { MemberStatus, Permission, UserRole } from "@/lib/roles";
+
 export interface User {
     id: string;
     name: string;
     username: string;
     email: string;
     avatarUrl?: string;
-    role: 'MEMBER' | 'MODERATOR' | 'ADMIN';
+    role: UserRole;
+    /** Effective restriction: expired ones are already ACTIVE */
+    status: MemberStatus;
+    statusReason: string | null;
+    statusUntil: string | null;
+    /** Everything this user may do, computed by the backend */
+    permissions: Permission[];
     socialAccounts?: SocialAccount[];
 }
 

@@ -20,6 +20,10 @@ model UserProfile {
   authUserId         String?             @unique // Supabase Auth user id (JWT "sub")
   username           String              @unique
   role               UserRole            @default(MEMBER)
+  // Restrictions: MUTED can read but not interact; SUSPENDED and BANNED can't use the community
+  status             MemberStatus        @default(ACTIVE)
+  statusReason       String?
+  statusUntil        DateTime? // null = until lifted by staff
   automations        Automation[]
   competitors        Competitor[]
   creators           Creator[]
@@ -34,6 +38,7 @@ model UserProfile {
   communityLikes     CommunityPostLike[]
   communityBookmarks CommunityBookmark[]
   communityVotes     CommunityPollVote[]
+  adminActivity      AdminActivity[]
 }
 
 model Hook {
@@ -284,8 +289,35 @@ model ProjectItem {
 
 enum UserRole {
   MEMBER
+  INSTRUCTOR
   MODERATOR
   ADMIN
+  SUPER_ADMIN
+}
+
+enum MemberStatus {
+  ACTIVE
+  MUTED
+  SUSPENDED
+  BANNED
+}
+
+// Who did what in the admin tools (role changes, restrictions, deletions…)
+model AdminActivity {
+  id          String       @id @default(uuid())
+  actorId     String?
+  action      String // e.g. "member.role_changed", "post.deleted"
+  targetType  String // "member", "post", "comment"…
+  targetId    String?
+  targetLabel String? // readable snapshot, kept even if the target is deleted
+  details     Json?
+  createdAt   DateTime     @default(now())
+  actor       UserProfile? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId])
+  @@map("admin_activity")
 }
 
 model CommunitySpace {

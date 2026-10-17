@@ -1,4 +1,6 @@
-export type UserRole = 'MEMBER' | 'MODERATOR' | 'ADMIN';
+import type { UserRole } from '@/lib/roles';
+
+export type { UserRole };
 
 export interface CommunityUser {
     id: string;

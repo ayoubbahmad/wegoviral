@@ -15,10 +15,14 @@ import {
     CalendarDays,
     Medal,
     GraduationCap,
+    Shield,
+    Gauge,
+    History,
     type LucideIcon,
 } from "lucide-react";
+import type { Permission } from "@/lib/roles";
 
-export type SpaceId = "community" | "creator";
+export type SpaceId = "community" | "creator" | "admin";
 
 export interface NavItem {
     name: string;
@@ -34,6 +38,8 @@ export interface Space {
     basePath: string;
     defaultHref: string;
     navItems: NavItem[];
+    /** Hidden from the switcher unless the user has this permission */
+    requires?: Permission;
 }
 
 export const SPACES: Record<SpaceId, Space> = {
@@ -72,6 +78,20 @@ export const SPACES: Record<SpaceId, Space> = {
             // { name: "Channels", href: "/creator/channels", icon: Target },
             { name: "Library", href: "/creator/library", icon: Library },
             { name: "Design System", href: "/creator/design-system", icon: Paintbrush },
+        ],
+    },
+    admin: {
+        id: "admin",
+        label: "Admin",
+        description: "Manage members and the community",
+        icon: Shield,
+        basePath: "/admin",
+        defaultHref: "/admin/overview",
+        requires: "admin.access",
+        navItems: [
+            { name: "Overview", href: "/admin/overview", icon: Gauge },
+            { name: "Members", href: "/admin/members", icon: Users },
+            { name: "Activity log", href: "/admin/activity", icon: History },
         ],
     },
 };

@@ -21,6 +21,7 @@ import watchlistsRoutes from './features/watchlists/routes';
 import videosRoutes from './features/videos/routes';
 import projectsRoutes from './features/projects/routes';
 import feedRoutes from './features/feed/routes';
+import adminRoutes from './features/admin/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -67,6 +68,7 @@ app.use('/api/watchlists', watchlistsRoutes);
 app.use('/api/videos', videosRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/feed', feedRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

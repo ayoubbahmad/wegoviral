@@ -28,6 +28,15 @@ apiClient.interceptors.response.use(
       await supabase.auth.signOut();
       window.location.href = '/login';
     }
+    // Suspended or banned mid-session: reload once so the app shows the notice
+    if (
+      error.response?.data?.code === 'ACCOUNT_RESTRICTED' &&
+      typeof window !== 'undefined' &&
+      !sessionStorage.getItem('wgv_restricted_reload')
+    ) {
+      sessionStorage.setItem('wgv_restricted_reload', '1');
+      window.location.reload();
+    }
     // No response at all means the server is unreachable or blocked by CORS
     const message = !error.response
       ? "Can't reach the server. Check your connection and try again."

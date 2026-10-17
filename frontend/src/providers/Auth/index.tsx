@@ -3,6 +3,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useAuthController } from './controller';
 import { AuthContextType } from './types';
+import type { Permission } from '@/lib/roles';
 
 export * from './types';
 
@@ -30,4 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   return useContext(AuthContext);
+}
+
+/** Permission check for hiding UI the user can't use (the API enforces it too). */
+export function useCan() {
+  const { user } = useContext(AuthContext);
+  return (permission: Permission) => Boolean(user?.permissions.includes(permission));
 }

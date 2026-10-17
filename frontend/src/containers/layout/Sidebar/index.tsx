@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/providers/Auth";
+import { useAuth, useCan } from "@/providers/Auth";
 import { useSidebarStore } from "./slice";
 import { SPACES, getSpaceFromPath } from "./spaces";
 import { SpaceSwitcher } from "./SpaceSwitcher";
@@ -23,7 +23,10 @@ export function Sidebar() {
 
     // The URL decides the space; shared pages (e.g. /settings) keep the last one used
     const pathSpace = getSpaceFromPath(pathname);
-    const activeSpace = pathSpace ?? lastSpace;
+    const can = useCan();
+    // A remembered space the user can no longer open falls back to Community
+    const rememberedSpace = SPACES[lastSpace]?.requires && !can(SPACES[lastSpace].requires!) ? "community" : lastSpace;
+    const activeSpace = pathSpace ?? rememberedSpace;
     const navItems = SPACES[activeSpace].navItems;
 
     useEffect(() => {

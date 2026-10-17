@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/Auth";
 import { DashboardLayout } from "@/containers/layout/DashboardLayout";
 import { Loader2 } from "lucide-react";
+import { RestrictedNotice } from "@/containers/Auth/RestrictedNotice";
 
 export default function ProtectedDashboardLayout({
     children,
@@ -33,6 +34,10 @@ export default function ProtectedDashboardLayout({
 
     if (!user) {
         return null; // Will redirect via useEffect
+    }
+
+    if (user.status === "SUSPENDED" || user.status === "BANNED") {
+        return <RestrictedNotice />;
     }
 
     return <DashboardLayout>{children}</DashboardLayout>;

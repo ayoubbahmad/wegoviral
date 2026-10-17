@@ -44,17 +44,17 @@ export const listTopPosts = handle('load top posts', async (_req, res) => {
 
 export const createPost = handle('create post', async (req, res) => {
   const input = CreatePostSchema.parse(req.body);
-  res.status(201).json(await feedService.createPost(req.user.id, input));
+  res.status(201).json(await feedService.createPost(req.user, input));
 });
 
 export const deletePost = handle('delete post', async (req, res) => {
-  await feedService.deletePost(req.user.id, req.params.id);
+  await feedService.deletePost(req.user, req.params.id);
   res.status(204).end();
 });
 
 export const pinPost = handle('pin post', async (req, res) => {
   const { pinned } = PinPostSchema.parse(req.body);
-  res.json(await feedService.setPinned(req.user.id, req.params.id, pinned));
+  res.json(await feedService.setPinned(req.user, req.params.id, pinned));
 });
 
 export const likePost = handle('like post', async (req, res) => {
@@ -88,7 +88,7 @@ export const createComment = handle('add comment', async (req, res) => {
 });
 
 export const deleteComment = handle('delete comment', async (req, res) => {
-  await feedService.deleteComment(req.user.id, req.params.id);
+  await feedService.deleteComment(req.user, req.params.id);
   res.status(204).end();
 });
 

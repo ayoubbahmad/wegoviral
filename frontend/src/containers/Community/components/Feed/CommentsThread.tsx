@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Loader2, Send, Trash2 } from 'lucide-react';
 import { useToast } from '@/providers/Toast';
+import { useAuth } from '@/providers/Auth';
 import { avatarFor, formatRelativeDate } from '@/lib/utils';
 import { CommunityUser } from '@/types/communityFeed';
 import { useComments, useCreateComment, useDeleteComment } from '../../api';
@@ -15,6 +16,7 @@ interface CommentsThreadProps {
 
 export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadProps) => {
   const { showToast } = useToast();
+  const { user } = useAuth();
   const [draft, setDraft] = useState('');
   const commentsQuery = useComments(postId, true);
   const createComment = useCreateComment(postId);
@@ -87,34 +89,38 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
         </ul>
       )}
 
-      <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        {currentUser && (
-          <img
-            src={avatarFor(currentUser)}
-            alt={currentUser.username}
-            className="w-8 h-8 rounded-full border border-border shrink-0"
-          />
-        )}
-        <input
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder="Write a comment..."
-          maxLength={2000}
-          className="h-10 flex-1 rounded-full border border-border bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
-        <button
-          type="submit"
-          disabled={!draft.trim() || createComment.isPending}
-          aria-label="Send comment"
-          className="p-2.5 rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
-        >
-          {createComment.isPending ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Send className="w-4 h-4" />
+      {user?.status === 'MUTED' ? (
+        <p className="text-xs text-muted-foreground">You&apos;re muted, so you can&apos;t comment for now.</p>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          {currentUser && (
+            <img
+              src={avatarFor(currentUser)}
+              alt={currentUser.username}
+              className="w-8 h-8 rounded-full border border-border shrink-0"
+            />
           )}
-        </button>
-      </form>
+          <input
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Write a comment..."
+            maxLength={2000}
+            className="h-10 flex-1 rounded-full border border-border bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+          <button
+            type="submit"
+            disabled={!draft.trim() || createComment.isPending}
+            aria-label="Send comment"
+            className="p-2.5 rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+          >
+            {createComment.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </button>
+        </form>
+      )}
     </div>
   );
 };

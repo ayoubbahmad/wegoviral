@@ -111,7 +111,16 @@ export function trackStorageFile(path: string) {
 
 /** Removes every test user, their profiles (cascading to their content) and uploaded files. */
 export async function cleanupTestData() {
-  await prisma.userProfile.deleteMany({ where: { email: { endsWith: `@${TEST_EMAIL_DOMAIN}` } } });
+  const testProfiles = await prisma.userProfile.findMany({
+    where: { email: { endsWith: `@${TEST_EMAIL_DOMAIN}` } },
+    select: { id: true },
+  });
+  const ids = testProfiles.map((profile) => profile.id);
+  // Activity entries by or about test users (post/comment entries are by a test actor)
+  await prisma.adminActivity.deleteMany({
+    where: { OR: [{ actorId: { in: ids } }, { targetId: { in: ids } }] },
+  });
+  await prisma.userProfile.deleteMany({ where: { id: { in: ids } } });
   for (const id of created.authUserIds.splice(0)) {
     await supabaseAdmin.auth.admin.deleteUser(id);
   }

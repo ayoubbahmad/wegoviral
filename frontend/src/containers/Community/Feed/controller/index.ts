@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useAuth } from '@/providers/Auth';
+import { useAuth, useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { CommunityPost, CommunityUser, NewPostDraft } from '@/types/communityFeed';
 import { ALL_SPACES_ID, useCommunityStore } from '../../slice';
@@ -20,6 +20,7 @@ import {
 
 export const useFeedController = () => {
   const { user } = useAuth();
+  const can = useCan();
   const { showToast } = useToast();
   const { activeSpaceId, setActiveSpaceId, isCreatePostOpen, setIsCreatePostOpen } =
     useCommunityStore();
@@ -55,7 +56,8 @@ export const useFeedController = () => {
   }, [spaces]);
 
   const activeSpace = spaces.find((space) => space.id === activeSpaceId) ?? null;
-  const isStaff = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
+  const isStaff = can('community.moderate');
+  const isMuted = user?.status === 'MUTED';
 
   const currentUser: CommunityUser | undefined = user
     ? { id: user.id, username: user.username, avatarUrl: user.avatarUrl, role: user.role }
@@ -136,6 +138,9 @@ export const useFeedController = () => {
     upcomingEvents,
     currentUser,
     isStaff,
+    isMuted,
+    muteReason: user?.statusReason ?? null,
+    mutedUntil: user?.statusUntil ?? null,
     isCreatePostOpen,
     setIsCreatePostOpen,
     handleCreatePost,

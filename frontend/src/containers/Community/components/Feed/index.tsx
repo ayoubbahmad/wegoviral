@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { AlertCircle, Loader2, MessageSquare } from 'lucide-react';
+import { AlertCircle, Loader2, MessageSquare, VolumeX } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';
 import { Card } from '@/components/Card';
@@ -37,10 +37,13 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
     upcomingEvents,
     currentUser,
     isStaff,
+    isMuted,
+    muteReason,
+    mutedUntil,
   } = feed;
 
   const spacesById = Object.fromEntries(spaces.map((space) => [space.id, space]));
-  const canPostHere = !activeSpace?.adminOnly || isStaff;
+  const canPostHere = (!activeSpace?.adminOnly || isStaff) && !isMuted;
 
   // Load the next page when the sentinel below the list scrolls into view
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -78,6 +81,21 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
         />
         {activeSpace && (
           <p className="px-1 text-sm text-muted-foreground">{activeSpace.description}</p>
+        )}
+
+        {isMuted && (
+          <div role="status" className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+            <VolumeX className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
+            <div>
+              <p className="font-semibold">
+                You&apos;re muted{mutedUntil ? ` until ${new Date(mutedUntil).toLocaleString()}` : ''}
+              </p>
+              <p className="text-muted-foreground">
+                You can still read the community, but not post, comment, react or vote.
+                {muteReason && <> Reason: {muteReason}</>}
+              </p>
+            </div>
+          </div>
         )}
 
         {canPostHere && (

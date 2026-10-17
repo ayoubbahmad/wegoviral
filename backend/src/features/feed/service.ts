@@ -2,9 +2,18 @@ import { randomUUID } from 'crypto';
 import { Prisma, UserRole } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { supabaseAdmin, COMMUNITY_BUCKET } from '../../lib/supabase-admin';
+import { can } from '../../lib/permissions';
+import { logActivity } from '../../lib/activity';
 import { CreatePostInput, FeedError } from './model';
 
-const STAFF_ROLES: UserRole[] = ['MODERATOR', 'ADMIN'];
+/** The signed-in member performing an action. */
+export interface Actor {
+  id: string;
+  role: UserRole;
+}
+
+const isModerator = (actor: Actor) => can(actor.role, 'community.moderate');
+const snippet = (text: string | null | undefined) => (text ?? '').slice(0, 80);
 const TOP_POSTS_WINDOW_DAYS = 30;
 
 const authorSelect = {
@@ -58,22 +67,10 @@ const toPostDto = (post: PostWithViewer) => ({
 const isUniqueViolation = (error: unknown) =>
   error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 
-async function getRole(userId: string) {
-  const user = await prisma.userProfile.findUnique({
-    where: { id: userId },
-    select: { role: true },
-  });
-  return user?.role ?? 'MEMBER';
-}
-
-async function isStaff(userId: string) {
-  return STAFF_ROLES.includes(await getRole(userId));
-}
-
 async function getLivePost(postId: string) {
   const post = await prisma.communityPost.findFirst({
     where: { id: postId, deletedAt: null },
-    select: { id: true, authorId: true },
+    select: { id: true, authorId: true, title: true, content: true },
   });
   if (!post) throw new FeedError(404, 'Post not found');
   return post;
@@ -150,10 +147,11 @@ export async function listTopPosts(limit = 5) {
     .map(({ score, ...post }) => ({ ...post, content: post.content.slice(0, 200) }));
 }
 
-export async function createPost(authorId: string, input: CreatePostInput) {
+export async function createPost(author: Actor, input: CreatePostInput) {
+  const authorId = author.id;
   const space = await prisma.communitySpace.findUnique({ where: { id: input.spaceId } });
   if (!space) throw new FeedError(400, 'This space does not exist');
-  if (space.adminOnly && !(await isStaff(authorId))) {
+  if (space.adminOnly && !isModerator(author)) {
     throw new FeedError(403, `Only the team can post in ${space.name}`);
   }
 
@@ -174,19 +172,37 @@ export async function createPost(authorId: string, input: CreatePostInput) {
   return toPostDto(post);
 }
 
-export async function deletePost(userId: string, postId: string) {
+export async function deletePost(actor: Actor, postId: string) {
   const post = await getLivePost(postId);
-  if (post.authorId !== userId && !(await isStaff(userId))) {
+  const isOwn = post.authorId === actor.id;
+  if (!isOwn && !isModerator(actor)) {
     throw new FeedError(403, 'You can only delete your own posts');
   }
   await prisma.communityPost.update({ where: { id: postId }, data: { deletedAt: new Date() } });
+  if (!isOwn) {
+    await logActivity({
+      actorId: actor.id,
+      action: 'post.deleted',
+      targetType: 'post',
+      targetId: postId,
+      targetLabel: snippet(post.title || post.content),
+      details: { authorId: post.authorId },
+    });
+  }
 }
 
-export async function setPinned(userId: string, postId: string, pinned: boolean) {
-  if (!(await isStaff(userId))) throw new FeedError(403, 'Only the team can pin posts');
-  await getLivePost(postId);
+export async function setPinned(actor: Actor, postId: string, pinned: boolean) {
+  if (!isModerator(actor)) throw new FeedError(403, 'Only the team can pin posts');
+  const post = await getLivePost(postId);
   await prisma.communityPost.update({ where: { id: postId }, data: { pinned } });
-  return getPostForViewer(postId, userId);
+  await logActivity({
+    actorId: actor.id,
+    action: pinned ? 'post.pinned' : 'post.unpinned',
+    targetType: 'post',
+    targetId: postId,
+    targetLabel: snippet(post.title || post.content),
+  });
+  return getPostForViewer(postId, actor.id);
 }
 
 // ─── Reactions ───────────────────────────────────────────────────────────────
@@ -272,13 +288,14 @@ export async function createComment(authorId: string, postId: string, content: s
   return comment;
 }
 
-export async function deleteComment(userId: string, commentId: string) {
+export async function deleteComment(actor: Actor, commentId: string) {
   const comment = await prisma.communityComment.findFirst({
     where: { id: commentId, deletedAt: null },
-    select: { authorId: true, postId: true },
+    select: { authorId: true, postId: true, content: true },
   });
   if (!comment) throw new FeedError(404, 'Comment not found');
-  if (comment.authorId !== userId && !(await isStaff(userId))) {
+  const isOwn = comment.authorId === actor.id;
+  if (!isOwn && !isModerator(actor)) {
     throw new FeedError(403, 'You can only delete your own comments');
   }
   await prisma.$transaction([
@@ -288,6 +305,16 @@ export async function deleteComment(userId: string, commentId: string) {
       data: { commentCount: { decrement: 1 } },
     }),
   ]);
+  if (!isOwn) {
+    await logActivity({
+      actorId: actor.id,
+      action: 'comment.deleted',
+      targetType: 'comment',
+      targetId: commentId,
+      targetLabel: snippet(comment.content),
+      details: { authorId: comment.authorId, postId: comment.postId },
+    });
+  }
 }
 
 // ─── Uploads ─────────────────────────────────────────────────────────────────

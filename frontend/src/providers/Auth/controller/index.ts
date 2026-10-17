@@ -36,6 +36,7 @@ export function useAuthController(): AuthContextType {
       try {
         // The backend creates the profile on the first authenticated request
         const { user } = await authApi.me();
+        sessionStorage.removeItem('wgv_restricted_reload');
         setUser(user);
         const accounts = user.socialAccounts ?? [];
         setSocialAccounts(accounts);

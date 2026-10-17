@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { authService } from './service';
+import { permissionsFor } from '../../lib/permissions';
 
 export const getMe = async (req: any, res: Response) => {
     try {
@@ -9,9 +10,17 @@ export const getMe = async (req: any, res: Response) => {
             return res.status(404).json({ error: 'User no longer exists' });
         }
 
+        const { status, statusReason, statusUntil } = req.user;
         res.status(200).json({
             status: 'success',
-            user
+            user: {
+                ...user,
+                // Effective values: expired restrictions already count as lifted
+                status,
+                statusReason,
+                statusUntil,
+                permissions: permissionsFor(user.role),
+            },
         });
     } catch (error) {
         console.error('Get Me Error:', error);

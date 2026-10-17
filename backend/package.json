@@ -10,7 +10,11 @@
     "start:dev": "ts-node src/index.ts",
     "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "test:api": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register --test --test-concurrency=1 tests/api/*.test.ts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
+    "demo:seed": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts seed",
+    "demo:clear": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts clear"
   },
   "keywords": [],
   "author": "",

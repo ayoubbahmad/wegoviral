@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+jobs:
+  frontend:
+    name: Frontend (typecheck, lint, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # Older files still have lint errors, so only the files this change touches are linted
+      - name: Lint changed files
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then BASE="HEAD~1"; fi
+          FILES=$(git diff --name-only --diff-filter=ACMR "$BASE" HEAD -- 'src/**/*.ts' 'src/**/*.tsx' | sed 's#^frontend/##')
+          if [ -z "$FILES" ]; then echo "No frontend source files changed"; exit 0; fi
+          echo "$FILES"
+          npx eslint $FILES
+
+      - name: Build
+        run: yarn build
+        env:
+          # Placeholders: the build only needs these to exist
+          NEXT_PUBLIC_API_URL: https://api.example.test/api
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+
+  backend:
+    name: Backend (typecheck, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: backend/yarn.lock
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Typecheck (app, tests, demo script)
+        run: yarn prisma generate && yarn typecheck
+
+      - name: Build
+        run: yarn build
+
+      - name: Migrations match the schema
+        run: npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --shadow-database-url "$SHADOW_DATABASE_URL" --exit-code
+        env:
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shadow
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/shadow
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/shadow
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: shadow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10

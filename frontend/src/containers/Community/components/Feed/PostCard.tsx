@@ -10,6 +10,8 @@ import {
   Pin,
   PinOff,
   Trash2,
+  Hourglass,
+  XCircle,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
@@ -79,6 +81,22 @@ export const PostCard = ({
       )}
 
       <div className="p-6 space-y-4">
+        {post.reviewStatus === 'PENDING' && (
+          <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
+            <Hourglass className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <span>
+              <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.
+            </span>
+          </div>
+        )}
+        {post.reviewStatus === 'REJECTED' && (
+          <div className="flex items-start gap-2 rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-500">
+            <XCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <span>
+              <strong>Not approved.</strong> Only you can see it.{post.reviewNote ? ` Reviewer's note: “${post.reviewNote}”` : ''}
+            </span>
+          </div>
+        )}
         {post.pinned && (
           <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
             <Pin className="w-3.5 h-3.5" /> Pinned
@@ -149,6 +167,7 @@ export const PostCard = ({
           <PostPoll poll={post.poll} onVote={(optionId) => onVote(post.id, optionId)} />
         )}
 
+        {post.reviewStatus === 'PUBLISHED' && (
         <div className="flex items-center gap-5 pt-1 text-xs text-muted-foreground">
           <button
             onClick={() => onLike(post)}
@@ -173,7 +192,9 @@ export const PostCard = ({
           </button>
         </div>
 
-        {isCommentsOpen && (
+        )}
+
+        {isCommentsOpen && post.reviewStatus === 'PUBLISHED' && (
           <CommentsThread postId={post.id} currentUser={currentUser} isStaff={isStaff} />
         )}
       </div>
@@ -270,18 +291,22 @@ const PostActions = ({
     </button>
   );
 
+  const isPublished = post.reviewStatus === 'PUBLISHED';
+
   return (
     <div className="flex items-center gap-1 shrink-0">
-      <button
-        onClick={() => onBookmark(post)}
-        title={post.bookmarkedByMe ? 'Remove bookmark' : 'Bookmark'}
-        aria-pressed={post.bookmarkedByMe}
-        className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
-      >
-        <Bookmark
-          className={cn('w-4 h-4', post.bookmarkedByMe && 'fill-primary text-primary')}
-        />
-      </button>
+      {isPublished && (
+        <button
+          onClick={() => onBookmark(post)}
+          title={post.bookmarkedByMe ? 'Remove bookmark' : 'Bookmark'}
+          aria-pressed={post.bookmarkedByMe}
+          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+        >
+          <Bookmark
+            className={cn('w-4 h-4', post.bookmarkedByMe && 'fill-primary text-primary')}
+          />
+        </button>
+      )}
 
       <div ref={menuRef} className="relative">
         <button
@@ -299,7 +324,7 @@ const PostActions = ({
             className="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150"
           >
             {menuItem('Copy link', <Link2 className="w-4 h-4" />, () => onCopyLink(post))}
-            {canPin &&
+            {canPin && isPublished &&
               menuItem(
                 post.pinned ? 'Unpin post' : 'Pin post',
                 post.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />,

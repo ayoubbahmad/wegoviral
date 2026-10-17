@@ -26,6 +26,11 @@ router.get('/posts/:id/comments', feedController.listComments);
 router.post('/posts/:id/comments', requireCanInteract, feedController.createComment);
 router.delete('/comments/:id', feedController.deleteComment);
 
+// Post review during probation (staff and trusted members; checked in the service)
+router.get('/reviews', requireCanInteract, feedController.listPendingReviews);
+router.post('/reviews/:id/approve', requireCanInteract, feedController.approvePost);
+router.post('/reviews/:id/reject', requireCanInteract, feedController.rejectPost);
+
 router.post('/uploads', requireCanInteract, feedController.createUpload);
 
 export default router;

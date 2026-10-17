@@ -12,7 +12,14 @@ export interface Onboarding {
     guideVersion: number;
     rulesAcceptedVersion: number | null;
     rejectionNote: string | null;
+    /** New members' first posts are reviewed before others see them */
+    probation: Probation;
+    canReviewPosts: boolean;
 }
+
+export type Probation =
+    | { onProbation: false }
+    | { onProbation: true; approvedPosts: number; pendingPosts: number; required: number };
 
 export interface User {
     id: string;

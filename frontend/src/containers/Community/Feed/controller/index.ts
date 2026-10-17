@@ -69,9 +69,13 @@ export const useFeedController = () => {
     showToast(error instanceof Error ? error.message : fallback, 'error');
 
   const handleCreatePost = async (draft: NewPostDraft) => {
-    await createPost.mutateAsync(draft);
+    const post = await createPost.mutateAsync(draft);
     setIsCreatePostOpen(false);
-    showToast('Post published');
+    showToast(
+      post.reviewStatus === 'PENDING'
+        ? "Sent for review: new members' first posts are checked before they go live"
+        : 'Post published',
+    );
   };
 
   const handleDeletePost = (postId: string) => {
@@ -142,6 +146,7 @@ export const useFeedController = () => {
     isStaff,
     isMuted,
     canInteract,
+    probation: user?.onboarding.probation,
     muteReason: user?.statusReason ?? null,
     mutedUntil: user?.statusUntil ?? null,
     isCreatePostOpen,

@@ -68,10 +68,13 @@ export async function createTestUser(
   {
     role,
     joined = true,
+    probation = false,
   }: {
     role?: UserRole;
     /** true: already approved and up to date with the guide/quiz, like an existing member */
     joined?: boolean;
+    /** true: a new member whose first posts still go through review */
+    probation?: boolean;
   } = {},
 ): Promise<TestUser> {
   const unique = `${tag}${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -107,7 +110,12 @@ export async function createTestUser(
     const version = settings?.guideVersion ?? 0;
     await prisma.userProfile.update({
       where: { id: me.data.user.id },
-      data: { joinStatus: 'APPROVED', rulesAcceptedVersion: version, quizPassedVersion: version },
+      data: {
+        joinStatus: 'APPROVED',
+        rulesAcceptedVersion: version,
+        quizPassedVersion: version,
+        probationCompletedAt: probation ? null : new Date(),
+      },
     });
   }
 

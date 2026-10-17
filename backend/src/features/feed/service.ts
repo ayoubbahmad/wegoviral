@@ -4,6 +4,9 @@ import { prisma } from '../../lib/prisma';
 import { supabaseAdmin, COMMUNITY_BUCKET } from '../../lib/supabase-admin';
 import { can } from '../../lib/permissions';
 import { logActivity } from '../../lib/activity';
+import { countApprovedReviewedPosts, isOnProbation, reviewerEligibility } from '../../lib/review';
+import { getSettings } from '../../lib/settings';
+import type { AuthenticatedUser } from '../../middleware/auth.middleware';
 import { CreatePostInput, FeedError } from './model';
 
 /** The signed-in member performing an action. */
@@ -38,7 +41,7 @@ type PostWithViewer = Prisma.CommunityPostGetPayload<{
   include: ReturnType<typeof postInclude>;
 }>;
 
-const toPostDto = (post: PostWithViewer) => ({
+const toPostDto = (post: PostWithViewer, viewerId: string) => ({
   id: post.id,
   spaceId: post.spaceId,
   author: post.author,
@@ -47,6 +50,9 @@ const toPostDto = (post: PostWithViewer) => ({
   coverUrl: post.coverUrl ?? undefined,
   images: post.images.length ? post.images : undefined,
   pinned: post.pinned,
+  reviewStatus: post.reviewStatus,
+  // The reviewer's note is only for the author
+  reviewNote: post.authorId === viewerId ? post.reviewNote ?? undefined : undefined,
   likeCount: post.likeCount,
   commentCount: post.commentCount,
   createdAt: post.createdAt,
@@ -67,10 +73,11 @@ const toPostDto = (post: PostWithViewer) => ({
 const isUniqueViolation = (error: unknown) =>
   error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 
-async function getLivePost(postId: string) {
+/** A post others can see. Posts waiting for review only exist for their author (and reviewers). */
+async function getLivePost(postId: string, { allowUnpublished = false } = {}) {
   const post = await prisma.communityPost.findFirst({
-    where: { id: postId, deletedAt: null },
-    select: { id: true, authorId: true, title: true, content: true },
+    where: { id: postId, deletedAt: null, ...(allowUnpublished ? {} : { reviewStatus: 'PUBLISHED' }) },
+    select: { id: true, authorId: true, title: true, content: true, reviewedById: true },
   });
   if (!post) throw new FeedError(404, 'Post not found');
   return post;
@@ -81,7 +88,7 @@ async function getPostForViewer(postId: string, viewerId: string) {
     where: { id: postId },
     include: postInclude(viewerId),
   });
-  return toPostDto(post);
+  return toPostDto(post, viewerId);
 }
 
 // ─── Spaces ──────────────────────────────────────────────────────────────────
@@ -91,7 +98,7 @@ export async function listSpaces() {
     prisma.communitySpace.findMany({ orderBy: { position: 'asc' } }),
     prisma.communityPost.groupBy({
       by: ['spaceId'],
-      where: { deletedAt: null },
+      where: { deletedAt: null, reviewStatus: 'PUBLISHED' },
       _count: { _all: true },
     }),
   ]);
@@ -106,7 +113,12 @@ export async function listPosts(
   { spaceId, cursor, limit }: { spaceId?: string; cursor?: string; limit: number },
 ) {
   const posts = await prisma.communityPost.findMany({
-    where: { deletedAt: null, ...(spaceId ? { spaceId } : {}) },
+    where: {
+      deletedAt: null,
+      ...(spaceId ? { spaceId } : {}),
+      // Everyone sees published posts; authors also see their own posts waiting for (or refused at) review
+      OR: [{ reviewStatus: 'PUBLISHED' }, { authorId: viewerId }],
+    },
     // Pinned posts first; id breaks ties so the cursor is stable
     orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
@@ -117,7 +129,7 @@ export async function listPosts(
   const hasMore = posts.length > limit;
   const page = hasMore ? posts.slice(0, limit) : posts;
   return {
-    posts: page.map(toPostDto),
+    posts: page.map((post) => toPostDto(post, viewerId)),
     nextCursor: hasMore ? page[page.length - 1].id : null,
   };
 }
@@ -126,7 +138,7 @@ export async function listPosts(
 export async function listTopPosts(limit = 5) {
   const since = new Date(Date.now() - TOP_POSTS_WINDOW_DAYS * 24 * 60 * 60 * 1000);
   const recent = await prisma.communityPost.findMany({
-    where: { deletedAt: null, createdAt: { gte: since } },
+    where: { deletedAt: null, reviewStatus: 'PUBLISHED', createdAt: { gte: since } },
     orderBy: { createdAt: 'desc' },
     take: 200,
     select: {
@@ -154,11 +166,17 @@ export async function createPost(author: Actor, input: CreatePostInput) {
   if (space.adminOnly && !isModerator(author)) {
     throw new FeedError(403, `Only the team can post in ${space.name}`);
   }
+  const profile = await prisma.userProfile.findUniqueOrThrow({
+    where: { id: authorId },
+    select: { role: true, specialMember: true, probationCompletedAt: true },
+  });
+  const needsReview = await isOnProbation(profile);
 
   const post = await prisma.communityPost.create({
     data: {
       spaceId: space.id,
       authorId,
+      reviewStatus: needsReview ? 'PENDING' : 'PUBLISHED',
       title: input.title || null,
       content: input.content,
       coverUrl: input.coverUrl ?? null,
@@ -169,11 +187,12 @@ export async function createPost(author: Actor, input: CreatePostInput) {
     },
     include: postInclude(authorId),
   });
-  return toPostDto(post);
+  return toPostDto(post, authorId);
 }
 
 export async function deletePost(actor: Actor, postId: string) {
-  const post = await getLivePost(postId);
+  // Authors can withdraw a post that's still waiting for (or was refused at) review
+  const post = await getLivePost(postId, { allowUnpublished: true });
   const isOwn = post.authorId === actor.id;
   if (!isOwn && !isModerator(actor)) {
     throw new FeedError(403, 'You can only delete your own posts');
@@ -188,6 +207,17 @@ export async function deletePost(actor: Actor, postId: string) {
       targetLabel: snippet(post.title || post.content),
       details: { authorId: post.authorId },
     });
+    // Responsibility trail: the member who approved this post during review vouched for it
+    if (post.reviewedById && post.reviewedById !== actor.id) {
+      await logActivity({
+        actorId: actor.id,
+        action: 'member.vouched_post_removed',
+        targetType: 'member',
+        targetId: post.reviewedById,
+        targetLabel: snippet(post.title || post.content),
+        details: { postId, authorId: post.authorId },
+      });
+    }
   }
 }
 
@@ -336,4 +366,77 @@ export async function createImageUpload(userId: string, contentType: string) {
 
   const { data: publicUrl } = supabaseAdmin.storage.from(COMMUNITY_BUCKET).getPublicUrl(path);
   return { path, token: data.token, publicUrl: publicUrl.publicUrl };
+}
+
+// ─── Post review (probation) ─────────────────────────────────────────────────
+
+async function assertCanReview(reviewer: AuthenticatedUser) {
+  const { canReview, reason } = await reviewerEligibility(reviewer);
+  if (!canReview) throw new FeedError(403, reason ?? "You can't review posts yet");
+}
+
+/** Posts waiting for review, oldest first; never the reviewer's own. */
+export async function listPendingReviews(reviewer: AuthenticatedUser) {
+  await assertCanReview(reviewer);
+  const posts = await prisma.communityPost.findMany({
+    where: { deletedAt: null, reviewStatus: 'PENDING', authorId: { not: reviewer.id } },
+    orderBy: { createdAt: 'asc' },
+    take: 50,
+    include: postInclude(reviewer.id),
+  });
+  return posts.map((post) => toPostDto(post, reviewer.id));
+}
+
+export async function reviewPost(
+  reviewer: AuthenticatedUser,
+  postId: string,
+  decision: 'PUBLISHED' | 'REJECTED',
+  note?: string,
+) {
+  await assertCanReview(reviewer);
+  const post = await prisma.communityPost.findFirst({
+    where: { id: postId, deletedAt: null },
+    select: { authorId: true, title: true, content: true, reviewStatus: true },
+  });
+  if (!post) throw new FeedError(404, 'Post not found');
+  if (post.authorId === reviewer.id) throw new FeedError(403, "You can't review your own post");
+
+  const now = new Date();
+  // Only one reviewer wins if two decide at the same time
+  const { count } = await prisma.communityPost.updateMany({
+    where: { id: postId, reviewStatus: 'PENDING' },
+    data: {
+      reviewStatus: decision,
+      reviewedById: reviewer.id,
+      reviewedAt: now,
+      reviewNote: note || null,
+      // An approved post goes live now, so it appears at the top of the feed
+      ...(decision === 'PUBLISHED' ? { createdAt: now } : {}),
+    },
+  });
+  if (!count) throw new FeedError(409, 'This post has already been reviewed');
+
+  await logActivity({
+    actorId: reviewer.id,
+    action: decision === 'PUBLISHED' ? 'post.approved' : 'post.rejected',
+    targetType: 'post',
+    targetId: postId,
+    targetLabel: snippet(post.title || post.content),
+    details: { authorId: post.authorId, ...(note ? { note } : {}) },
+  });
+
+  // Enough approved posts: the author's probation is over
+  if (decision === 'PUBLISHED') {
+    const [{ probationPostCount }, approved] = await Promise.all([
+      getSettings(),
+      countApprovedReviewedPosts(post.authorId),
+    ]);
+    if (approved >= probationPostCount) {
+      await prisma.userProfile.updateMany({
+        where: { id: post.authorId, probationCompletedAt: null },
+        data: { probationCompletedAt: now },
+      });
+    }
+  }
+  return { reviewStatus: decision };
 }

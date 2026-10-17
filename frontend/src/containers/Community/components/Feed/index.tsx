@@ -42,6 +42,7 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
     canInteract: feedCanInteract,
     muteReason,
     mutedUntil,
+    probation,
   } = feed;
 
   const spacesById = Object.fromEntries(spaces.map((space) => [space.id, space]));
@@ -105,6 +106,13 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
             currentUser={currentUser}
             onOpen={() => feed.setIsCreatePostOpen(true)}
           />
+        )}
+        {canPostHere && probation?.onProbation && (
+          <p className="px-1 text-xs text-muted-foreground">
+            As a new member, your first {probation.required} posts are reviewed before they go live ·{' '}
+            {probation.approvedPosts}/{probation.required} approved
+            {probation.pendingPosts > 0 && `, ${probation.pendingPosts} waiting`}
+          </p>
         )}
 
         {isLoadingPosts ? (

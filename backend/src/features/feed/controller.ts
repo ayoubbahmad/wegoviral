@@ -8,6 +8,7 @@ import {
   FeedError,
   ListPostsQuerySchema,
   PinPostSchema,
+  ReviewPostSchema,
   VoteSchema,
 } from './model';
 
@@ -95,4 +96,17 @@ export const deleteComment = handle('delete comment', async (req, res) => {
 export const createUpload = handle('prepare upload', async (req, res) => {
   const { contentType } = CreateUploadSchema.parse(req.body);
   res.status(201).json(await feedService.createImageUpload(req.user.id, contentType));
+});
+
+export const listPendingReviews = handle('load posts to review', async (req, res) => {
+  res.json(await feedService.listPendingReviews(req.user));
+});
+
+export const approvePost = handle('approve post', async (req, res) => {
+  res.json(await feedService.reviewPost(req.user, req.params.id, 'PUBLISHED'));
+});
+
+export const rejectPost = handle('reject post', async (req, res) => {
+  const { note } = ReviewPostSchema.parse(req.body ?? {});
+  res.json(await feedService.reviewPost(req.user, req.params.id, 'REJECTED', note));
 });

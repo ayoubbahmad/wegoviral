@@ -51,6 +51,14 @@ export function describeActivity(entry: ActivityEntry): string {
       return `created the invite link “${target}”${details.specialMember ? ' for special members' : ''}`;
     case 'invite.revoked':
       return `turned off the invite link “${target}”`;
+    case 'post.approved':
+      return `approved a new member's post: “${target}”`;
+    case 'post.rejected':
+      return `didn't approve a new member's post: “${target}”${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
+    case 'member.vouched_post_removed':
+      return `removed a post this member had approved in review: “${target}”`;
+    case 'member.referral_restricted':
+      return `restricted ${target}, who joined through this member's referral link`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

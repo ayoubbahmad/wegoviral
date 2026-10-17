@@ -78,6 +78,7 @@ export interface AdminOverview {
   };
   content: { postsThisWeek: number; commentsThisWeek: number };
   pendingApprovals: number;
+  pendingReviews: number;
   recentMembers: AdminMember[];
 }
 
@@ -134,6 +135,7 @@ export interface MemberJoining {
   rulesAcceptedAt: string | null;
   quizPassedVersion: number | null;
   rulesAcceptances: { version: number; acceptedAt: string }[];
+  probation: { onProbation: false } | { onProbation: true; approvedPosts: number; pendingPosts: number; required: number };
 }
 
 export interface CommunitySettings {

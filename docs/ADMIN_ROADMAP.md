@@ -119,10 +119,12 @@ Shipped; **acceptance pending** (Ayoub). 15 automated onboarding tests (57 in to
 
 ### 2b — Probation & post review
 
-- ⬜ **Reviewed first posts**: a new member's first N posts (default 3) wait for review before they appear in the feed; the author sees "waiting for review".
-- ⬜ **Review queue**: staff and trusted members approve or reject waiting posts (with a reason); the reviewer's name is stored with the post and takes responsibility for it.
-- ⬜ **Peer reviewers**: staff, plus trusted members (finished their own probation, in the community for 30+ days, not restricted). Never their own posts.
-- ⬜ **Responsibility trail**: a referrer's and reviewer's history shows when someone they vouched for, or a post they approved, was removed or restricted. *Recorded only for now; automatic consequences (points, losing review/referral rights) come with Phase 6.*
+Shipped; **acceptance pending** (Ayoub). 11 automated review tests (68 in total).
+
+- ✅ **Reviewed first posts**: a new member's posts wait for review until N of them (default 3) have been approved; the author sees "waiting for review" (or the reviewer's note if refused). Members who joined before review existed, special members and staff skip it. Approved posts go live at the top of the feed.
+- ✅ **Review queue** (Community → Review posts): staff and trusted members approve or reject waiting posts (with a note for the author); the reviewer's name is stored with the post. The admin overview shows how many are waiting.
+- ✅ **Peer reviewers**: staff, plus trusted members (finished their own probation, in the community for 30+ days, not restricted). Never their own posts.
+- ✅ **Responsibility trail**: a referrer's and reviewer's history shows when someone they vouched for, or a post they approved, was removed or restricted. *Recorded only for now; automatic consequences (points, losing review/referral rights) come with Phase 6.*
 
 ## Phase 3 — Moderation & spaces
 

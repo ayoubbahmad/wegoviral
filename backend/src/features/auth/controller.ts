@@ -3,6 +3,7 @@ import { authService } from './service';
 import { permissionsFor } from '../../lib/permissions';
 import { getSettings } from '../../lib/settings';
 import { prisma } from '../../lib/prisma';
+import { probationSummary, reviewerEligibility } from '../../lib/review';
 
 export const getMe = async (req: any, res: Response) => {
     try {
@@ -13,7 +14,7 @@ export const getMe = async (req: any, res: Response) => {
         }
 
         const { status, statusReason, statusUntil, onboarding: step } = req.user;
-        const [settings, joining] = await Promise.all([
+        const [settings, joining, probation, reviewing] = await Promise.all([
             getSettings(),
             prisma.userProfile.findUniqueOrThrow({
                 where: { id: req.user.id },
@@ -24,6 +25,8 @@ export const getMe = async (req: any, res: Response) => {
                     application: { select: { reviewNote: true } },
                 },
             }),
+            probationSummary(req.user.id),
+            reviewerEligibility(req.user),
         ]);
         res.status(200).json({
             status: 'success',
@@ -42,6 +45,8 @@ export const getMe = async (req: any, res: Response) => {
                     rulesAcceptedVersion: joining.rulesAcceptedVersion,
                     // Shown to applicants who weren't approved
                     rejectionNote: joining.joinStatus === 'REJECTED' ? joining.application?.reviewNote ?? null : null,
+                    probation,
+                    canReviewPosts: reviewing.canReview,
                 },
             },
         });

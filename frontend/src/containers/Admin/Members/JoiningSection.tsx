@@ -129,6 +129,16 @@ export const JoiningSection = ({ member }: { member: MemberDetail }) => {
           </div>
         )}
         <div>
+          <dt className="text-xs text-muted-foreground">First posts review</dt>
+          <dd>
+            {joining.probation.onProbation
+              ? `On probation: ${joining.probation.approvedPosts}/${joining.probation.required} posts approved${
+                  joining.probation.pendingPosts ? `, ${joining.probation.pendingPosts} waiting` : ''
+                }`
+              : 'Not on probation'}
+          </dd>
+        </div>
+        <div>
           <dt className="text-xs text-muted-foreground">Community guide</dt>
           <dd>
             {joining.rulesAcceptedVersion

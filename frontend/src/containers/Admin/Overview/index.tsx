@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Activity, MessageCircle, MessageSquare, UserCheck, UserPlus, Users } from 'lucide-react';
+import { Activity, ClipboardCheck, MessageCircle, MessageSquare, UserCheck, UserPlus, Users } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
@@ -43,6 +43,17 @@ export const AdminOverviewContainer = () => {
             >
               <UserCheck className="w-5 h-5 text-primary" />
               {data.pendingApprovals} new member{data.pendingApprovals === 1 ? '' : 's'} waiting for approval
+              <span className="ml-auto text-primary">Review →</span>
+            </Link>
+          )}
+
+          {data.pendingReviews > 0 && (
+            <Link
+              href="/community/reviews"
+              className="flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm font-semibold hover:bg-primary/10"
+            >
+              <ClipboardCheck className="w-5 h-5 text-primary" />
+              {data.pendingReviews} new member post{data.pendingReviews === 1 ? '' : 's'} waiting for review
               <span className="ml-auto text-primary">Review →</span>
             </Link>
           )}

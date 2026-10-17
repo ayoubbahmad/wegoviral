@@ -1,5 +1,6 @@
 import { MemberStatus, Prisma, UserRole } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
+import { probationSummary } from '../../lib/review';
 import { logActivity } from '../../lib/activity';
 import {
   assignableRoles,
@@ -96,6 +97,7 @@ export async function getOverview() {
     restricted,
     recentMembers,
     pendingApprovals,
+    pendingReviews,
   ] = await Promise.all([
     prisma.userProfile.count(),
     prisma.userProfile.count({ where: { createdAt: { gte: weekAgo } } }),
@@ -111,6 +113,7 @@ export async function getOverview() {
     }),
     prisma.userProfile.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: memberSelect }),
     prisma.userProfile.count({ where: { joinStatus: 'PENDING', application: { isNot: null } } }),
+    prisma.communityPost.count({ where: { deletedAt: null, reviewStatus: 'PENDING' } }),
   ]);
 
   // Active = posted, commented or liked in the last 7 days
@@ -134,6 +137,7 @@ export async function getOverview() {
     },
     content: { postsThisWeek, commentsThisWeek },
     pendingApprovals,
+    pendingReviews,
     recentMembers: recentMembers.map(toMemberDto),
   };
 }
@@ -179,7 +183,7 @@ export async function listMembers(query: ListMembersQuery) {
 
 export async function getMember(actor: Actor, id: string) {
   const member = await getMemberOrThrow(id);
-  const [likesGiven, likesReceived, history, joining] = await Promise.all([
+  const [likesGiven, likesReceived, history, joining, probation] = await Promise.all([
     prisma.communityPostLike.count({ where: { userId: id } }),
     prisma.communityPostLike.count({ where: { post: { authorId: id } } }),
     prisma.adminActivity.findMany({
@@ -201,6 +205,7 @@ export async function getMember(actor: Actor, id: string) {
         rulesAcceptances: { orderBy: { acceptedAt: 'desc' }, take: 10, select: { version: true, acceptedAt: true } },
       },
     }),
+    probationSummary(id),
   ]);
 
   const isSelf = actor.id === id;
@@ -219,6 +224,7 @@ export async function getMember(actor: Actor, id: string) {
       rulesAcceptedAt: joining.rulesAcceptedAt,
       quizPassedVersion: joining.quizPassedVersion,
       rulesAcceptances: joining.rulesAcceptances,
+      probation,
     },
     // What the current staff member may do here, so the UI only offers allowed actions
     allowedActions: {
@@ -297,6 +303,18 @@ export async function restrictMember(actor: Actor, id: string, input: RestrictMe
     targetLabel: memberLabel(member),
     details: { reason: input.reason, until: statusUntil?.toISOString() ?? null },
   });
+  // Responsibility trail: the member who referred them vouched for them
+  const { referredById } = await prisma.userProfile.findUniqueOrThrow({ where: { id }, select: { referredById: true } });
+  if (referredById && referredById !== actor.id) {
+    await logActivity({
+      actorId: actor.id,
+      action: 'member.referral_restricted',
+      targetType: 'member',
+      targetId: referredById,
+      targetLabel: memberLabel(member),
+      details: { memberId: id, status: input.status },
+    });
+  }
   return toMemberDto(updated);
 }
 

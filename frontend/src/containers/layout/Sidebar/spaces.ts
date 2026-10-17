@@ -12,6 +12,7 @@ import {
     FolderOpen,
     Paintbrush,
     MessageSquare,
+    ClipboardCheck,
     CalendarDays,
     Medal,
     GraduationCap,
@@ -24,6 +25,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/lib/roles";
+import type { User } from "@/providers/Auth/types";
 
 export type SpaceId = "community" | "creator" | "admin";
 
@@ -33,6 +35,8 @@ export interface NavItem {
     icon: LucideIcon;
     /** Hidden unless the user has this permission */
     requires?: Permission;
+    /** Extra visibility rule that isn't a permission */
+    visibleWhen?: (user: User) => boolean;
 }
 
 export interface Space {
@@ -62,6 +66,12 @@ export const SPACES: Record<SpaceId, Space> = {
             { name: "Courses", href: "/community/courses", icon: GraduationCap },
             { name: "Members", href: "/community/members", icon: Users2 },
             { name: "Challenges", href: "/community/challenges", icon: Trophy },
+            {
+                name: "Review posts",
+                href: "/community/reviews",
+                icon: ClipboardCheck,
+                visibleWhen: (user) => user.onboarding.canReviewPosts,
+            },
         ],
     },
     creator: {

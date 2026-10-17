@@ -28,6 +28,8 @@ export const ListPostsQuerySchema = z.object({
 
 export const PinPostSchema = z.object({ pinned: z.boolean() });
 
+export const ReviewPostSchema = z.object({ note: z.string().trim().max(500).optional() });
+
 export const VoteSchema = z.object({ optionId: z.string().min(1) });
 
 export const CreateCommentSchema = z.object({

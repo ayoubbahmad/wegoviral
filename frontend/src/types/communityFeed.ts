@@ -41,6 +41,10 @@ export interface CommunityPost {
     images?: string[];
     poll?: CommunityPoll;
     pinned: boolean;
+    /** PENDING: waiting for review, only the author sees it */
+    reviewStatus: 'PENDING' | 'PUBLISHED' | 'REJECTED';
+    /** Why the post was refused (only sent to its author) */
+    reviewNote?: string;
     createdAt: string; // ISO date
     likeCount: number;
     commentCount: number;

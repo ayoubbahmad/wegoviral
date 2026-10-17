@@ -282,3 +282,26 @@ export const useDeleteComment = (postId: string) => {
     },
   });
 };
+
+// ─── Post review (probation) ─────────────────────────────────────────────────
+
+export const reviewKeys = { queue: ['feed', 'reviews'] as const };
+
+export const usePendingReviews = (enabled: boolean) =>
+  useQuery({
+    queryKey: reviewKeys.queue,
+    queryFn: async () => (await apiClient.get<CommunityPost[]>('/feed/reviews')).data,
+    enabled,
+  });
+
+export const useReviewPost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ postId, decision, note }: { postId: string; decision: 'approve' | 'reject'; note?: string }) =>
+      (await apiClient.post(`/feed/reviews/${postId}/${decision}`, decision === 'reject' ? { note } : {})).data,
+    onSuccess: (_result, { postId }) => {
+      queryClient.setQueryData<CommunityPost[]>(reviewKeys.queue, (posts = []) => posts.filter((post) => post.id !== postId));
+      queryClient.invalidateQueries({ queryKey: feedKeys.all });
+    },
+  });
+};

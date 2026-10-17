@@ -35,6 +35,8 @@ model UserProfile {
   rulesAcceptedVersion Int?
   rulesAcceptedAt      DateTime?
   quizPassedVersion    Int?
+  // Set once enough reviewed posts were approved (or for members who joined before review existed)
+  probationCompletedAt DateTime?
   automations          Automation[]
   competitors          Competitor[]
   creators             Creator[]
@@ -54,6 +56,7 @@ model UserProfile {
   reviewedApplications MemberApplication[] @relation("ApplicationReviewer")
   rulesAcceptances     RulesAcceptance[]
   createdInvites       InviteLink[]
+  reviewedPosts        CommunityPost[]     @relation("PostReviewer")
 }
 
 model Hook {
@@ -357,6 +360,11 @@ model CommunityPost {
   coverUrl     String?
   images       String[]
   pinned       Boolean               @default(false)
+  // New members' first posts wait for review before others can see them
+  reviewStatus PostReviewStatus      @default(PUBLISHED)
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNote   String?
   // Denormalized counters, kept in sync in the same transaction as the write
   likeCount    Int                   @default(0)
   commentCount Int                   @default(0)
@@ -365,6 +373,7 @@ model CommunityPost {
   deletedAt    DateTime?
   space        CommunitySpace        @relation(fields: [spaceId], references: [id])
   author       UserProfile           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reviewedBy   UserProfile?          @relation("PostReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
   likes        CommunityPostLike[]
   bookmarks    CommunityBookmark[]
   comments     CommunityComment[]
@@ -373,6 +382,7 @@ model CommunityPost {
 
   @@index([deletedAt, pinned, createdAt])
   @@index([spaceId, deletedAt, pinned, createdAt])
+  @@index([reviewStatus, createdAt])
   @@map("community_posts")
 }
 
@@ -441,6 +451,12 @@ model CommunityComment {
 }
 
 // ─── Joining (Phase 2a) ──────────────────────────────────────────────────────
+
+enum PostReviewStatus {
+  PENDING // waiting for review, only the author sees it
+  PUBLISHED
+  REJECTED
+}
 
 enum JoinStatus {
   PENDING // hasn't applied yet, or waiting for review

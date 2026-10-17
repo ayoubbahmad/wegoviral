@@ -107,7 +107,7 @@ const SettingsCard = ({ settings }: { settings: CommunitySettings }) => {
         />
         <NumberSetting
           label="Reviewed posts for new members"
-          hint="Used by post review (coming in Phase 2b)."
+          hint="New members' first posts wait for review by staff or trusted members. 0 turns review off."
           value={settings.probationPostCount}
           min={0}
           max={20}

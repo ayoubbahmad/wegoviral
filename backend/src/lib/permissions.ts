@@ -43,6 +43,8 @@ export const PERMISSIONS = {
   'community.settings': atLeast('ADMIN'),
   /** Create, edit, reorder and archive spaces */
   'spaces.manage': atLeast('ADMIN'),
+  /** Membership tiers, members' tiers, and what each tier unlocks */
+  'tiers.manage': atLeast('SUPER_ADMIN'),
 } satisfies Record<string, UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

@@ -4,6 +4,7 @@ import * as adminService from './service';
 import * as joiningService from './joining.service';
 import * as moderationService from './moderation.service';
 import * as spacesService from './spaces.service';
+import * as accessService from './access.service';
 import {
   AdminError,
   ChangeRoleSchema,
@@ -25,6 +26,10 @@ import {
   UpdateSpaceSchema,
   ReorderSpacesSchema,
   ArchiveSpaceSchema,
+  TierSchema,
+  UpdateTierSchema,
+  MemberTierSchema,
+  AccessRuleSchema,
 } from './model';
 
 /** Maps validation and permission errors to proper status codes. */
@@ -187,4 +192,36 @@ export const reorderSpaces = handle('reorder spaces', async (req, res) => {
 export const archiveSpace = handle('archive space', async (req, res) => {
   const { archived } = ArchiveSpaceSchema.parse(req.body);
   res.json(await spacesService.setArchived(req.user, req.params.id, archived));
+});
+
+// ─── Tiers & access ──────────────────────────────────────────────────────────
+
+export const listTiers = handle('load tiers', async (_req, res) => {
+  res.json(await accessService.listTiers());
+});
+
+export const createTier = handle('create tier', async (req, res) => {
+  res.status(201).json(await accessService.createTier(req.user, TierSchema.parse(req.body)));
+});
+
+export const updateTier = handle('update tier', async (req, res) => {
+  res.json(await accessService.updateTier(req.user, req.params.id, UpdateTierSchema.parse(req.body)));
+});
+
+export const deleteTier = handle('delete tier', async (req, res) => {
+  await accessService.deleteTier(req.user, req.params.id);
+  res.status(204).end();
+});
+
+export const setMemberTier = handle('change tier', async (req, res) => {
+  const { tierId } = MemberTierSchema.parse(req.body);
+  res.json(await accessService.setMemberTier(req.user, req.params.id, tierId));
+});
+
+export const getSpaceAccess = handle('load access rule', async (req, res) => {
+  res.json(await accessService.getAccessRule('space', req.params.id));
+});
+
+export const setSpaceAccess = handle('save access rule', async (req, res) => {
+  res.json(await accessService.setAccessRule(req.user, 'space', req.params.id, AccessRuleSchema.parse(req.body)));
 });

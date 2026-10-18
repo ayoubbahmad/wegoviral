@@ -81,9 +81,10 @@ export const useSpaces = () =>
     queryFn: async () => (await apiClient.get<CommunitySpace[]>('/feed/spaces')).data,
   });
 
-export const useFeedPosts = (spaceId?: string) =>
+export const useFeedPosts = (spaceId?: string, enabled = true) =>
   useInfiniteQuery({
     queryKey: feedKeys.postsBySpace(spaceId),
+    enabled,
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam }) =>
       (

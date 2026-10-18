@@ -7,6 +7,7 @@ import { logActivity } from '../../lib/activity';
 import { countApprovedReviewedPosts, isOnProbation, reviewerEligibility } from '../../lib/review';
 import { getSettings } from '../../lib/settings';
 import { findFlaggedWord } from '../../lib/contentFilter';
+import { AccessViewer, accessByResource, describeLock, evaluateRule, getRule, lockedResourceIds } from '../../lib/access';
 import type { AuthenticatedUser } from '../../middleware/auth.middleware';
 import { CreatePostInput, EditPostInput, FeedError, ReportInput } from './model';
 
@@ -79,13 +80,24 @@ const isUniqueViolation = (error: unknown) =>
   error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 
 /** A post others can see. Posts waiting for review only exist for their author (and reviewers). */
-async function getLivePost(postId: string, { allowUnpublished = false } = {}) {
+async function getLivePost(
+  postId: string,
+  { allowUnpublished = false, viewer }: { allowUnpublished?: boolean; viewer?: AccessViewer } = {},
+) {
   const post = await prisma.communityPost.findFirst({
     where: { id: postId, deletedAt: null, ...(allowUnpublished ? {} : { reviewStatus: 'PUBLISHED' }) },
-    select: { id: true, authorId: true, title: true, content: true, reviewedById: true },
+    select: { id: true, authorId: true, title: true, content: true, reviewedById: true, spaceId: true },
   });
   if (!post) throw new FeedError(404, 'Post not found');
+  // Posts in a space the viewer can't open don't exist for them (authors keep their own)
+  if (viewer && post.authorId !== viewer.id && (await isSpaceLocked(post.spaceId, viewer))) {
+    throw new FeedError(404, 'Post not found');
+  }
   return post;
+}
+
+async function isSpaceLocked(spaceId: string, viewer: AccessViewer) {
+  return (await evaluateRule(await getRule('space', spaceId), viewer)).locked;
 }
 
 async function getPostForViewer(postId: string, viewerId: string) {
@@ -98,7 +110,7 @@ async function getPostForViewer(postId: string, viewerId: string) {
 
 // ─── Spaces ──────────────────────────────────────────────────────────────────
 
-export async function listSpaces() {
+export async function listSpaces(viewer: AccessViewer) {
   const [spaces, counts] = await Promise.all([
     prisma.communitySpace.findMany({ where: { archivedAt: null }, orderBy: { position: 'asc' } }),
     prisma.communityPost.groupBy({
@@ -108,19 +120,31 @@ export async function listSpaces() {
     }),
   ]);
   const countBySpace = new Map(counts.map((count) => [count.spaceId, count._count._all]));
-  return spaces.map((space) => ({ ...space, postCount: countBySpace.get(space.id) ?? 0 }));
+  const access = await accessByResource('space', viewer);
+  return spaces.map((space) => ({
+    ...space,
+    postCount: countBySpace.get(space.id) ?? 0,
+    // Locked spaces stay listed so members can see what they'd unlock
+    access: access.get(space.id) ?? { locked: false, reasons: [] },
+  }));
 }
 
 // ─── Posts ───────────────────────────────────────────────────────────────────
 
 export async function listPosts(
-  viewerId: string,
+  viewer: AccessViewer,
   { spaceId, cursor, limit }: { spaceId?: string; cursor?: string; limit: number },
 ) {
+  const viewerId = viewer.id;
+  if (spaceId) {
+    const access = await evaluateRule(await getRule('space', spaceId), viewer);
+    if (access.locked) throw new FeedError(403, describeLock(access));
+  }
+  const locked = await lockedResourceIds('space', viewer);
   const posts = await prisma.communityPost.findMany({
     where: {
       deletedAt: null,
-      ...(spaceId ? { spaceId } : {}),
+      ...(spaceId ? { spaceId } : locked.length ? { spaceId: { notIn: locked } } : {}),
       // Everyone sees published posts; authors also see their own posts waiting for (or refused at) review
       OR: [{ reviewStatus: 'PUBLISHED' }, { authorId: viewerId }],
     },
@@ -140,10 +164,16 @@ export async function listPosts(
 }
 
 /** Most engaged recent posts; comments weigh double since they signal conversation. */
-export async function listTopPosts(limit = 5) {
+export async function listTopPosts(viewer: AccessViewer, limit = 5) {
   const since = new Date(Date.now() - TOP_POSTS_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const locked = await lockedResourceIds('space', viewer);
   const recent = await prisma.communityPost.findMany({
-    where: { deletedAt: null, reviewStatus: 'PUBLISHED', createdAt: { gte: since } },
+    where: {
+      deletedAt: null,
+      reviewStatus: 'PUBLISHED',
+      createdAt: { gte: since },
+      ...(locked.length ? { spaceId: { notIn: locked } } : {}),
+    },
     orderBy: { createdAt: 'desc' },
     take: 200,
     select: {
@@ -164,11 +194,13 @@ export async function listTopPosts(limit = 5) {
     .map(({ score, ...post }) => ({ ...post, content: post.content.slice(0, 200) }));
 }
 
-export async function createPost(author: Actor, input: CreatePostInput) {
+export async function createPost(author: AccessViewer, input: CreatePostInput) {
   const authorId = author.id;
   const space = await prisma.communitySpace.findUnique({ where: { id: input.spaceId } });
   if (!space) throw new FeedError(400, 'This space does not exist');
   if (space.archivedAt) throw new FeedError(400, `${space.name} is archived and closed to new posts`);
+  const spaceAccess = await evaluateRule(await getRule('space', space.id), author);
+  if (spaceAccess.locked) throw new FeedError(403, `${space.name}: ${describeLock(spaceAccess)}`);
   if (space.adminOnly && !isModerator(author)) {
     throw new FeedError(403, `Only the team can post in ${space.name}`);
   }
@@ -245,8 +277,9 @@ export async function setPinned(actor: Actor, postId: string, pinned: boolean) {
 
 // ─── Reactions ───────────────────────────────────────────────────────────────
 
-export async function setLiked(userId: string, postId: string, liked: boolean) {
-  await getLivePost(postId);
+export async function setLiked(viewer: AccessViewer, postId: string, liked: boolean) {
+  const userId = viewer.id;
+  await getLivePost(postId, { viewer });
   if (liked) {
     try {
       await prisma.$transaction([
@@ -271,8 +304,9 @@ export async function setLiked(userId: string, postId: string, liked: boolean) {
   return { likedByMe: liked, likeCount };
 }
 
-export async function setBookmarked(userId: string, postId: string, bookmarked: boolean) {
-  await getLivePost(postId);
+export async function setBookmarked(viewer: AccessViewer, postId: string, bookmarked: boolean) {
+  const userId = viewer.id;
+  await getLivePost(postId, { viewer });
   if (bookmarked) {
     await prisma.communityBookmark.upsert({
       where: { postId_userId: { postId, userId } },
@@ -285,8 +319,9 @@ export async function setBookmarked(userId: string, postId: string, bookmarked: 
   return { bookmarkedByMe: bookmarked };
 }
 
-export async function vote(userId: string, postId: string, optionId: string) {
-  await getLivePost(postId);
+export async function vote(viewer: AccessViewer, postId: string, optionId: string) {
+  const userId = viewer.id;
+  await getLivePost(postId, { viewer });
   const option = await prisma.communityPollOption.findFirst({ where: { id: optionId, postId } });
   if (!option) throw new FeedError(400, 'This option is not part of the poll');
 
@@ -324,8 +359,9 @@ const toCommentDto = (
   heldForReview: heldReason ? true : undefined,
 });
 
-export async function listComments(viewerId: string, postId: string) {
-  await getLivePost(postId);
+export async function listComments(viewer: AccessViewer, postId: string) {
+  const viewerId = viewer.id;
+  await getLivePost(postId, { viewer });
   const comments = await prisma.communityComment.findMany({
     // Held comments are only visible to their author until the team releases them
     where: { postId, deletedAt: null, OR: [{ heldReason: null }, { authorId: viewerId }] },
@@ -336,8 +372,8 @@ export async function listComments(viewerId: string, postId: string) {
   return comments.map(toCommentDto);
 }
 
-export async function createComment(author: Actor, postId: string, content: string) {
-  await getLivePost(postId);
+export async function createComment(author: AccessViewer, postId: string, content: string) {
+  await getLivePost(postId, { viewer: author });
   const flagged = isModerator(author) ? null : await flaggedWordIn(content);
   const comment = await prisma.communityComment.create({
     data: { postId, authorId: author.id, content, heldReason: flagged ? `Contains “${flagged}”` : null },
@@ -460,8 +496,8 @@ export async function editPost(actor: Actor, postId: string, input: EditPostInpu
 
 const REPORTED_ALREADY = 'You already reported this. The team will look at it.';
 
-export async function reportPost(reporter: Actor, postId: string, input: ReportInput) {
-  const post = await getLivePost(postId);
+export async function reportPost(reporter: AccessViewer, postId: string, input: ReportInput) {
+  const post = await getLivePost(postId, { viewer: reporter });
   if (post.authorId === reporter.id) throw new FeedError(400, "You can't report your own post");
   try {
     await prisma.contentReport.create({ data: { reporterId: reporter.id, postId, reason: input.reason, note: input.note } });
@@ -472,12 +508,12 @@ export async function reportPost(reporter: Actor, postId: string, input: ReportI
   return { reported: true };
 }
 
-export async function reportComment(reporter: Actor, commentId: string, input: ReportInput) {
+export async function reportComment(reporter: AccessViewer, commentId: string, input: ReportInput) {
   const comment = await prisma.communityComment.findFirst({
     where: { id: commentId, deletedAt: null, heldReason: null },
-    select: { authorId: true },
+    select: { authorId: true, post: { select: { spaceId: true } } },
   });
-  if (!comment) throw new FeedError(404, 'Comment not found');
+  if (!comment || (await isSpaceLocked(comment.post.spaceId, reporter))) throw new FeedError(404, 'Comment not found');
   if (comment.authorId === reporter.id) throw new FeedError(400, "You can't report your own comment");
   try {
     await prisma.contentReport.create({ data: { reporterId: reporter.id, commentId, reason: input.reason, note: input.note } });
@@ -529,8 +565,10 @@ export async function listPendingReviews(reviewer: AuthenticatedUser) {
       deletedAt: null,
       reviewStatus: 'PENDING',
       authorId: { not: reviewer.id },
-      // Posts held by the word filter are for staff only
-      ...(isModerator(reviewer) ? {} : { heldReason: null }),
+      // Posts held by the word filter are for staff only; peers never see spaces they can't open
+      ...(isModerator(reviewer)
+        ? {}
+        : { heldReason: null, spaceId: { notIn: await lockedResourceIds('space', reviewer) } }),
     },
     orderBy: { createdAt: 'asc' },
     take: 50,

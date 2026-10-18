@@ -4,6 +4,7 @@ import { permissionsFor } from '../../lib/permissions';
 import { getSettings } from '../../lib/settings';
 import { prisma } from '../../lib/prisma';
 import { probationSummary, reviewerEligibility } from '../../lib/review';
+import { effectiveTierId, getTiers } from '../../lib/access';
 
 export const getMe = async (req: any, res: Response) => {
     try {
@@ -14,7 +15,7 @@ export const getMe = async (req: any, res: Response) => {
         }
 
         const { status, statusReason, statusUntil, onboarding: step } = req.user;
-        const [settings, joining, probation, reviewing, warnings] = await Promise.all([
+        const [settings, joining, probation, reviewing, warnings, tiers, tierId] = await Promise.all([
             getSettings(),
             prisma.userProfile.findUniqueOrThrow({
                 where: { id: req.user.id },
@@ -32,7 +33,10 @@ export const getMe = async (req: any, res: Response) => {
                 orderBy: { createdAt: 'asc' },
                 select: { id: true, reason: true, createdAt: true },
             }),
+            getTiers(),
+            effectiveTierId(req.user.tierId),
         ]);
+        const tier = tiers.find((t) => t.id === tierId);
         res.status(200).json({
             status: 'success',
             user: {
@@ -44,6 +48,7 @@ export const getMe = async (req: any, res: Response) => {
                 permissions: permissionsFor(user.role),
                 // Warnings from the team the member hasn't acknowledged yet
                 warnings,
+                tier: tier ? { id: tier.id, name: tier.name } : null,
                 onboarding: {
                     step,
                     joinStatus: joining.joinStatus,

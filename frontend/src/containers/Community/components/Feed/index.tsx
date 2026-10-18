@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { AlertCircle, Loader2, MessageSquare, VolumeX } from 'lucide-react';
+import { AlertCircle, Loader2, Lock, MessageSquare, VolumeX } from 'lucide-react';
+import { describeLockReason } from '@/lib/access';
 import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';
 import { Card } from '@/components/Card';
@@ -46,7 +47,8 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
   } = feed;
 
   const spacesById = Object.fromEntries(spaces.map((space) => [space.id, space]));
-  const canPostHere = (!activeSpace?.adminOnly || isStaff) && feedCanInteract;
+  const isLocked = Boolean(activeSpace?.access.locked);
+  const canPostHere = (!activeSpace?.adminOnly || isStaff) && feedCanInteract && !isLocked;
 
   // Load the next page when the sentinel below the list scrolls into view
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -118,7 +120,24 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
           </p>
         )}
 
-        {isLoadingPosts ? (
+        {isLocked && activeSpace ? (
+          <Card className="space-y-3 text-center">
+            <div className="mx-auto inline-flex rounded-2xl bg-secondary/60 p-4">
+              <Lock className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <h2 className="text-lg font-bold">
+              {activeSpace.emoji} {activeSpace.name} is locked
+            </h2>
+            <ul className="space-y-1 text-sm text-muted-foreground">
+              {activeSpace.access.reasons.map((reason, index) => (
+                <li key={index}>{describeLockReason(reason)}</li>
+              ))}
+            </ul>
+            {activeSpace.access.reasons.some((reason) => reason.type === 'tier') && (
+              <p className="text-xs text-muted-foreground">Upgrading will be available soon.</p>
+            )}
+          </Card>
+        ) : isLoadingPosts ? (
           <PostSkeletons />
         ) : postsError ? (
           <Card className="flex flex-col items-center gap-3 text-center">

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { AdminSpace, DeletedContent, HeldContent, ReportGroup, ReportStatus, ResolveReportsInput, SpaceInput } from '../types';
+import { AccessRule, AdminSpace, Tier, DeletedContent, HeldContent, ReportGroup, ReportStatus, ResolveReportsInput, SpaceInput } from '../types';
 import { adminKeys } from '.';
 
 export const moderationKeys = {
@@ -134,6 +134,63 @@ export const useArchiveSpace = () => {
   return useMutation({
     mutationFn: async ({ id, archived }: { id: string; archived: boolean }) =>
       (await apiClient.patch<AdminSpace>(`/admin/spaces/${id}/archive`, { archived })).data,
+    onSuccess: refresh,
+  });
+};
+
+// ─── Access rules & tiers ────────────────────────────────────────────────────
+
+export const tierKeys = { all: ['admin', 'tiers'] as const };
+
+export const useSaveSpaceAccess = () => {
+  const refresh = useRefreshSpaces();
+  return useMutation({
+    mutationFn: async ({ id, rule }: { id: string; rule: AccessRule }) =>
+      (await apiClient.put<AccessRule | null>(`/admin/spaces/${id}/access`, rule)).data,
+    onSuccess: refresh,
+  });
+};
+
+export const useTiers = (enabled = true) =>
+  useQuery({
+    queryKey: tierKeys.all,
+    queryFn: async () => (await apiClient.get<Tier[]>('/admin/tiers')).data,
+    enabled,
+  });
+
+const useRefreshTiers = () => {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: tierKeys.all });
+    queryClient.invalidateQueries({ queryKey: moderationKeys.spaces });
+    queryClient.invalidateQueries({ queryKey: adminKeys.members });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'activity'] });
+    queryClient.invalidateQueries({ queryKey: ['feed'] });
+  };
+};
+
+export const useSaveTier = () => {
+  const refresh = useRefreshTiers();
+  return useMutation({
+    mutationFn: async ({ id, input }: { id?: string; input: { name?: string; description?: string; isDefault?: boolean } }) =>
+      id ? (await apiClient.patch<Tier>(`/admin/tiers/${id}`, input)).data : (await apiClient.post<Tier>('/admin/tiers', input)).data,
+    onSuccess: refresh,
+  });
+};
+
+export const useDeleteTier = () => {
+  const refresh = useRefreshTiers();
+  return useMutation({
+    mutationFn: async (id: string) => (await apiClient.delete(`/admin/tiers/${id}`)).data,
+    onSuccess: refresh,
+  });
+};
+
+export const useSetMemberTier = () => {
+  const refresh = useRefreshTiers();
+  return useMutation({
+    mutationFn: async ({ id, tierId }: { id: string; tierId: string | null }) =>
+      (await apiClient.patch(`/admin/members/${id}/tier`, { tierId })).data,
     onSuccess: refresh,
   });
 };

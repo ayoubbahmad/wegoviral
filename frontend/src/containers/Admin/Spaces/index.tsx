@@ -9,7 +9,8 @@ import { Button } from '@/components/Button';
 import { Skeleton } from '@/components/Skeleton';
 import { useToast } from '@/providers/Toast';
 import { cn } from '@/lib/utils';
-import { useAdminSpaces, useArchiveSpace, useReorderSpaces, useSaveSpace } from '../api/moderation';
+import { useAdminSpaces, useArchiveSpace, useReorderSpaces, useSaveSpace, useTiers } from '../api/moderation';
+import { AccessEditor, summarizeAccess } from './AccessEditor';
 import { AdminSpace, SpaceInput } from '../types';
 
 const inputClass =
@@ -128,7 +129,10 @@ const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: A
   );
 };
 
-const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.ReactNode }) => (
+const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.ReactNode }) => {
+  const { data: tiers } = useTiers();
+  const access = summarizeAccess(space.access, tiers);
+  return (
   <li className="flex items-center gap-3 px-5 py-3">
     <span className="text-2xl" aria-hidden>{space.emoji}</span>
     <div className="min-w-0 flex-1">
@@ -139,6 +143,11 @@ const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.Reac
             <Lock className="w-3 h-3" /> Team only
           </span>
         )}
+        {access && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+            <Lock className="w-3 h-3" /> {access}
+          </span>
+        )}
       </p>
       <p className="text-xs text-muted-foreground truncate">
         {space.description} · {space.postCount} post{space.postCount === 1 ? '' : 's'}
@@ -146,7 +155,8 @@ const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.Reac
     </div>
     <div className="flex items-center gap-1">{children}</div>
   </li>
-);
+  );
+};
 
 const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => void }) => {
   const { showToast } = useToast();
@@ -203,6 +213,7 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
             <span className="block text-xs text-muted-foreground">Members can read and comment, like Announcements.</span>
           </span>
         </label>
+        {space && <AccessEditor space={space} />}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onDone}>Cancel</Button>
           <Button type="submit" variant="primary" disabled={!valid || save.isPending}>

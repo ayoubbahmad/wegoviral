@@ -16,7 +16,8 @@ export type Permission =
   | 'members.exempt'
   | 'invites.manage'
   | 'community.settings'
-  | 'spaces.manage';
+  | 'spaces.manage'
+  | 'tiers.manage';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

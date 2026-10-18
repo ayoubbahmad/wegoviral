@@ -62,7 +62,8 @@ const CreatePostForm = ({
   canPostInAdminSpaces,
   onSubmit,
 }: CreatePostFormProps) => {
-  const canPostIn = (space: CommunitySpace) => !space.adminOnly || canPostInAdminSpaces;
+  const canPostIn = (space: CommunitySpace) =>
+    (!space.adminOnly || canPostInAdminSpaces) && !space.access.locked;
   const postableSpaces = spaces.filter(canPostIn);
 
   const [title, setTitle] = useState('');

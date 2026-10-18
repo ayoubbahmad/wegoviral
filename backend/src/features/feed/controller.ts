@@ -33,17 +33,17 @@ const handle =
     }
   };
 
-export const listSpaces = handle('load spaces', async (_req, res) => {
-  res.json(await feedService.listSpaces());
+export const listSpaces = handle('load spaces', async (req, res) => {
+  res.json(await feedService.listSpaces(req.user));
 });
 
 export const listPosts = handle('load posts', async (req, res) => {
   const query = ListPostsQuerySchema.parse(req.query);
-  res.json(await feedService.listPosts(req.user.id, query));
+  res.json(await feedService.listPosts(req.user, query));
 });
 
-export const listTopPosts = handle('load top posts', async (_req, res) => {
-  res.json(await feedService.listTopPosts());
+export const listTopPosts = handle('load top posts', async (req, res) => {
+  res.json(await feedService.listTopPosts(req.user));
 });
 
 export const createPost = handle('create post', async (req, res) => {
@@ -62,28 +62,28 @@ export const pinPost = handle('pin post', async (req, res) => {
 });
 
 export const likePost = handle('like post', async (req, res) => {
-  res.json(await feedService.setLiked(req.user.id, req.params.id, true));
+  res.json(await feedService.setLiked(req.user, req.params.id, true));
 });
 
 export const unlikePost = handle('unlike post', async (req, res) => {
-  res.json(await feedService.setLiked(req.user.id, req.params.id, false));
+  res.json(await feedService.setLiked(req.user, req.params.id, false));
 });
 
 export const bookmarkPost = handle('bookmark post', async (req, res) => {
-  res.json(await feedService.setBookmarked(req.user.id, req.params.id, true));
+  res.json(await feedService.setBookmarked(req.user, req.params.id, true));
 });
 
 export const unbookmarkPost = handle('remove bookmark', async (req, res) => {
-  res.json(await feedService.setBookmarked(req.user.id, req.params.id, false));
+  res.json(await feedService.setBookmarked(req.user, req.params.id, false));
 });
 
 export const votePoll = handle('vote', async (req, res) => {
   const { optionId } = VoteSchema.parse(req.body);
-  res.json(await feedService.vote(req.user.id, req.params.id, optionId));
+  res.json(await feedService.vote(req.user, req.params.id, optionId));
 });
 
 export const listComments = handle('load comments', async (req, res) => {
-  res.json(await feedService.listComments(req.user.id, req.params.id));
+  res.json(await feedService.listComments(req.user, req.params.id));
 });
 
 export const createComment = handle('add comment', async (req, res) => {

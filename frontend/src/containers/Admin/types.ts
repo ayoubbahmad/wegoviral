@@ -13,6 +13,7 @@ export interface AdminMember {
   createdAt: string;
   joinStatus: JoinStatus;
   specialMember: boolean;
+  tierId: string | null;
   postCount: number;
   commentCount: number;
 }
@@ -27,7 +28,7 @@ export interface ActivityActor {
 export interface ActivityEntry {
   id: string;
   action: string;
-  targetType: 'member' | 'post' | 'comment' | 'space' | 'settings' | 'guide' | 'invite';
+  targetType: 'member' | 'post' | 'comment' | 'space' | 'settings' | 'guide' | 'invite' | 'tier';
   targetId: string | null;
   targetLabel: string | null;
   details: Record<string, unknown> | null;
@@ -50,6 +51,7 @@ export interface MemberDetail extends AdminMember {
     maxRestrictionDays: number | null;
     setSpecial: boolean;
     reviewApplication: boolean;
+    setTier: boolean;
   };
 }
 
@@ -245,6 +247,7 @@ export interface AdminSpace {
   position: number;
   archivedAt: string | null;
   postCount: number;
+  access: AccessRule | null;
 }
 
 export interface SpaceInput {
@@ -253,4 +256,21 @@ export interface SpaceInput {
   description: string;
   coverUrl?: string;
   adminOnly: boolean;
+}
+
+// ─── Access rules & tiers (Phase 4) ──────────────────────────────────────────
+
+export interface AccessRule {
+  minRole: UserRole | null;
+  tierIds: string[];
+  minDays: number | null;
+}
+
+export interface Tier {
+  id: string;
+  name: string;
+  description: string | null;
+  position: number;
+  isDefault: boolean;
+  memberCount: number;
 }

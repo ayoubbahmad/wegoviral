@@ -22,7 +22,7 @@ export const RestrictMemberSchema = z.object({
 });
 
 export const ListActivityQuerySchema = z.object({
-  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite']).optional(),
+  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier']).optional(),
   targetId: z.string().optional(),
   actorId: z.string().optional(),
   cursor: z.string().optional(),
@@ -154,3 +154,22 @@ export const ArchiveSpaceSchema = z.object({ archived: z.boolean() });
 
 export type ResolveReportsInput = z.infer<typeof ResolveReportsSchema>;
 export type SpaceInput = z.infer<typeof SpaceSchema>;
+
+// ─── Access rules & tiers (Phase 4) ──────────────────────────────────────────
+
+export const TierSchema = z.object({
+  name: z.string().trim().min(2, 'Give the tier a name').max(40),
+  description: z.string().trim().max(200).optional(),
+});
+export const UpdateTierSchema = TierSchema.partial().extend({ isDefault: z.boolean().optional() });
+
+export const MemberTierSchema = z.object({ tierId: z.string().min(1).nullable() });
+
+export const AccessRuleSchema = z.object({
+  minRole: z.enum(ROLE_VALUES).nullable().optional(),
+  tierIds: z.array(z.string().min(1)).max(20).default([]),
+  minDays: z.number().int().min(1).max(3650).nullable().optional(),
+});
+
+export type TierInput = z.infer<typeof TierSchema>;
+export type AccessRuleInput = z.infer<typeof AccessRuleSchema>;

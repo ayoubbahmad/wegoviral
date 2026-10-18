@@ -15,6 +15,9 @@ export interface AuthenticatedUser {
   statusReason: string | null;
   statusUntil: Date | null;
   onboarding: OnboardingStep;
+  /** For access rules (Phase 4) */
+  tierId: string | null;
+  joinedAt: Date;
 }
 
 const restrictionError = (user: AuthenticatedUser) => ({
@@ -60,6 +63,8 @@ const authenticate =
             specialMember: true,
             rulesAcceptedVersion: true,
             quizPassedVersion: true,
+            tierId: true,
+            createdAt: true,
             application: { select: { id: true } },
           },
         }),
@@ -74,6 +79,8 @@ const authenticate =
         statusReason: status === 'ACTIVE' ? null : profile.statusReason,
         statusUntil: status === 'ACTIVE' ? null : profile.statusUntil,
         onboarding: onboardingStep({ ...profile, hasApplication: Boolean(profile.application) }, settings),
+        tierId: profile.tierId,
+        joinedAt: profile.createdAt,
       };
     } catch (error) {
       req.log?.error({ err: error }, 'Failed to resolve user profile');

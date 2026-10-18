@@ -28,7 +28,9 @@ export const useFeedController = () => {
 
   const spaceFilter = activeSpaceId === ALL_SPACES_ID ? undefined : activeSpaceId;
   const spacesQuery = useSpaces();
-  const postsQuery = useFeedPosts(spaceFilter);
+  // A locked space has nothing to load: the feed explains how to unlock it instead
+  const selectedSpace = spacesQuery.data?.find((space) => space.id === spaceFilter);
+  const postsQuery = useFeedPosts(spaceFilter, !selectedSpace?.access.locked);
   const topPostsQuery = useTopPosts();
 
   const createPost = useCreatePost();

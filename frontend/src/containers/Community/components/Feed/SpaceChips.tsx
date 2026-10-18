@@ -1,5 +1,6 @@
 'use client';
 
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommunitySpace } from '@/types/communityFeed';
 import { ALL_SPACES_ID } from '../../slice';
@@ -18,8 +19,8 @@ export const SpaceChips = ({
   onChange,
 }: SpaceChipsProps) => {
   const chips = [
-    { id: ALL_SPACES_ID, name: 'All', emoji: '✨' },
-    ...spaces,
+    { id: ALL_SPACES_ID, name: 'All', emoji: '✨', locked: false },
+    ...spaces.map((space) => ({ ...space, locked: space.access.locked })),
   ];
 
   return (
@@ -47,6 +48,7 @@ export const SpaceChips = ({
           >
             <span aria-hidden>{chip.emoji}</span>
             {chip.name}
+            {chip.locked && <Lock className="w-3 h-3 opacity-70" aria-label="Locked" />}
             <span
               className={cn(
                 'min-w-5 rounded-full px-1.5 text-[11px] font-bold tabular-nums',

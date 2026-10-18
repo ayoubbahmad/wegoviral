@@ -37,6 +37,8 @@ export interface User {
     onboarding: Onboarding;
     /** Warnings from the team the member hasn't acknowledged yet */
     warnings: { id: string; reason: string; createdAt: string }[];
+    /** Membership tier (falls back to the default tier) */
+    tier: { id: string; name: string } | null;
     socialAccounts?: SocialAccount[];
 }
 

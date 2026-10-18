@@ -74,6 +74,8 @@ yarn test:api                 # API test suite against it
 API_URL=https://backend-production-ab0be.up.railway.app/api yarn test:api   # against production (slow: ~10-15 min from far away)
 ```
 
+**Running the full suite locally:** start the test backend and the runner with `DATABASE_URL` set to the transaction pooler URL (the one in `.env.production`), e.g. `DATABASE_URL=… PORT=3011 node dist/index.js` and `DATABASE_URL=… API_URL=http://localhost:3011/api yarn test:api`. On the session pooler, a dev backend, a test backend and the runner together exceed Supabase's 15-client limit and requests start failing midway.
+
 The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest.wegoviral.test`) and deletes everything it created afterwards, including logins left by an interrupted run. The onboarding tests temporarily change the guide, quiz and joining settings and restore them at the end; if a run is killed midway, the next run detects the leftover `[test]` content and restores a clean state. It needs `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` and `DATABASE_URL` in `backend/.env`.
 
 ## Demo data

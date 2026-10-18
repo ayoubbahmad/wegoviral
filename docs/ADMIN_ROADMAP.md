@@ -141,13 +141,15 @@ Shipped; **acceptance pending** (Ayoub). 17 automated moderation tests (85 in to
 
 ## Phase 4 — Access rules engine
 
-One shared system used by spaces, courses, events and challenges.
+One shared system used by spaces now, and by courses, events and challenges in their phases.
 
-- ⬜ **Rule types**: role, tier (free/paid plans), minimum level, minimum time in the community (days since joining), onboarding complete. Rules can be combined (all must match).
-- ⬜ **Locked state UI**: locked items stay visible with a clear reason, e.g. "Unlocks in 12 days", "Reach Level 5", "Paid members only — Upgrade".
-- ⬜ **Enforced on the API** (locked content is never sent to the browser).
-- ⬜ **Manual tier assignment** for testing until Stripe is connected in Phase 9.
-  - *Accept:* the same course shows as locked to a 10-day-old member and unlocked to a 40-day-old one with a 30-day rule.
+Shipped; **acceptance pending** (Ayoub). 10 automated access tests.
+
+- ✅ **Rule types**: minimum role, tiers, minimum days in the community (counted from sign-up). Conditions combine (all must match); staff always have access. *Minimum level is added with Phase 6; "onboarding complete" is already enforced for everyone by Phase 2.*
+- ✅ **Locked state UI**: locked spaces stay in the chips with a 🔒; opening one explains why, e.g. "Unlocks in 12 days (on …)", "For Pro members", "Only for instructors and the team".
+- ✅ **Enforced on the API**: posts in a locked space are never sent (filtered from the feed, Top posts and the review queue; likes, comments, votes and reports answer "not found"); posting there is refused. Authors keep access to their own posts.
+- ✅ **Tiers & manual assignment** (Super Admin): Admin → Tiers (create, rename, default, delete); tier picker in the member panel until Stripe (Phase 9). Only Super Admins decide which tiers can open something; admins set role and time conditions in Admin → Spaces.
+  - *Accept:* the same space shows as locked to a 10-day-old member and unlocked to a 40-day-old one with a 30-day rule. *(Automated test passes.)*
 
 ## Phase 5 — Events
 
@@ -202,6 +204,17 @@ One shared system used by spaces, courses, events and challenges.
 - ⬜ **Export** any table as CSV.
 
 ---
+
+## Phase 11 — Help center & documentation (last)
+
+In-app documentation of how WeGoViral works, written for each audience (requested 2026-10-18).
+
+- ⬜ **Help in every space**: a "Help" entry in the sidebar of each space (Community, Creator Space, Admin) opens the docs for *that* space only.
+- ⬜ **Role-aware articles**: each article has a space and an audience (everyone, instructors, moderators, admins, Super Admins); members only see what applies to their role, staff also see the staff guides (e.g. how to handle reports).
+- ⬜ **First set of articles** written from the shipped features: joining and the guide, posting and review, reporting, spaces, events, courses, points and badges, Creator Space tools; staff guides for every admin page.
+- ⬜ **Search** across the articles you can see, and links from relevant screens ("How does review work?").
+- ⬜ **Editable by admins** (create, edit, reorder, publish), so the docs stay current without a code change.
+  - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides; in the Creator Space, only Creator Space articles show.
 
 ## Backlog (member-facing, from the earlier feature list)
 

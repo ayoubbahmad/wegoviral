@@ -37,6 +37,7 @@ const memberSelect = {
   createdAt: true,
   joinStatus: true,
   specialMember: true,
+  tierId: true,
   _count: { select: { communityPosts: { where: { deletedAt: null } }, communityComments: { where: { deletedAt: null } } } },
 } satisfies Prisma.UserProfileSelect;
 
@@ -58,6 +59,7 @@ const toMemberDto = (member: MemberRow) => {
     createdAt: member.createdAt,
     joinStatus: member.joinStatus,
     specialMember: member.specialMember,
+    tierId: member.tierId,
     postCount: member._count.communityPosts,
     commentCount: member._count.communityComments,
   };
@@ -245,6 +247,7 @@ export async function getMember(actor: Actor, id: string) {
       maxRestrictionDays: can(actor.role, 'members.ban') ? null : MODERATOR_MAX_RESTRICTION_DAYS,
       setSpecial: !isSelf && can(actor.role, 'members.exempt'),
       reviewApplication: member.joinStatus === 'PENDING' && can(actor.role, 'members.approve'),
+      setTier: can(actor.role, 'tiers.manage'),
     },
   };
 }

@@ -51,5 +51,14 @@ router.post('/spaces', requirePermission('spaces.manage'), adminController.creat
 router.put('/spaces/order', requirePermission('spaces.manage'), adminController.reorderSpaces);
 router.patch('/spaces/:id', requirePermission('spaces.manage'), adminController.updateSpace);
 router.patch('/spaces/:id/archive', requirePermission('spaces.manage'), adminController.archiveSpace);
+router.get('/spaces/:id/access', requirePermission('spaces.manage'), adminController.getSpaceAccess);
+router.put('/spaces/:id/access', requirePermission('spaces.manage'), adminController.setSpaceAccess);
+
+// Tiers (what's paid is the Super Admin's call)
+router.get('/tiers', requirePermission('spaces.manage'), adminController.listTiers);
+router.post('/tiers', requirePermission('tiers.manage'), adminController.createTier);
+router.patch('/tiers/:id', requirePermission('tiers.manage'), adminController.updateTier);
+router.delete('/tiers/:id', requirePermission('tiers.manage'), adminController.deleteTier);
+router.patch('/members/:id/tier', requirePermission('tiers.manage'), adminController.setMemberTier);
 
 export default router;

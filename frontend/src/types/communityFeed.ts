@@ -18,6 +18,8 @@ export interface CommunitySpace {
     adminOnly: boolean; // only moderators/admins can post here
     coverUrl?: string | null;
     archivedAt?: string | null;
+    /** Whether the current member can open this space (Phase 4 access rules) */
+    access: AccessResult;
     position: number;
     postCount: number;
 }
@@ -130,3 +132,13 @@ export const REPORT_REASONS: { value: ReportReason; label: string }[] = [
     { value: 'SELF_PROMOTION', label: 'Unwanted self-promotion' },
     { value: 'OTHER', label: 'Something else' },
 ];
+
+export type LockReason =
+    | { type: 'role'; minRole: UserRole }
+    | { type: 'tier'; tiers: { id: string; name: string }[] }
+    | { type: 'time'; unlocksAt: string; daysLeft: number };
+
+export interface AccessResult {
+    locked: boolean;
+    reasons: LockReason[];
+}

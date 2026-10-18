@@ -6,16 +6,22 @@ import { AdminError, SpaceInput } from './model';
 
 /** All spaces including archived ones, with post counts. */
 export async function listAllSpaces() {
-  const [spaces, counts] = await Promise.all([
+  const [spaces, counts, rules] = await Promise.all([
     prisma.communitySpace.findMany({ orderBy: [{ archivedAt: 'asc' }, { position: 'asc' }] }),
     prisma.communityPost.groupBy({
       by: ['spaceId'],
       where: { deletedAt: null, reviewStatus: 'PUBLISHED' },
       _count: { _all: true },
     }),
+    prisma.accessRule.findMany({ where: { resourceType: 'space' } }),
   ]);
   const countBySpace = new Map(counts.map((count) => [count.spaceId, count._count._all]));
-  return spaces.map((space) => ({ ...space, postCount: countBySpace.get(space.id) ?? 0 }));
+  const ruleBySpace = new Map(rules.map((rule) => [rule.resourceId, rule]));
+  return spaces.map((space) => ({
+    ...space,
+    postCount: countBySpace.get(space.id) ?? 0,
+    access: ruleBySpace.get(space.id) ?? null,
+  }));
 }
 
 /** Readable, URL-safe id from the name, e.g. "Brand Deals" → "brand-deals". */

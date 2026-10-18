@@ -4,6 +4,8 @@ import { Check, Loader2, Phone, Star, X } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { useToast } from '@/providers/Toast';
 import { useReviewApplication, useSetSpecialMember } from '../api/joining';
+import { useSetMemberTier, useTiers } from '../api/moderation';
+import { Select } from '@/components/Select';
 import { MemberDetail } from '../types';
 
 /** How the member joined: application answers, referrer, rules acceptance and special status. */
@@ -12,6 +14,9 @@ export const JoiningSection = ({ member }: { member: MemberDetail }) => {
   const setSpecial = useSetSpecialMember();
   const review = useReviewApplication();
   const { joining, allowedActions } = member;
+  const { data: tiers = [] } = useTiers(allowedActions.setTier);
+  const setTier = useSetMemberTier();
+  const defaultTier = tiers.find((tier) => tier.isDefault);
   const application = joining.application;
 
   const toggleSpecial = () =>
@@ -68,6 +73,27 @@ export const JoiningSection = ({ member }: { member: MemberDetail }) => {
             onChange={toggleSpecial}
             disabled={setSpecial.isPending}
             className="mt-1 accent-[var(--primary)]"
+          />
+        </label>
+      )}
+
+      {allowedActions.setTier && tiers.length > 0 && (
+        <label className="block space-y-1.5">
+          <span className="text-xs font-semibold text-muted-foreground">Tier (set by hand until payments are connected)</span>
+          <Select
+            aria-label="Tier"
+            value={member.tierId ?? ''}
+            disabled={setTier.isPending}
+            onChange={(event) =>
+              setTier.mutate(
+                { id: member.id, tierId: event.target.value || null },
+                { onSuccess: () => showToast('Tier updated'), onError: (error) => showToast(error.message, 'error') },
+              )
+            }
+            options={[
+              { value: '', label: `${defaultTier?.name ?? 'Default'} (default)` },
+              ...tiers.filter((tier) => !tier.isDefault).map((tier) => ({ value: tier.id, label: tier.name })),
+            ]}
           />
         </label>
       )}

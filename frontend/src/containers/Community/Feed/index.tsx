@@ -9,7 +9,8 @@ import { useFeedController } from './controller';
 
 export const CommunityFeedContainer = () => {
   const feed = useFeedController();
-  const canPostHere = (!feed.activeSpace?.adminOnly || feed.isStaff) && feed.canInteract;
+  const canPostHere =
+    (!feed.activeSpace?.adminOnly || feed.isStaff) && feed.canInteract && !feed.activeSpace?.access.locked;
 
   return (
     <PageContainer>

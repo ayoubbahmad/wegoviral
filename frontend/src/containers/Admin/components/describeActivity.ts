@@ -85,6 +85,16 @@ export function describeActivity(entry: ActivityEntry): string {
       return `brought back the space ${target}`;
     case 'spaces.reordered':
       return 'changed the order of the spaces';
+    case 'tier.created':
+      return `created the tier ${target}`;
+    case 'tier.updated':
+      return details.isDefault ? `made ${target} the default tier` : `edited the tier ${target}`;
+    case 'tier.deleted':
+      return `deleted the tier ${target}`;
+    case 'member.tier_changed':
+      return `moved ${target} from the ${details.from ?? 'default'} tier to ${details.to ?? 'the default tier'}`;
+    case 'access.updated':
+      return details.open ? `opened the ${entry.targetType} ${target} to every member` : `changed who can open the ${entry.targetType} ${target}`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

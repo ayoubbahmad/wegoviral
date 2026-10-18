@@ -37,6 +37,9 @@ model UserProfile {
   quizPassedVersion    Int?
   // Set once enough reviewed posts were approved (or for members who joined before review existed)
   probationCompletedAt DateTime?
+  // Membership tier (null = the default tier). Set by hand until Stripe (Phase 9)
+  tierId               String?
+  tier                 MembershipTier?     @relation(fields: [tierId], references: [id], onDelete: SetNull)
   automations          Automation[]
   competitors          Competitor[]
   creators             Creator[]
@@ -633,4 +636,38 @@ model MemberWarning {
 
   @@index([userId, seenAt])
   @@map("member_warnings")
+}
+
+// ─── Access rules (Phase 4) ──────────────────────────────────────────────────
+
+/**
+ * Membership tiers such as Free and Pro. Exactly one is the default for members without a tier.
+ */
+model MembershipTier {
+  id          String        @id
+  name        String
+  description String?
+  position    Int           @default(0)
+  isDefault   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  members     UserProfile[]
+
+  @@map("membership_tiers")
+}
+
+/**
+ * Who can open a space (and later courses, events, challenges). All set
+ * conditions must match; staff always have access. No row = open to everyone.
+ */
+model AccessRule {
+  id           String    @id @default(uuid())
+  resourceType String // "space", later "course", "event", "challenge"
+  resourceId   String
+  minRole      UserRole?
+  tierIds      String[] // empty = any tier
+  minDays      Int? // days since joining
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([resourceType, resourceId])
+  @@map("access_rules")
 }

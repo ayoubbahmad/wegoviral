@@ -16,6 +16,8 @@ export interface CommunitySpace {
     emoji: string;
     description: string;
     adminOnly: boolean; // only moderators/admins can post here
+    coverUrl?: string | null;
+    archivedAt?: string | null;
     position: number;
     postCount: number;
 }
@@ -45,6 +47,10 @@ export interface CommunityPost {
     reviewStatus: 'PENDING' | 'PUBLISHED' | 'REJECTED';
     /** Why the post was refused (only sent to its author) */
     reviewNote?: string;
+    /** Held by the word filter (only sent to its author) */
+    heldForReview?: boolean;
+    editedAt?: string;
+    editedByStaff?: boolean;
     createdAt: string; // ISO date
     likeCount: number;
     commentCount: number;
@@ -72,6 +78,10 @@ export interface CommunityComment {
     postId: string;
     content: string;
     createdAt: string;
+    editedAt?: string;
+    editedByStaff?: boolean;
+    /** Held by the word filter: only its author sees it until the team releases it */
+    heldForReview?: boolean;
     author: CommunityUser;
 }
 
@@ -108,3 +118,15 @@ export interface LeaderboardEntry {
     user: CommunityUser;
     points: number;
 }
+
+export type ReportReason = 'SPAM' | 'HARASSMENT' | 'HATE' | 'NSFW' | 'MISINFORMATION' | 'SELF_PROMOTION' | 'OTHER';
+
+export const REPORT_REASONS: { value: ReportReason; label: string }[] = [
+    { value: 'SPAM', label: 'Spam or scam' },
+    { value: 'HARASSMENT', label: 'Harassment or bullying' },
+    { value: 'HATE', label: 'Hate speech' },
+    { value: 'NSFW', label: 'Inappropriate or explicit' },
+    { value: 'MISINFORMATION', label: 'False information' },
+    { value: 'SELF_PROMOTION', label: 'Unwanted self-promotion' },
+    { value: 'OTHER', label: 'Something else' },
+];

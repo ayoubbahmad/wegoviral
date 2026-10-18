@@ -10,6 +10,7 @@ export interface Settings {
   probationPostCount: number;
   guideVersion: number;
   quizQuestionCount: number;
+  flaggedWords: string[];
 }
 
 let cached: { value: Settings; at: number } | null = null;
@@ -29,6 +30,7 @@ export async function getSettings(): Promise<Settings> {
     probationPostCount: settings.probationPostCount,
     guideVersion: settings.guideVersion,
     quizQuestionCount,
+    flaggedWords: settings.flaggedWords,
   };
   cached = { value, at: Date.now() };
   return value;

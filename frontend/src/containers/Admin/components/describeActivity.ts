@@ -59,6 +59,32 @@ export function describeActivity(entry: ActivityEntry): string {
       return `removed a post this member had approved in review: “${target}”`;
     case 'member.referral_restricted':
       return `restricted ${target}, who joined through this member's referral link`;
+    case 'reports.dismissed':
+      return `dismissed ${details.reports} report${details.reports === 1 ? '' : 's'} on: “${target}”`;
+    case 'reports.resolved':
+      return `handled ${details.reports} report${details.reports === 1 ? '' : 's'} (${details.resolution}) on: “${target}”`;
+    case 'member.warned':
+      return `warned ${target}${reason}`;
+    case 'post.edited':
+      return `edited a post: “${target}”`;
+    case 'comment.edited':
+      return `edited a comment: “${target}”`;
+    case 'post.restored':
+      return `restored a post: “${target}”`;
+    case 'comment.restored':
+      return `restored a comment: “${target}”`;
+    case 'comment.released':
+      return `released a held comment: “${target}”`;
+    case 'space.created':
+      return `created the space ${target}`;
+    case 'space.updated':
+      return `edited the space ${target}`;
+    case 'space.archived':
+      return `archived the space ${target}`;
+    case 'space.unarchived':
+      return `brought back the space ${target}`;
+    case 'spaces.reordered':
+      return 'changed the order of the spaces';
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

@@ -14,6 +14,7 @@ router.get('/posts', feedController.listPosts);
 router.get('/posts/top', feedController.listTopPosts);
 router.post('/posts', requireCanInteract, feedController.createPost);
 router.delete('/posts/:id', feedController.deletePost);
+router.patch('/posts/:id', requireCanInteract, feedController.editPost);
 router.patch('/posts/:id/pin', feedController.pinPost);
 
 router.put('/posts/:id/like', requireCanInteract, feedController.likePost);
@@ -25,6 +26,11 @@ router.post('/posts/:id/vote', requireCanInteract, feedController.votePoll);
 router.get('/posts/:id/comments', feedController.listComments);
 router.post('/posts/:id/comments', requireCanInteract, feedController.createComment);
 router.delete('/comments/:id', feedController.deleteComment);
+router.patch('/comments/:id', requireCanInteract, feedController.editComment);
+
+// Reporting stays open to muted members: it's a safety feature
+router.post('/posts/:id/report', feedController.reportPost);
+router.post('/comments/:id/report', feedController.reportComment);
 
 // Post review during probation (staff and trusted members; checked in the service)
 router.get('/reviews', requireCanInteract, feedController.listPendingReviews);

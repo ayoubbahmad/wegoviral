@@ -15,6 +15,7 @@ import {
   CreatePostPayload,
   FeedPage,
   NewPostDraft,
+  ReportReason,
   TopPost,
 } from '@/types/communityFeed';
 
@@ -255,10 +256,13 @@ export const useCreateComment = (postId: string) => {
         ...comments,
         comment,
       ]);
-      updateCachedPost(queryClient, postId, (post) => ({
-        ...post,
-        commentCount: post.commentCount + 1,
-      }));
+      // Comments held by the word filter don't count until the team releases them
+      if (!comment.heldForReview) {
+        updateCachedPost(queryClient, postId, (post) => ({
+          ...post,
+          commentCount: post.commentCount + 1,
+        }));
+      }
       queryClient.invalidateQueries({ queryKey: feedKeys.top });
     },
   });
@@ -305,3 +309,32 @@ export const useReviewPost = () => {
     },
   });
 };
+
+// ─── Editing & reporting ─────────────────────────────────────────────────────
+
+export const useEditPost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ postId, title, content }: { postId: string; title?: string; content: string }) =>
+      (await apiClient.patch<CommunityPost>(`/feed/posts/${postId}`, { title, content })).data,
+    onSuccess: (post) => updateCachedPost(queryClient, post.id, () => post),
+  });
+};
+
+export const useEditComment = (postId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ commentId, content }: { commentId: string; content: string }) =>
+      (await apiClient.patch<CommunityComment>(`/feed/comments/${commentId}`, { content })).data,
+    onSuccess: (comment) =>
+      queryClient.setQueryData<CommunityComment[]>(feedKeys.comments(postId), (comments = []) =>
+        comments.map((existing) => (existing.id === comment.id ? comment : existing)),
+      ),
+  });
+};
+
+export const useReport = () =>
+  useMutation({
+    mutationFn: async ({ target, id, reason, note }: { target: 'post' | 'comment'; id: string; reason: ReportReason; note?: string }) =>
+      (await apiClient.post(`/feed/${target === 'post' ? 'posts' : 'comments'}/${id}/report`, { reason, note })).data,
+  });

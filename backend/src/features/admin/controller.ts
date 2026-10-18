@@ -2,6 +2,8 @@ import { Response } from 'express';
 import { ZodError } from 'zod';
 import * as adminService from './service';
 import * as joiningService from './joining.service';
+import * as moderationService from './moderation.service';
+import * as spacesService from './spaces.service';
 import {
   AdminError,
   ChangeRoleSchema,
@@ -15,6 +17,14 @@ import {
   GuideSectionsSchema,
   QuizSchema,
   CreateInviteSchema,
+  ListReportsQuerySchema,
+  ResolveReportsSchema,
+  WarnMemberSchema,
+  RestoreSchema,
+  SpaceSchema,
+  UpdateSpaceSchema,
+  ReorderSpacesSchema,
+  ArchiveSpaceSchema,
 } from './model';
 
 /** Maps validation and permission errors to proper status codes. */
@@ -119,4 +129,62 @@ export const createInvite = handle('create invite link', async (req, res) => {
 
 export const revokeInvite = handle('turn off invite link', async (req, res) => {
   res.json(await joiningService.revokeInvite(req.user, req.params.id));
+});
+
+// ─── Moderation ──────────────────────────────────────────────────────────────
+
+export const listReports = handle('load reports', async (req, res) => {
+  const { status } = ListReportsQuerySchema.parse(req.query);
+  res.json(await moderationService.listReports(status));
+});
+
+export const resolveReports = handle('handle reports', async (req, res) => {
+  res.json(await moderationService.resolveReports(req.user, ResolveReportsSchema.parse(req.body)));
+});
+
+export const warnMember = handle('warn member', async (req, res) => {
+  const { reason } = WarnMemberSchema.parse(req.body);
+  res.status(201).json(await moderationService.issueWarning(req.user, req.params.id, reason));
+});
+
+export const listHeld = handle('load held content', async (_req, res) => {
+  res.json(await moderationService.listHeldContent());
+});
+
+export const releaseComment = handle('release comment', async (req, res) => {
+  await moderationService.releaseComment(req.user, req.params.id);
+  res.status(204).end();
+});
+
+export const listDeleted = handle('load deleted content', async (_req, res) => {
+  res.json(await moderationService.listDeleted());
+});
+
+export const restoreContent = handle('restore', async (req, res) => {
+  const { targetType, id } = RestoreSchema.parse(req.body);
+  res.json(await moderationService.restoreContent(req.user, targetType, id));
+});
+
+// ─── Spaces ──────────────────────────────────────────────────────────────────
+
+export const listSpaces = handle('load spaces', async (_req, res) => {
+  res.json(await spacesService.listAllSpaces());
+});
+
+export const createSpace = handle('create space', async (req, res) => {
+  res.status(201).json(await spacesService.createSpace(req.user, SpaceSchema.parse(req.body)));
+});
+
+export const updateSpace = handle('update space', async (req, res) => {
+  res.json(await spacesService.updateSpace(req.user, req.params.id, UpdateSpaceSchema.parse(req.body)));
+});
+
+export const reorderSpaces = handle('reorder spaces', async (req, res) => {
+  const { ids } = ReorderSpacesSchema.parse(req.body);
+  res.json(await spacesService.reorderSpaces(req.user, ids));
+});
+
+export const archiveSpace = handle('archive space', async (req, res) => {
+  const { archived } = ArchiveSpaceSchema.parse(req.body);
+  res.json(await spacesService.setArchived(req.user, req.params.id, archived));
 });

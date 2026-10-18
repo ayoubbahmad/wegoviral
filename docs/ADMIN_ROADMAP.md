@@ -128,13 +128,16 @@ Shipped; **acceptance pending** (Ayoub). 11 automated review tests (68 in total)
 
 ## Phase 3 — Moderation & spaces
 
-- ⬜ **Report button** on posts and comments (reason + note).
-- ⬜ **Moderation queue**: open reports grouped by post/comment, actions (dismiss, delete, warn author, suspend author), resolution recorded in the activity log.
-- ⬜ **Edit any post or comment** (staff), with an "edited by the team" mark.
-- ⬜ **Recently deleted**: restore within 30 days.
-- ⬜ **Spaces management**: create, edit (name, emoji, description, cover), reorder, archive; who can post (everyone / staff only).
+Shipped; **acceptance pending** (Ayoub). 17 automated moderation tests (85 in total).
+
+- ✅ **Report button** on posts and comments (reason + optional note), once per member per item; members can't report their own content. Still available to muted members.
+- ✅ **Moderation queue** (Admin → Moderation): open reports grouped per post/comment with reasons and reporters; "Nothing wrong" (dismiss) or remove, optionally also **warning**, muting or suspending the author (moderators' 7-day limit applies). Resolutions are kept and logged.
+- ✅ **Warnings**: the member sees the warning the next time they open the app and confirms they read it. Staff can also send one from the member panel.
+- ✅ **Editing**: authors edit their own posts and comments; staff can edit anyone's, shown as "edited by the team" and logged. (Images and polls aren't editable.)
+- ✅ **Recently deleted**: posts and comments deleted in the last 30 days, with who deleted them; staff can restore them.
+- ✅ **Spaces management** (Admin → Spaces): create, edit (name, emoji, description, cover image link), reorder, archive and bring back; "only the team can post" switch. Archived spaces disappear from the feed filters and close to new posts; their posts stay.
 - ⬜ **Space access rules** (uses Phase 4): e.g. a paid-only space, or one unlocked at Level 5.
-- ⬜ **Flagged words list**: matching posts/comments are held for review.
+- ✅ **Flagged words list** (Admin → Moderation → Word filter): matching posts and comments are held for the team only (not peer reviewers); whole words, case and accents ignored; staff aren't filtered.
 
 ## Phase 4 — Access rules engine
 

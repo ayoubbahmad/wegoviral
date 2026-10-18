@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Activity, ClipboardCheck, MessageCircle, MessageSquare, UserCheck, UserPlus, Users } from 'lucide-react';
+import { Activity, ClipboardCheck, Flag, MessageCircle, MessageSquare, UserCheck, UserPlus, Users } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
@@ -44,6 +44,22 @@ export const AdminOverviewContainer = () => {
               <UserCheck className="w-5 h-5 text-primary" />
               {data.pendingApprovals} new member{data.pendingApprovals === 1 ? '' : 's'} waiting for approval
               <span className="ml-auto text-primary">Review →</span>
+            </Link>
+          )}
+
+          {data.openReports + data.heldContent > 0 && (
+            <Link
+              href="/admin/moderation"
+              className="flex items-center gap-3 rounded-2xl border border-red-500/30 bg-red-500/5 p-4 text-sm font-semibold hover:bg-red-500/10"
+            >
+              <Flag className="w-5 h-5 text-red-500" />
+              {[
+                data.openReports && `${data.openReports} open report${data.openReports === 1 ? '' : 's'}`,
+                data.heldContent && `${data.heldContent} held by the word filter`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+              <span className="ml-auto text-red-500">Moderate →</span>
             </Link>
           )}
 
@@ -123,7 +139,6 @@ export const AdminOverviewContainer = () => {
             </Card>
           </div>
 
-          <p className="text-xs text-muted-foreground">Open reports will appear here with moderation (Phase 3).</p>
         </>
       )}
     </PageContainer>

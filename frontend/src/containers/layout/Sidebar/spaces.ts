@@ -22,6 +22,8 @@ import {
     UserCheck,
     BookOpenCheck,
     Link2,
+    Flag,
+    LayoutGrid,
     type LucideIcon,
 } from "lucide-react";
 import type { Permission } from "@/lib/roles";
@@ -107,6 +109,8 @@ export const SPACES: Record<SpaceId, Space> = {
             { name: "Overview", href: "/admin/overview", icon: Gauge },
             { name: "Approvals", href: "/admin/approvals", icon: UserCheck, requires: "members.approve" },
             { name: "Members", href: "/admin/members", icon: Users },
+            { name: "Moderation", href: "/admin/moderation", icon: Flag, requires: "community.moderate" },
+            { name: "Spaces", href: "/admin/spaces", icon: LayoutGrid, requires: "spaces.manage" },
             { name: "Onboarding", href: "/admin/onboarding", icon: BookOpenCheck, requires: "community.settings" },
             { name: "Invite links", href: "/admin/invites", icon: Link2, requires: "invites.manage" },
             { name: "Activity log", href: "/admin/activity", icon: History },

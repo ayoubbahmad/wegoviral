@@ -46,6 +46,23 @@ export const CreateUploadSchema = z.object({
 
 export type CreatePostInput = z.infer<typeof CreatePostSchema>;
 
+export const EditPostSchema = z.object({
+  title: z.string().trim().max(120).optional(),
+  content: z.string().trim().max(10000).optional(),
+});
+
+export const EditCommentSchema = z.object({
+  content: z.string().trim().min(1, 'Comment cannot be empty').max(2000),
+});
+
+export const ReportSchema = z.object({
+  reason: z.enum(['SPAM', 'HARASSMENT', 'HATE', 'NSFW', 'MISINFORMATION', 'SELF_PROMOTION', 'OTHER']),
+  note: z.string().trim().max(500).optional(),
+});
+
+export type EditPostInput = z.infer<typeof EditPostSchema>;
+export type ReportInput = z.infer<typeof ReportSchema>;
+
 /** Errors with an HTTP status the controller can pass straight through. */
 export class FeedError extends Error {
   constructor(

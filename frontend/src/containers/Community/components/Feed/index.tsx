@@ -82,6 +82,9 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
           postCountBySpace={postCountBySpace}
           onChange={setActiveSpaceId}
         />
+        {activeSpace?.coverUrl && (
+          <img src={activeSpace.coverUrl} alt="" className="h-32 w-full rounded-2xl border border-border object-cover" />
+        )}
         {activeSpace && (
           <p className="px-1 text-sm text-muted-foreground">{activeSpace.description}</p>
         )}

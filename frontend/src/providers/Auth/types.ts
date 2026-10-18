@@ -35,6 +35,8 @@ export interface User {
     /** Everything this user may do, computed by the backend */
     permissions: Permission[];
     onboarding: Onboarding;
+    /** Warnings from the team the member hasn't acknowledged yet */
+    warnings: { id: string; reason: string; createdAt: string }[];
     socialAccounts?: SocialAccount[];
 }
 

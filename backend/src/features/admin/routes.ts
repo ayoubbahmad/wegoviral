@@ -36,4 +36,20 @@ router.get('/invites', requirePermission('invites.manage'), adminController.list
 router.post('/invites', requirePermission('invites.manage'), adminController.createInvite);
 router.delete('/invites/:id', requirePermission('invites.manage'), adminController.revokeInvite);
 
+// Moderation
+router.get('/moderation/reports', requirePermission('community.moderate'), adminController.listReports);
+router.post('/moderation/reports/resolve', requirePermission('community.moderate'), adminController.resolveReports);
+router.get('/moderation/held', requirePermission('community.moderate'), adminController.listHeld);
+router.post('/moderation/comments/:id/release', requirePermission('community.moderate'), adminController.releaseComment);
+router.get('/moderation/deleted', requirePermission('community.moderate'), adminController.listDeleted);
+router.post('/moderation/restore', requirePermission('community.moderate'), adminController.restoreContent);
+router.post('/members/:id/warn', requirePermission('community.moderate'), adminController.warnMember);
+
+// Spaces
+router.get('/spaces', requirePermission('spaces.manage'), adminController.listSpaces);
+router.post('/spaces', requirePermission('spaces.manage'), adminController.createSpace);
+router.put('/spaces/order', requirePermission('spaces.manage'), adminController.reorderSpaces);
+router.patch('/spaces/:id', requirePermission('spaces.manage'), adminController.updateSpace);
+router.patch('/spaces/:id/archive', requirePermission('spaces.manage'), adminController.archiveSpace);
+
 export default router;

@@ -12,6 +12,8 @@ import {
   Trash2,
   Hourglass,
   XCircle,
+  Pencil,
+  Flag,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
@@ -19,6 +21,8 @@ import { CommunityPost, CommunitySpace, CommunityUser } from '@/types/communityF
 import { ROLE_BADGES } from '@/lib/roles';
 import { PostPoll } from './PostPoll';
 import { CommentsThread } from './CommentsThread';
+import { ReportDialog } from '../Moderation/ReportDialog';
+import { EditPostDialog } from '../Moderation/EditPostDialog';
 
 // Longer posts are clamped with a "See more" toggle
 const CLAMP_CHARACTERS = 280;
@@ -56,17 +60,23 @@ export const PostCard = ({
   const isLong =
     post.content.length > CLAMP_CHARACTERS ||
     post.content.split('\n').length > CLAMP_LINES;
-  const canDelete = isStaff || post.author.id === currentUser?.id;
+  const isOwn = post.author.id === currentUser?.id;
+  const canDelete = isStaff || isOwn;
+  const [dialog, setDialog] = useState<'edit' | 'report' | null>(null);
 
   const actions = (
     <PostActions
       post={post}
       canPin={isStaff}
       canDelete={canDelete}
+      canEdit={canDelete}
+      canReport={!isOwn}
       onBookmark={onBookmark}
       onCopyLink={onCopyLink}
       onPin={onPin}
       onDelete={onDelete}
+      onEdit={() => setDialog('edit')}
+      onReport={() => setDialog('report')}
     />
   );
 
@@ -85,7 +95,15 @@ export const PostCard = ({
           <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
             <Hourglass className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>
-              <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.
+              {post.heldForReview ? (
+                <>
+                  <strong>Held for the team.</strong> It contains a word the team checks first. Only you can see it for now.
+                </>
+              ) : (
+                <>
+                  <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.
+                </>
+              )}
             </span>
           </div>
         )}
@@ -126,6 +144,11 @@ export const PostCard = ({
               )}
               <span className="text-xs text-muted-foreground shrink-0">
                 {formatRelativeDate(post.createdAt)}
+                {post.editedAt && (
+                  <span title={new Date(post.editedAt).toLocaleString()}>
+                    {post.editedByStaff ? ' · edited by the team' : ' · edited'}
+                  </span>
+                )}
               </span>
             </div>
             {space && (
@@ -198,6 +221,8 @@ export const PostCard = ({
           <CommentsThread postId={post.id} currentUser={currentUser} isStaff={isStaff} />
         )}
       </div>
+      {dialog === 'edit' && <EditPostDialog post={post} isOwn={isOwn} onClose={() => setDialog(null)} />}
+      {dialog === 'report' && <ReportDialog target="post" id={post.id} onClose={() => setDialog(null)} />}
     </Card>
   );
 };
@@ -248,6 +273,10 @@ interface PostActionsProps {
   post: CommunityPost;
   canPin: boolean;
   canDelete: boolean;
+  canEdit: boolean;
+  canReport: boolean;
+  onEdit: () => void;
+  onReport: () => void;
   onBookmark: (post: CommunityPost) => void;
   onCopyLink: (post: CommunityPost) => void;
   onPin: (post: CommunityPost) => void;
@@ -258,6 +287,10 @@ const PostActions = ({
   post,
   canPin,
   canDelete,
+  canEdit,
+  canReport,
+  onEdit,
+  onReport,
   onBookmark,
   onCopyLink,
   onPin,
@@ -324,6 +357,8 @@ const PostActions = ({
             className="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150"
           >
             {menuItem('Copy link', <Link2 className="w-4 h-4" />, () => onCopyLink(post))}
+            {canEdit && menuItem('Edit post', <Pencil className="w-4 h-4" />, onEdit)}
+            {canReport && isPublished && menuItem('Report', <Flag className="w-4 h-4" />, onReport)}
             {canPin && isPublished &&
               menuItem(
                 post.pinned ? 'Unpin post' : 'Pin post',

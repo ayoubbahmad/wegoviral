@@ -14,7 +14,7 @@ export const getMe = async (req: any, res: Response) => {
         }
 
         const { status, statusReason, statusUntil, onboarding: step } = req.user;
-        const [settings, joining, probation, reviewing] = await Promise.all([
+        const [settings, joining, probation, reviewing, warnings] = await Promise.all([
             getSettings(),
             prisma.userProfile.findUniqueOrThrow({
                 where: { id: req.user.id },
@@ -27,6 +27,11 @@ export const getMe = async (req: any, res: Response) => {
             }),
             probationSummary(req.user.id),
             reviewerEligibility(req.user),
+            prisma.memberWarning.findMany({
+                where: { userId: req.user.id, seenAt: null },
+                orderBy: { createdAt: 'asc' },
+                select: { id: true, reason: true, createdAt: true },
+            }),
         ]);
         res.status(200).json({
             status: 'success',
@@ -37,6 +42,8 @@ export const getMe = async (req: any, res: Response) => {
                 statusReason,
                 statusUntil,
                 permissions: permissionsFor(user.role),
+                // Warnings from the team the member hasn't acknowledged yet
+                warnings,
                 onboarding: {
                     step,
                     joinStatus: joining.joinStatus,
@@ -75,5 +82,19 @@ export const checkUsername = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Check Username Error:', error);
         res.status(500).json({ error: 'Failed to check username' });
+    }
+};
+
+export const acknowledgeWarning = async (req: any, res: Response) => {
+    try {
+        const { count } = await prisma.memberWarning.updateMany({
+            where: { id: req.params.id, userId: req.user.id, seenAt: null },
+            data: { seenAt: new Date() },
+        });
+        if (!count) return res.status(404).json({ error: 'Warning not found' });
+        res.status(204).end();
+    } catch (error) {
+        console.error('Acknowledge Warning Error:', error);
+        res.status(500).json({ error: 'Failed to acknowledge the warning' });
     }
 };

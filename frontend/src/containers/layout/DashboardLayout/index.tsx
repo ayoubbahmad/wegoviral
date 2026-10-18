@@ -2,6 +2,7 @@ import { Sidebar } from "@/containers/layout/Sidebar";
 import { useSidebarStore } from "@/containers/layout/Sidebar/slice";
 import { cn } from "@/lib/utils";
 import { OnboardingBanner } from "@/containers/Onboarding/OnboardingBanner";
+import { WarningNotice } from "@/containers/Auth/WarningNotice";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { sidebarCollapsed } = useSidebarStore();
@@ -9,6 +10,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Sidebar />
+            <WarningNotice />
             <main className={cn(
                 "min-h-screen transition-all duration-300 ease-in-out",
                 sidebarCollapsed ? "pl-20" : "pl-64"

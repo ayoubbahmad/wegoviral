@@ -9,6 +9,9 @@ import {
   ListPostsQuerySchema,
   PinPostSchema,
   ReviewPostSchema,
+  EditPostSchema,
+  EditCommentSchema,
+  ReportSchema,
   VoteSchema,
 } from './model';
 
@@ -80,12 +83,12 @@ export const votePoll = handle('vote', async (req, res) => {
 });
 
 export const listComments = handle('load comments', async (req, res) => {
-  res.json(await feedService.listComments(req.params.id));
+  res.json(await feedService.listComments(req.user.id, req.params.id));
 });
 
 export const createComment = handle('add comment', async (req, res) => {
   const { content } = CreateCommentSchema.parse(req.body);
-  res.status(201).json(await feedService.createComment(req.user.id, req.params.id, content));
+  res.status(201).json(await feedService.createComment(req.user, req.params.id, content));
 });
 
 export const deleteComment = handle('delete comment', async (req, res) => {
@@ -109,4 +112,21 @@ export const approvePost = handle('approve post', async (req, res) => {
 export const rejectPost = handle('reject post', async (req, res) => {
   const { note } = ReviewPostSchema.parse(req.body ?? {});
   res.json(await feedService.reviewPost(req.user, req.params.id, 'REJECTED', note));
+});
+
+export const editPost = handle('edit post', async (req, res) => {
+  res.json(await feedService.editPost(req.user, req.params.id, EditPostSchema.parse(req.body)));
+});
+
+export const editComment = handle('edit comment', async (req, res) => {
+  const { content } = EditCommentSchema.parse(req.body);
+  res.json(await feedService.editComment(req.user, req.params.id, content));
+});
+
+export const reportPost = handle('report post', async (req, res) => {
+  res.status(201).json(await feedService.reportPost(req.user, req.params.id, ReportSchema.parse(req.body)));
+});
+
+export const reportComment = handle('report comment', async (req, res) => {
+  res.status(201).json(await feedService.reportComment(req.user, req.params.id, ReportSchema.parse(req.body)));
 });

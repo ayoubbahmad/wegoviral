@@ -6,8 +6,9 @@ import { can } from '../../lib/permissions';
 import { logActivity } from '../../lib/activity';
 import { countApprovedReviewedPosts, isOnProbation, reviewerEligibility } from '../../lib/review';
 import { getSettings } from '../../lib/settings';
+import { findFlaggedWord } from '../../lib/contentFilter';
 import type { AuthenticatedUser } from '../../middleware/auth.middleware';
-import { CreatePostInput, FeedError } from './model';
+import { CreatePostInput, EditPostInput, FeedError, ReportInput } from './model';
 
 /** The signed-in member performing an action. */
 export interface Actor {
@@ -53,6 +54,10 @@ const toPostDto = (post: PostWithViewer, viewerId: string) => ({
   reviewStatus: post.reviewStatus,
   // The reviewer's note is only for the author
   reviewNote: post.authorId === viewerId ? post.reviewNote ?? undefined : undefined,
+  // Held by the word filter: the author is told it's waiting for the team
+  heldForReview: post.authorId === viewerId && Boolean(post.heldReason) ? true : undefined,
+  editedAt: post.editedAt ?? undefined,
+  editedByStaff: post.editedByStaff || undefined,
   likeCount: post.likeCount,
   commentCount: post.commentCount,
   createdAt: post.createdAt,
@@ -95,7 +100,7 @@ async function getPostForViewer(postId: string, viewerId: string) {
 
 export async function listSpaces() {
   const [spaces, counts] = await Promise.all([
-    prisma.communitySpace.findMany({ orderBy: { position: 'asc' } }),
+    prisma.communitySpace.findMany({ where: { archivedAt: null }, orderBy: { position: 'asc' } }),
     prisma.communityPost.groupBy({
       by: ['spaceId'],
       where: { deletedAt: null, reviewStatus: 'PUBLISHED' },
@@ -163,6 +168,7 @@ export async function createPost(author: Actor, input: CreatePostInput) {
   const authorId = author.id;
   const space = await prisma.communitySpace.findUnique({ where: { id: input.spaceId } });
   if (!space) throw new FeedError(400, 'This space does not exist');
+  if (space.archivedAt) throw new FeedError(400, `${space.name} is archived and closed to new posts`);
   if (space.adminOnly && !isModerator(author)) {
     throw new FeedError(403, `Only the team can post in ${space.name}`);
   }
@@ -171,12 +177,14 @@ export async function createPost(author: Actor, input: CreatePostInput) {
     select: { role: true, specialMember: true, probationCompletedAt: true },
   });
   const needsReview = await isOnProbation(profile);
+  const flagged = isModerator(author) ? null : await flaggedWordIn(`${input.title ?? ''}\n${input.content}`);
 
   const post = await prisma.communityPost.create({
     data: {
       spaceId: space.id,
       authorId,
-      reviewStatus: needsReview ? 'PENDING' : 'PUBLISHED',
+      reviewStatus: needsReview || flagged ? 'PENDING' : 'PUBLISHED',
+      heldReason: flagged ? `Contains “${flagged}”` : null,
       title: input.title || null,
       content: input.content,
       coverUrl: input.coverUrl ?? null,
@@ -197,7 +205,7 @@ export async function deletePost(actor: Actor, postId: string) {
   if (!isOwn && !isModerator(actor)) {
     throw new FeedError(403, 'You can only delete your own posts');
   }
-  await prisma.communityPost.update({ where: { id: postId }, data: { deletedAt: new Date() } });
+  await prisma.communityPost.update({ where: { id: postId }, data: { deletedAt: new Date(), deletedById: actor.id } });
   if (!isOwn) {
     await logActivity({
       actorId: actor.id,
@@ -296,32 +304,94 @@ export async function vote(userId: string, postId: string, optionId: string) {
 
 // ─── Comments ────────────────────────────────────────────────────────────────
 
-export async function listComments(postId: string) {
+const commentSelect = {
+  id: true,
+  postId: true,
+  content: true,
+  createdAt: true,
+  editedAt: true,
+  editedByStaff: true,
+  heldReason: true,
+  author: { select: authorSelect },
+} satisfies Prisma.CommunityCommentSelect;
+
+const toCommentDto = (
+  { heldReason, ...comment }: Prisma.CommunityCommentGetPayload<{ select: typeof commentSelect }>,
+) => ({
+  ...comment,
+  editedAt: comment.editedAt ?? undefined,
+  editedByStaff: comment.editedByStaff || undefined,
+  heldForReview: heldReason ? true : undefined,
+});
+
+export async function listComments(viewerId: string, postId: string) {
   await getLivePost(postId);
-  return prisma.communityComment.findMany({
-    where: { postId, deletedAt: null },
+  const comments = await prisma.communityComment.findMany({
+    // Held comments are only visible to their author until the team releases them
+    where: { postId, deletedAt: null, OR: [{ heldReason: null }, { authorId: viewerId }] },
     orderBy: { createdAt: 'asc' },
     take: 200,
-    select: { id: true, postId: true, content: true, createdAt: true, author: { select: authorSelect } },
+    select: commentSelect,
   });
+  return comments.map(toCommentDto);
 }
 
-export async function createComment(authorId: string, postId: string, content: string) {
+export async function createComment(author: Actor, postId: string, content: string) {
   await getLivePost(postId);
-  const [comment] = await prisma.$transaction([
-    prisma.communityComment.create({
-      data: { postId, authorId, content },
-      select: { id: true, postId: true, content: true, createdAt: true, author: { select: authorSelect } },
-    }),
-    prisma.communityPost.update({ where: { id: postId }, data: { commentCount: { increment: 1 } } }),
-  ]);
-  return comment;
+  const flagged = isModerator(author) ? null : await flaggedWordIn(content);
+  const comment = await prisma.communityComment.create({
+    data: { postId, authorId: author.id, content, heldReason: flagged ? `Contains “${flagged}”` : null },
+    select: commentSelect,
+  });
+  // Held comments only count once released
+  if (!flagged) {
+    await prisma.communityPost.update({ where: { id: postId }, data: { commentCount: { increment: 1 } } });
+  }
+  return toCommentDto(comment);
+}
+
+export async function editComment(actor: Actor, commentId: string, content: string) {
+  const comment = await prisma.communityComment.findFirst({
+    where: { id: commentId, deletedAt: null },
+    select: { authorId: true, postId: true, heldReason: true },
+  });
+  if (!comment) throw new FeedError(404, 'Comment not found');
+  const isOwn = comment.authorId === actor.id;
+  if (!isOwn && !isModerator(actor)) throw new FeedError(403, 'You can only edit your own comments');
+
+  // An author adding a flagged word sends the comment back for review
+  const flagged = isOwn && !isModerator(actor) ? await flaggedWordIn(content) : null;
+  const newlyHeld = Boolean(flagged) && !comment.heldReason;
+  const updated = await prisma.communityComment.update({
+    where: { id: commentId },
+    data: {
+      content,
+      editedAt: new Date(),
+      editedByStaff: !isOwn,
+      ...(flagged ? { heldReason: `Contains “${flagged}”` } : {}),
+    },
+    select: commentSelect,
+  });
+  if (newlyHeld) {
+    await prisma.communityPost.update({ where: { id: comment.postId }, data: { commentCount: { decrement: 1 } } });
+  }
+  if (!isOwn) {
+    await logActivity({
+      actorId: actor.id,
+      action: 'comment.edited',
+      targetType: 'comment',
+      targetId: commentId,
+      targetLabel: snippet(content),
+      details: { authorId: comment.authorId, postId: comment.postId },
+    });
+  }
+  return toCommentDto(updated);
 }
 
 export async function deleteComment(actor: Actor, commentId: string) {
   const comment = await prisma.communityComment.findFirst({
     where: { id: commentId, deletedAt: null },
-    select: { authorId: true, postId: true, content: true },
+    select: { authorId: true, postId: true, content: true, heldReason: true },
   });
   if (!comment) throw new FeedError(404, 'Comment not found');
   const isOwn = comment.authorId === actor.id;
@@ -329,11 +399,14 @@ export async function deleteComment(actor: Actor, commentId: string) {
     throw new FeedError(403, 'You can only delete your own comments');
   }
   await prisma.$transaction([
-    prisma.communityComment.update({ where: { id: commentId }, data: { deletedAt: new Date() } }),
-    prisma.communityPost.update({
-      where: { id: comment.postId },
-      data: { commentCount: { decrement: 1 } },
+    prisma.communityComment.update({
+      where: { id: commentId },
+      data: { deletedAt: new Date(), deletedById: actor.id },
     }),
+    // Held comments were never counted
+    ...(comment.heldReason
+      ? []
+      : [prisma.communityPost.update({ where: { id: comment.postId }, data: { commentCount: { decrement: 1 } } })]),
   ]);
   if (!isOwn) {
     await logActivity({
@@ -345,6 +418,79 @@ export async function deleteComment(actor: Actor, commentId: string) {
       details: { authorId: comment.authorId, postId: comment.postId },
     });
   }
+}
+
+// ─── Editing posts ───────────────────────────────────────────────────────────
+
+export async function editPost(actor: Actor, postId: string, input: EditPostInput) {
+  const post = await getLivePost(postId, { allowUnpublished: true });
+  const isOwn = post.authorId === actor.id;
+  if (!isOwn && !isModerator(actor)) throw new FeedError(403, 'You can only edit your own posts');
+
+  const title = input.title === undefined ? post.title : input.title || null;
+  const content = input.content ?? post.content;
+  if (!title && !content) throw new FeedError(400, 'Add a title or some text');
+
+  // An author adding a flagged word sends the post back for review
+  const flagged = isOwn && !isModerator(actor) ? await flaggedWordIn(`${title ?? ''}\n${content}`) : null;
+  await prisma.communityPost.update({
+    where: { id: postId },
+    data: {
+      title,
+      content,
+      editedAt: new Date(),
+      editedByStaff: !isOwn,
+      ...(flagged ? { reviewStatus: 'PENDING', heldReason: `Contains “${flagged}”` } : {}),
+    },
+  });
+  if (!isOwn) {
+    await logActivity({
+      actorId: actor.id,
+      action: 'post.edited',
+      targetType: 'post',
+      targetId: postId,
+      targetLabel: snippet(title || content),
+      details: { authorId: post.authorId },
+    });
+  }
+  return getPostForViewer(postId, actor.id);
+}
+
+// ─── Reports ─────────────────────────────────────────────────────────────────
+
+const REPORTED_ALREADY = 'You already reported this. The team will look at it.';
+
+export async function reportPost(reporter: Actor, postId: string, input: ReportInput) {
+  const post = await getLivePost(postId);
+  if (post.authorId === reporter.id) throw new FeedError(400, "You can't report your own post");
+  try {
+    await prisma.contentReport.create({ data: { reporterId: reporter.id, postId, reason: input.reason, note: input.note } });
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new FeedError(409, REPORTED_ALREADY);
+    throw error;
+  }
+  return { reported: true };
+}
+
+export async function reportComment(reporter: Actor, commentId: string, input: ReportInput) {
+  const comment = await prisma.communityComment.findFirst({
+    where: { id: commentId, deletedAt: null, heldReason: null },
+    select: { authorId: true },
+  });
+  if (!comment) throw new FeedError(404, 'Comment not found');
+  if (comment.authorId === reporter.id) throw new FeedError(400, "You can't report your own comment");
+  try {
+    await prisma.contentReport.create({ data: { reporterId: reporter.id, commentId, reason: input.reason, note: input.note } });
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new FeedError(409, REPORTED_ALREADY);
+    throw error;
+  }
+  return { reported: true };
+}
+
+async function flaggedWordIn(text: string) {
+  const { flaggedWords } = await getSettings();
+  return findFlaggedWord(text, flaggedWords);
 }
 
 // ─── Uploads ─────────────────────────────────────────────────────────────────
@@ -379,7 +525,13 @@ async function assertCanReview(reviewer: AuthenticatedUser) {
 export async function listPendingReviews(reviewer: AuthenticatedUser) {
   await assertCanReview(reviewer);
   const posts = await prisma.communityPost.findMany({
-    where: { deletedAt: null, reviewStatus: 'PENDING', authorId: { not: reviewer.id } },
+    where: {
+      deletedAt: null,
+      reviewStatus: 'PENDING',
+      authorId: { not: reviewer.id },
+      // Posts held by the word filter are for staff only
+      ...(isModerator(reviewer) ? {} : { heldReason: null }),
+    },
     orderBy: { createdAt: 'asc' },
     take: 50,
     include: postInclude(reviewer.id),
@@ -396,10 +548,13 @@ export async function reviewPost(
   await assertCanReview(reviewer);
   const post = await prisma.communityPost.findFirst({
     where: { id: postId, deletedAt: null },
-    select: { authorId: true, title: true, content: true, reviewStatus: true },
+    select: { authorId: true, title: true, content: true, reviewStatus: true, heldReason: true },
   });
   if (!post) throw new FeedError(404, 'Post not found');
   if (post.authorId === reviewer.id) throw new FeedError(403, "You can't review your own post");
+  if (post.heldReason && !isModerator(reviewer)) {
+    throw new FeedError(403, 'Only the team can review posts held by the filter');
+  }
 
   const now = new Date();
   // Only one reviewer wins if two decide at the same time
@@ -410,6 +565,7 @@ export async function reviewPost(
       reviewedById: reviewer.id,
       reviewedAt: now,
       reviewNote: note || null,
+      heldReason: null,
       // An approved post goes live now, so it appears at the top of the feed
       ...(decision === 'PUBLISHED' ? { createdAt: now } : {}),
     },

@@ -98,6 +98,8 @@ export async function getOverview() {
     recentMembers,
     pendingApprovals,
     pendingReviews,
+    openReports,
+    heldContent,
   ] = await Promise.all([
     prisma.userProfile.count(),
     prisma.userProfile.count({ where: { createdAt: { gte: weekAgo } } }),
@@ -114,6 +116,11 @@ export async function getOverview() {
     prisma.userProfile.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: memberSelect }),
     prisma.userProfile.count({ where: { joinStatus: 'PENDING', application: { isNot: null } } }),
     prisma.communityPost.count({ where: { deletedAt: null, reviewStatus: 'PENDING' } }),
+    prisma.contentReport.count({ where: { status: 'OPEN' } }),
+    Promise.all([
+      prisma.communityPost.count({ where: { deletedAt: null, reviewStatus: 'PENDING', heldReason: { not: null } } }),
+      prisma.communityComment.count({ where: { deletedAt: null, heldReason: { not: null } } }),
+    ]).then(([posts, comments]) => posts + comments),
   ]);
 
   // Active = posted, commented or liked in the last 7 days
@@ -138,6 +145,8 @@ export async function getOverview() {
     content: { postsThisWeek, commentsThisWeek },
     pendingApprovals,
     pendingReviews,
+    openReports,
+    heldContent,
     recentMembers: recentMembers.map(toMemberDto),
   };
 }

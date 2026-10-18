@@ -63,6 +63,10 @@ export const UpdateSettingsSchema = z
     requireQuiz: z.boolean(),
     quizPassPercent: z.number().int().min(1).max(100),
     probationPostCount: z.number().int().min(0).max(20),
+    flaggedWords: z
+      .array(z.string().trim().min(1).max(50))
+      .max(300)
+      .transform((words) => [...new Set(words.map((word) => word.toLowerCase()))]),
   })
   .partial();
 
@@ -105,3 +109,48 @@ export type UpdateSettingsInput = z.infer<typeof UpdateSettingsSchema>;
 export type GuideSectionsInput = z.infer<typeof GuideSectionsSchema>;
 export type QuizInput = z.infer<typeof QuizSchema>;
 export type CreateInviteInput = z.infer<typeof CreateInviteSchema>;
+
+// ─── Moderation & spaces (Phase 3) ───────────────────────────────────────────
+
+export const ListReportsQuerySchema = z.object({
+  status: z.enum(['OPEN', 'RESOLVED', 'DISMISSED']).default('OPEN'),
+});
+
+export const ResolveReportsSchema = z
+  .object({
+    targetType: z.enum(['post', 'comment']),
+    targetId: z.string().min(1),
+    action: z.enum(['dismiss', 'remove']),
+    authorAction: z
+      .object({
+        type: z.enum(['warn', 'mute', 'suspend']),
+        reason: z.string().trim().min(3, 'Give the author a short reason').max(500),
+        durationDays: z.number().int().min(1).max(365).nullable().optional(),
+      })
+      .optional(),
+    note: z.string().trim().max(500).optional(),
+  })
+  .refine((input) => input.action === 'remove' || !input.authorAction, {
+    message: 'Author actions only apply when removing content',
+  });
+
+export const WarnMemberSchema = z.object({ reason: z.string().trim().min(3, 'Give a short reason').max(500) });
+
+export const RestoreSchema = z.object({ targetType: z.enum(['post', 'comment']), id: z.string().min(1) });
+
+const optionalUrl = z.string().trim().url().max(500).optional().or(z.literal('').transform(() => undefined));
+
+export const SpaceSchema = z.object({
+  name: z.string().trim().min(2, 'Give the space a name').max(40),
+  emoji: z.string().trim().min(1, 'Pick an emoji').max(8),
+  description: z.string().trim().min(3, 'Describe the space in a few words').max(200),
+  coverUrl: optionalUrl,
+  adminOnly: z.boolean().default(false),
+});
+
+export const UpdateSpaceSchema = SpaceSchema.partial();
+export const ReorderSpacesSchema = z.object({ ids: z.array(z.string().min(1)).min(1).max(100) });
+export const ArchiveSpaceSchema = z.object({ archived: z.boolean() });
+
+export type ResolveReportsInput = z.infer<typeof ResolveReportsSchema>;
+export type SpaceInput = z.infer<typeof SpaceSchema>;

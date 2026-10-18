@@ -15,7 +15,8 @@ export type Permission =
   | 'members.approve'
   | 'members.exempt'
   | 'invites.manage'
-  | 'community.settings';
+  | 'community.settings'
+  | 'spaces.manage';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

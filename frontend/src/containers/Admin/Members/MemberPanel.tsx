@@ -15,6 +15,7 @@ import { RoleBadge, StatusBadge } from '../components/Badges';
 import { describeActivity } from '../components/describeActivity';
 import { MemberDetail, RestrictionInput } from '../types';
 import { JoiningSection } from './JoiningSection';
+import { useWarnMember } from '../api/moderation';
 
 const DURATIONS = [1, 3, 7, 30, 90];
 
@@ -121,6 +122,7 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
       )}
 
       {allowedActions.changeRole && <RoleForm member={member} />}
+      {allowedActions.restrict && <WarnForm member={member} />}
       {allowedActions.restrict && member.status === 'ACTIVE' && <RestrictForm member={member} />}
 
       <section className="space-y-3">
@@ -289,5 +291,56 @@ const RestrictForm = ({ member }: { member: MemberDetail }) => {
         {restrict.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : isBan ? 'Ban member' : `Apply`}
       </Button>
     </form>
+  );
+};
+
+const WarnForm = ({ member }: { member: MemberDetail }) => {
+  const { showToast } = useToast();
+  const warn = useWarnMember();
+  const [isOpen, setIsOpen] = useState(false);
+  const [reason, setReason] = useState('');
+
+  if (!isOpen) {
+    return (
+      <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+        Send a warning
+      </Button>
+    );
+  }
+
+  return (
+    <section className="space-y-2">
+      <h3 className="text-sm font-bold">Warning</h3>
+      <Textarea
+        value={reason}
+        onChange={(event) => setReason(event.target.value)}
+        placeholder="What should they change? They'll see this next time they open the app."
+        maxLength={500}
+        className="min-h-[80px]"
+      />
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>Cancel</Button>
+        <Button
+          variant="primary"
+          size="sm"
+          disabled={reason.trim().length < 3 || warn.isPending}
+          onClick={() =>
+            warn.mutate(
+              { id: member.id, reason: reason.trim() },
+              {
+                onSuccess: () => {
+                  showToast(`Warning sent to @${member.username}`);
+                  setReason('');
+                  setIsOpen(false);
+                },
+                onError: (error) => showToast(error.message, 'error'),
+              },
+            )
+          }
+        >
+          {warn.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
+        </Button>
+      </div>
+    </section>
   );
 };

@@ -79,6 +79,8 @@ export interface AdminOverview {
   content: { postsThisWeek: number; commentsThisWeek: number };
   pendingApprovals: number;
   pendingReviews: number;
+  openReports: number;
+  heldContent: number;
   recentMembers: AdminMember[];
 }
 
@@ -145,6 +147,7 @@ export interface CommunitySettings {
   quizPassPercent: number;
   probationPostCount: number;
   guideVersion: number;
+  flaggedWords: string[];
 }
 
 export interface GuideSectionDraft {
@@ -188,4 +191,66 @@ export interface CreateInviteInput {
   specialMember: boolean;
   expiresInDays: number | null;
   maxUses: number | null;
+}
+
+// ─── Moderation & spaces (Phase 3) ───────────────────────────────────────────
+
+export interface ModAuthor {
+  id: string;
+  username: string;
+  name: string | null;
+  avatarUrl: string | null;
+  role: UserRole;
+}
+
+export interface ReportGroup {
+  targetType: 'post' | 'comment';
+  targetId: string;
+  post: { id: string; title: string | null; content: string; coverUrl: string | null; images: string[]; spaceId: string; createdAt: string; deletedAt: string | null; author: ModAuthor } | null;
+  comment: { id: string; content: string; postId: string; createdAt: string; deletedAt: string | null; author: ModAuthor } | null;
+  reports: { id: string; reason: string; note: string | null; createdAt: string; reporter: { id: string; username: string } }[];
+  resolution: string | null;
+  resolvedBy: { id: string; username: string } | null;
+  resolvedAt: string | null;
+}
+
+export type ReportStatus = 'OPEN' | 'RESOLVED' | 'DISMISSED';
+
+export interface ResolveReportsInput {
+  targetType: 'post' | 'comment';
+  targetId: string;
+  action: 'dismiss' | 'remove';
+  authorAction?: { type: 'warn' | 'mute' | 'suspend'; reason: string; durationDays?: number | null };
+  note?: string;
+}
+
+export interface HeldContent {
+  posts: { id: string; title: string | null; content: string; heldReason: string; createdAt: string; spaceId: string; author: ModAuthor }[];
+  comments: { id: string; content: string; heldReason: string; createdAt: string; postId: string; author: ModAuthor }[];
+}
+
+export interface DeletedContent {
+  windowDays: number;
+  posts: { id: string; title: string | null; content: string; deletedAt: string; spaceId: string; author: ModAuthor; deletedBy: { id: string; username: string } | null }[];
+  comments: { id: string; content: string; deletedAt: string; postId: string; author: ModAuthor; deletedBy: { id: string; username: string } | null }[];
+}
+
+export interface AdminSpace {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  coverUrl: string | null;
+  adminOnly: boolean;
+  position: number;
+  archivedAt: string | null;
+  postCount: number;
+}
+
+export interface SpaceInput {
+  name: string;
+  emoji: string;
+  description: string;
+  coverUrl?: string;
+  adminOnly: boolean;
 }

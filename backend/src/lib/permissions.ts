@@ -39,8 +39,10 @@ export const PERMISSIONS = {
   'members.exempt': atLeast('MODERATOR'),
   /** Create and revoke staff invite links */
   'invites.manage': atLeast('ADMIN'),
-  /** Joining rules, community guide and quiz */
+  /** Joining rules, community guide and quiz, flagged words */
   'community.settings': atLeast('ADMIN'),
+  /** Create, edit, reorder and archive spaces */
+  'spaces.manage': atLeast('ADMIN'),
 } satisfies Record<string, UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

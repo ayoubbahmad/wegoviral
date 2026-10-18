@@ -22,7 +22,7 @@ import {
   ResolveReportsSchema,
   WarnMemberSchema,
   RestoreSchema,
-  SpaceSchema,
+  CreateSpaceSchema,
   UpdateSpaceSchema,
   ReorderSpacesSchema,
   ArchiveSpaceSchema,
@@ -177,7 +177,7 @@ export const listSpaces = handle('load spaces', async (_req, res) => {
 });
 
 export const createSpace = handle('create space', async (req, res) => {
-  res.status(201).json(await spacesService.createSpace(req.user, SpaceSchema.parse(req.body)));
+  res.status(201).json(await spacesService.createSpace(req.user, CreateSpaceSchema.parse(req.body)));
 });
 
 export const updateSpace = handle('update space', async (req, res) => {

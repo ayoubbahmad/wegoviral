@@ -5,7 +5,7 @@ import { useAuth, useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { CommunityPost, CommunityUser, NewPostDraft } from '@/types/communityFeed';
 import { ALL_SPACES_ID, useCommunityStore } from '../../slice';
-import { useCommunityController } from '../../controller';
+import { useEvents } from '../../Events/api';
 import {
   useBookmarkPost,
   useCreatePost,
@@ -24,7 +24,7 @@ export const useFeedController = () => {
   const { showToast } = useToast();
   const { activeSpaceId, setActiveSpaceId, isCreatePostOpen, setIsCreatePostOpen } =
     useCommunityStore();
-  const { upcomingEvents } = useCommunityController();
+  const { data: upcomingEvents = [] } = useEvents('upcoming', undefined, 3);
 
   const spaceFilter = activeSpaceId === ALL_SPACES_ID ? undefined : activeSpaceId;
   const spacesQuery = useSpaces();

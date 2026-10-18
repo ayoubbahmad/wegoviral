@@ -23,6 +23,7 @@ import projectsRoutes from './features/projects/routes';
 import feedRoutes from './features/feed/routes';
 import adminRoutes from './features/admin/routes';
 import onboardingRoutes from './features/onboarding/routes';
+import eventsRoutes from './features/events/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -71,6 +72,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/feed', feedRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

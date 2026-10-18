@@ -145,15 +145,17 @@ export const SpaceSchema = z.object({
   emoji: z.string().trim().min(1, 'Pick an emoji').max(8),
   description: z.string().trim().min(3, 'Describe the space in a few words').max(200),
   coverUrl: optionalUrl,
-  adminOnly: z.boolean().default(false),
+  adminOnly: z.boolean(),
 });
 
+// Defaults only on create: on a partial update they would overwrite fields the admin didn't touch
+export const CreateSpaceSchema = SpaceSchema.extend({ adminOnly: SpaceSchema.shape.adminOnly.default(false) });
 export const UpdateSpaceSchema = SpaceSchema.partial();
 export const ReorderSpacesSchema = z.object({ ids: z.array(z.string().min(1)).min(1).max(100) });
 export const ArchiveSpaceSchema = z.object({ archived: z.boolean() });
 
 export type ResolveReportsInput = z.infer<typeof ResolveReportsSchema>;
-export type SpaceInput = z.infer<typeof SpaceSchema>;
+export type SpaceInput = z.infer<typeof CreateSpaceSchema>;
 
 // ─── Access rules & tiers (Phase 4) ──────────────────────────────────────────
 

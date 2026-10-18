@@ -112,7 +112,7 @@ export const useComments = (postId: string, enabled: boolean) =>
 // ─── Uploads ─────────────────────────────────────────────────────────────────
 
 /** Uploads straight to Supabase Storage with a signed URL from our API. */
-async function uploadImage(file: File) {
+export async function uploadImage(file: File) {
   const { data } = await apiClient.post<{ path: string; token: string; publicUrl: string }>(
     '/feed/uploads',
     { contentType: file.type, size: file.size },

@@ -17,7 +17,9 @@ export type Permission =
   | 'invites.manage'
   | 'community.settings'
   | 'spaces.manage'
-  | 'tiers.manage';
+  | 'tiers.manage'
+  | 'events.create'
+  | 'events.manage';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

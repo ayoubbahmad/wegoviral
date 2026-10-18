@@ -45,6 +45,10 @@ export const PERMISSIONS = {
   'spaces.manage': atLeast('ADMIN'),
   /** Membership tiers, members' tiers, and what each tier unlocks */
   'tiers.manage': atLeast('SUPER_ADMIN'),
+  /** Create events and manage your own (instructors and up) */
+  'events.create': atLeast('INSTRUCTOR'),
+  /** Manage every event */
+  'events.manage': atLeast('MODERATOR'),
 } satisfies Record<string, UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

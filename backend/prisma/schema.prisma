@@ -64,6 +64,8 @@ model UserProfile {
   resolvedReports      ContentReport[]     @relation("ReportResolver")
   warnings             MemberWarning[]     @relation("WarnedMember")
   issuedWarnings       MemberWarning[]     @relation("WarningIssuer")
+  hostedEvents         CommunityEvent[]    @relation("EventHost")
+  eventRsvps           EventRsvp[]
 }
 
 model Hook {
@@ -670,4 +672,54 @@ model AccessRule {
 
   @@unique([resourceType, resourceId])
   @@map("access_rules")
+}
+
+// ─── Events (Phase 5) ────────────────────────────────────────────────────────
+
+enum EventStatus {
+  DRAFT // only the host and staff see it
+  PUBLISHED
+  CANCELLED
+}
+
+enum EventLocationType {
+  ONLINE
+  IN_PERSON
+}
+
+model CommunityEvent {
+  id           String            @id @default(uuid())
+  title        String
+  description  String            @default("")
+  coverUrl     String?
+  startsAt     DateTime
+  endsAt       DateTime
+  timezone     String // IANA zone the host chose, e.g. "Africa/Casablanca"
+  locationType EventLocationType @default(ONLINE)
+  location     String? // address or venue for in-person events
+  link         String? // live link: only shown to members who are going, the host and staff
+  category     String?
+  capacity     Int? // null = unlimited
+  status       EventStatus       @default(DRAFT)
+  recordingUrl String?
+  hostId       String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  deletedAt    DateTime?
+  host         UserProfile       @relation("EventHost", fields: [hostId], references: [id], onDelete: Cascade)
+  rsvps        EventRsvp[]
+
+  @@index([status, startsAt])
+  @@map("community_events")
+}
+
+model EventRsvp {
+  eventId   String
+  userId    String
+  createdAt DateTime       @default(now())
+  event     CommunityEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      UserProfile    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+  @@map("event_rsvps")
 }

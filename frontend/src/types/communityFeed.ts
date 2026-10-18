@@ -106,13 +106,48 @@ export interface CreatePostPayload {
     pollOptions?: string[];
 }
 
+export type EventStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
+
 export interface CommunityEvent {
     id: string;
     title: string;
+    coverUrl: string | null;
+    startsAt: string; // ISO
+    endsAt: string; // ISO
+    timezone: string; // the host's time zone
+    locationType: 'ONLINE' | 'IN_PERSON';
+    category: string | null;
+    capacity: number | null;
+    status: EventStatus;
+    host: CommunityUser;
+    goingCount: number;
+    isFull: boolean;
+    goingByMe: boolean;
+    canManage: boolean;
+    access: AccessResult;
+    // Not sent for events the member can't open
     description?: string;
-    date: string; // ISO date
-    attendeeCount: number;
-    createdBy: CommunityUser;
+    location?: string | null;
+    /** Only sent to members who are going, the host and staff */
+    link?: string | null;
+    hasLink?: boolean;
+    recordingUrl?: string | null;
+}
+
+export interface EventInput {
+    title: string;
+    description: string;
+    coverUrl?: string | null;
+    startsAt: string;
+    endsAt: string;
+    timezone: string;
+    locationType: 'ONLINE' | 'IN_PERSON';
+    location?: string | null;
+    link?: string | null;
+    category?: string | null;
+    capacity?: number | null;
+    status: EventStatus;
+    recordingUrl?: string | null;
 }
 
 export interface LeaderboardEntry {

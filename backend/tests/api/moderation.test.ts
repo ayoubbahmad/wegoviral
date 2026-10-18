@@ -237,6 +237,9 @@ describe('moderation', () => {
       await admin.call('PATCH', `/admin/spaces/${spaceId}`, { adminOnly: true, description: 'Team updates on deals' });
       assert.equal((await post(author, 'hi', spaceId)).status, 403);
       assert.equal((await post(moderator, 'Team post', spaceId)).status, 201);
+      // Renaming must not quietly reopen it to everyone
+      const renamed = await admin.call('PATCH', `/admin/spaces/${spaceId}`, { name: `${TEST_SPACE_PREFIX} Brand Deals HQ` });
+      assert.equal(renamed.data.adminOnly, true);
     });
 
     it('validates and saves a new order', async () => {

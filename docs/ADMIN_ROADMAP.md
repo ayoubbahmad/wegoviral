@@ -153,11 +153,13 @@ Shipped; **acceptance pending** (Ayoub). 10 automated access tests.
 
 ## Phase 5 — Events
 
-- ⬜ **Events CRUD**: title, description, cover, start/end, timezone, location or live link, category, capacity; draft/published; instructors manage their own.
-- ⬜ **RSVP** and attendee list (export CSV); "Add to calendar" (Google / .ics).
-- ⬜ **Access rules** per event (e.g. paid members only).
-- ⬜ **Recording link** added after the event (manual; can later be attached to a course by hand).
-- ⬜ **Member-facing**: real Upcoming events card, list and calendar views, category chips (replaces the mock data).
+Shipped; **acceptance pending** (Ayoub). 12 automated event tests.
+
+- ✅ **Events CRUD**: title, description, cover, start/end (entered in the host's time zone, shown in each member's), online or in person, live link, category, capacity, draft/published/cancelled. Moderators and above manage every event; instructors create and manage their own.
+- ✅ **RSVP** with capacity; the live link only shows to members who are going (and the host/staff). Attendee list for the host and staff, with CSV export. "Add to calendar": Google Calendar and .ics.
+- ✅ **Access rules** per event (Phase 4): locked events show the basics and why; RSVPs are refused. Hosts set role/time conditions; tiers stay with Super Admins.
+- ✅ **Recording link** added after the event ("Watch the recording"); turning it into a course stays manual.
+- ✅ **Member-facing**: category chips + **cards / calendar switch** (calendar: month navigation, today highlighted, past days and past/cancelled events greyed, drafts dashed); upcoming/past in cards view; shareable event links (`?event=…`); the feed's Upcoming events card uses real data. Mock events removed; demo data includes events.
 
 ## Phase 6 — Points, levels & badges
 

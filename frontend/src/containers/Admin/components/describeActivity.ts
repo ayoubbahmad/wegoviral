@@ -95,6 +95,16 @@ export function describeActivity(entry: ActivityEntry): string {
       return `moved ${target} from the ${details.from ?? 'default'} tier to ${details.to ?? 'the default tier'}`;
     case 'access.updated':
       return details.open ? `opened the ${entry.targetType} ${target} to every member` : `changed who can open the ${entry.targetType} ${target}`;
+    case 'event.created':
+      return `created the event “${target}”`;
+    case 'event.published':
+      return `published the event “${target}”`;
+    case 'event.updated':
+      return `edited the event “${target}”`;
+    case 'event.cancelled':
+      return `cancelled the event “${target}”`;
+    case 'event.deleted':
+      return `deleted the event “${target}”`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

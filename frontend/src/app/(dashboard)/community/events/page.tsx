@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { CommunityEventsContainer } from '@/containers/Community/Events';
 
 export const metadata = {
@@ -5,5 +6,10 @@ export const metadata = {
 };
 
 export default function CommunityEventsPage() {
-  return <CommunityEventsContainer />;
+  // The open event is read from the URL, which needs a Suspense boundary
+  return (
+    <Suspense>
+      <CommunityEventsContainer />
+    </Suspense>
+  );
 }

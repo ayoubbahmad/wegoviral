@@ -27,10 +27,10 @@ export const UpcomingEventsCard = ({ events }: UpcomingEventsCardProps) => {
       ) : (
         <ul className="space-y-4">
           {events.map((event) => {
-            const date = new Date(event.date);
+            const date = new Date(event.startsAt);
             return (
               <li key={event.id}>
-                <Link href="/community/events" className="group flex items-start gap-3">
+                <Link href={`/community/events?event=${event.id}`} className="group flex items-start gap-3">
                   <div className="flex w-12 shrink-0 flex-col items-center rounded-xl border border-border bg-secondary/30 py-1.5">
                     <span className="text-base font-black leading-none">{date.getDate()}</span>
                     <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -42,7 +42,7 @@ export const UpcomingEventsCard = ({ events }: UpcomingEventsCardProps) => {
                       {event.title}
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {formatTime(event.date)} · {event.attendeeCount} going
+                      {formatTime(event.startsAt)} · {event.goingCount} going
                     </p>
                   </div>
                 </Link>

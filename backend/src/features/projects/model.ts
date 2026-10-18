@@ -14,7 +14,8 @@ export const CreateProjectSchema = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
 });
 
-export const UpdateProjectSchema = CreateProjectSchema.partial();
+// Without the create default: a partial update must not reset the type to GENERAL
+export const UpdateProjectSchema = CreateProjectSchema.extend({ type: ProjectTypeSchema.optional() }).partial();
 
 export const CreateProjectItemSchema = z.object({
   type: z.string().min(1, 'Type is required'),

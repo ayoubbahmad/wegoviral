@@ -171,7 +171,43 @@ async function seedDemo() {
     postCount++;
   }
 
-  console.log(`Seeded ${members.length} demo members and ${postCount} posts`);
+  // Events: a few upcoming ones and a past one with a recording, with RSVPs
+  const at = (days: number, hourUtc: number) => {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() + days);
+    date.setUTCHours(hourUtc, 0, 0, 0);
+    return date;
+  };
+  const EVENTS = [
+    { title: 'Live hook workshop', category: 'Workshops', days: 3, hour: 18, host: 0, going: [1, 2, 3], description: 'Bring 3 hooks; we rewrite them live together.', link: 'https://meet.google.com/demo-hooks' },
+    { title: 'Brand deals Q&A with the founders', category: 'Q&A', days: 8, hour: 19, host: 2, going: [0, 1, 4, 5], capacity: 50, description: 'Pricing, contracts and how to pitch brands.', link: 'https://meet.google.com/demo-deals' },
+    { title: 'Casablanca creators meetup', category: 'Meetups', days: 15, hour: 17, host: 4, going: [2], location: 'Café Bohème, Casablanca', description: 'Coffee and collabs, in person.' },
+    { title: 'Editing speed-run: CapCut tricks', category: 'Workshops', days: 22, hour: 18, host: 1, going: [], description: 'Cut a Reel in 15 minutes.', link: 'https://meet.google.com/demo-edit' },
+    { title: 'Monthly content sprint kickoff', category: 'Challenges', days: -6, hour: 18, host: 3, going: [0, 2, 5], description: '30 days, one post a day.', link: 'https://meet.google.com/demo-sprint', recordingUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  ];
+  for (const event of EVENTS) {
+    const startsAt = at(event.days, event.hour);
+    await prisma.communityEvent.create({
+      data: {
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + 90 * 60 * 1000),
+        timezone: 'Africa/Casablanca',
+        locationType: event.location ? 'IN_PERSON' : 'ONLINE',
+        location: event.location ?? null,
+        link: event.link ?? null,
+        capacity: event.capacity ?? null,
+        status: 'PUBLISHED',
+        recordingUrl: event.recordingUrl ?? null,
+        hostId: members[event.host].id,
+        rsvps: { create: event.going.map((index) => ({ userId: members[index].id })) },
+      },
+    });
+  }
+
+  console.log(`Seeded ${members.length} demo members, ${postCount} posts and ${EVENTS.length} events`);
 }
 
 const command = process.argv[2];

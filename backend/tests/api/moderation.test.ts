@@ -243,10 +243,15 @@ describe('moderation', () => {
       const active = (await admin.call('GET', '/admin/spaces')).data.filter((s: { archivedAt: string | null }) => !s.archivedAt);
       const ids = active.map((s: { id: string }) => s.id);
       assert.equal((await admin.call('PUT', '/admin/spaces/order', { ids: ids.slice(1) })).status, 400);
-      const reversed = await admin.call('PUT', '/admin/spaces/order', { ids: [...ids].reverse() });
-      assert.equal(reversed.status, 200);
-      const first = (await author.call('GET', '/feed/spaces')).data[0];
-      assert.equal(first.id, ids[ids.length - 1]);
+      try {
+        const reversed = await admin.call('PUT', '/admin/spaces/order', { ids: [...ids].reverse() });
+        assert.equal(reversed.status, 200);
+        const first = (await author.call('GET', '/feed/spaces')).data[0];
+        assert.equal(first.id, ids[ids.length - 1]);
+      } finally {
+        // Put the real order back right away: members see it
+        await admin.call('PUT', '/admin/spaces/order', { ids });
+      }
     });
 
     it('archiving hides the space and closes it to new posts', async () => {

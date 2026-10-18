@@ -71,7 +71,7 @@ Local equivalents live in `backend/.env` and `frontend/.env.local` (both gitigno
 cd backend
 yarn dev                      # backend on http://localhost:3001
 yarn test:api                 # API test suite against it
-API_URL=https://backend-production-ab0be.up.railway.app/api yarn test:api   # against production
+API_URL=https://backend-production-ab0be.up.railway.app/api yarn test:api   # against production (slow: ~10-15 min from far away)
 ```
 
 The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest.wegoviral.test`) and deletes everything it created afterwards, including logins left by an interrupted run. The onboarding tests temporarily change the guide, quiz and joining settings and restore them at the end; if a run is killed midway, the next run detects the leftover `[test]` content and restores a clean state. It needs `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` and `DATABASE_URL` in `backend/.env`.

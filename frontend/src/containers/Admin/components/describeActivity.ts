@@ -125,6 +125,18 @@ export function describeActivity(entry: ActivityEntry): string {
       return `gave ${target} the ${details.badge} badge${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
     case 'badge.removed':
       return `removed the ${details.badge} badge from ${target}`;
+    case 'course.created':
+      return `created the course “${target}”`;
+    case 'course.published':
+      return `published the course “${target}”`;
+    case 'course.unpublished':
+      return `moved the course “${target}” back to draft`;
+    case 'course.archived':
+      return `archived the course “${target}”`;
+    case 'course.updated':
+      return `edited the course “${target}”`;
+    case 'course.deleted':
+      return `deleted the course “${target}”`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

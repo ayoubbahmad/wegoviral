@@ -1,6 +1,7 @@
 /**
  * One-time credit for activity from before points existed (Phase 6):
- * published posts, comments, likes received, event RSVPs, post reviews and guide acceptance.
+ * published posts, comments, likes received, event RSVPs, post reviews, guide acceptance,
+ * completed lessons and finished courses.
  * Rows keep the original date, so the 7/30-day leaderboards stay honest, and daily caps
  * apply per original day. Safe to run again: actions already in the ledger are skipped.
  *
@@ -19,13 +20,15 @@ interface Row {
 
 async function main() {
   const rules = new Map((await prisma.pointRule.findMany()).map((rule) => [rule.action, rule]));
-  const [posts, comments, likes, rsvps, reviews, guide] = await Promise.all([
+  const [posts, comments, likes, rsvps, reviews, guide, lessonsDone, coursesDone] = await Promise.all([
     prisma.communityPost.findMany({ where: { deletedAt: null, reviewStatus: 'PUBLISHED' }, select: { id: true, authorId: true, createdAt: true } }),
     prisma.communityComment.findMany({ where: { deletedAt: null, heldReason: null }, select: { id: true, authorId: true, createdAt: true } }),
     prisma.communityPostLike.findMany({ where: { post: { deletedAt: null } }, select: { postId: true, userId: true, createdAt: true, post: { select: { authorId: true } } } }),
     prisma.eventRsvp.findMany({ select: { eventId: true, userId: true, createdAt: true } }),
     prisma.communityPost.findMany({ where: { reviewedById: { not: null }, reviewedAt: { not: null } }, select: { id: true, reviewedById: true, reviewedAt: true } }),
     prisma.userProfile.findMany({ where: { rulesAcceptedAt: { not: null } }, select: { id: true, rulesAcceptedAt: true } }),
+    prisma.lessonProgress.findMany({ select: { lessonId: true, userId: true, completedAt: true } }),
+    prisma.courseEnrollment.findMany({ where: { completedAt: { not: null } }, select: { courseId: true, userId: true, completedAt: true } }),
   ]);
 
   const rows: Row[] = [
@@ -37,6 +40,8 @@ async function main() {
     ...rsvps.map((r) => ({ userId: r.userId, action: 'EVENT_JOINED', sourceType: 'event', sourceId: r.eventId, createdAt: r.createdAt })),
     ...reviews.map((r) => ({ userId: r.reviewedById!, action: 'POST_REVIEWED', sourceType: 'post', sourceId: r.id, createdAt: r.reviewedAt! })),
     ...guide.map((g) => ({ userId: g.id, action: 'GUIDE_ACCEPTED', sourceType: 'guide', sourceId: 'guide', createdAt: g.rulesAcceptedAt! })),
+    ...lessonsDone.map((l) => ({ userId: l.userId, action: 'LESSON_COMPLETED', sourceType: 'lesson', sourceId: l.lessonId, createdAt: l.completedAt })),
+    ...coursesDone.map((c) => ({ userId: c.userId, action: 'COURSE_COMPLETED', sourceType: 'course', sourceId: c.courseId, createdAt: c.completedAt! })),
   ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   // Skip what's already recorded, and count it towards that day's cap

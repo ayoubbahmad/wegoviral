@@ -172,17 +172,21 @@ Shipped; **acceptance pending** (Ayoub). 16 automated gamification tests.
 - ✅ **Real leaderboard**: 7 days / 30 days / all time (periods count points earned in that time), top 3 podium, your level card with progress, the level ladder, and a "How do points work?" explainer. Mock data removed.
 - ✅ **Badges CRUD**: name, emoji, colour, description; archive/restore. Up to 3 recent badges show next to names in posts, comments and the leaderboard.
 - ✅ **Manual awarding** from the member panel (with an optional team-only note), plus manual point adjustments with a reason; both go to the activity log.
-- ✅ **Automatic badges**: milestones on posts, comments, likes received, events joined or total points (seeded: First post, Regular, Conversationalist, Crowd favorite, Event-goer, Rising star; manual: Ambassador, Member of the month). New automatic badges go to everyone who already qualifies. *Streaks and "course graduate" come with Phases 7–8.*
+- ✅ **Automatic badges**: milestones on posts, comments, likes received, events joined or total points (seeded: First post, Regular, Conversationalist, Crowd favorite, Event-goer, Rising star; manual: Ambassador, Member of the month). New automatic badges go to everyone who already qualifies. *"Course graduate" arrived with Phase 7; streaks come with Phase 8.*
 - ✅ **Backfill**: `yarn points:backfill` credited activity from before points existed (keeping the original dates; safe to re-run).
 
 ## Phase 7 — Courses
 
-- ⬜ **Course builder**: course → modules → lessons (video, text, attachments); drag to reorder; draft/published.
-- ⬜ **Instructor ownership**: instructors create and edit only their own courses; admins can edit all.
-- ⬜ **Access rules** (tier, level, time in community) per course, with optional per-module drip release.
-- ⬜ **Member experience**: course catalogue, lesson player, progress tracking, "continue where you left off".
-- ⬜ **Completion**: points and an optional automatic badge.
-- ⬜ **Course stats**: enrolments, completion rate, drop-off per lesson (instructors see their own).
+Shipped; **acceptance pending** (Ayoub). 17 automated course tests.
+
+- ✅ **Course builder** (Courses → New course, or "Edit course"): course → modules → lessons. A lesson is a video (YouTube, Vimeo, Loom or a video file link) or text, with notes, a length and resources (uploaded files up to 50 MB, or links). Drag modules and lessons to reorder them, also between modules (arrow buttons for keyboard users). Draft / published / archived; a course needs at least one lesson to be published.
+- ✅ **Instructor ownership**: instructors and admins create courses; instructors edit only their own, admins edit every course and can hand one to another instructor. Moderators don't build courses (per the roles table). Other instructors don't see drafts.
+- ✅ **Access rules** per course (role, tier, level, days in the community, Phase 4): locked courses show their outline and why, never lesson content. **Drip**: each module can open N days after a member starts the course.
+- ✅ **Private files**: resources live in a private storage bucket (`course-files`) and are downloaded through one-hour signed links, only after the access check. Removing a resource or lesson deletes its file.
+- ✅ **Member experience**: catalogue with filters (all / in progress / completed / I teach), "Continue where you left off", course page with outline (ticks, locks, drip dates), lesson player with previous/next and "Mark complete & continue". Members are enrolled when they open their first lesson; owners and admins previewing aren't counted.
+- ✅ **Completion**: +2 points per lesson (20/day), +20 for finishing a course (once), the automatic **🎓 Course graduate** badge, and an optional extra badge per course. Unticking a lesson takes its points back; finishing stays recorded. Owners can't take their own course.
+- ✅ **Course stats** (instructor and admins): started, finished, completion rate, active this week, drop-off per lesson, and the member list with progress. *Open question 5 answered by default:* instructors see names and progress only; emails are shown to staff who can see members (moderators and up). Easy to change.
+- ✅ **Demo data**: two published courses with members part-way through (`yarn demo:courses` adds them without reseeding).
 
 ## Phase 8 — Challenges
 
@@ -244,5 +248,5 @@ In-app documentation of how WeGoViral works, written for each audience (requeste
 2. ~~Community guide format~~ — rules and policy, plus an optional quiz (off by default).
 3. ~~Order of gates~~ — sign-up form → approval (guide readable while waiting, acceptance logged) → probation.
 4. **Moderator suspensions**: maximum length? *Set to 7 days for now (`MODERATOR_MAX_RESTRICTION_DAYS`).*
-5. **Instructors**: can they see the members enrolled in their courses (names/emails), or only numbers?
+5. **Instructors**: can they see the members enrolled in their courses (names/emails), or only numbers? *For now: names and progress, no emails (Phase 7).*
 6. **Stripe**: account details, currency, test-mode keys, and whether existing subscribers need migrating.

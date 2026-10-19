@@ -15,6 +15,8 @@ export const POINT_ACTIONS = {
   EVENT_JOINED: 'Joining an event',
   POST_REVIEWED: "Reviewing a new member's post",
   GUIDE_ACCEPTED: 'Accepting the community guide',
+  LESSON_COMPLETED: 'Completing a lesson',
+  COURSE_COMPLETED: 'Finishing a course',
   POST_REMOVED_BY_TEAM: 'Having a post removed by the team',
   VOUCHED_POST_REMOVED: 'A post you approved in review being removed',
   WARNING_RECEIVED: 'Receiving a warning',
@@ -135,6 +137,7 @@ export const AUTO_BADGE_TYPES = {
   COMMENTS: { label: 'Comments written', action: 'COMMENT_ADDED' },
   LIKES_RECEIVED: { label: 'Likes received', action: 'LIKE_RECEIVED' },
   EVENTS_JOINED: { label: 'Events joined', action: 'EVENT_JOINED' },
+  COURSES_COMPLETED: { label: 'Courses completed', action: 'COURSE_COMPLETED' },
   POINTS: { label: 'Total points', action: null },
 } as const;
 

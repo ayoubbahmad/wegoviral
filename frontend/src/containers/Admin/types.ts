@@ -291,7 +291,7 @@ export interface MemberBadgeRow {
   awardedBy: { username: string } | null;
 }
 
-export type AutoBadgeType = 'POSTS' | 'COMMENTS' | 'LIKES_RECEIVED' | 'EVENTS_JOINED' | 'POINTS';
+export type AutoBadgeType = 'POSTS' | 'COMMENTS' | 'LIKES_RECEIVED' | 'EVENTS_JOINED' | 'COURSES_COMPLETED' | 'POINTS';
 
 export interface AdminBadge extends BadgeChip {
   description: string;

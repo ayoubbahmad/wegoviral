@@ -13,6 +13,8 @@ export const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, {
 });
 
 export const COMMUNITY_BUCKET = 'community';
+/** Private: course attachments are only downloaded through short-lived signed URLs. */
+export const COURSE_FILES_BUCKET = 'course-files';
 
 /** Prefix every uploaded community image URL starts with. */
 export const communityPublicUrlPrefix = `${SUPABASE_URL}/storage/v1/object/public/${COMMUNITY_BUCKET}/`;

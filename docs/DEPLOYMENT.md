@@ -8,6 +8,13 @@
 | Backend (`backend/`, Express + Prisma) | Railway project `wegoviral`, service `backend`, Root Directory `/backend` | Every push to `main` |
 | Database, Auth, Storage | Supabase | Migrations run automatically before each backend deploy |
 
+**Storage buckets** (Supabase → Storage; create them in a new project):
+
+| Bucket | Access | Limits | Used for |
+|---|---|---|---|
+| `community` | public | 5 MB, PNG/JPEG/WebP/GIF | Post images, covers |
+| `course-files` | **private** | 50 MB | Lesson resources, served through one-hour signed links |
+
 > Until the community launches, local development, previews and tests all use the **production** database. See "Before launch" in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md).
 
 ### Railway service settings
@@ -84,6 +91,7 @@ The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest
 cd backend
 yarn demo:seed    # replaces demo data with a fresh set (members, posts, polls, likes, comments)
 yarn demo:clear   # removes all demo data
+yarn demo:courses     # adds the demo courses to existing demo members (no reseed)
 yarn points:backfill  # gives points (and automatic badges) for existing activity; run after seeding
 ```
 

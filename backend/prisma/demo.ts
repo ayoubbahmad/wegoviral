@@ -1,8 +1,9 @@
 /**
- * Demo data for trying the app: members, posts, polls, likes and comments.
+ * Demo data for trying the app: members, posts, polls, likes, comments, events and courses.
  *
  *   yarn demo:seed   replaces any existing demo data with a fresh set
  *   yarn demo:clear  removes all demo data
+ *   yarn demo:courses adds the demo courses to existing demo members (no reseed)
  *
  * Demo members use the DEMO_EMAIL_DOMAIN; clearing deletes only those profiles
  * (their posts, comments, likes and votes cascade), so real data is untouched.
@@ -207,7 +208,102 @@ async function seedDemo() {
     });
   }
 
-  console.log(`Seeded ${members.length} demo members, ${postCount} posts and ${EVENTS.length} events`);
+  const courses = await seedDemoCourses(members);
+  console.log(`Seeded ${members.length} demo members, ${postCount} posts, ${EVENTS.length} events and ${courses} courses`);
+}
+
+const VIDEO = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+const COURSES = [
+  {
+    title: 'Hooks that stop the scroll',
+    description: 'The first three seconds decide everything. Learn the hook formulas our top creators use, then practise them on your own content.',
+    cover: 'hooks-course',
+    owner: 0,
+    modules: [
+      { title: 'Why hooks matter', dripDays: null, lessons: ['The 3-second rule', 'Anatomy of a great hook'] },
+      { title: 'Hook formulas', dripDays: null, lessons: ['The curiosity gap', 'The bold claim', 'The pattern interrupt'] },
+      { title: 'Practice', dripDays: 3, lessons: ['Rewrite 5 of your hooks', 'Test and measure'] },
+    ],
+    // [member index, lessons completed]
+    learners: [[1, 7], [2, 4], [3, 1], [5, 2]] as [number, number][],
+  },
+  {
+    title: 'Landing your first brand deal',
+    description: 'From media kit to signed contract: how to price yourself, pitch brands and deliver work they rebook.',
+    cover: 'brand-deals-course',
+    owner: 2,
+    modules: [
+      { title: 'Getting ready', dripDays: null, lessons: ['Your media kit', 'What to charge'] },
+      { title: 'Pitching', dripDays: 7, lessons: ['Finding the right brands', 'The pitch email that works'] },
+    ],
+    learners: [[0, 2], [4, 1]] as [number, number][],
+  },
+];
+
+/** Two published courses with a few members part-way through. */
+async function seedDemoCourses(members: UserProfile[]) {
+  const DAY = 24 * 60 * 60 * 1000;
+  for (const course of COURSES) {
+    const owner = members[course.owner];
+    await prisma.userProfile.update({ where: { id: owner.id }, data: { role: 'INSTRUCTOR' } });
+    const created = await prisma.course.create({
+      data: {
+        title: course.title,
+        description: course.description,
+        coverUrl: `https://picsum.photos/seed/${course.cover}/1200/675`,
+        status: 'PUBLISHED',
+        ownerId: owner.id,
+        modules: {
+          create: course.modules.map((module, position) => ({
+            title: module.title,
+            position,
+            dripDays: module.dripDays,
+            lessons: {
+              create: module.lessons.map((title, index) => ({
+                title,
+                position: index,
+                type: index % 3 === 2 ? 'TEXT' : 'VIDEO',
+                videoUrl: index % 3 === 2 ? null : VIDEO,
+                content: `Notes for “${title}”.\n\nWatch, then try it on your next post.`,
+                durationMinutes: 4 + index * 3,
+              })),
+            },
+          })),
+        },
+      },
+      include: { modules: { orderBy: { position: 'asc' }, include: { lessons: { orderBy: { position: 'asc' } } } } },
+    });
+    const lessons = created.modules.flatMap((module) => module.lessons);
+    for (const [index, done] of course.learners) {
+      const learner = members[index];
+      const finished = done >= lessons.length;
+      await prisma.courseEnrollment.create({
+        data: {
+          courseId: created.id,
+          userId: learner.id,
+          startedAt: new Date(Date.now() - 10 * DAY),
+          lastActivityAt: new Date(Date.now() - index * DAY),
+          lastLessonId: lessons[Math.min(done, lessons.length - 1)].id,
+          completedAt: finished ? new Date(Date.now() - DAY) : null,
+        },
+      });
+      await prisma.lessonProgress.createMany({
+        data: lessons.slice(0, done).map((lesson) => ({ lessonId: lesson.id, userId: learner.id, courseId: created.id })),
+      });
+    }
+  }
+  return COURSES.length;
+}
+
+/** Adds the demo courses without touching the rest of the demo data. */
+async function addDemoCourses() {
+  const members = await prisma.userProfile.findMany({ where: { email: { endsWith: `@${DEMO_EMAIL_DOMAIN}` } } });
+  const byUsername = new Map(members.map((member) => [member.username, member]));
+  const ordered = MEMBERS.map((member) => byUsername.get(member.username));
+  if (ordered.some((member) => !member)) throw new Error('Demo members are missing: run yarn demo:seed first');
+  await prisma.course.deleteMany({ where: { ownerId: { in: members.map((member) => member.id) } } });
+  return seedDemoCourses(ordered as UserProfile[]);
 }
 
 const command = process.argv[2];
@@ -216,7 +312,9 @@ const command = process.argv[2];
   ? clearDemo().then((count) => console.log(`Removed ${count} demo members and their content`))
   : command === 'seed'
     ? seedDemo()
-    : Promise.reject(new Error('Usage: demo.ts seed|clear')))
+    : command === 'courses'
+      ? addDemoCourses().then((count) => console.log(`Added ${count} demo courses`))
+    : Promise.reject(new Error('Usage: demo.ts seed|clear|courses')))
   .catch((error) => {
     console.error('❌', error.message);
     process.exitCode = 1;

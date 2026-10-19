@@ -49,6 +49,10 @@ export const PERMISSIONS = {
   'events.create': atLeast('INSTRUCTOR'),
   /** Manage every event */
   'events.manage': atLeast('MODERATOR'),
+  /** Create courses and manage your own (instructors, admins; not moderators) */
+  'courses.create': ['INSTRUCTOR', 'ADMIN', 'SUPER_ADMIN'],
+  /** Manage every course */
+  'courses.manage': atLeast('ADMIN'),
   /** Point rules, levels, badges; award badges and adjust points */
   'gamification.manage': atLeast('ADMIN'),
 } satisfies Record<string, UserRole[]>;

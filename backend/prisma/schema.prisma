@@ -67,6 +67,9 @@ model UserProfile {
   warnings             MemberWarning[]     @relation("WarnedMember")
   issuedWarnings       MemberWarning[]     @relation("WarningIssuer")
   hostedEvents         CommunityEvent[]    @relation("EventHost")
+  ownedCourses         Course[]            @relation("CourseOwner")
+  courseEnrollments    CourseEnrollment[]
+  lessonProgress       LessonProgress[]
   eventRsvps           EventRsvp[]
   pointEvents          PointEvent[]
   badges               MemberBadge[]       @relation("BadgeHolder")
@@ -780,11 +783,12 @@ model Badge {
   emoji       String
   color       String        @default("#f59e0b")
   description String        @default("")
-  // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "POINTS", "threshold": n }
+  // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "COURSES_COMPLETED" | "POINTS", "threshold": n }
   autoRule    Json?
   archivedAt  DateTime?
   createdAt   DateTime      @default(now())
   holders     MemberBadge[]
+  courses     Course[] // courses that give this badge on completion
 
   @@map("badges")
 }
@@ -801,4 +805,114 @@ model MemberBadge {
 
   @@id([badgeId, userId])
   @@map("member_badges")
+}
+
+// ─── Courses (Phase 7) ────────────────────────────────────────────────────────
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED // hidden from the catalogue; members who started keep access
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+}
+
+model Course {
+  id                String             @id @default(uuid())
+  title             String
+  description       String             @default("")
+  coverUrl          String?
+  status            CourseStatus       @default(DRAFT)
+  ownerId           String
+  completionBadgeId String? // optional badge given when a member finishes the course
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  owner             UserProfile        @relation("CourseOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  completionBadge   Badge?             @relation(fields: [completionBadgeId], references: [id], onDelete: SetNull)
+  modules           CourseModule[]
+  enrollments       CourseEnrollment[]
+
+  @@index([status, createdAt])
+  @@map("courses")
+}
+
+model CourseModule {
+  id       String   @id @default(uuid())
+  courseId String
+  title    String
+  position Int      @default(0)
+  dripDays Int? // opens this many days after the member starts the course; null = right away
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  @@index([courseId, position])
+  @@map("course_modules")
+}
+
+model Lesson {
+  id              String             @id @default(uuid())
+  moduleId        String
+  title           String
+  type            LessonType         @default(VIDEO)
+  videoUrl        String?
+  content         String             @default("")
+  durationMinutes Int?
+  position        Int                @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  module          CourseModule       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  attachments     LessonAttachment[]
+  progress        LessonProgress[]
+
+  @@index([moduleId, position])
+  @@map("course_lessons")
+}
+
+/**
+ * A link, or a file in the private course-files bucket (downloaded through short-lived signed URLs).
+ */
+model LessonAttachment {
+  id          String  @id @default(uuid())
+  lessonId    String
+  name        String
+  url         String?
+  storagePath String?
+  size        Int?
+  position    Int     @default(0)
+  lesson      Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId, position])
+  @@map("lesson_attachments")
+}
+
+model CourseEnrollment {
+  courseId       String
+  userId         String
+  startedAt      DateTime    @default(now())
+  lastLessonId   String?
+  lastActivityAt DateTime    @default(now())
+  completedAt    DateTime?
+  course         Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user           UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, userId])
+  @@index([userId, lastActivityAt])
+  @@map("course_enrollments")
+}
+
+model LessonProgress {
+  lessonId    String
+  userId      String
+  courseId    String // kept for per-course counts
+  completedAt DateTime    @default(now())
+  lesson      Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, userId])
+  @@index([courseId, userId])
+  @@map("lesson_progress")
 }

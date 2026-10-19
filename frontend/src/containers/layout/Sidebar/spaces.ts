@@ -109,6 +109,7 @@ export const SPACES: Record<SpaceId, Space> = {
         requires: "admin.access",
         navItems: [
             { name: "Overview", href: "/admin/overview", icon: Gauge },
+            { name: "Stats", href: "/admin/stats", icon: BarChart2, requires: "stats.view" },
             { name: "Approvals", href: "/admin/approvals", icon: UserCheck, requires: "members.approve" },
             { name: "Members", href: "/admin/members", icon: Users },
             { name: "Moderation", href: "/admin/moderation", icon: Flag, requires: "community.moderate" },

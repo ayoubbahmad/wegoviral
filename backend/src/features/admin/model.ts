@@ -222,3 +222,20 @@ export const AdjustPointsSchema = z.object({
 export type PointRulesInput = z.infer<typeof PointRulesSchema>;
 export type LevelsInput = z.infer<typeof LevelsSchema>;
 export type BadgeInput = z.infer<typeof BadgeSchema>;
+
+// ─── Stats (Phase 10) ────────────────────────────────────────────────────────
+
+const isValidTimezone = (zone: string) => {
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: zone });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const StatsQuerySchema = z.object({
+  range: z.enum(['30d', '90d', '12m']).default('30d'),
+  timezone: z.string().refine(isValidTimezone, 'Unknown time zone').default('UTC'),
+});
+export type StatsQuery = z.infer<typeof StatsQuerySchema>;

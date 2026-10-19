@@ -322,3 +322,40 @@ export interface BadgeInput {
   description: string;
   autoRule: { type: AutoBadgeType; threshold: number } | null;
 }
+
+// ─── Stats (Phase 10) ────────────────────────────────────────────────────────
+
+export type StatsRange = '30d' | '90d' | '12m';
+export type StatsBucket = 'day' | 'week' | 'month';
+
+export interface SeriesPoint {
+  bucket: string;
+  value: number;
+}
+
+export interface MemberStats {
+  range: StatsRange;
+  bucket: StatsBucket;
+  signups: SeriesPoint[];
+  active: SeriesPoint[];
+  current: { day: number; week: number; month: number };
+  retention: { cohort: string; size: number; months: { offset: number; users: number; share: number }[] }[];
+  funnel: { step: string; count: number }[];
+}
+
+export interface EngagementStats {
+  range: StatsRange;
+  bucket: StatsBucket;
+  series: { bucket: string; posts: number; comments: number; likes: number }[];
+  totals: { posts: number; comments: number; likes: number };
+  bySpace: { spaceId: string; name: string; emoji: string; posts: number; comments: number; likes: number }[];
+  topContributors: { member: { id: string; username: string; name: string | null; avatarUrl: string | null }; posts: number; comments: number; likesReceived: number }[];
+  bestTimes: { day: string; hours: { hour: number; posts: number; avgEngagement: number }[] }[];
+}
+
+export interface ContentStats {
+  range: StatsRange;
+  courses: { id: string; title: string; status: string; lessons: number; enrolled: number; startedInRange: number; completed: number; completionRate: number }[];
+  events: { id: string; title: string; startsAt: string; status: string; category: string | null; going: number; capacity: number | null; fillRate: number | null }[];
+  challenges: { id: string; title: string; startsAt: string; endsAt: string; status: string; checkInType: string; participants: number; finished: number; checkIns: number; finishRate: number }[];
+}

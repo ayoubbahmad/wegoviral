@@ -8,6 +8,9 @@ const router = Router();
 router.use(protect, requirePermission('admin.access'));
 
 router.get('/overview', requirePermission('stats.view'), adminController.getOverview);
+router.get('/stats/members', requirePermission('stats.view'), adminController.getMemberStats);
+router.get('/stats/engagement', requirePermission('stats.view'), adminController.getEngagementStats);
+router.get('/stats/content', requirePermission('stats.view'), adminController.getContentStats);
 
 router.get('/members', requirePermission('members.view'), adminController.listMembers);
 router.get('/members/:id', requirePermission('members.view'), adminController.getMember);

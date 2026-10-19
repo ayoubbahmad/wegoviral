@@ -6,6 +6,7 @@ import * as moderationService from './moderation.service';
 import * as spacesService from './spaces.service';
 import * as accessService from './access.service';
 import * as gamificationService from './gamification.service';
+import * as statsService from './stats.service';
 import {
   AdminError,
   ChangeRoleSchema,
@@ -38,6 +39,7 @@ import {
   ArchiveBadgeSchema,
   AwardBadgeSchema,
   AdjustPointsSchema,
+  StatsQuerySchema,
 } from './model';
 
 /** Maps validation and permission errors to proper status codes. */
@@ -275,4 +277,18 @@ export const removeBadge = handle('remove badge', async (req, res) => {
 export const adjustPoints = handle('adjust points', async (req, res) => {
   const { points, reason } = AdjustPointsSchema.parse(req.body);
   res.json(await gamificationService.adjustMemberPoints(req.user, req.params.id, points, reason));
+});
+
+// ─── Stats ───────────────────────────────────────────────────────────────────
+
+export const getMemberStats = handle('load member stats', async (req, res) => {
+  res.json(await statsService.memberStats(StatsQuerySchema.parse(req.query)));
+});
+
+export const getEngagementStats = handle('load engagement stats', async (req, res) => {
+  res.json(await statsService.engagementStats(StatsQuerySchema.parse(req.query)));
+});
+
+export const getContentStats = handle('load content stats', async (req, res) => {
+  res.json(await statsService.contentStats(StatsQuerySchema.parse(req.query)));
 });

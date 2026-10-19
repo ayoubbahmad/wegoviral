@@ -200,7 +200,32 @@ Shipped; **acceptance pending** (Ayoub). 17 automated challenge tests.
 - ✅ **Points and badges**: +3 per check-in (9/day), +30 for finishing, +100 for winning; automatic 🔥 **Challenge finisher** and 🏆 **Challenge winner** badges, plus optional extras per challenge. Removing a check-in takes its points (and the finish, if it falls below the target) back.
 - ✅ **Demo data**: an active 30-day Reels sprint with members on different streaks, and a finished one-time challenge with winners (`yarn demo:challenges`).
 
-## Phase 9 — Monetization (Stripe) · Super Admin only
+## Phase 10 — Stats dashboard
+
+Shipped; **acceptance pending** (Ayoub). 6 automated stats tests.
+
+Admin → Stats (moderators and up), for the last 30 days (by day), 90 days (by week) or 12 months (by month), in the viewer's time zone. Every table and chart exports to CSV.
+
+- ✅ **Members**: active today / this week / this month, sign-ups and active members over time, the joining funnel (signed up → sign-up form → approved → guide accepted → first post → probation finished) and retention by sign-up month (share active 0–5 months later). *Active* = posted, commented, liked, voted, RSVPed, completed a lesson or checked in.
+- ✅ **Engagement**: posts, comments and likes over time; per space; top 10 contributors; best posting times (weekday × hour heatmap of average likes and comments per post).
+- ✅ **Content**: courses (started, finished, completion rate), events (going, capacity, fill rate) and challenges (taking part, check-ins, finish rate).
+- ⬜ **Revenue** (Super Admin): the tab is there and fills in with Phase 9.
+- ✅ **Export** any table as CSV.
+
+## Phase 11 — Help center & documentation
+
+In-app documentation of how WeGoViral works, written for each audience (requested 2026-10-18).
+
+- ⬜ **Help in every space**: a "Help" entry in the sidebar of each space (Community, Creator Space, Admin) opens the docs for *that* space only.
+- ⬜ **Role-aware articles**: each article has a space and an audience (everyone, instructors, moderators, admins, Super Admins); members only see what applies to their role, staff also see the staff guides (e.g. how to handle reports).
+- ⬜ **First set of articles** written from the shipped features: joining and the guide, posting and review, reporting, spaces, events, courses, points and badges, Creator Space tools; staff guides for every admin page.
+- ⬜ **Search** across the articles you can see, and links from relevant screens ("How does review work?").
+- ⬜ **Editable by admins** (create, edit, reorder, publish), so the docs stay current without a code change.
+  - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides; in the Creator Space, only Creator Space articles show.
+
+## Phase 9 — Monetization (Stripe) · Super Admin only · moved to the end
+
+*Postponed on 2026-10-19 until the Stripe details are ready (open question 6); the other phases go first.*
 
 - ⬜ **Connect Stripe**: keys on Railway, webhook endpoint, test mode first.
 - ⬜ **Plans / tiers**: create plans (monthly/yearly prices) synced with Stripe products and prices.
@@ -211,26 +236,7 @@ Shipped; **acceptance pending** (Ayoub). 17 automated challenge tests.
 - ⬜ **Coupons**: percentage/amount off, duration, expiry, usage limit, limited to certain plans (Stripe promotion codes).
 - ⬜ **Revenue stats**: monthly recurring revenue, active subscribers, churn, coupon usage, free→paid conversion.
 
-## Phase 10 — Stats dashboard
-
-- ⬜ **Members**: sign-ups over time, daily/weekly/monthly active members, retention by sign-up month, approval/onboarding funnel.
-- ⬜ **Engagement**: posts, comments and reactions per day and per space; top contributors; best posting times.
-- ⬜ **Content**: course and event performance, challenge participation.
-- ⬜ **Revenue** (Super Admin): links to Phase 9 stats.
-- ⬜ **Export** any table as CSV.
-
 ---
-
-## Phase 11 — Help center & documentation (last)
-
-In-app documentation of how WeGoViral works, written for each audience (requested 2026-10-18).
-
-- ⬜ **Help in every space**: a "Help" entry in the sidebar of each space (Community, Creator Space, Admin) opens the docs for *that* space only.
-- ⬜ **Role-aware articles**: each article has a space and an audience (everyone, instructors, moderators, admins, Super Admins); members only see what applies to their role, staff also see the staff guides (e.g. how to handle reports).
-- ⬜ **First set of articles** written from the shipped features: joining and the guide, posting and review, reporting, spaces, events, courses, points and badges, Creator Space tools; staff guides for every admin page.
-- ⬜ **Search** across the articles you can see, and links from relevant screens ("How does review work?").
-- ⬜ **Editable by admins** (create, edit, reorder, publish), so the docs stay current without a code change.
-  - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides; in the Creator Space, only Creator Space articles show.
 
 ## Backlog (member-facing, from the earlier feature list)
 

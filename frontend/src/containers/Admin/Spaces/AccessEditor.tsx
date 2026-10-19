@@ -7,6 +7,7 @@ import { Select } from '@/components/Select';
 import { useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { ROLE_LABELS, UserRole } from '@/lib/roles';
+import { useHowPointsWork } from '@/containers/Community/Leaderboard/api';
 import { useSaveSpaceAccess, useTiers } from '../api/moderation';
 import { AccessRule, AdminSpace, Tier } from '../types';
 
@@ -17,9 +18,16 @@ export function summarizeAccess(rule: AccessRule | null, tiers: Tier[] = []) {
     rule.minRole && `${ROLE_LABELS[rule.minRole]}s+`,
     rule.tierIds.length && rule.tierIds.map((id) => tiers.find((tier) => tier.id === id)?.name ?? id).join(' / '),
     rule.minDays && `${rule.minDays}+ days`,
+    rule.minLevel && `Level ${rule.minLevel}+`,
   ].filter(Boolean);
   return parts.length ? parts.join(' · ') : null;
 }
+
+/** "Any level" plus every level above the first. */
+export const levelOptions = (levels: { level: number; name: string; minPoints: number }[] = []) => [
+  { value: '', label: 'Any level' },
+  ...levels.filter((level) => level.level > 1).map((level) => ({ value: String(level.level), label: `Level ${level.level} · ${level.name} (${level.minPoints} pts)` })),
+];
 
 const ROLE_OPTIONS: { value: '' | UserRole; label: string }[] = [
   { value: '', label: 'Every member' },
@@ -38,13 +46,15 @@ export const AccessEditor = ({ space }: { space: AdminSpace }) => {
   const [minRole, setMinRole] = useState<'' | UserRole>(space.access?.minRole ?? '');
   const [tierIds, setTierIds] = useState<string[]>(space.access?.tierIds ?? []);
   const [minDays, setMinDays] = useState(space.access?.minDays ? String(space.access.minDays) : '');
+  const [minLevel, setMinLevel] = useState(space.access?.minLevel ? String(space.access.minLevel) : '');
+  const { data: points } = useHowPointsWork();
 
   const parsedDays = minDays ? Number(minDays) : null;
   const daysValid = parsedDays === null || (Number.isInteger(parsedDays) && parsedDays >= 1 && parsedDays <= 3650);
 
   const handleSave = () =>
     save.mutate(
-      { id: space.id, rule: { minRole: minRole || null, tierIds, minDays: parsedDays } },
+      { id: space.id, rule: { minRole: minRole || null, tierIds, minDays: parsedDays, minLevel: minLevel ? Number(minLevel) : null } },
       {
         onSuccess: (rule) => showToast(rule ? 'Access saved' : 'Space is open to every member'),
         onError: (error) => showToast(error.message, 'error'),
@@ -74,6 +84,10 @@ export const AccessEditor = ({ space }: { space: AdminSpace }) => {
             placeholder="No minimum"
             className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
+        </label>
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold text-muted-foreground">Level</span>
+          <Select aria-label="Minimum level" value={minLevel} onChange={(e) => setMinLevel(e.target.value)} options={levelOptions(points?.levels)} />
         </label>
       </div>
       <div className="space-y-1.5">

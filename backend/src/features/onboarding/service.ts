@@ -4,6 +4,7 @@ import { prisma } from '../../lib/prisma';
 import { logActivity } from '../../lib/activity';
 import { effectiveStatus } from '../../lib/permissions';
 import { getSettings } from '../../lib/settings';
+import { awardPoints } from '../../lib/gamification';
 import { ApplicationInput, OnboardingError } from './model';
 
 const CODE_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'; // no look-alikes (0/o, 1/l/i)
@@ -171,6 +172,8 @@ export async function acceptRules(userId: string, version: number) {
     }),
     prisma.rulesAcceptance.create({ data: { userId, version, acceptedAt } }),
   ]);
+  // Once per member, not once per guide version
+  await awardPoints({ userId, action: 'GUIDE_ACCEPTED', sourceType: 'guide', sourceId: 'guide' });
   return { acceptedVersion: version, acceptedAt };
 }
 

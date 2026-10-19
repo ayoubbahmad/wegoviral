@@ -61,4 +61,15 @@ router.patch('/tiers/:id', requirePermission('tiers.manage'), adminController.up
 router.delete('/tiers/:id', requirePermission('tiers.manage'), adminController.deleteTier);
 router.patch('/members/:id/tier', requirePermission('tiers.manage'), adminController.setMemberTier);
 
+// Points, levels & badges
+router.get('/gamification', requirePermission('gamification.manage'), adminController.getGamification);
+router.put('/gamification/rules', requirePermission('gamification.manage'), adminController.updatePointRules);
+router.put('/gamification/levels', requirePermission('gamification.manage'), adminController.updateLevels);
+router.post('/badges', requirePermission('gamification.manage'), adminController.createBadge);
+router.patch('/badges/:id', requirePermission('gamification.manage'), adminController.updateBadge);
+router.patch('/badges/:id/archive', requirePermission('gamification.manage'), adminController.archiveBadge);
+router.post('/members/:id/badges', requirePermission('gamification.manage'), adminController.awardBadge);
+router.delete('/members/:id/badges/:badgeId', requirePermission('gamification.manage'), adminController.removeBadge);
+router.post('/members/:id/points', requirePermission('gamification.manage'), adminController.adjustPoints);
+
 export default router;

@@ -11,6 +11,8 @@ import { useToast } from '@/providers/Toast';
 import { CommunityEvent, EventInput, EventStatus } from '@/types/communityFeed';
 import { uploadImage } from '../../api';
 import { useTiers } from '@/containers/Admin/api/moderation';
+import { levelOptions } from '@/containers/Admin/Spaces/AccessEditor';
+import { useHowPointsWork } from '@/containers/Community/Leaderboard/api';
 import { AccessRuleInput, useEventAccess, useEventCategories, useSaveEvent, useSaveEventAccess } from '../api';
 import { viewerTimezone } from '../utils';
 
@@ -70,14 +72,15 @@ export const EventFormDialog = ({ event, onClose, onSaved }: EventFormDialogProp
     status: (event?.status ?? 'DRAFT') as EventStatus,
     recordingUrl: event?.recordingUrl ?? '',
   });
-  const [rule, setRule] = useState<AccessRuleInput>({ minRole: null, tierIds: [], minDays: null });
+  const [rule, setRule] = useState<AccessRuleInput>({ minRole: null, tierIds: [], minDays: null, minLevel: null });
+  const { data: points } = useHowPointsWork();
   const [ruleLoaded, setRuleLoaded] = useState(!event);
   const [isUploading, setIsUploading] = useState(false);
 
   // Fill the access section once the event's current rule has loaded
   useEffect(() => {
     if (event && !isRulePending && !ruleLoaded) {
-      setRule({ minRole: currentRule?.minRole ?? null, tierIds: currentRule?.tierIds ?? [], minDays: currentRule?.minDays ?? null });
+      setRule({ minRole: currentRule?.minRole ?? null, tierIds: currentRule?.tierIds ?? [], minDays: currentRule?.minDays ?? null, minLevel: currentRule?.minLevel ?? null });
       setRuleLoaded(true);
     }
   }, [event, isRulePending, currentRule, ruleLoaded]);
@@ -270,6 +273,14 @@ export const EventFormDialog = ({ event, onClose, onSaved }: EventFormDialogProp
                   onChange={(e) => setRule({ ...rule, minDays: e.target.value ? Number(e.target.value) : null })}
                   placeholder="No minimum"
                   className={inputClass}
+                />
+              </Field>
+              <Field label="Level">
+                <Select
+                  aria-label="Minimum level"
+                  value={rule.minLevel ? String(rule.minLevel) : ''}
+                  onChange={(e) => setRule({ ...rule, minLevel: e.target.value ? Number(e.target.value) : null })}
+                  options={levelOptions(points?.levels)}
                 />
               </Field>
             </div>

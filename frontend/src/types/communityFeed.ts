@@ -8,6 +8,22 @@ export interface CommunityUser {
     name?: string | null;
     avatarUrl?: string | null;
     role?: UserRole;
+    /** Up to 3 most recent badges, shown next to the name */
+    badges?: BadgeChip[];
+}
+
+export interface BadgeChip {
+    id: string;
+    name: string;
+    emoji: string;
+    color: string;
+}
+
+export interface MemberLevel {
+    level: number;
+    name: string;
+    minPoints: number;
+    next: { level: number; name: string; minPoints: number; pointsToGo: number } | null;
 }
 
 export interface CommunitySpace {
@@ -150,10 +166,31 @@ export interface EventInput {
     recordingUrl?: string | null;
 }
 
+export type LeaderboardPeriod = '7d' | '30d' | 'all';
+
+export interface LeaderboardMember extends CommunityUser {
+    points: number;
+    badges: BadgeChip[];
+}
+
 export interface LeaderboardEntry {
     rank: number;
-    user: CommunityUser;
+    /** Points earned in the period */
     points: number;
+    member: LeaderboardMember;
+    level: MemberLevel;
+}
+
+export interface Leaderboard {
+    period: LeaderboardPeriod;
+    entries: LeaderboardEntry[];
+    me: { rank: number | null; periodPoints: number; member: LeaderboardMember; level: MemberLevel };
+}
+
+export interface HowPointsWork {
+    rules: { action: string; label: string; points: number; dailyCap: number | null }[];
+    levels: { level: number; name: string; minPoints: number }[];
+    badges: (BadgeChip & { description: string; howToEarn: string })[];
 }
 
 export type ReportReason = 'SPAM' | 'HARASSMENT' | 'HATE' | 'NSFW' | 'MISINFORMATION' | 'SELF_PROMOTION' | 'OTHER';
@@ -171,7 +208,8 @@ export const REPORT_REASONS: { value: ReportReason; label: string }[] = [
 export type LockReason =
     | { type: 'role'; minRole: UserRole }
     | { type: 'tier'; tiers: { id: string; name: string }[] }
-    | { type: 'time'; unlocksAt: string; daysLeft: number };
+    | { type: 'time'; unlocksAt: string; daysLeft: number }
+    | { type: 'level'; minLevel: number; levelName: string; pointsToGo: number };
 
 export interface AccessResult {
     locked: boolean;

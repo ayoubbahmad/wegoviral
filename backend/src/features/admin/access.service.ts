@@ -138,14 +138,14 @@ export async function setAccessRule(actor: Actor, resourceType: ResourceType, re
     if (known !== tierIds.length) throw new AdminError(400, 'Unknown tier');
   }
 
-  const isOpen = !input.minRole && !tierIds.length && !input.minDays;
+  const isOpen = !input.minRole && !tierIds.length && !input.minDays && !input.minLevel;
   if (isOpen) {
     await prisma.accessRule.deleteMany({ where: { resourceType, resourceId } });
   } else {
     await prisma.accessRule.upsert({
       where: { resourceType_resourceId: { resourceType, resourceId } },
-      create: { resourceType, resourceId, minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null },
-      update: { minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null },
+      create: { resourceType, resourceId, minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null, minLevel: input.minLevel ?? null },
+      update: { minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null, minLevel: input.minLevel ?? null },
     });
   }
   invalidateAccessCache();
@@ -155,7 +155,7 @@ export async function setAccessRule(actor: Actor, resourceType: ResourceType, re
     targetType: resourceType,
     targetId: resourceId,
     targetLabel: resourceId,
-    details: isOpen ? { open: true } : { minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null },
+    details: isOpen ? { open: true } : { minRole: input.minRole ?? null, tierIds, minDays: input.minDays ?? null, minLevel: input.minLevel ?? null },
   });
   return isOpen ? null : getRule(resourceType, resourceId);
 }

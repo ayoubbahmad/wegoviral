@@ -22,7 +22,7 @@ export const RestrictMemberSchema = z.object({
 });
 
 export const ListActivityQuerySchema = z.object({
-  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier']).optional(),
+  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier', 'event', 'badge']).optional(),
   targetId: z.string().optional(),
   actorId: z.string().optional(),
   cursor: z.string().optional(),
@@ -171,7 +171,54 @@ export const AccessRuleSchema = z.object({
   minRole: z.enum(ROLE_VALUES).nullable().optional(),
   tierIds: z.array(z.string().min(1)).max(20).default([]),
   minDays: z.number().int().min(1).max(3650).nullable().optional(),
+  minLevel: z.number().int().min(2).max(100).nullable().optional(),
 });
 
 export type TierInput = z.infer<typeof TierSchema>;
 export type AccessRuleInput = z.infer<typeof AccessRuleSchema>;
+
+// ─── Points, levels & badges (Phase 6) ───────────────────────────────────────
+
+export const PointRulesSchema = z.object({
+  rules: z
+    .array(
+      z.object({
+        action: z.string().min(1),
+        points: z.number().int().min(-1000).max(1000),
+        dailyCap: z.number().int().min(1).max(10000).nullable(),
+        enabled: z.boolean(),
+      }),
+    )
+    .min(1),
+});
+
+export const LevelsSchema = z.object({
+  levels: z
+    .array(z.object({ name: z.string().trim().min(1, 'Every level needs a name').max(30), minPoints: z.number().int().min(0).max(10_000_000) }))
+    .min(1)
+    .max(50),
+});
+
+const AutoRuleSchema = z.object({
+  type: z.enum(['POSTS', 'COMMENTS', 'LIKES_RECEIVED', 'EVENTS_JOINED', 'POINTS']),
+  threshold: z.number().int().min(1).max(10_000_000),
+});
+
+export const BadgeSchema = z.object({
+  name: z.string().trim().min(2, 'Give the badge a name').max(40),
+  emoji: z.string().trim().min(1, 'Pick an emoji').max(8),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Use a color like #f59e0b'),
+  description: z.string().trim().max(200),
+  autoRule: AutoRuleSchema.nullable(),
+});
+export const UpdateBadgeSchema = BadgeSchema.partial();
+export const ArchiveBadgeSchema = z.object({ archived: z.boolean() });
+export const AwardBadgeSchema = z.object({ badgeId: z.string().min(1), note: z.string().trim().max(200).optional() });
+export const AdjustPointsSchema = z.object({
+  points: z.number().int().min(-10000).max(10000).refine((value) => value !== 0, 'Enter a number other than 0'),
+  reason: z.string().trim().min(3, 'Give a short reason').max(200),
+});
+
+export type PointRulesInput = z.infer<typeof PointRulesSchema>;
+export type LevelsInput = z.infer<typeof LevelsSchema>;
+export type BadgeInput = z.infer<typeof BadgeSchema>;

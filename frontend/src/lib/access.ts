@@ -12,5 +12,7 @@ export function describeLockReason(reason: LockReason): string {
       return `For ${reason.tiers.map((tier) => tier.name).join(' or ')} members`;
     case 'time':
       return `Unlocks in ${reason.daysLeft} day${reason.daysLeft === 1 ? '' : 's'} (on ${new Date(reason.unlocksAt).toLocaleDateString()})`;
+    case 'level':
+      return `Reach Level ${reason.minLevel} (${reason.levelName}): ${reason.pointsToGo} more point${reason.pointsToGo === 1 ? '' : 's'} to go`;
   }
 }

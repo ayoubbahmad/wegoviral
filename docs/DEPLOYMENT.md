@@ -84,6 +84,7 @@ The suite (`backend/tests/api/`) signs in as real Supabase test users (`@apitest
 cd backend
 yarn demo:seed    # replaces demo data with a fresh set (members, posts, polls, likes, comments)
 yarn demo:clear   # removes all demo data
+yarn points:backfill  # gives points (and automatic badges) for existing activity; run after seeding
 ```
 
 Demo members use `@demo.wegoviral.test` emails and can't log in. Clearing deletes only them and their content, never real members. Clear it before launch.

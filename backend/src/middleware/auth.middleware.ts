@@ -18,6 +18,7 @@ export interface AuthenticatedUser {
   /** For access rules (Phase 4) */
   tierId: string | null;
   joinedAt: Date;
+  points: number;
 }
 
 const restrictionError = (user: AuthenticatedUser) => ({
@@ -65,6 +66,7 @@ const authenticate =
             quizPassedVersion: true,
             tierId: true,
             createdAt: true,
+            points: true,
             application: { select: { id: true } },
           },
         }),
@@ -81,6 +83,7 @@ const authenticate =
         onboarding: onboardingStep({ ...profile, hasApplication: Boolean(profile.application) }, settings),
         tierId: profile.tierId,
         joinedAt: profile.createdAt,
+        points: profile.points,
       };
     } catch (error) {
       req.log?.error({ err: error }, 'Failed to resolve user profile');

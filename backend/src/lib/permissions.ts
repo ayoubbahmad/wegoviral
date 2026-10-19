@@ -49,6 +49,8 @@ export const PERMISSIONS = {
   'events.create': atLeast('INSTRUCTOR'),
   /** Manage every event */
   'events.manage': atLeast('MODERATOR'),
+  /** Point rules, levels, badges; award badges and adjust points */
+  'gamification.manage': atLeast('ADMIN'),
 } satisfies Record<string, UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

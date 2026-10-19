@@ -19,6 +19,7 @@ import { Card } from '@/components/Card';
 import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
 import { CommunityPost, CommunitySpace, CommunityUser } from '@/types/communityFeed';
 import { ROLE_BADGES } from '@/lib/roles';
+import { MemberBadges } from '@/components/MemberBadges';
 import { PostPoll } from './PostPoll';
 import { CommentsThread } from './CommentsThread';
 import { ReportDialog } from '../Moderation/ReportDialog';
@@ -137,6 +138,7 @@ export const PostCard = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm truncate">@{post.author.username}</span>
+              <MemberBadges badges={post.author.badges} />
               {post.author.role && ROLE_BADGES[post.author.role] && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                   {ROLE_BADGES[post.author.role]}

@@ -1,11 +1,12 @@
 /**
  * Access rules engine (docs/ADMIN_ROADMAP.md, Phase 4): one rule per resource
- * (space now; courses, events and challenges later). Every condition set on a
- * rule must match. Staff always have access. Levels are added in Phase 6.
+ * (spaces, events; courses and challenges later). Every condition set on a
+ * rule must match. Staff always have access.
  */
 import { AccessRule, MembershipTier, UserRole } from '@prisma/client';
 import { prisma } from './prisma';
 import { can, ROLE_RANK } from './permissions';
+import { getLevels, levelFor } from './gamification';
 
 const CACHE_MS = 30_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -17,12 +18,14 @@ export interface AccessViewer {
   role: UserRole;
   tierId: string | null;
   joinedAt: Date;
+  points: number;
 }
 
 export type LockReason =
   | { type: 'role'; minRole: UserRole }
   | { type: 'tier'; tiers: { id: string; name: string }[] }
-  | { type: 'time'; unlocksAt: string; daysLeft: number };
+  | { type: 'time'; unlocksAt: string; daysLeft: number }
+  | { type: 'level'; minLevel: number; levelName: string; pointsToGo: number };
 
 export interface AccessResult {
   locked: boolean;
@@ -65,7 +68,7 @@ export async function effectiveTierId(tierId: string | null) {
 // ─── Evaluation ──────────────────────────────────────────────────────────────
 
 export async function evaluateRule(
-  rule: Pick<AccessRule, 'minRole' | 'tierIds' | 'minDays'> | null | undefined,
+  rule: Pick<AccessRule, 'minRole' | 'tierIds' | 'minDays' | 'minLevel'> | null | undefined,
   viewer: AccessViewer,
 ): Promise<AccessResult> {
   if (!rule || can(viewer.role, 'community.moderate')) return OPEN;
@@ -93,6 +96,19 @@ export async function evaluateRule(
         type: 'time',
         unlocksAt: unlocksAt.toISOString(),
         daysLeft: Math.ceil((unlocksAt.getTime() - Date.now()) / DAY_MS),
+      });
+    }
+  }
+
+  if (rule.minLevel) {
+    const current = await levelFor(viewer.points);
+    if (current.level < rule.minLevel) {
+      const target = (await getLevels()).find((level) => level.level === rule.minLevel);
+      reasons.push({
+        type: 'level',
+        minLevel: rule.minLevel,
+        levelName: target?.name ?? `Level ${rule.minLevel}`,
+        pointsToGo: Math.max(0, (target?.minPoints ?? 0) - viewer.points),
       });
     }
   }
@@ -126,7 +142,9 @@ export function describeLock(result: AccessResult) {
         ? 'Only for the team'
         : reason.type === 'tier'
           ? `For ${reason.tiers.map((tier) => tier.name).join(' or ')} members`
-          : `Unlocks in ${reason.daysLeft} day${reason.daysLeft === 1 ? '' : 's'}`,
+          : reason.type === 'level'
+            ? `Reach Level ${reason.minLevel} (${reason.levelName})`
+            : `Unlocks in ${reason.daysLeft} day${reason.daysLeft === 1 ? '' : 's'}`,
     )
     .join(' · ');
 }

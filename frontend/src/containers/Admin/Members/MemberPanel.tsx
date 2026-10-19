@@ -15,6 +15,7 @@ import { RoleBadge, StatusBadge } from '../components/Badges';
 import { describeActivity } from '../components/describeActivity';
 import { MemberDetail, RestrictionInput } from '../types';
 import { JoiningSection } from './JoiningSection';
+import { PointsSection } from './PointsSection';
 import { useWarnMember } from '../api/moderation';
 
 const DURATIONS = [1, 3, 7, 30, 90];
@@ -109,6 +110,8 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
       </dl>
 
       <JoiningSection member={member} />
+
+      <PointsSection member={member} />
 
       {member.status !== 'ACTIVE' && <CurrentRestriction member={member} />}
 

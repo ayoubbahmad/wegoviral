@@ -14,7 +14,8 @@
     "test:api": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register --test --test-concurrency=1 --test-timeout=900000 tests/api/*.test.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "demo:seed": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts seed",
-    "demo:clear": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts clear"
+    "demo:clear": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts clear",
+    "points:backfill": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/backfill-points.ts"
   },
   "keywords": [],
   "author": "",

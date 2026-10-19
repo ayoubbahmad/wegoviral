@@ -3,9 +3,6 @@ import { Hook, ScriptTemplate } from '@/containers/Library/types';
 import { Competitor, CompetitorPost } from '@/types/competitor';
 import { Follower } from '@/types/followers';
 import { PerformancePost, PostingTimeAnalysis } from '@/types/performance';
-import {
-  LeaderboardEntry,
-} from '@/types/communityFeed';
 
 export const MOCK_HOOKS: Hook[] = [
   {
@@ -264,50 +261,4 @@ export const MOCK_POSTING_TIMES: PostingTimeAnalysis[] = [
   { dayFormatted: 'Fri', hour: 9, score: 3 },
   { dayFormatted: 'Fri', hour: 12, score: 5 },
   { dayFormatted: 'Fri', hour: 17, score: 6 },
-];
-
-const MOCK_USER_MAYA = {
-  id: 'u1',
-  username: 'maya_creates',
-  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya',
-};
-const MOCK_USER_LEO = {
-  id: 'u2',
-  username: 'leo_edits',
-  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo',
-};
-const MOCK_USER_PRIYA = {
-  id: 'u3',
-  username: 'priya_growth',
-  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
-};
-const MOCK_USER_SAM = {
-  id: 'u4',
-  username: 'sam_scripts',
-  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
-};
-
-export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, user: MOCK_USER_PRIYA, points: 4820 },
-  { rank: 2, user: MOCK_USER_MAYA, points: 4210 },
-  { rank: 3, user: MOCK_USER_LEO, points: 3990 },
-  { rank: 4, user: MOCK_USER_SAM, points: 3105 },
-  {
-    rank: 5,
-    user: {
-      id: 'u5',
-      username: 'nina_films',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina',
-    },
-    points: 2870,
-  },
-  {
-    rank: 6,
-    user: {
-      id: 'u6',
-      username: 'theo_hooks',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Theo',
-    },
-    points: 2440,
-  },
 ];

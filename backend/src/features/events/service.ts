@@ -3,6 +3,7 @@ import { prisma } from '../../lib/prisma';
 import { logActivity } from '../../lib/activity';
 import { can } from '../../lib/permissions';
 import { AccessResult, AccessViewer, accessByResource, describeLock, evaluateRule, getRule } from '../../lib/access';
+import { awardPoints, revokePoints } from '../../lib/gamification';
 import { CreateEventInput, EventError, ListEventsQuery, UpdateEventInput } from './model';
 
 const OPEN: AccessResult = { locked: false, reasons: [] };
@@ -172,8 +173,10 @@ export async function setGoing(viewer: AccessViewer, id: string, going: boolean)
       }
       await tx.eventRsvp.create({ data: { eventId: id, userId: viewer.id } });
     });
+    await awardPoints({ userId: viewer.id, action: 'EVENT_JOINED', sourceType: 'event', sourceId: id });
   } else {
     await prisma.eventRsvp.deleteMany({ where: { eventId: id, userId: viewer.id } });
+    await revokePoints({ userId: viewer.id, action: 'EVENT_JOINED', sourceId: id });
   }
   return getEvent(viewer, id);
 }

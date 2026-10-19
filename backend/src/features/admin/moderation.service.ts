@@ -3,6 +3,7 @@ import { Prisma, ReportStatus } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { logActivity } from '../../lib/activity';
 import { canManageMember } from '../../lib/permissions';
+import { awardPoints, revokePoints } from '../../lib/gamification';
 import * as feedService from '../feed/service';
 import { restrictMember } from './service';
 import type { Actor } from './service';
@@ -152,6 +153,7 @@ export async function issueWarning(actor: Actor, userId: string, reason: string)
     throw new AdminError(403, "You can't warn someone with the same or a higher role");
   }
   const warning = await prisma.memberWarning.create({ data: { userId, issuedById: actor.id, reason } });
+  await awardPoints({ userId, action: 'WARNING_RECEIVED', sourceType: 'warning', sourceId: warning.id });
   await logActivity({
     actorId: actor.id,
     action: 'member.warned',
@@ -191,6 +193,7 @@ export async function releaseComment(actor: Actor, commentId: string) {
     prisma.communityComment.update({ where: { id: commentId }, data: { heldReason: null } }),
     prisma.communityPost.update({ where: { id: comment.postId }, data: { commentCount: { increment: 1 } } }),
   ]);
+  await awardPoints({ userId: comment.authorId, action: 'COMMENT_ADDED', sourceType: 'comment', sourceId: commentId });
   await logActivity({
     actorId: actor.id,
     action: 'comment.released',
@@ -234,15 +237,24 @@ export async function listDeleted() {
 export async function restoreContent(actor: Actor, targetType: 'post' | 'comment', id: string) {
   const since = new Date(Date.now() - RESTORE_WINDOW_DAYS * DAY_MS);
   if (targetType === 'post') {
-    const post = await prisma.communityPost.findFirst({ where: { id, deletedAt: { gte: since } }, select: { title: true, content: true } });
+    const post = await prisma.communityPost.findFirst({
+      where: { id, deletedAt: { gte: since } },
+      select: { title: true, content: true, authorId: true, reviewStatus: true },
+    });
     if (!post) throw new AdminError(404, `Only posts deleted in the last ${RESTORE_WINDOW_DAYS} days can be restored`);
     await prisma.communityPost.update({ where: { id }, data: { deletedAt: null, deletedById: null } });
+    // Undo the removal's effect on points
+    await revokePoints({ action: 'POST_REMOVED_BY_TEAM', sourceId: id });
+    await revokePoints({ action: 'VOUCHED_POST_REMOVED', sourceId: id });
+    if (post.reviewStatus === 'PUBLISHED') {
+      await awardPoints({ userId: post.authorId, action: 'POST_PUBLISHED', sourceType: 'post', sourceId: id });
+    }
     await logActivity({ actorId: actor.id, action: 'post.restored', targetType: 'post', targetId: id, targetLabel: snippet(post.title || post.content) });
     return { restored: true };
   }
   const comment = await prisma.communityComment.findFirst({
     where: { id, deletedAt: { gte: since } },
-    select: { content: true, postId: true, heldReason: true, post: { select: { deletedAt: true } } },
+    select: { content: true, postId: true, heldReason: true, authorId: true, post: { select: { deletedAt: true } } },
   });
   if (!comment) throw new AdminError(404, `Only comments deleted in the last ${RESTORE_WINDOW_DAYS} days can be restored`);
   if (comment.post.deletedAt) throw new AdminError(409, 'Restore the post first: this comment belongs to a deleted post');
@@ -252,6 +264,9 @@ export async function restoreContent(actor: Actor, targetType: 'post' | 'comment
       ? []
       : [prisma.communityPost.update({ where: { id: comment.postId }, data: { commentCount: { increment: 1 } } })]),
   ]);
+  if (!comment.heldReason) {
+    await awardPoints({ userId: comment.authorId, action: 'COMMENT_ADDED', sourceType: 'comment', sourceId: id });
+  }
   await logActivity({ actorId: actor.id, action: 'comment.restored', targetType: 'comment', targetId: id, targetLabel: snippet(comment.content) });
   return { restored: true };
 }

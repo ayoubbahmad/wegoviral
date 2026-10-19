@@ -5,6 +5,7 @@ import * as joiningService from './joining.service';
 import * as moderationService from './moderation.service';
 import * as spacesService from './spaces.service';
 import * as accessService from './access.service';
+import * as gamificationService from './gamification.service';
 import {
   AdminError,
   ChangeRoleSchema,
@@ -30,6 +31,13 @@ import {
   UpdateTierSchema,
   MemberTierSchema,
   AccessRuleSchema,
+  PointRulesSchema,
+  LevelsSchema,
+  BadgeSchema,
+  UpdateBadgeSchema,
+  ArchiveBadgeSchema,
+  AwardBadgeSchema,
+  AdjustPointsSchema,
 } from './model';
 
 /** Maps validation and permission errors to proper status codes. */
@@ -224,4 +232,47 @@ export const getSpaceAccess = handle('load access rule', async (req, res) => {
 
 export const setSpaceAccess = handle('save access rule', async (req, res) => {
   res.json(await accessService.setAccessRule(req.user, 'space', req.params.id, AccessRuleSchema.parse(req.body)));
+});
+
+// ─── Points, levels & badges ─────────────────────────────────────────────────
+
+export const getGamification = handle('load points and badges', async (_req, res) => {
+  res.json(await gamificationService.getGamification());
+});
+
+export const updatePointRules = handle('save point rules', async (req, res) => {
+  res.json(await gamificationService.updatePointRules(req.user, PointRulesSchema.parse(req.body)));
+});
+
+export const updateLevels = handle('save levels', async (req, res) => {
+  res.json(await gamificationService.updateLevels(req.user, LevelsSchema.parse(req.body)));
+});
+
+export const createBadge = handle('create badge', async (req, res) => {
+  res.status(201).json(await gamificationService.createBadge(req.user, BadgeSchema.parse(req.body)));
+});
+
+export const updateBadge = handle('update badge', async (req, res) => {
+  res.json(await gamificationService.updateBadge(req.user, req.params.id, UpdateBadgeSchema.parse(req.body)));
+});
+
+export const archiveBadge = handle('archive badge', async (req, res) => {
+  const { archived } = ArchiveBadgeSchema.parse(req.body);
+  res.json(await gamificationService.setBadgeArchived(req.user, req.params.id, archived));
+});
+
+export const awardBadge = handle('award badge', async (req, res) => {
+  const { badgeId, note } = AwardBadgeSchema.parse(req.body);
+  await gamificationService.awardBadge(req.user, req.params.id, badgeId, note);
+  res.status(201).json({ awarded: true });
+});
+
+export const removeBadge = handle('remove badge', async (req, res) => {
+  await gamificationService.removeBadge(req.user, req.params.id, req.params.badgeId);
+  res.status(204).end();
+});
+
+export const adjustPoints = handle('adjust points', async (req, res) => {
+  const { points, reason } = AdjustPointsSchema.parse(req.body);
+  res.json(await gamificationService.adjustMemberPoints(req.user, req.params.id, points, reason));
 });

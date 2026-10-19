@@ -81,7 +81,7 @@ Shipped; **acceptance pending** (Ayoub). Covered by 17 automated admin tests.
 - ✅ **Admin space**: 🛡️ Admin in the space switcher (staff only), Overview / Members / Activity log, route guard.
   - *Accept:* members never see the entry; typing `/admin` as a member redirects away.
 - ✅ **Members list**: search (name, username, email), filters (role, status), sorting, pagination; filters are kept in the URL. *Tier and join-date filters come with Phase 4/9.*
-- ✅ **Member profile panel**: details, join date, posts/comments/likes, role, status and history. *Badges come with Phase 6.*
+- ✅ **Member profile panel**: details, join date, posts/comments/likes, role, status and history. Points, level and badges since Phase 6.
 - ✅ **Change roles**, following the permission table and safety rules (no self-changes, only manage lower ranks, last Super Admin protected).
   - *Accept:* an Admin can't create another Admin; a Super Admin can; nobody can demote themselves.
 - ✅ **Mute / suspend / ban** with a reason and duration, enforced by the API. Moderators: mute or suspend for up to **7 days**; only admins ban, lift bans or restrict indefinitely. Suspended/banned members see a notice with the reason; muted members see a banner and can only read.
@@ -112,7 +112,7 @@ Shipped; **acceptance pending** (Ayoub). 15 automated onboarding tests (57 in to
 - ✅ **Rules acceptance, logged**: "I've read and accept" is stored with the guide version and date. Members who are approved without having accepted are reminded and can't interact until they do; when the guide changes (new version), everyone is asked to accept again.
   - *Accept:* the member panel shows when and which version each member accepted.
 - ✅ **Quiz (optional, off by default)**: a few multiple-choice questions after the guide with a pass mark; retries allowed. Correct answers never leave the server.
-- ✅ **Exemptions / special members**: staff can mark someone as a special member (instructor, guest, successful creator…) who skips approval, the guide and probation. Badges for them come in Phase 6.
+- ✅ **Exemptions / special members**: staff can mark someone as a special member (instructor, guest, successful creator…) who skips approval, the guide and probation. Badges can be given to them since Phase 6.
 - ✅ **Invite links (staff)**: a link that can auto-approve and/or grant special-member exemptions, with an expiry date and maximum uses, e.g. "Instagram followers, 7 days, first 100".
 - ✅ **Referral links (members)**: every approved member has a personal link; new members who join through it are **approved automatically**, marked "referred by @member", and the referrer is recorded as responsible for them.
 - ⬜ **Welcome**: once a member can interact, prompt a first post in Introduce Yourself.
@@ -124,7 +124,7 @@ Shipped; **acceptance pending** (Ayoub). 11 automated review tests (68 in total)
 - ✅ **Reviewed first posts**: a new member's posts wait for review until N of them (default 3) have been approved; the author sees "waiting for review" (or the reviewer's note if refused). Members who joined before review existed, special members and staff skip it. Approved posts go live at the top of the feed.
 - ✅ **Review queue** (Community → Review posts): staff and trusted members approve or reject waiting posts (with a note for the author); the reviewer's name is stored with the post. The admin overview shows how many are waiting.
 - ✅ **Peer reviewers**: staff, plus trusted members (finished their own probation, in the community for 30+ days, not restricted). Never their own posts.
-- ✅ **Responsibility trail**: a referrer's and reviewer's history shows when someone they vouched for, or a post they approved, was removed or restricted. *Recorded only for now; automatic consequences (points, losing review/referral rights) come with Phase 6.*
+- ✅ **Responsibility trail**: a referrer's and reviewer's history shows when someone they vouched for, or a post they approved, was removed or restricted. *Recorded; point penalties are available since Phase 6 (off by default). Losing review/referral rights stays manual.*
 
 ## Phase 3 — Moderation & spaces
 
@@ -145,7 +145,7 @@ One shared system used by spaces now, and by courses, events and challenges in t
 
 Shipped; **acceptance pending** (Ayoub). 10 automated access tests.
 
-- ✅ **Rule types**: minimum role, tiers, minimum days in the community (counted from sign-up). Conditions combine (all must match); staff always have access. *Minimum level is added with Phase 6; "onboarding complete" is already enforced for everyone by Phase 2.*
+- ✅ **Rule types**: minimum role, tiers, minimum days in the community (counted from sign-up). Conditions combine (all must match); staff always have access. Minimum level was added with Phase 6. *"Onboarding complete" is already enforced for everyone by Phase 2.*
 - ✅ **Locked state UI**: locked spaces stay in the chips with a 🔒; opening one explains why, e.g. "Unlocks in 12 days (on …)", "For Pro members", "Only for instructors and the team".
 - ✅ **Enforced on the API**: posts in a locked space are never sent (filtered from the feed, Top posts and the review queue; likes, comments, votes and reports answer "not found"); posting there is refused. Authors keep access to their own posts.
 - ✅ **Tiers & manual assignment** (Super Admin): Admin → Tiers (create, rename, default, delete); tier picker in the member panel until Stripe (Phase 9). Only Super Admins decide which tiers can open something; admins set role and time conditions in Admin → Spaces.
@@ -163,12 +163,17 @@ Shipped; **acceptance pending** (Ayoub). 12 automated event tests.
 
 ## Phase 6 — Points, levels & badges
 
-- ⬜ **Point rules**: admin sets points per action (post, comment, received like, event attended, lesson completed, challenge finished…), with daily caps to avoid farming.
-- ⬜ **Levels**: names and thresholds (e.g. Rookie → Rising → Viral → Legend), editable by admins.
-- ⬜ **Real leaderboard**: 7 days / 30 days / all time (replaces the mock data).
-- ⬜ **Badges CRUD**: name, icon/emoji, colour, description.
-- ⬜ **Manual awarding**: e.g. Ambassador, Member of the month, with an optional note; shown on profiles and next to names.
-- ⬜ **Automatic badges**: rules such as "first post", "10 wins posted", "30-day streak", "course graduate".
+Shipped; **acceptance pending** (Ayoub). 16 automated gamification tests.
+
+- ✅ **Point rules** (Admin → Points & badges): points per action with optional daily caps. Defaults: post +5 (25/day), comment +2 (20/day), like received +1 (50/day), event RSVP +3 (9/day), reviewing a new member's post +2 (20/day), accepting the guide +10 once. Every action is one ledger row, so it never scores twice and is taken back when undone (deleted post or comment, unlike, cancelled RSVP). *Lessons and challenges add their rules in Phases 7 and 8.*
+- ✅ **Penalties (off by default)**: post removed by the team −10, a post you approved in review being removed −5, warning −20. Admins switch them on in the point rules; restoring a post undoes them. *This is the optional consequence for the Phase 2b responsibility trail.*
+- ✅ **Levels**: 9 named levels (Rookie 0 → Starter 10 → Rising 25 → Creator 50 → Trending 100 → Influencer 200 → Viral 400 → Icon 800 → Legend 1600), editable by admins.
+- ✅ **Level locks**: spaces and events can require a minimum level (completes the Phase 4 rule types); locked members see "Reach Level N (Name): X more points to go".
+- ✅ **Real leaderboard**: 7 days / 30 days / all time (periods count points earned in that time), top 3 podium, your level card with progress, the level ladder, and a "How do points work?" explainer. Mock data removed.
+- ✅ **Badges CRUD**: name, emoji, colour, description; archive/restore. Up to 3 recent badges show next to names in posts, comments and the leaderboard.
+- ✅ **Manual awarding** from the member panel (with an optional team-only note), plus manual point adjustments with a reason; both go to the activity log.
+- ✅ **Automatic badges**: milestones on posts, comments, likes received, events joined or total points (seeded: First post, Regular, Conversationalist, Crowd favorite, Event-goer, Rising star; manual: Ambassador, Member of the month). New automatic badges go to everyone who already qualifies. *Streaks and "course graduate" come with Phases 7–8.*
+- ✅ **Backfill**: `yarn points:backfill` credited activity from before points existed (keeping the original dates; safe to re-run).
 
 ## Phase 7 — Courses
 

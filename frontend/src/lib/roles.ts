@@ -19,7 +19,8 @@ export type Permission =
   | 'spaces.manage'
   | 'tiers.manage'
   | 'events.create'
-  | 'events.manage';
+  | 'events.manage'
+  | 'gamification.manage';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

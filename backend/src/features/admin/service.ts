@@ -1,6 +1,7 @@
 import { MemberStatus, Prisma, UserRole } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { probationSummary } from '../../lib/review';
+import { levelFor } from '../../lib/gamification';
 import { logActivity } from '../../lib/activity';
 import {
   assignableRoles,
@@ -194,7 +195,7 @@ export async function listMembers(query: ListMembersQuery) {
 
 export async function getMember(actor: Actor, id: string) {
   const member = await getMemberOrThrow(id);
-  const [likesGiven, likesReceived, history, joining, probation] = await Promise.all([
+  const [likesGiven, likesReceived, history, joining, probation, badges, profilePoints] = await Promise.all([
     prisma.communityPostLike.count({ where: { userId: id } }),
     prisma.communityPostLike.count({ where: { post: { authorId: id } } }),
     prisma.adminActivity.findMany({
@@ -217,6 +218,17 @@ export async function getMember(actor: Actor, id: string) {
       },
     }),
     probationSummary(id),
+    prisma.memberBadge.findMany({
+      where: { userId: id },
+      orderBy: { awardedAt: 'desc' },
+      select: {
+        awardedAt: true,
+        note: true,
+        badge: { select: { id: true, name: true, emoji: true, color: true, archivedAt: true } },
+        awardedBy: { select: { username: true } },
+      },
+    }),
+    prisma.userProfile.findUniqueOrThrow({ where: { id }, select: { points: true } }),
   ]);
 
   const isSelf = actor.id === id;
@@ -226,6 +238,9 @@ export async function getMember(actor: Actor, id: string) {
     likesGiven,
     likesReceived,
     history,
+    points: profilePoints.points,
+    level: await levelFor(profilePoints.points),
+    badges,
     joining: {
       phone: joining.phone,
       application: joining.application,
@@ -248,6 +263,7 @@ export async function getMember(actor: Actor, id: string) {
       setSpecial: !isSelf && can(actor.role, 'members.exempt'),
       reviewApplication: member.joinStatus === 'PENDING' && can(actor.role, 'members.approve'),
       setTier: can(actor.role, 'tiers.manage'),
+      manageGamification: can(actor.role, 'gamification.manage'),
     },
   };
 }

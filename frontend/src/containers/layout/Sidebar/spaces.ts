@@ -1,4 +1,5 @@
 import {
+    Award,
     LayoutDashboard,
     BarChart2,
     Users,
@@ -113,6 +114,7 @@ export const SPACES: Record<SpaceId, Space> = {
             { name: "Moderation", href: "/admin/moderation", icon: Flag, requires: "community.moderate" },
             { name: "Spaces", href: "/admin/spaces", icon: LayoutGrid, requires: "spaces.manage" },
             { name: "Tiers", href: "/admin/tiers", icon: Gem, requires: "tiers.manage" },
+            { name: "Points & badges", href: "/admin/points", icon: Award, requires: "gamification.manage" },
             { name: "Onboarding", href: "/admin/onboarding", icon: BookOpenCheck, requires: "community.settings" },
             { name: "Invite links", href: "/admin/invites", icon: Link2, requires: "invites.manage" },
             { name: "Activity log", href: "/admin/activity", icon: History },

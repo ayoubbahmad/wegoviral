@@ -105,6 +105,26 @@ export function describeActivity(entry: ActivityEntry): string {
       return `cancelled the event “${target}”`;
     case 'event.deleted':
       return `deleted the event “${target}”`;
+    case 'points.rules_updated':
+      return 'changed the point rules';
+    case 'points.levels_updated':
+      return `changed the levels (${details.levels} levels)`;
+    case 'points.adjusted': {
+      const points = Number(details.points);
+      return `${points > 0 ? 'gave' : 'took'} ${Math.abs(points)} point${Math.abs(points) === 1 ? '' : 's'} ${points > 0 ? 'to' : 'from'} ${target}${reason}`;
+    }
+    case 'badge.created':
+      return `created the badge ${target}`;
+    case 'badge.updated':
+      return `edited the badge ${target}`;
+    case 'badge.archived':
+      return `archived the badge ${target}`;
+    case 'badge.unarchived':
+      return `brought back the badge ${target}`;
+    case 'badge.awarded':
+      return `gave ${target} the ${details.badge} badge${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
+    case 'badge.removed':
+      return `removed the ${details.badge} badge from ${target}`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

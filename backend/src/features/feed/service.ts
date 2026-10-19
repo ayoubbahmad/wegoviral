@@ -7,6 +7,7 @@ import { logActivity } from '../../lib/activity';
 import { countApprovedReviewedPosts, isOnProbation, reviewerEligibility } from '../../lib/review';
 import { getSettings } from '../../lib/settings';
 import { findFlaggedWord } from '../../lib/contentFilter';
+import { awardPoints, badgesSelect, revokePoints } from '../../lib/gamification';
 import { AccessViewer, accessByResource, describeLock, evaluateRule, getRule, lockedResourceIds } from '../../lib/access';
 import type { AuthenticatedUser } from '../../middleware/auth.middleware';
 import { CreatePostInput, EditPostInput, FeedError, ReportInput } from './model';
@@ -27,7 +28,14 @@ const authorSelect = {
   name: true,
   avatarUrl: true,
   role: true,
+  ...badgesSelect,
 } satisfies Prisma.UserProfileSelect;
+
+/** Authors come with their latest badges, flattened for display next to the name. */
+const flattenAuthor = <T extends { badges: { badge: unknown }[] }>(author: T) => ({
+  ...author,
+  badges: author.badges.map((row) => row.badge),
+});
 
 /** Everything needed to render a post for one viewer. */
 const postInclude = (viewerId: string) =>
@@ -46,7 +54,7 @@ type PostWithViewer = Prisma.CommunityPostGetPayload<{
 const toPostDto = (post: PostWithViewer, viewerId: string) => ({
   id: post.id,
   spaceId: post.spaceId,
-  author: post.author,
+  author: flattenAuthor(post.author),
   title: post.title ?? undefined,
   content: post.content,
   coverUrl: post.coverUrl ?? undefined,
@@ -227,6 +235,10 @@ export async function createPost(author: AccessViewer, input: CreatePostInput) {
     },
     include: postInclude(authorId),
   });
+  // Posts waiting for review score once approved
+  if (post.reviewStatus === 'PUBLISHED') {
+    await awardPoints({ userId: authorId, action: 'POST_PUBLISHED', sourceType: 'post', sourceId: post.id });
+  }
   return toPostDto(post, authorId);
 }
 
@@ -238,7 +250,10 @@ export async function deletePost(actor: Actor, postId: string) {
     throw new FeedError(403, 'You can only delete your own posts');
   }
   await prisma.communityPost.update({ where: { id: postId }, data: { deletedAt: new Date(), deletedById: actor.id } });
+  // A deleted post doesn't keep its points (no post-and-delete farming)
+  await revokePoints({ userId: post.authorId, action: 'POST_PUBLISHED', sourceId: postId });
   if (!isOwn) {
+    await awardPoints({ userId: post.authorId, action: 'POST_REMOVED_BY_TEAM', sourceType: 'post', sourceId: postId });
     await logActivity({
       actorId: actor.id,
       action: 'post.deleted',
@@ -249,6 +264,7 @@ export async function deletePost(actor: Actor, postId: string) {
     });
     // Responsibility trail: the member who approved this post during review vouched for it
     if (post.reviewedById && post.reviewedById !== actor.id) {
+      await awardPoints({ userId: post.reviewedById, action: 'VOUCHED_POST_REMOVED', sourceType: 'post', sourceId: postId });
       await logActivity({
         actorId: actor.id,
         action: 'member.vouched_post_removed',
@@ -279,13 +295,16 @@ export async function setPinned(actor: Actor, postId: string, pinned: boolean) {
 
 export async function setLiked(viewer: AccessViewer, postId: string, liked: boolean) {
   const userId = viewer.id;
-  await getLivePost(postId, { viewer });
+  const post = await getLivePost(postId, { viewer });
+  // The author earns a point per like from someone else
+  const likeSource = { userId: post.authorId, action: 'LIKE_RECEIVED' as const, sourceId: `${postId}:${userId}` };
   if (liked) {
     try {
       await prisma.$transaction([
         prisma.communityPostLike.create({ data: { postId, userId } }),
         prisma.communityPost.update({ where: { id: postId }, data: { likeCount: { increment: 1 } } }),
       ]);
+      if (post.authorId !== userId) await awardPoints({ ...likeSource, sourceType: 'like' });
     } catch (error) {
       if (!isUniqueViolation(error)) throw error; // already liked: nothing to do
     }
@@ -296,6 +315,7 @@ export async function setLiked(viewer: AccessViewer, postId: string, liked: bool
         await tx.communityPost.update({ where: { id: postId }, data: { likeCount: { decrement: count } } });
       }
     });
+    await revokePoints(likeSource);
   }
   const { likeCount } = await prisma.communityPost.findUniqueOrThrow({
     where: { id: postId },
@@ -354,6 +374,7 @@ const toCommentDto = (
   { heldReason, ...comment }: Prisma.CommunityCommentGetPayload<{ select: typeof commentSelect }>,
 ) => ({
   ...comment,
+  author: flattenAuthor(comment.author),
   editedAt: comment.editedAt ?? undefined,
   editedByStaff: comment.editedByStaff || undefined,
   heldForReview: heldReason ? true : undefined,
@@ -382,6 +403,7 @@ export async function createComment(author: AccessViewer, postId: string, conten
   // Held comments only count once released
   if (!flagged) {
     await prisma.communityPost.update({ where: { id: postId }, data: { commentCount: { increment: 1 } } });
+    await awardPoints({ userId: author.id, action: 'COMMENT_ADDED', sourceType: 'comment', sourceId: comment.id });
   }
   return toCommentDto(comment);
 }
@@ -444,6 +466,7 @@ export async function deleteComment(actor: Actor, commentId: string) {
       ? []
       : [prisma.communityPost.update({ where: { id: comment.postId }, data: { commentCount: { decrement: 1 } } })]),
   ]);
+  await revokePoints({ userId: comment.authorId, action: 'COMMENT_ADDED', sourceId: commentId });
   if (!isOwn) {
     await logActivity({
       actorId: actor.id,
@@ -618,6 +641,11 @@ export async function reviewPost(
     targetLabel: snippet(post.title || post.content),
     details: { authorId: post.authorId, ...(note ? { note } : {}) },
   });
+
+  await awardPoints({ userId: reviewer.id, action: 'POST_REVIEWED', sourceType: 'post', sourceId: postId });
+  if (decision === 'PUBLISHED') {
+    await awardPoints({ userId: post.authorId, action: 'POST_PUBLISHED', sourceType: 'post', sourceId: postId });
+  }
 
   // Enough approved posts: the author's probation is over
   if (decision === 'PUBLISHED') {

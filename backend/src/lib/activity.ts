@@ -4,7 +4,7 @@ import { prisma } from './prisma';
 export interface ActivityEntry {
   actorId: string | null; // null for automatic actions (e.g. approval through an invite link)
   action: string; // e.g. "member.role_changed"
-  targetType: 'member' | 'post' | 'comment' | 'space' | 'settings' | 'guide' | 'invite' | 'tier' | 'course' | 'event' | 'challenge';
+  targetType: 'member' | 'post' | 'comment' | 'space' | 'settings' | 'guide' | 'invite' | 'tier' | 'course' | 'event' | 'challenge' | 'badge';
   targetId?: string;
   targetLabel?: string;
   details?: Prisma.InputJsonValue;

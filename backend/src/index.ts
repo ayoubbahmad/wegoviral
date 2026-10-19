@@ -24,6 +24,7 @@ import feedRoutes from './features/feed/routes';
 import adminRoutes from './features/admin/routes';
 import onboardingRoutes from './features/onboarding/routes';
 import eventsRoutes from './features/events/routes';
+import leaderboardRoutes from './features/leaderboard/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -73,6 +74,7 @@ app.use('/api/feed', feedRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/events', eventsRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

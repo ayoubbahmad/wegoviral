@@ -39,6 +39,8 @@ model UserProfile {
   probationCompletedAt DateTime?
   // Membership tier (null = the default tier). Set by hand until Stripe (Phase 9)
   tierId               String?
+  // All-time points (sum of the points ledger); levels are derived from it
+  points               Int                 @default(0)
   tier                 MembershipTier?     @relation(fields: [tierId], references: [id], onDelete: SetNull)
   automations          Automation[]
   competitors          Competitor[]
@@ -66,6 +68,9 @@ model UserProfile {
   issuedWarnings       MemberWarning[]     @relation("WarningIssuer")
   hostedEvents         CommunityEvent[]    @relation("EventHost")
   eventRsvps           EventRsvp[]
+  pointEvents          PointEvent[]
+  badges               MemberBadge[]       @relation("BadgeHolder")
+  awardedBadges        MemberBadge[]       @relation("BadgeAwarder")
 }
 
 model Hook {
@@ -668,6 +673,7 @@ model AccessRule {
   minRole      UserRole?
   tierIds      String[] // empty = any tier
   minDays      Int? // days since joining
+  minLevel     Int?
   updatedAt    DateTime  @updatedAt
 
   @@unique([resourceType, resourceId])
@@ -722,4 +728,77 @@ model EventRsvp {
 
   @@id([eventId, userId])
   @@map("event_rsvps")
+}
+
+// ─── Points, levels & badges (Phase 6) ───────────────────────────────────────
+
+/**
+ * Points per action, editable by admins. Negative points are penalties.
+ */
+model PointRule {
+  action    String   @id // e.g. "POST_PUBLISHED"
+  points    Int
+  dailyCap  Int? // max points per member per day from this action; null = no cap
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  @@map("point_rules")
+}
+
+/**
+ * Ledger of every scored action. One row per member, action and source, so an
+ * action never scores twice and can be taken back (e.g. an unlike).
+ */
+model PointEvent {
+  id         String      @id @default(uuid())
+  userId     String
+  action     String
+  points     Int // can be 0 when the daily cap is reached; the action still counts for badges
+  sourceType String? // "post", "comment", "event", "manual"…
+  sourceId   String?
+  note       String?
+  createdAt  DateTime    @default(now())
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, action, sourceId])
+  @@index([createdAt])
+  @@index([userId, action])
+  @@map("point_events")
+}
+
+model Level {
+  level     Int    @id
+  name      String
+  minPoints Int
+
+  @@map("levels")
+}
+
+model Badge {
+  id          String        @id
+  name        String
+  emoji       String
+  color       String        @default("#f59e0b")
+  description String        @default("")
+  // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "POINTS", "threshold": n }
+  autoRule    Json?
+  archivedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  holders     MemberBadge[]
+
+  @@map("badges")
+}
+
+model MemberBadge {
+  badgeId     String
+  userId      String
+  awardedById String? // null = awarded automatically
+  note        String?
+  awardedAt   DateTime     @default(now())
+  badge       Badge        @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user        UserProfile  @relation("BadgeHolder", fields: [userId], references: [id], onDelete: Cascade)
+  awardedBy   UserProfile? @relation("BadgeAwarder", fields: [awardedById], references: [id], onDelete: SetNull)
+
+  @@id([badgeId, userId])
+  @@map("member_badges")
 }

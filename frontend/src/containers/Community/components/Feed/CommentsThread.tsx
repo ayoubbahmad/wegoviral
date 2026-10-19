@@ -5,6 +5,7 @@ import { Flag, Loader2, Pencil, Send, Trash2 } from 'lucide-react';
 import { useToast } from '@/providers/Toast';
 import { useAuth } from '@/providers/Auth';
 import { avatarFor, formatRelativeDate } from '@/lib/utils';
+import { MemberBadges } from '@/components/MemberBadges';
 import { CommunityComment, CommunityUser } from '@/types/communityFeed';
 import { useComments, useCreateComment, useDeleteComment, useEditComment } from '../../api';
 import { ReportDialog } from '../Moderation/ReportDialog';
@@ -145,6 +146,7 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
       <div className="min-w-0 flex-1 rounded-xl bg-secondary/30 px-3 py-2">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold">@{comment.author.username}</span>
+          <MemberBadges badges={comment.author.badges} />
           <span className="text-[11px] text-muted-foreground">
             {formatRelativeDate(comment.createdAt)}
             {comment.editedAt && (comment.editedByStaff ? ' · edited by the team' : ' · edited')}

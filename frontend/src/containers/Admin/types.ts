@@ -1,4 +1,5 @@
 import type { MemberStatus, UserRole } from '@/lib/roles';
+import type { BadgeChip, MemberLevel } from '@/types/communityFeed';
 
 export interface AdminMember {
   id: string;
@@ -41,6 +42,9 @@ export interface MemberDetail extends AdminMember {
   likesReceived: number;
   history: ActivityEntry[];
   joining: MemberJoining;
+  points: number;
+  level: MemberLevel;
+  badges: MemberBadgeRow[];
   allowedActions: {
     changeRole: boolean;
     assignableRoles: UserRole[];
@@ -52,6 +56,7 @@ export interface MemberDetail extends AdminMember {
     setSpecial: boolean;
     reviewApplication: boolean;
     setTier: boolean;
+    manageGamification: boolean;
   };
 }
 
@@ -264,6 +269,7 @@ export interface AccessRule {
   minRole: UserRole | null;
   tierIds: string[];
   minDays: number | null;
+  minLevel: number | null;
 }
 
 export interface Tier {
@@ -273,4 +279,46 @@ export interface Tier {
   position: number;
   isDefault: boolean;
   memberCount: number;
+}
+
+// ─── Points, levels & badges (Phase 6) ───────────────────────────────────────
+
+export interface MemberBadgeRow {
+  awardedAt: string;
+  note: string | null;
+  badge: BadgeChip & { archivedAt: string | null };
+  /** null = earned automatically */
+  awardedBy: { username: string } | null;
+}
+
+export type AutoBadgeType = 'POSTS' | 'COMMENTS' | 'LIKES_RECEIVED' | 'EVENTS_JOINED' | 'POINTS';
+
+export interface AdminBadge extends BadgeChip {
+  description: string;
+  autoRule: { type: AutoBadgeType; threshold: number } | null;
+  archivedAt: string | null;
+  holderCount: number;
+}
+
+export interface PointRuleRow {
+  action: string;
+  label: string;
+  points: number;
+  dailyCap: number | null;
+  enabled: boolean;
+}
+
+export interface GamificationConfig {
+  rules: PointRuleRow[];
+  levels: { level: number; name: string; minPoints: number }[];
+  badges: AdminBadge[];
+  autoBadgeTypes: { type: AutoBadgeType; label: string }[];
+}
+
+export interface BadgeInput {
+  name: string;
+  emoji: string;
+  color: string;
+  description: string;
+  autoRule: { type: AutoBadgeType; threshold: number } | null;
 }

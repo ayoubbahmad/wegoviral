@@ -1,6 +1,7 @@
 "use client";
 
 import type { MemberStatus, Permission, UserRole } from "@/lib/roles";
+import type { BadgeChip, MemberLevel } from "@/types/communityFeed";
 
 /** Where a member is in the joining journey (APPLICATION → PENDING → RULES → QUIZ → DONE). */
 export type OnboardingStep = "APPLICATION" | "PENDING" | "REJECTED" | "RULES" | "QUIZ" | "DONE";
@@ -39,6 +40,10 @@ export interface User {
     warnings: { id: string; reason: string; createdAt: string }[];
     /** Membership tier (falls back to the default tier) */
     tier: { id: string; name: string } | null;
+    points: number;
+    level: MemberLevel;
+    /** Up to 3 most recent badges */
+    badges: BadgeChip[];
     socialAccounts?: SocialAccount[];
 }
 

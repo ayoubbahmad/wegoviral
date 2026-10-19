@@ -5,6 +5,7 @@ import { getSettings } from '../../lib/settings';
 import { prisma } from '../../lib/prisma';
 import { probationSummary, reviewerEligibility } from '../../lib/review';
 import { effectiveTierId, getTiers } from '../../lib/access';
+import { badgesSelect, levelFor } from '../../lib/gamification';
 
 export const getMe = async (req: any, res: Response) => {
     try {
@@ -15,7 +16,7 @@ export const getMe = async (req: any, res: Response) => {
         }
 
         const { status, statusReason, statusUntil, onboarding: step } = req.user;
-        const [settings, joining, probation, reviewing, warnings, tiers, tierId] = await Promise.all([
+        const [settings, joining, probation, reviewing, warnings, tiers, tierId, gamification] = await Promise.all([
             getSettings(),
             prisma.userProfile.findUniqueOrThrow({
                 where: { id: req.user.id },
@@ -35,6 +36,7 @@ export const getMe = async (req: any, res: Response) => {
             }),
             getTiers(),
             effectiveTierId(req.user.tierId),
+            prisma.userProfile.findUniqueOrThrow({ where: { id: req.user.id }, select: { points: true, ...badgesSelect } }),
         ]);
         const tier = tiers.find((t) => t.id === tierId);
         res.status(200).json({
@@ -49,6 +51,9 @@ export const getMe = async (req: any, res: Response) => {
                 // Warnings from the team the member hasn't acknowledged yet
                 warnings,
                 tier: tier ? { id: tier.id, name: tier.name } : null,
+                points: gamification.points,
+                level: await levelFor(gamification.points),
+                badges: gamification.badges.map((row) => row.badge),
                 onboarding: {
                     step,
                     joinStatus: joining.joinStatus,

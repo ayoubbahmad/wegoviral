@@ -6,6 +6,7 @@ export interface AccessRuleInput {
   minRole: string | null;
   tierIds: string[];
   minDays: number | null;
+  minLevel: number | null;
 }
 
 export const eventKeys = {

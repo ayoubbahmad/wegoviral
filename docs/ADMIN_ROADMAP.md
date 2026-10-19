@@ -165,14 +165,14 @@ Shipped; **acceptance pending** (Ayoub). 12 automated event tests.
 
 Shipped; **acceptance pending** (Ayoub). 16 automated gamification tests.
 
-- ✅ **Point rules** (Admin → Points & badges): points per action with optional daily caps. Defaults: post +5 (25/day), comment +2 (20/day), like received +1 (50/day), event RSVP +3 (9/day), reviewing a new member's post +2 (20/day), accepting the guide +10 once. Every action is one ledger row, so it never scores twice and is taken back when undone (deleted post or comment, unlike, cancelled RSVP). *Lessons and challenges add their rules in Phases 7 and 8.*
+- ✅ **Point rules** (Admin → Points & badges): points per action with optional daily caps. Defaults: post +5 (25/day), comment +2 (20/day), like received +1 (50/day), event RSVP +3 (9/day), reviewing a new member's post +2 (20/day), accepting the guide +10 once. Every action is one ledger row, so it never scores twice and is taken back when undone (deleted post or comment, unlike, cancelled RSVP). Lessons, courses and challenges added their rules in Phases 7 and 8.
 - ✅ **Penalties (off by default)**: post removed by the team −10, a post you approved in review being removed −5, warning −20. Admins switch them on in the point rules; restoring a post undoes them. *This is the optional consequence for the Phase 2b responsibility trail.*
 - ✅ **Levels**: 9 named levels (Rookie 0 → Starter 10 → Rising 25 → Creator 50 → Trending 100 → Influencer 200 → Viral 400 → Icon 800 → Legend 1600), editable by admins.
 - ✅ **Level locks**: spaces and events can require a minimum level (completes the Phase 4 rule types); locked members see "Reach Level N (Name): X more points to go".
 - ✅ **Real leaderboard**: 7 days / 30 days / all time (periods count points earned in that time), top 3 podium, your level card with progress, the level ladder, and a "How do points work?" explainer. Mock data removed.
 - ✅ **Badges CRUD**: name, emoji, colour, description; archive/restore. Up to 3 recent badges show next to names in posts, comments and the leaderboard.
 - ✅ **Manual awarding** from the member panel (with an optional team-only note), plus manual point adjustments with a reason; both go to the activity log.
-- ✅ **Automatic badges**: milestones on posts, comments, likes received, events joined or total points (seeded: First post, Regular, Conversationalist, Crowd favorite, Event-goer, Rising star; manual: Ambassador, Member of the month). New automatic badges go to everyone who already qualifies. *"Course graduate" arrived with Phase 7; streaks come with Phase 8.*
+- ✅ **Automatic badges**: milestones on posts, comments, likes received, events joined or total points (seeded: First post, Regular, Conversationalist, Crowd favorite, Event-goer, Rising star; manual: Ambassador, Member of the month). New automatic badges go to everyone who already qualifies. *"Course graduate" arrived with Phase 7; challenge finisher/winner and streaks with Phase 8.*
 - ✅ **Backfill**: `yarn points:backfill` credited activity from before points existed (keeping the original dates; safe to re-run).
 
 ## Phase 7 — Courses
@@ -190,10 +190,15 @@ Shipped; **acceptance pending** (Ayoub). 17 automated course tests.
 
 ## Phase 8 — Challenges
 
-- ⬜ **Challenges CRUD**: title, rules, start/end dates, daily or one-time check-ins, prizes, access rules.
-- ⬜ **Participation**: join, submit check-ins (text/image/link), progress and streaks.
-- ⬜ **Challenge leaderboard** and winners chosen manually or by points.
-- ⬜ **Points and badges** for completion (from Phase 6).
+Shipped; **acceptance pending** (Ayoub). 17 automated challenge tests.
+
+- ✅ **Challenges CRUD** (moderators and up, per the roles table): title, short description, rules, prizes, cover, start/end, **daily** (with "check-ins to finish", default every day) or **one-time** check-ins, draft/published/cancelled, optional extra badges for finishing and winning, and access rules (role, tier, level, days in the community). Days and streaks follow the challenge's time zone.
+- ✅ **Participation**: join (and leave before the first check-in), one check-in per day with text, an optional image and link; your progress, live streak 🔥, best streak and a day-by-day grid. Check-ins open at the start and close at the end.
+- ✅ **Check-in feed** per challenge; members remove their own, the team removes any (kept hidden and logged).
+- ✅ **Challenge leaderboard**: ranked by check-ins, then best streak, then who joined first.
+- ✅ **Winners** once the challenge has ended: take the top N of the board or pick by hand (in order); picking again replaces them, and clearing takes the points back. Shown as a banner on the challenge.
+- ✅ **Points and badges**: +3 per check-in (9/day), +30 for finishing, +100 for winning; automatic 🔥 **Challenge finisher** and 🏆 **Challenge winner** badges, plus optional extras per challenge. Removing a check-in takes its points (and the finish, if it falls below the target) back.
+- ✅ **Demo data**: an active 30-day Reels sprint with members on different streaks, and a finished one-time challenge with winners (`yarn demo:challenges`).
 
 ## Phase 9 — Monetization (Stripe) · Super Admin only
 

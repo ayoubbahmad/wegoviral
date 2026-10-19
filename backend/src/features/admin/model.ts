@@ -22,7 +22,7 @@ export const RestrictMemberSchema = z.object({
 });
 
 export const ListActivityQuerySchema = z.object({
-  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier', 'event', 'badge', 'course']).optional(),
+  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier', 'event', 'badge', 'course', 'challenge']).optional(),
   targetId: z.string().optional(),
   actorId: z.string().optional(),
   cursor: z.string().optional(),
@@ -200,7 +200,7 @@ export const LevelsSchema = z.object({
 });
 
 const AutoRuleSchema = z.object({
-  type: z.enum(['POSTS', 'COMMENTS', 'LIKES_RECEIVED', 'EVENTS_JOINED', 'COURSES_COMPLETED', 'POINTS']),
+  type: z.enum(['POSTS', 'COMMENTS', 'LIKES_RECEIVED', 'EVENTS_JOINED', 'COURSES_COMPLETED', 'CHALLENGES_COMPLETED', 'CHALLENGES_WON', 'POINTS']),
   threshold: z.number().int().min(1).max(10_000_000),
 });
 

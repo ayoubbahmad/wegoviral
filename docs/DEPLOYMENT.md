@@ -92,6 +92,7 @@ cd backend
 yarn demo:seed    # replaces demo data with a fresh set (members, posts, polls, likes, comments)
 yarn demo:clear   # removes all demo data
 yarn demo:courses     # adds the demo courses to existing demo members (no reseed)
+yarn demo:challenges  # same for the demo challenges
 yarn points:backfill  # gives points (and automatic badges) for existing activity; run after seeding
 ```
 

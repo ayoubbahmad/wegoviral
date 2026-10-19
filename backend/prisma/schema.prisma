@@ -10,28 +10,28 @@ datasource db {
 }
 
 model UserProfile {
-  id                   String              @id @default(uuid())
-  email                String              @unique
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
   avatarUrl            String?
   name                 String?
   passwordHash         String? // Unused since Supabase Auth; kept nullable for old rows
-  authUserId           String?             @unique // Supabase Auth user id (JWT "sub")
-  username             String              @unique
-  role                 UserRole            @default(MEMBER)
+  authUserId           String?                @unique // Supabase Auth user id (JWT "sub")
+  username             String                 @unique
+  role                 UserRole               @default(MEMBER)
   // Restrictions: MUTED can read but not interact; SUSPENDED and BANNED can't use the community
-  status               MemberStatus        @default(ACTIVE)
+  status               MemberStatus           @default(ACTIVE)
   statusReason         String?
   statusUntil          DateTime? // null = until lifted by staff
   // Joining: application → approval → rules acceptance (see docs/ADMIN_ROADMAP.md, Phase 2)
-  joinStatus           JoinStatus          @default(PENDING)
+  joinStatus           JoinStatus             @default(PENDING)
   phone                String?
-  specialMember        Boolean             @default(false) // skips approval, the guide and probation
-  referralCode         String?             @unique
+  specialMember        Boolean                @default(false) // skips approval, the guide and probation
+  referralCode         String?                @unique
   referredById         String?
-  referredBy           UserProfile?        @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
-  referrals            UserProfile[]       @relation("Referrals")
+  referredBy           UserProfile?           @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals            UserProfile[]          @relation("Referrals")
   rulesAcceptedVersion Int?
   rulesAcceptedAt      DateTime?
   quizPassedVersion    Int?
@@ -40,8 +40,8 @@ model UserProfile {
   // Membership tier (null = the default tier). Set by hand until Stripe (Phase 9)
   tierId               String?
   // All-time points (sum of the points ledger); levels are derived from it
-  points               Int                 @default(0)
-  tier                 MembershipTier?     @relation(fields: [tierId], references: [id], onDelete: SetNull)
+  points               Int                    @default(0)
+  tier                 MembershipTier?        @relation(fields: [tierId], references: [id], onDelete: SetNull)
   automations          Automation[]
   competitors          Competitor[]
   creators             Creator[]
@@ -57,23 +57,26 @@ model UserProfile {
   communityBookmarks   CommunityBookmark[]
   communityVotes       CommunityPollVote[]
   adminActivity        AdminActivity[]
-  application          MemberApplication?  @relation("Applicant")
-  reviewedApplications MemberApplication[] @relation("ApplicationReviewer")
+  application          MemberApplication?     @relation("Applicant")
+  reviewedApplications MemberApplication[]    @relation("ApplicationReviewer")
   rulesAcceptances     RulesAcceptance[]
   createdInvites       InviteLink[]
-  reviewedPosts        CommunityPost[]     @relation("PostReviewer")
-  reports              ContentReport[]     @relation("Reporter")
-  resolvedReports      ContentReport[]     @relation("ReportResolver")
-  warnings             MemberWarning[]     @relation("WarnedMember")
-  issuedWarnings       MemberWarning[]     @relation("WarningIssuer")
-  hostedEvents         CommunityEvent[]    @relation("EventHost")
-  ownedCourses         Course[]            @relation("CourseOwner")
+  reviewedPosts        CommunityPost[]        @relation("PostReviewer")
+  reports              ContentReport[]        @relation("Reporter")
+  resolvedReports      ContentReport[]        @relation("ReportResolver")
+  warnings             MemberWarning[]        @relation("WarnedMember")
+  issuedWarnings       MemberWarning[]        @relation("WarningIssuer")
+  hostedEvents         CommunityEvent[]       @relation("EventHost")
+  ownedCourses         Course[]               @relation("CourseOwner")
   courseEnrollments    CourseEnrollment[]
   lessonProgress       LessonProgress[]
+  createdChallenges    Challenge[]            @relation("ChallengeCreator")
+  challengeEntries     ChallengeParticipant[]
+  challengeCheckIns    ChallengeCheckIn[]
   eventRsvps           EventRsvp[]
   pointEvents          PointEvent[]
-  badges               MemberBadge[]       @relation("BadgeHolder")
-  awardedBadges        MemberBadge[]       @relation("BadgeAwarder")
+  badges               MemberBadge[]          @relation("BadgeHolder")
+  awardedBadges        MemberBadge[]          @relation("BadgeAwarder")
 }
 
 model Hook {
@@ -778,17 +781,19 @@ model Level {
 }
 
 model Badge {
-  id          String        @id
-  name        String
-  emoji       String
-  color       String        @default("#f59e0b")
-  description String        @default("")
-  // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "COURSES_COMPLETED" | "POINTS", "threshold": n }
-  autoRule    Json?
-  archivedAt  DateTime?
-  createdAt   DateTime      @default(now())
-  holders     MemberBadge[]
-  courses     Course[] // courses that give this badge on completion
+  id                  String        @id
+  name                String
+  emoji               String
+  color               String        @default("#f59e0b")
+  description         String        @default("")
+  // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "COURSES_COMPLETED" | "CHALLENGES_COMPLETED" | "CHALLENGES_WON" | "POINTS", "threshold": n }
+  autoRule            Json?
+  archivedAt          DateTime?
+  createdAt           DateTime      @default(now())
+  holders             MemberBadge[]
+  courses             Course[] // courses that give this badge on completion
+  challengesCompleted Challenge[]   @relation("ChallengeCompletionBadge")
+  challengesWon       Challenge[]   @relation("ChallengeWinnerBadge")
 
   @@map("badges")
 }
@@ -915,4 +920,84 @@ model LessonProgress {
   @@id([lessonId, userId])
   @@index([courseId, userId])
   @@map("lesson_progress")
+}
+
+// ─── Challenges (Phase 8) ─────────────────────────────────────────────────────
+
+enum ChallengeStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum CheckInType {
+  DAILY // one check-in per day, streaks count
+  ONE_TIME // a single submission
+}
+
+model Challenge {
+  id                String                 @id @default(uuid())
+  title             String
+  description       String                 @default("")
+  rules             String                 @default("")
+  prizes            String                 @default("")
+  coverUrl          String?
+  startsAt          DateTime
+  endsAt            DateTime
+  timezone          String // days and streaks are counted in this zone
+  checkInType       CheckInType            @default(DAILY)
+  requiredCheckIns  Int? // daily: check-ins needed to finish (null = every day)
+  status            ChallengeStatus        @default(DRAFT)
+  createdById       String
+  completionBadgeId String?
+  winnerBadgeId     String?
+  winnersPickedAt   DateTime?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  deletedAt         DateTime?
+  createdBy         UserProfile            @relation("ChallengeCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  completionBadge   Badge?                 @relation("ChallengeCompletionBadge", fields: [completionBadgeId], references: [id], onDelete: SetNull)
+  winnerBadge       Badge?                 @relation("ChallengeWinnerBadge", fields: [winnerBadgeId], references: [id], onDelete: SetNull)
+  participants      ChallengeParticipant[]
+  checkIns          ChallengeCheckIn[]
+
+  @@index([status, startsAt])
+  @@map("challenges")
+}
+
+model ChallengeParticipant {
+  challengeId   String
+  userId        String
+  joinedAt      DateTime    @default(now())
+  checkInCount  Int         @default(0)
+  currentStreak Int         @default(0)
+  bestStreak    Int         @default(0)
+  lastCheckInAt DateTime?
+  completedAt   DateTime?
+  winnerRank    Int? // 1 = first place
+  challenge     Challenge   @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user          UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([challengeId, userId])
+  @@index([challengeId, checkInCount])
+  @@map("challenge_participants")
+}
+
+model ChallengeCheckIn {
+  id          String      @id @default(uuid())
+  challengeId String
+  userId      String
+  day         String // YYYY-MM-DD in the challenge's time zone ("once" for one-time challenges)
+  content     String
+  imageUrl    String?
+  link        String?
+  createdAt   DateTime    @default(now())
+  deletedAt   DateTime?
+  deletedById String?
+  challenge   Challenge   @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId, day])
+  @@index([challengeId, createdAt])
+  @@map("challenge_check_ins")
 }

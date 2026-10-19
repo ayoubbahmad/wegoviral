@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +24,8 @@ interface ModalProps {
     | 'full';
 }
 
+const subscribeNoop = () => () => {};
+
 export function Modal({
   isOpen,
   onClose,
@@ -31,10 +33,10 @@ export function Modal({
   children,
   maxWidth = 'lg',
 }: ModalProps) {
-  const [mounted, setMounted] = useState(false);
+  // Portals need document.body, which only exists in the browser
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   useEffect(() => {
-    setMounted(true);
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -65,20 +67,21 @@ export function Modal({
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200'>
       <div
         className={cn(
-          'relative w-full bg-card border border-border rounded-xl shadow-lg animate-in zoom-in-95 duration-200',
+          'relative flex max-h-[90vh] w-full flex-col bg-card border border-border rounded-xl shadow-lg animate-in zoom-in-95 duration-200',
           maxWidthClasses[maxWidth],
         )}
       >
-        <div className='flex items-center justify-between p-6 border-b border-border'>
+        <div className='flex shrink-0 items-center justify-between p-6 border-b border-border'>
           <h2 className='text-xl font-semibold'>{title}</h2>
           <button
             onClick={onClose}
+            aria-label='Close'
             className='p-2 rounded-lg hover:bg-secondary transition-colors'
           >
             <X className='w-5 h-5' />
           </button>
         </div>
-        <div className='p-6'>{children}</div>
+        <div className='overflow-y-auto p-6'>{children}</div>
       </div>
     </div>,
     document.body,

@@ -137,6 +137,22 @@ export function describeActivity(entry: ActivityEntry): string {
       return `edited the course “${target}”`;
     case 'course.deleted':
       return `deleted the course “${target}”`;
+    case 'challenge.created':
+      return `created the challenge “${target}”`;
+    case 'challenge.published':
+      return `published the challenge “${target}”`;
+    case 'challenge.updated':
+      return `edited the challenge “${target}”`;
+    case 'challenge.cancelled':
+      return `cancelled the challenge “${target}”`;
+    case 'challenge.deleted':
+      return `deleted the challenge “${target}”`;
+    case 'challenge.check_in_removed':
+      return `removed a check-in from “${target}”${typeof details.content === 'string' ? `: “${details.content}”` : ''}`;
+    case 'challenge.winners_picked':
+      return `picked ${details.winners} winner${details.winners === 1 ? '' : 's'} for “${target}”${details.mode === 'top' ? ' (top of the board)' : ''}`;
+    case 'challenge.winners_cleared':
+      return `cleared the winners of “${target}”`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

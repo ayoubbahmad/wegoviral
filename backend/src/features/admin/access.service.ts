@@ -127,6 +127,9 @@ export async function setAccessRule(actor: Actor, resourceType: ResourceType, re
   if (resourceType === 'event' && !(await prisma.communityEvent.findFirst({ where: { id: resourceId, deletedAt: null } }))) {
     throw new AdminError(404, 'Event not found');
   }
+  if (resourceType === 'challenge' && !(await prisma.challenge.findFirst({ where: { id: resourceId, deletedAt: null } }))) {
+    throw new AdminError(404, 'Challenge not found');
+  }
   if (resourceType === 'course' && !(await prisma.course.findFirst({ where: { id: resourceId, deletedAt: null } }))) {
     throw new AdminError(404, 'Course not found');
   }

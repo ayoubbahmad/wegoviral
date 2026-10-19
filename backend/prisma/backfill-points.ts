@@ -1,7 +1,7 @@
 /**
  * One-time credit for activity from before points existed (Phase 6):
  * published posts, comments, likes received, event RSVPs, post reviews, guide acceptance,
- * completed lessons and finished courses.
+ * completed lessons, finished courses, and challenge check-ins, finishes and wins.
  * Rows keep the original date, so the 7/30-day leaderboards stay honest, and daily caps
  * apply per original day. Safe to run again: actions already in the ledger are skipped.
  *
@@ -20,7 +20,7 @@ interface Row {
 
 async function main() {
   const rules = new Map((await prisma.pointRule.findMany()).map((rule) => [rule.action, rule]));
-  const [posts, comments, likes, rsvps, reviews, guide, lessonsDone, coursesDone] = await Promise.all([
+  const [posts, comments, likes, rsvps, reviews, guide, lessonsDone, coursesDone, checkIns, challengeEntries] = await Promise.all([
     prisma.communityPost.findMany({ where: { deletedAt: null, reviewStatus: 'PUBLISHED' }, select: { id: true, authorId: true, createdAt: true } }),
     prisma.communityComment.findMany({ where: { deletedAt: null, heldReason: null }, select: { id: true, authorId: true, createdAt: true } }),
     prisma.communityPostLike.findMany({ where: { post: { deletedAt: null } }, select: { postId: true, userId: true, createdAt: true, post: { select: { authorId: true } } } }),
@@ -29,6 +29,11 @@ async function main() {
     prisma.userProfile.findMany({ where: { rulesAcceptedAt: { not: null } }, select: { id: true, rulesAcceptedAt: true } }),
     prisma.lessonProgress.findMany({ select: { lessonId: true, userId: true, completedAt: true } }),
     prisma.courseEnrollment.findMany({ where: { completedAt: { not: null } }, select: { courseId: true, userId: true, completedAt: true } }),
+    prisma.challengeCheckIn.findMany({ where: { deletedAt: null }, select: { id: true, userId: true, createdAt: true } }),
+    prisma.challengeParticipant.findMany({
+      where: { OR: [{ completedAt: { not: null } }, { winnerRank: { not: null } }] },
+      select: { challengeId: true, userId: true, completedAt: true, winnerRank: true, challenge: { select: { winnersPickedAt: true, endsAt: true } } },
+    }),
   ]);
 
   const rows: Row[] = [
@@ -42,6 +47,13 @@ async function main() {
     ...guide.map((g) => ({ userId: g.id, action: 'GUIDE_ACCEPTED', sourceType: 'guide', sourceId: 'guide', createdAt: g.rulesAcceptedAt! })),
     ...lessonsDone.map((l) => ({ userId: l.userId, action: 'LESSON_COMPLETED', sourceType: 'lesson', sourceId: l.lessonId, createdAt: l.completedAt })),
     ...coursesDone.map((c) => ({ userId: c.userId, action: 'COURSE_COMPLETED', sourceType: 'course', sourceId: c.courseId, createdAt: c.completedAt! })),
+    ...checkIns.map((c) => ({ userId: c.userId, action: 'CHALLENGE_CHECKIN', sourceType: 'challenge_check_in', sourceId: c.id, createdAt: c.createdAt })),
+    ...challengeEntries
+      .filter((e) => e.completedAt)
+      .map((e) => ({ userId: e.userId, action: 'CHALLENGE_COMPLETED', sourceType: 'challenge', sourceId: e.challengeId, createdAt: e.completedAt! })),
+    ...challengeEntries
+      .filter((e) => e.winnerRank)
+      .map((e) => ({ userId: e.userId, action: 'CHALLENGE_WON', sourceType: 'challenge', sourceId: e.challengeId, createdAt: e.challenge.winnersPickedAt ?? e.challenge.endsAt })),
   ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   // Skip what's already recorded, and count it towards that day's cap

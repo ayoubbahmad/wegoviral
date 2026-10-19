@@ -1,9 +1,10 @@
 /**
- * Demo data for trying the app: members, posts, polls, likes, comments, events and courses.
+ * Demo data for trying the app: members, posts, polls, likes, comments, events, courses and challenges.
  *
  *   yarn demo:seed   replaces any existing demo data with a fresh set
  *   yarn demo:clear  removes all demo data
  *   yarn demo:courses adds the demo courses to existing demo members (no reseed)
+ *   yarn demo:challenges adds the demo challenges the same way
  *
  * Demo members use the DEMO_EMAIL_DOMAIN; clearing deletes only those profiles
  * (their posts, comments, likes and votes cascade), so real data is untouched.
@@ -209,7 +210,8 @@ async function seedDemo() {
   }
 
   const courses = await seedDemoCourses(members);
-  console.log(`Seeded ${members.length} demo members, ${postCount} posts, ${EVENTS.length} events and ${courses} courses`);
+  const challenges = await seedDemoChallenges(members);
+  console.log(`Seeded ${members.length} demo members, ${postCount} posts, ${EVENTS.length} events, ${courses} courses and ${challenges} challenges`);
 }
 
 const VIDEO = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
@@ -296,14 +298,126 @@ async function seedDemoCourses(members: UserProfile[]) {
   return COURSES.length;
 }
 
-/** Adds the demo courses without touching the rest of the demo data. */
-async function addDemoCourses() {
+async function existingDemoMembers() {
   const members = await prisma.userProfile.findMany({ where: { email: { endsWith: `@${DEMO_EMAIL_DOMAIN}` } } });
   const byUsername = new Map(members.map((member) => [member.username, member]));
   const ordered = MEMBERS.map((member) => byUsername.get(member.username));
   if (ordered.some((member) => !member)) throw new Error('Demo members are missing: run yarn demo:seed first');
+  return ordered as UserProfile[];
+}
+
+/** Adds the demo courses without touching the rest of the demo data. */
+async function addDemoCourses() {
+  const members = await existingDemoMembers();
   await prisma.course.deleteMany({ where: { ownerId: { in: members.map((member) => member.id) } } });
-  return seedDemoCourses(ordered as UserProfile[]);
+  return seedDemoCourses(members);
+}
+
+const TIMEZONE = 'Africa/Casablanca';
+const dayKey = (date: Date) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+
+/**
+ * An active 30-day sprint with members on different streaks, and a finished
+ * one-time challenge with its winners. Hosted by a demo member made moderator.
+ */
+async function seedDemoChallenges(members: UserProfile[]) {
+  const DAY = 24 * 60 * 60 * 1000;
+  const host = members[3];
+  await prisma.userProfile.update({ where: { id: host.id }, data: { role: 'MODERATOR' } });
+  const startOfDay = (daysAgo: number) => {
+    const date = new Date(Date.now() - daysAgo * DAY);
+    date.setUTCHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const sprint = await prisma.challenge.create({
+    data: {
+      title: '30 days of Reels',
+      description: 'One Reel a day for 30 days. Consistency beats perfection.',
+      rules: 'Post one Reel each day and check in with the link.\nMiss a day? Keep going: you need 25 of the 30 days to finish.',
+      prizes: 'A 1:1 strategy call with the founders for the top 3',
+      coverUrl: 'https://picsum.photos/seed/reels-sprint/1200/675',
+      startsAt: startOfDay(6),
+      endsAt: new Date(startOfDay(6).getTime() + 30 * DAY),
+      timezone: TIMEZONE,
+      checkInType: 'DAILY',
+      requiredCheckIns: 25,
+      status: 'PUBLISHED',
+      createdById: host.id,
+    },
+  });
+  // [member, days checked in counting back from yesterday]
+  const sprinters: [number, number[]][] = [
+    [0, [1, 2, 3, 4, 5, 6]],
+    [1, [1, 2, 4, 5]],
+    [2, [1, 2, 3]],
+    [4, [3, 5, 6]],
+    [5, [6]],
+  ];
+  for (const [index, daysAgo] of sprinters) {
+    const member = members[index];
+    const sorted = [...daysAgo].sort((a, b) => b - a);
+    let best = 0;
+    let run = 0;
+    for (const [i, day] of sorted.entries()) {
+      run = i > 0 && day === sorted[i - 1] - 1 ? run + 1 : 1;
+      best = Math.max(best, run);
+    }
+    const last = new Date(Date.now() - Math.min(...daysAgo) * DAY);
+    await prisma.challengeParticipant.create({
+      data: { challengeId: sprint.id, userId: member.id, joinedAt: startOfDay(6), checkInCount: daysAgo.length, bestStreak: best, currentStreak: run, lastCheckInAt: last },
+    });
+    await prisma.challengeCheckIn.createMany({
+      data: sorted.map((ago) => ({
+        challengeId: sprint.id,
+        userId: member.id,
+        day: dayKey(new Date(Date.now() - ago * DAY)),
+        content: `Day ${7 - ago}: posted my Reel ✅`,
+        link: 'https://instagram.com/reel/demo',
+        createdAt: new Date(Date.now() - ago * DAY),
+      })),
+    });
+  }
+
+  const hooks = await prisma.challenge.create({
+    data: {
+      title: 'Best hook of the month',
+      description: 'Share your best-performing hook. The team picks the winners.',
+      rules: 'One submission: the hook, and a link to the post.',
+      prizes: 'Featured in the newsletter',
+      startsAt: new Date(Date.now() - 20 * DAY),
+      endsAt: new Date(Date.now() - 2 * DAY),
+      timezone: TIMEZONE,
+      checkInType: 'ONE_TIME',
+      status: 'PUBLISHED',
+      createdById: host.id,
+      winnersPickedAt: new Date(Date.now() - DAY),
+    },
+  });
+  const entries: [number, string, number | null][] = [
+    [1, '“I lost 10k followers doing this one thing…”', 1],
+    [2, '“Stop posting at 9am. Here’s why.”', 2],
+    [5, '“The 3-second rule nobody tells you about”', null],
+  ];
+  for (const [index, hook, rank] of entries) {
+    const member = members[index];
+    const at = new Date(Date.now() - (10 + index) * DAY);
+    await prisma.challengeParticipant.create({
+      data: { challengeId: hooks.id, userId: member.id, joinedAt: at, checkInCount: 1, lastCheckInAt: at, completedAt: at, winnerRank: rank },
+    });
+    await prisma.challengeCheckIn.create({
+      data: { challengeId: hooks.id, userId: member.id, day: 'once', content: hook, link: 'https://instagram.com/p/demo', createdAt: at },
+    });
+  }
+  return 2;
+}
+
+/** Adds the demo challenges without touching the rest of the demo data. */
+async function addDemoChallenges() {
+  const members = await existingDemoMembers();
+  await prisma.challenge.deleteMany({ where: { createdById: { in: members.map((member) => member.id) } } });
+  return seedDemoChallenges(members);
 }
 
 const command = process.argv[2];
@@ -314,7 +428,9 @@ const command = process.argv[2];
     ? seedDemo()
     : command === 'courses'
       ? addDemoCourses().then((count) => console.log(`Added ${count} demo courses`))
-    : Promise.reject(new Error('Usage: demo.ts seed|clear|courses')))
+      : command === 'challenges'
+        ? addDemoChallenges().then((count) => console.log(`Added ${count} demo challenges`))
+    : Promise.reject(new Error('Usage: demo.ts seed|clear|courses|challenges')))
   .catch((error) => {
     console.error('❌', error.message);
     process.exitCode = 1;

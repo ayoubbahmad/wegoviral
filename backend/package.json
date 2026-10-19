@@ -16,6 +16,7 @@
     "demo:seed": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts seed",
     "demo:clear": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts clear",
     "demo:courses": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts courses",
+    "demo:challenges": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/demo.ts challenges",
     "points:backfill": "TS_NODE_TRANSPILE_ONLY=true node -r dotenv/config -r ts-node/register prisma/backfill-points.ts"
   },
   "keywords": [],

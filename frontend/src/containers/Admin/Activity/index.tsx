@@ -18,6 +18,7 @@ const FILTERS = [
   { id: 'comment', label: 'Comments' },
   { id: 'badge', label: 'Badges' },
   { id: 'course', label: 'Courses' },
+  { id: 'challenge', label: 'Challenges' },
 ] as const;
 
 export const AdminActivityContainer = () => {

@@ -26,6 +26,7 @@ import onboardingRoutes from './features/onboarding/routes';
 import eventsRoutes from './features/events/routes';
 import leaderboardRoutes from './features/leaderboard/routes';
 import coursesRoutes from './features/courses/routes';
+import challengesRoutes from './features/challenges/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -77,6 +78,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/courses', coursesRoutes);
+app.use('/api/challenges', challengesRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

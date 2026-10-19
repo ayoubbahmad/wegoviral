@@ -17,6 +17,9 @@ export const POINT_ACTIONS = {
   GUIDE_ACCEPTED: 'Accepting the community guide',
   LESSON_COMPLETED: 'Completing a lesson',
   COURSE_COMPLETED: 'Finishing a course',
+  CHALLENGE_CHECKIN: 'Checking in to a challenge',
+  CHALLENGE_COMPLETED: 'Finishing a challenge',
+  CHALLENGE_WON: 'Winning a challenge',
   POST_REMOVED_BY_TEAM: 'Having a post removed by the team',
   VOUCHED_POST_REMOVED: 'A post you approved in review being removed',
   WARNING_RECEIVED: 'Receiving a warning',
@@ -138,6 +141,8 @@ export const AUTO_BADGE_TYPES = {
   LIKES_RECEIVED: { label: 'Likes received', action: 'LIKE_RECEIVED' },
   EVENTS_JOINED: { label: 'Events joined', action: 'EVENT_JOINED' },
   COURSES_COMPLETED: { label: 'Courses completed', action: 'COURSE_COMPLETED' },
+  CHALLENGES_COMPLETED: { label: 'Challenges finished', action: 'CHALLENGE_COMPLETED' },
+  CHALLENGES_WON: { label: 'Challenges won', action: 'CHALLENGE_WON' },
   POINTS: { label: 'Total points', action: null },
 } as const;
 

@@ -12,12 +12,13 @@ import { useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { useAdminMembers } from '@/containers/Admin/api';
 import { useTiers } from '@/containers/Admin/api/moderation';
-import { levelOptions } from '@/containers/Admin/Spaces/AccessEditor';
+import { levelOptions } from '@/lib/levels';
 import { useHowPointsWork } from '@/containers/Community/Leaderboard/api';
 import { CourseStatus, EditableCourse } from '@/types/courses';
 import { uploadImage } from '../../api';
 import type { AccessRuleInput } from '../../Events/api';
 import { useCourseAccess, useDeleteCourse, useSaveCourseAccess, useUpdateCourse } from '../api';
+import { useT } from '@/i18n/provider';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -30,11 +31,6 @@ const Field = ({ label, hint, children }: { label: string; hint?: string; childr
   </label>
 );
 
-const STATUS_OPTIONS: { value: CourseStatus; label: string }[] = [
-  { value: 'DRAFT', label: 'Draft (only you and admins)' },
-  { value: 'PUBLISHED', label: 'Published' },
-  { value: 'ARCHIVED', label: 'Archived (kept for members who started)' },
-];
 
 export const DetailsTab = ({ course }: { course: EditableCourse }) => (
   <div className="grid gap-6 lg:grid-cols-2">
@@ -47,6 +43,7 @@ export const DetailsTab = ({ course }: { course: EditableCourse }) => (
 );
 
 const DetailsCard = ({ course }: { course: EditableCourse }) => {
+  const t = useT();
   const { showToast } = useToast();
   const save = useUpdateCourse();
   const { data: points } = useHowPointsWork();
@@ -69,7 +66,7 @@ const DetailsCard = ({ course }: { course: EditableCourse }) => {
     try {
       update({ coverUrl: await uploadImage(file) });
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Could not upload the cover', 'error');
+      showToast(error instanceof Error ? error.message : t('courses.builder.details.coverFailed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -89,53 +86,62 @@ const DetailsCard = ({ course }: { course: EditableCourse }) => {
         },
       },
       {
-        onSuccess: () => showToast(form.status === 'PUBLISHED' && course.status !== 'PUBLISHED' ? 'Course published 🎉' : 'Course saved'),
+        onSuccess: () => showToast(form.status === 'PUBLISHED' && course.status !== 'PUBLISHED' ? t('courses.builder.details.published') : t('courses.builder.details.saved')),
         onError: (error) => showToast(error.message, 'error'),
       },
     );
 
   return (
     <Card className="space-y-4">
-      <h2 className="font-bold">Details</h2>
-      <Field label="Title">
+      <h2 className="font-bold">{t('courses.builder.details.title')}</h2>
+      <Field label={t('courses.builder.details.courseTitle')}>
         <input value={form.title} maxLength={120} onChange={(e) => update({ title: e.target.value })} className={inputClass} />
       </Field>
-      <Field label="Description" hint="What members will learn and who it's for.">
+      <Field label={t('courses.builder.details.description')} hint={t('courses.builder.details.descriptionHint')}>
         <Textarea value={form.description} maxLength={5000} onChange={(e) => update({ description: e.target.value })} className="min-h-[120px]" />
       </Field>
       <div className="space-y-1.5">
-        <span className="text-xs font-semibold text-muted-foreground">Cover image</span>
+        <span className="text-xs font-semibold text-muted-foreground">{t('courses.builder.details.cover')}</span>
         {form.coverUrl ? (
           <div className="relative">
             <img src={form.coverUrl} alt="" className="h-40 w-full rounded-xl object-cover" />
-            <button aria-label="Remove cover" onClick={() => update({ coverUrl: null })} className="absolute right-2 top-2 rounded-lg bg-background/90 p-1.5">
+            <button aria-label={t('courses.builder.details.removeCover')} onClick={() => update({ coverUrl: null })} className="absolute end-2 top-2 rounded-lg bg-background/90 p-1.5">
               <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <label className="flex h-28 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border text-sm text-muted-foreground hover:bg-secondary/30">
-            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />} Upload a cover (16:9 works best)
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />} {t('courses.builder.details.uploadCover')}
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleCover} className="hidden" />
           </label>
         )}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Status">
-          <Select aria-label="Status" value={form.status} onChange={(e) => update({ status: e.target.value as CourseStatus })} options={STATUS_OPTIONS} />
-        </Field>
-        <Field label="Badge for finishing" hint="Members who finish also get the Course graduate badge and points.">
+        <Field label={t('courses.builder.details.status')}>
           <Select
-            aria-label="Badge for finishing"
+            aria-label={t('courses.builder.details.status')}
+            value={form.status}
+            onChange={(e) => update({ status: e.target.value as CourseStatus })}
+            options={[
+              { value: 'DRAFT', label: t('courses.builder.details.statusDraft') },
+              { value: 'PUBLISHED', label: t('courses.builder.details.statusPublished') },
+              { value: 'ARCHIVED', label: t('courses.builder.details.statusArchived') },
+            ]}
+          />
+        </Field>
+        <Field label={t('courses.builder.details.badge')} hint={t('courses.builder.details.badgeHint')}>
+          <Select
+            aria-label={t('courses.builder.details.badge')}
             value={form.completionBadgeId}
             onChange={(e) => update({ completionBadgeId: e.target.value })}
-            options={[{ value: '', label: 'No extra badge' }, ...(points?.badges ?? []).map((badge) => ({ value: badge.id, label: `${badge.emoji} ${badge.name}` }))]}
+            options={[{ value: '', label: t('courses.builder.details.noBadge') }, ...(points?.badges ?? []).map((badge) => ({ value: badge.id, label: `${badge.emoji} ${badge.name}` }))]}
           />
         </Field>
       </div>
       {course.canChangeOwner && <OwnerField value={form.ownerId} current={course} onChange={(ownerId) => update({ ownerId })} />}
       <div className="flex justify-end">
         <Button variant="primary" onClick={handleSave} disabled={form.title.trim().length < 3 || save.isPending || uploading}>
-          {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save details'}
+          {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('courses.builder.details.save')}
         </Button>
       </div>
     </Card>
@@ -144,6 +150,7 @@ const DetailsCard = ({ course }: { course: EditableCourse }) => {
 
 /** Admins can hand a course to another instructor or admin. */
 const OwnerField = ({ value, current, onChange }: { value: string; current: EditableCourse; onChange: (id: string) => void }) => {
+  const t = useT();
   const filters = { sort: 'name' as const, page: 1 };
   const instructors = useAdminMembers({ ...filters, role: 'INSTRUCTOR' });
   const admins = useAdminMembers({ ...filters, role: 'ADMIN' });
@@ -151,9 +158,9 @@ const OwnerField = ({ value, current, onChange }: { value: string; current: Edit
   const people = [current.owner, ...[instructors, admins, superAdmins].flatMap((query) => query.data?.members ?? [])];
   const unique = [...new Map(people.map((person) => [person.id, person])).values()];
   return (
-    <Field label="Instructor">
+    <Field label={t('courses.builder.details.instructor')}>
       <Select
-        aria-label="Instructor"
+        aria-label={t('courses.builder.details.instructor')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         options={unique.map((person) => ({ value: person.id, label: person.name ? `${person.name} (@${person.username})` : `@${person.username}` }))}
@@ -174,6 +181,7 @@ const AccessCard = ({ courseId }: { courseId: string }) => {
 };
 
 const AccessForm = ({ courseId, initial }: { courseId: string; initial: AccessRuleInput }) => {
+  const t = useT();
   const can = useCan();
   const { showToast } = useToast();
   const save = useSaveCourseAccess();
@@ -185,43 +193,43 @@ const AccessForm = ({ courseId, initial }: { courseId: string; initial: AccessRu
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="font-bold">Who can take this course</h2>
-        <p className="text-sm text-muted-foreground">Members who don&apos;t match see the course with a lock and the reason. The team always has access.</p>
+        <h2 className="font-bold">{t('courses.builder.details.accessTitle')}</h2>
+        <p className="text-sm text-muted-foreground">{t('courses.builder.details.accessBody')}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
-        <Field label="Role">
+        <Field label={t('common.access.role')}>
           <Select
-            aria-label="Minimum role"
+            aria-label={t('common.access.minRole')}
             value={rule.minRole ?? ''}
             onChange={(e) => setRule({ ...rule, minRole: e.target.value || null })}
             options={[
-              { value: '', label: 'Every member' },
-              { value: 'INSTRUCTOR', label: 'Instructors and the team' },
+              { value: '', label: t('common.access.everyMember') },
+              { value: 'INSTRUCTOR', label: t('common.access.instructorsTeam') },
             ]}
           />
         </Field>
-        <Field label="Days in the community">
+        <Field label={t('common.access.days')}>
           <input
             type="number"
             min={1}
             value={rule.minDays ?? ''}
             onChange={(e) => setRule({ ...rule, minDays: e.target.value ? Number(e.target.value) : null })}
-            placeholder="No minimum"
+            placeholder={t('common.access.noMinimum')}
             className={inputClass}
           />
         </Field>
-        <Field label="Level">
+        <Field label={t('common.access.level')}>
           <Select
-            aria-label="Minimum level"
+            aria-label={t('common.access.minLevel')}
             value={rule.minLevel ? String(rule.minLevel) : ''}
             onChange={(e) => setRule({ ...rule, minLevel: e.target.value ? Number(e.target.value) : null })}
-            options={levelOptions(points?.levels)}
+            options={levelOptions(points?.levels, t)}
           />
         </Field>
       </div>
       {canSetTiers && tiers.length > 0 && (
         <div className="space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Tiers (none ticked = every tier)</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('common.access.tiers')}</span>
           <div className="flex flex-wrap gap-3">
             {tiers.map((tier) => (
               <label key={tier.id} className="flex items-center gap-2 text-sm">
@@ -237,19 +245,19 @@ const AccessForm = ({ courseId, initial }: { courseId: string; initial: AccessRu
           </div>
         </div>
       )}
-      <p className="text-xs text-muted-foreground">To release modules over time, set &ldquo;Opens … days after a member starts&rdquo; on each module in the Content tab.</p>
+      <p className="text-xs text-muted-foreground">{t('courses.builder.details.dripHint')}</p>
       <div className="flex justify-end">
         <Button
           variant="outline"
           onClick={() =>
             save.mutate(
               { id: courseId, rule },
-              { onSuccess: (saved) => showToast(saved ? 'Access saved' : 'Open to every member'), onError: (error) => showToast(error.message, 'error') },
+              { onSuccess: (saved) => showToast(saved ? t('courses.builder.details.accessSaved') : t('courses.builder.details.accessOpen')), onError: (error) => showToast(error.message, 'error') },
             )
           }
           disabled={save.isPending || (rule.minDays !== null && (!Number.isInteger(rule.minDays) || rule.minDays < 1))}
         >
-          {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save access'}
+          {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('courses.builder.details.saveAccess')}
         </Button>
       </div>
     </Card>
@@ -257,29 +265,30 @@ const AccessForm = ({ courseId, initial }: { courseId: string; initial: AccessRu
 };
 
 const DangerCard = ({ course }: { course: EditableCourse }) => {
+  const t = useT();
   const router = useRouter();
   const { showToast } = useToast();
   const remove = useDeleteCourse();
   return (
     <Card className="space-y-3">
-      <h2 className="font-bold">Delete course</h2>
-      <p className="text-sm text-muted-foreground">Removes it for everyone, including members who started. To hide it but keep it for them, archive it instead.</p>
+      <h2 className="font-bold">{t('courses.builder.details.deleteTitle')}</h2>
+      <p className="text-sm text-muted-foreground">{t('courses.builder.details.deleteBody')}</p>
       <Button
         variant="ghost"
         className="text-red-500 hover:bg-red-500/10"
         disabled={remove.isPending}
         onClick={() =>
-          window.confirm(`Delete “${course.title}”? This can't be undone.`) &&
+          window.confirm(t('courses.builder.details.deleteConfirm', { title: course.title })) &&
           remove.mutate(course.id, {
             onSuccess: () => {
-              showToast('Course deleted');
+              showToast(t('courses.builder.details.deleted'));
               router.push('/community/courses');
             },
             onError: (error) => showToast(error.message, 'error'),
           })
         }
       >
-        Delete course
+        {t('courses.builder.details.deleteTitle')}
       </Button>
     </Card>
   );

@@ -8,8 +8,9 @@ import { cn } from '@/lib/utils';
 import { CommunityEvent } from '@/types/communityFeed';
 import { useEventsInRange } from '../api';
 import { happensOn, isPast, monthGrid, sameDate } from '../utils';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MAX_PER_DAY = 3;
 
 export const CalendarView = ({ category, onOpen }: { category?: string; onOpen: (event: CommunityEvent) => void }) => {
@@ -17,29 +18,32 @@ export const CalendarView = ({ category, onOpen }: { category?: string; onOpen: 
   const { days, from, to } = monthGrid(month);
   const { data: events = [], isPending } = useEventsInRange(from, to, category);
   const today = new Date();
+  const t = useT();
+  // Sunday first, named in the app's language (2023-01-01 was a Sunday)
+  const weekdays = Array.from({ length: 7 }, (_, i) => new Date(2023, 0, 1 + i).toLocaleDateString(activeIntl(), { weekday: 'short' }));
 
   const shift = (by: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + by, 1));
 
   return (
     <Card padding="none" className="overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4">
-        <h2 className="text-lg font-bold">{month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</h2>
+        <h2 className="text-lg font-bold">{month.toLocaleDateString(activeIntl(), { month: 'long', year: 'numeric' })}</h2>
         <div className="flex gap-2">
           <button onClick={() => setMonth(new Date(today.getFullYear(), today.getMonth(), 1))} className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-secondary/50">
-            Today
+            {t('events.today')}
           </button>
-          <button aria-label="Previous month" onClick={() => shift(-1)} className="rounded-lg border border-border p-2 hover:bg-secondary/50">
-            <ChevronLeft className="w-4 h-4" />
+          <button aria-label={t('events.previousMonth')} onClick={() => shift(-1)} className="rounded-lg border border-border p-2 hover:bg-secondary/50">
+            <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
           </button>
-          <button aria-label="Next month" onClick={() => shift(1)} className="rounded-lg border border-border p-2 hover:bg-secondary/50">
-            <ChevronRight className="w-4 h-4" />
+          <button aria-label={t('events.nextMonth')} onClick={() => shift(1)} className="rounded-lg border border-border p-2 hover:bg-secondary/50">
+            <ChevronRight className="w-4 h-4 rtl:rotate-180" />
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-7 border-t border-border text-center text-xs font-semibold text-muted-foreground">
-        {WEEKDAYS.map((day) => (
-          <div key={day} className="border-r border-border py-2 last:border-r-0">
+        {weekdays.map((day) => (
+          <div key={day} className="border-e border-border py-2 last:border-e-0">
             {day}
           </div>
         ))}
@@ -58,7 +62,7 @@ export const CalendarView = ({ category, onOpen }: { category?: string; onOpen: 
               <div
                 key={day.toISOString()}
                 className={cn(
-                  'min-h-28 border-r border-t border-border p-1.5 [&:nth-child(7n)]:border-r-0',
+                  'min-h-28 border-e border-t border-border p-1.5 [&:nth-child(7n)]:border-e-0',
                   (!inMonth || pastDay) && 'bg-secondary/20',
                 )}
               >
@@ -79,7 +83,7 @@ export const CalendarView = ({ category, onOpen }: { category?: string; onOpen: 
                         onClick={() => onOpen(event)}
                         title={event.title}
                         className={cn(
-                          'flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-left text-[11px] font-medium leading-tight transition-opacity hover:opacity-80',
+                          'flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-start text-[11px] font-medium leading-tight transition-opacity hover:opacity-80',
                           faded
                             ? 'border border-border bg-background text-muted-foreground'
                             : event.status === 'DRAFT'
@@ -94,7 +98,7 @@ export const CalendarView = ({ category, onOpen }: { category?: string; onOpen: 
                     );
                   })}
                   {dayEvents.length > MAX_PER_DAY && (
-                    <p className="px-1 text-[11px] text-muted-foreground">+{dayEvents.length - MAX_PER_DAY} more</p>
+                    <p className="px-1 text-[11px] text-muted-foreground">{t('events.more', { count: dayEvents.length - MAX_PER_DAY })}</p>
                   )}
                 </div>
               </div>

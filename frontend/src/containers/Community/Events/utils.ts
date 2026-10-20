@@ -1,15 +1,18 @@
 import { CommunityEvent } from '@/types/communityFeed';
+import { activeIntl, activeLocale } from '@/i18n/active';
+import { translate } from '@/i18n/translate';
+import { messages } from '@/i18n/messages';
 
 /** "Sat, Oct 25 · 6:00 – 8:00 PM", in the viewer's own time zone. */
 export function formatEventWhen(event: Pick<CommunityEvent, 'startsAt' | 'endsAt'>) {
   const start = new Date(event.startsAt);
   const end = new Date(event.endsAt);
   const sameDay = start.toDateString() === end.toDateString();
-  const day = start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-  const time = (date: Date) => date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const day = start.toLocaleDateString(activeIntl(), { weekday: 'short', month: 'short', day: 'numeric' });
+  const time = (date: Date) => date.toLocaleTimeString(activeIntl(), { hour: 'numeric', minute: '2-digit' });
   return sameDay
     ? `${day} · ${time(start)} – ${time(end)}`
-    : `${day} ${time(start)} – ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} ${time(end)}`;
+    : `${day} ${time(start)} – ${end.toLocaleDateString(activeIntl(), { month: 'short', day: 'numeric' })} ${time(end)}`;
 }
 
 export const viewerTimezone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -43,7 +46,7 @@ export function happensOn(event: Pick<CommunityEvent, 'startsAt' | 'endsAt'>, da
 const icsDate = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 
 const where = (event: CommunityEvent) =>
-  event.locationType === 'IN_PERSON' ? event.location ?? '' : event.link ?? 'Online (link on WeGoViral)';
+  event.locationType === 'IN_PERSON' ? event.location ?? '' : event.link ?? translate(messages[activeLocale()], messages.en, activeLocale(), 'events.onlineLocation');
 
 export function googleCalendarUrl(event: CommunityEvent) {
   const params = new URLSearchParams({

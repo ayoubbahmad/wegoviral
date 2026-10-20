@@ -30,6 +30,9 @@ import { avatarFor, cn } from '@/lib/utils';
 import { CourseDetail, LessonView, OutlineModule } from '@/types/courses';
 import { useCompleteLesson, useCourse, useLesson } from './api';
 import { formatBytes, formatMinutes, progressPercent, videoSource } from './utils';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
+import { T } from '@/i18n/T';
 
 /** First lesson the member can open: where they left off, else the first not done. */
 function startingLesson(course: CourseDetail) {
@@ -40,6 +43,7 @@ function startingLesson(course: CourseDetail) {
 }
 
 export const CoursePage = ({ courseId }: { courseId: string }) => {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -74,7 +78,7 @@ export const CoursePage = ({ courseId }: { courseId: string }) => {
           <h1 className="text-2xl font-bold tracking-tight">{course.title}</h1>
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <img src={avatarFor(course.owner)} alt="" className="w-5 h-5 rounded-full border border-border" />
-            by {course.owner.name || `@${course.owner.username}`} · {course.lessonCount} lessons
+            {t('courses.page.by', { name: course.owner.name || `@${course.owner.username}`, lessons: t('courses.lessons', { count: course.lessonCount }) })}
             {course.totalMinutes > 0 && ` · ${formatMinutes(course.totalMinutes)}`}
           </p>
         </div>
@@ -82,12 +86,12 @@ export const CoursePage = ({ courseId }: { courseId: string }) => {
           <div className="flex gap-2">
             <Link href={`/community/courses/${course.id}/edit?tab=stats`}>
               <Button variant="outline" size="sm">
-                <BarChart3 className="w-4 h-4" /> Stats
+                <BarChart3 className="w-4 h-4" /> {t('courses.page.stats')}
               </Button>
             </Link>
             <Link href={`/community/courses/${course.id}/edit`}>
               <Button variant="outline" size="sm">
-                <Pencil className="w-4 h-4" /> Edit course
+                <Pencil className="w-4 h-4" /> {t('courses.page.edit')}
               </Button>
             </Link>
           </div>
@@ -105,10 +109,10 @@ export const CoursePage = ({ courseId }: { courseId: string }) => {
         <aside className="space-y-4">
           {course.progress && !course.isOwner && (
             <Card className="space-y-2" padding="sm">
-              <p className="text-sm font-semibold">{course.progress.completedAt ? 'Course completed 🎉' : 'Your progress'}</p>
+              <p className="text-sm font-semibold">{course.progress.completedAt ? t('courses.page.completedTitle') : t('courses.page.yourProgress')}</p>
               <ProgressBar value={percent} />
               <p className="text-xs text-muted-foreground">
-                {course.progress.completedLessons} of {course.lessonCount} lessons · {percent}%
+                {t('courses.lessonsOf', { done: course.progress.completedLessons, total: course.lessonCount, percent })}
               </p>
             </Card>
           )}
@@ -121,57 +125,68 @@ export const CoursePage = ({ courseId }: { courseId: string }) => {
 
 const BackLink = () => (
   <Link href="/community/courses" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-    <ArrowLeft className="w-4 h-4" /> All courses
+    <ArrowLeft className="w-4 h-4 rtl:rotate-180" /> <T k="courses.page.allCourses" />
   </Link>
 );
 
-const CourseOverview = ({ course, onStart }: { course: CourseDetail; onStart: () => void }) => (
+const CourseOverview = ({ course, onStart }: { course: CourseDetail; onStart: () => void }) => {
+  const t = useT();
+  return (
   <Card padding="none" className="overflow-hidden">
     {course.coverUrl && <img src={course.coverUrl} alt="" className="h-56 w-full object-cover" />}
     <div className="space-y-4 p-6">
       {course.status !== 'PUBLISHED' && (
         <p className="rounded-lg bg-secondary/50 px-3 py-2 text-sm text-muted-foreground">
-          {course.status === 'DRAFT' ? 'This course is a draft: only you and the admins can see it.' : 'This course is archived: only members who started it can still see it.'}
+          {course.status === 'DRAFT' ? t('courses.page.draftNote') : t('courses.page.archivedNote')}
         </p>
       )}
       {course.access.locked ? (
         <div className="space-y-1 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
           <p className="flex items-center gap-2 font-semibold">
-            <Lock className="w-4 h-4" /> This course is locked
+            <Lock className="w-4 h-4" /> {t('courses.page.locked')}
           </p>
           {course.access.reasons.map((reason, index) => (
-            <p key={index} className="text-muted-foreground">{describeLockReason(reason)}</p>
+            <p key={index} className="text-muted-foreground">{describeLockReason(reason, t)}</p>
           ))}
         </div>
       ) : null}
       {course.description && <p className="whitespace-pre-wrap text-sm leading-relaxed">{course.description}</p>}
       {course.completionBadge && (
         <p className="text-sm text-muted-foreground">
-          Finish it to earn the <span className="font-semibold text-foreground">{course.completionBadge.emoji} {course.completionBadge.name}</span> badge.
+          {t('courses.page.badgeNote', { badge: `${course.completionBadge.emoji} ${course.completionBadge.name}` })}
         </p>
       )}
       {!course.access.locked && course.lessonCount > 0 && (
         <Button variant="primary" onClick={onStart}>
           <PlayCircle className="w-4 h-4" />
-          {course.isOwner || course.canManage ? 'Preview' : course.progress ? (course.progress.completedAt ? 'Watch again' : 'Continue') : 'Start the course'}
+          {course.isOwner || course.canManage
+            ? t('courses.page.preview')
+            : course.progress
+              ? course.progress.completedAt
+                ? t('courses.page.watchAgain')
+                : t('courses.page.continue')
+              : t('courses.page.start')}
         </Button>
       )}
     </div>
   </Card>
-);
+  );
+};
 
-const moduleLockText = (module: OutlineModule) =>
+const moduleLockText = (module: OutlineModule, t: ReturnType<typeof useT>) =>
   module.unlocksAt
-    ? `Opens on ${new Date(module.unlocksAt).toLocaleDateString()}`
+    ? t('courses.page.opensOn', { date: new Date(module.unlocksAt).toLocaleDateString(activeIntl()) })
     : module.dripDays
-      ? `Opens ${module.dripDays} day${module.dripDays === 1 ? '' : 's'} after you start`
-      : 'Locked';
+      ? t('courses.page.opensAfter', { count: module.dripDays })
+      : t('common.locked');
 
-const Outline = ({ course, activeLessonId, onOpen }: { course: CourseDetail; activeLessonId: string | null; onOpen: (id: string) => void }) => (
+const Outline = ({ course, activeLessonId, onOpen }: { course: CourseDetail; activeLessonId: string | null; onOpen: (id: string) => void }) => {
+  const t = useT();
+  return (
   <Card padding="none">
-    <p className="px-5 pt-4 text-sm font-bold">Course outline</p>
+    <p className="px-5 pt-4 text-sm font-bold">{t('courses.page.outline')}</p>
     {course.modules.length === 0 ? (
-      <p className="px-5 py-4 text-sm text-muted-foreground">No lessons yet.</p>
+      <p className="px-5 py-4 text-sm text-muted-foreground">{t('courses.page.noLessons')}</p>
     ) : (
       <ol className="space-y-3 p-3">
         {course.modules.map((module, index) => (
@@ -182,7 +197,7 @@ const Outline = ({ course, activeLessonId, onOpen }: { course: CourseDetail; act
               </p>
               {module.locked && !course.access.locked && (
                 <span className="flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
-                  <Lock className="w-3 h-3" /> {moduleLockText(module)}
+                  <Lock className="w-3 h-3" /> {moduleLockText(module, t)}
                 </span>
               )}
             </div>
@@ -193,7 +208,7 @@ const Outline = ({ course, activeLessonId, onOpen }: { course: CourseDetail; act
                     disabled={module.locked}
                     onClick={() => onOpen(lesson.id)}
                     className={cn(
-                      'flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm transition-colors',
+                      'flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-start text-sm transition-colors',
                       activeLessonId === lesson.id ? 'bg-primary/10 font-semibold text-primary' : 'hover:bg-secondary/50',
                       module.locked && 'cursor-not-allowed opacity-50 hover:bg-transparent',
                     )}
@@ -217,9 +232,11 @@ const Outline = ({ course, activeLessonId, onOpen }: { course: CourseDetail; act
       </ol>
     )}
   </Card>
-);
+  );
+};
 
 const LessonPlayer = ({ course, lessonId, onOpen }: { course: CourseDetail; lessonId: string; onOpen: (id: string | null) => void }) => {
+  const t = useT();
   const { user } = useAuth();
   const { showToast } = useToast();
   const { data: lesson, isPending, error } = useLesson(course.id, lessonId);
@@ -233,7 +250,7 @@ const LessonPlayer = ({ course, lessonId, onOpen }: { course: CourseDetail; less
         <p className="flex items-center gap-2 font-semibold">
           <Lock className="w-4 h-4" /> {error.message}
         </p>
-        <Button variant="outline" size="sm" onClick={() => onOpen(null)}>Back to the course</Button>
+        <Button variant="outline" size="sm" onClick={() => onOpen(null)}>{t('courses.page.backToCourse')}</Button>
       </Card>
     );
   }
@@ -243,7 +260,7 @@ const LessonPlayer = ({ course, lessonId, onOpen }: { course: CourseDetail; less
       { courseId: course.id, lessonId: lesson.id, completed: !lesson.completed },
       {
         onSuccess: (result) => {
-          if (result.courseCompleted) showToast(`🎓 You finished “${course.title}”!`);
+          if (result.courseCompleted) showToast(t('courses.page.finished', { title: course.title }));
           if (thenNext && lesson.next) onOpen(lesson.next.id);
         },
         onError: (err) => showToast(err.message, 'error'),
@@ -263,7 +280,7 @@ const LessonPlayer = ({ course, lessonId, onOpen }: { course: CourseDetail; less
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
           <Button variant="ghost" size="sm" disabled={!lesson.previous} onClick={() => lesson.previous && onOpen(lesson.previous.id)}>
-            <ChevronLeft className="w-4 h-4" /> Previous
+            <ChevronLeft className="w-4 h-4 rtl:rotate-180" /> {t('courses.page.previous')}
           </Button>
           <div className="flex flex-wrap gap-2">
             {lesson.canComplete && canInteract && (
@@ -272,18 +289,18 @@ const LessonPlayer = ({ course, lessonId, onOpen }: { course: CourseDetail; less
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : lesson.completed ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4" /> Completed
+                    <CheckCircle2 className="w-4 h-4" /> {t('courses.page.completedButton')}
                   </>
                 ) : lesson.next ? (
-                  'Mark complete & continue'
+                  t('courses.page.completeContinue')
                 ) : (
-                  'Mark complete'
+                  t('courses.page.complete')
                 )}
               </Button>
             )}
             {lesson.next && (lesson.completed || !lesson.canComplete) && (
               <Button variant="ghost" size="sm" onClick={() => onOpen(lesson.next!.id)}>
-                Next <ChevronRight className="w-4 h-4" />
+                {t('courses.page.next')} <ChevronRight className="w-4 h-4 rtl:rotate-180" />
               </Button>
             )}
           </div>
@@ -314,7 +331,7 @@ const VideoPlayer = ({ url, title }: { url: string; title: string }) => {
 
 const Attachments = ({ lesson }: { lesson: LessonView }) => (
   <div className="space-y-2">
-    <p className="text-sm font-semibold">Resources</p>
+    <p className="text-sm font-semibold"><T k="courses.page.resources" /></p>
     <ul className="grid gap-2 sm:grid-cols-2">
       {lesson.attachments.map((attachment) => (
         <li key={attachment.id}>

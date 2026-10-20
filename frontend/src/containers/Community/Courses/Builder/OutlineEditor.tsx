@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { EditableCourse, EditableModule } from '@/types/courses';
 import { courseKeys, useDeleteModule, useSaveLesson, useSaveModule, useSaveOutline } from '../api';
 import { LessonEditor } from './LessonEditor';
+import { useT } from '@/i18n/provider';
 
 type Outline = { id: string; lessonIds: string[] }[];
 type Drag = { type: 'lesson' | 'module'; id: string } | null;
@@ -27,6 +28,7 @@ const applyOutline = (course: EditableCourse, outline: Outline): EditableCourse 
 };
 
 export const OutlineEditor = ({ course }: { course: EditableCourse }) => {
+  const t = useT();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const saveOutline = useSaveOutline();
@@ -100,13 +102,13 @@ export const OutlineEditor = ({ course }: { course: EditableCourse }) => {
 
   const addModule = () =>
     saveModule.mutate(
-      { courseId: course.id, input: { title: `Module ${course.modules.length + 1}` } },
+      { courseId: course.id, input: { title: t('courses.builder.outline.newModule', { number: course.modules.length + 1 }) } },
       { onError: (error) => showToast(error.message, 'error') },
     );
 
   const addLesson = (moduleId: string) =>
     saveLesson.mutate(
-      { moduleId, input: { title: 'New lesson', type: 'VIDEO' } },
+      { moduleId, input: { title: t('courses.builder.outline.newLesson'), type: 'VIDEO' } },
       { onSuccess: (lesson) => setSelectedId(lesson.id), onError: (error) => showToast(error.message, 'error') },
     );
 
@@ -124,7 +126,7 @@ export const OutlineEditor = ({ course }: { course: EditableCourse }) => {
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
       <div className="space-y-3">
         {course.modules.length === 0 && (
-          <Card className="text-sm text-muted-foreground">Start with a module (a chapter), then add lessons to it.</Card>
+          <Card className="text-sm text-muted-foreground">{t('courses.builder.outline.empty')}</Card>
         )}
         {course.modules.map((module, moduleIndex) => (
           <ModuleCard
@@ -156,16 +158,16 @@ export const OutlineEditor = ({ course }: { course: EditableCourse }) => {
           />
         ))}
         <Button variant="outline" size="sm" onClick={addModule} disabled={saveModule.isPending}>
-          {saveModule.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Add module
+          {saveModule.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} {t('courses.builder.outline.addModule')}
         </Button>
-        <p className="text-xs text-muted-foreground">Drag modules and lessons to reorder them, or use the arrows.</p>
+        <p className="text-xs text-muted-foreground">{t('courses.builder.outline.hint')}</p>
       </div>
 
       <div className="min-w-0">
         {selected ? (
           <LessonEditor key={selected.id} courseId={course.id} lesson={selected} onDeleted={() => setSelectedId(null)} />
         ) : (
-          <Card className="text-sm text-muted-foreground">Select a lesson to edit it, or add one to a module.</Card>
+          <Card className="text-sm text-muted-foreground">{t('courses.builder.outline.select')}</Card>
         )}
       </div>
     </div>
@@ -196,6 +198,7 @@ interface ModuleCardProps {
 const iconButton = 'rounded p-1 text-muted-foreground hover:bg-secondary/60 hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent';
 
 const ModuleCard = (props: ModuleCardProps) => {
+  const t = useT();
   const { module, selectedId, drag, dropTarget } = props;
   const { showToast } = useToast();
   const saveModule = useSaveModule();
@@ -208,7 +211,7 @@ const ModuleCard = (props: ModuleCardProps) => {
 
   const handleDelete = () => {
     const count = module.lessons.length;
-    if (count && !window.confirm(`Delete “${module.title}” and its ${count} lesson${count === 1 ? '' : 's'}? Members' progress on them is lost.`)) return;
+    if (count && !window.confirm(t('courses.builder.outline.deleteModuleConfirm', { title: module.title, count }))) return;
     deleteModule.mutate(module.id, { onError: (error) => showToast(error.message, 'error') });
   };
 
@@ -234,29 +237,29 @@ const ModuleCard = (props: ModuleCardProps) => {
             <GripVertical className="w-4 h-4" />
           </span>
           <input
-            aria-label="Module title"
+            aria-label={t('courses.builder.outline.moduleTitle')}
             value={title}
             maxLength={120}
             onChange={(event) => setTitle(event.target.value)}
             onBlur={() => title.trim() && title.trim() !== module.title && save({ title: title.trim() })}
             className="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-sm font-bold focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          <button aria-label="Move module up" disabled={props.isFirst} onClick={() => props.onNudgeModule(-1)} className={iconButton}>
+          <button aria-label={t('courses.builder.outline.moveModuleUp')} disabled={props.isFirst} onClick={() => props.onNudgeModule(-1)} className={iconButton}>
             <ChevronUp className="w-4 h-4" />
           </button>
-          <button aria-label="Move module down" disabled={props.isLast} onClick={() => props.onNudgeModule(1)} className={iconButton}>
+          <button aria-label={t('courses.builder.outline.moveModuleDown')} disabled={props.isLast} onClick={() => props.onNudgeModule(1)} className={iconButton}>
             <ChevronDown className="w-4 h-4" />
           </button>
-          <button aria-label="Delete module" onClick={handleDelete} disabled={deleteModule.isPending} className={cn(iconButton, 'hover:text-red-500')}>
+          <button aria-label={t('courses.builder.outline.deleteModule')} onClick={handleDelete} disabled={deleteModule.isPending} className={cn(iconButton, 'hover:text-red-500')}>
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-        <label className="flex items-center gap-2 pl-6 text-xs text-muted-foreground">
-          Opens
+        <label className="flex items-center gap-2 ps-6 text-xs text-muted-foreground">
+          {t('courses.builder.outline.opens')}
           <input
             type="number"
             min={1}
-            aria-label="Days after starting"
+            aria-label={t('courses.builder.outline.daysAfter')}
             value={dripDays}
             placeholder="0"
             onChange={(event) => setDripDays(event.target.value)}
@@ -266,7 +269,7 @@ const ModuleCard = (props: ModuleCardProps) => {
             }}
             className="h-7 w-14 rounded-md border border-border bg-background px-2 text-xs"
           />
-          days after a member starts {dripDays ? '' : '(0 = right away)'}
+          {t('courses.builder.outline.daysAfterText')} {dripDays ? '' : t('courses.builder.outline.rightAway')}
         </label>
       </div>
       <ul
@@ -294,16 +297,16 @@ const ModuleCard = (props: ModuleCardProps) => {
             )}
           >
             <GripVertical className="w-4 h-4 shrink-0 cursor-grab text-muted-foreground" aria-hidden />
-            <button onClick={() => props.onSelect(lesson.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+            <button onClick={() => props.onSelect(lesson.id)} className="flex min-w-0 flex-1 items-center gap-2 text-start">
               {lesson.type === 'VIDEO' ? <PlayCircle className="w-4 h-4 shrink-0" /> : <FileText className="w-4 h-4 shrink-0" />}
               <span className="truncate">{lesson.title}</span>
               {lesson.attachments.length > 0 && <Paperclip className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />}
             </button>
             <span className="flex shrink-0 opacity-0 transition-opacity group-hover/lesson:opacity-100 group-focus-within/lesson:opacity-100">
-              <button aria-label={`Move ${lesson.title} up`} disabled={props.isFirstLesson(lesson.id)} onClick={() => props.onNudgeLesson(lesson.id, -1)} className={iconButton}>
+              <button aria-label={t('courses.builder.outline.moveUp', { title: lesson.title })} disabled={props.isFirstLesson(lesson.id)} onClick={() => props.onNudgeLesson(lesson.id, -1)} className={iconButton}>
                 <ChevronUp className="w-3.5 h-3.5" />
               </button>
-              <button aria-label={`Move ${lesson.title} down`} disabled={props.isLastLesson(lesson.id)} onClick={() => props.onNudgeLesson(lesson.id, 1)} className={iconButton}>
+              <button aria-label={t('courses.builder.outline.moveDown', { title: lesson.title })} disabled={props.isLastLesson(lesson.id)} onClick={() => props.onNudgeLesson(lesson.id, 1)} className={iconButton}>
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
             </span>
@@ -311,7 +314,7 @@ const ModuleCard = (props: ModuleCardProps) => {
         ))}
         {drag?.type === 'lesson' && (
           <li className={cn('rounded-lg border-2 border-dashed px-3 py-2 text-xs text-muted-foreground', dropTarget === `end:${module.id}` ? 'border-primary' : 'border-border')}>
-            Drop here to move it to the end
+            {t('courses.builder.outline.dropEnd')}
           </li>
         )}
         <li>
@@ -320,7 +323,7 @@ const ModuleCard = (props: ModuleCardProps) => {
             disabled={props.addingLesson}
             className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-sm text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
-            <Plus className="w-4 h-4" /> Add lesson
+            <Plus className="w-4 h-4" /> {t('courses.builder.outline.addLesson')}
           </button>
         </li>
       </ul>

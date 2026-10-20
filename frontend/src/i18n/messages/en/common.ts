@@ -66,4 +66,18 @@ export const common = {
     mb: '{count} MB',
   },
   justNow: 'just now',
+  access: {
+    role: 'Role',
+    minRole: 'Minimum role',
+    everyMember: 'Every member',
+    instructorsTeam: 'Instructors and the team',
+    moderatorsUp: 'Moderators and above',
+    days: 'Days in the community',
+    noMinimum: 'No minimum',
+    level: 'Level',
+    minLevel: 'Minimum level',
+    anyLevel: 'Any level',
+    levelOption: 'Level {level} · {name} ({points} pts)',
+    tiers: 'Tiers (none ticked = every tier)',
+  },
 };

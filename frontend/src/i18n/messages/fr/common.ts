@@ -69,4 +69,18 @@ export const common: Shape<typeof en> = {
     mb: '{count} Mo',
   },
   justNow: 'à l’instant',
+  access: {
+    role: 'Rôle',
+    minRole: 'Rôle minimum',
+    everyMember: 'Tous les membres',
+    instructorsTeam: 'Formateurs et équipe',
+    moderatorsUp: 'Modérateurs et plus',
+    days: 'Jours dans la communauté',
+    noMinimum: 'Pas de minimum',
+    level: 'Niveau',
+    minLevel: 'Niveau minimum',
+    anyLevel: 'Tous les niveaux',
+    levelOption: 'Niveau {level} · {name} ({points} pts)',
+    tiers: 'Offres (aucune cochée = toutes)',
+  },
 };

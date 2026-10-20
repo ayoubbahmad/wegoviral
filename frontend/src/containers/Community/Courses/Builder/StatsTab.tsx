@@ -4,9 +4,12 @@ import { Card } from '@/components/Card';
 import { Skeleton } from '@/components/Skeleton';
 import { avatarFor, formatRelativeDate } from '@/lib/utils';
 import { useCourseStats } from '../api';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 /** Enrolments, completion, drop-off per lesson and who's taking the course. */
 export const StatsTab = ({ courseId }: { courseId: string }) => {
+  const t = useT();
   const { data: stats, isPending, error } = useCourseStats(courseId, true);
   if (isPending) return <Skeleton className="h-96 rounded-2xl" />;
   if (error) return <p className="text-sm text-muted-foreground">{error.message}</p>;
@@ -17,10 +20,10 @@ export const StatsTab = ({ courseId }: { courseId: string }) => {
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-4">
         {[
-          ['Started', stats.enrolled],
-          ['Finished', stats.completed],
-          ['Completion rate', `${Math.round(stats.completionRate * 100)}%`],
-          ['Active this week', stats.activeThisWeek],
+          [t('courses.builder.stats.started'), stats.enrolled],
+          [t('courses.builder.stats.finished'), stats.completed],
+          [t('courses.builder.stats.rate'), `${Math.round(stats.completionRate * 100)}%`],
+          [t('courses.builder.stats.activeWeek'), stats.activeThisWeek],
         ].map(([label, value]) => (
           <Card key={label} padding="sm">
             <p className="text-xs text-muted-foreground">{label}</p>
@@ -31,11 +34,11 @@ export const StatsTab = ({ courseId }: { courseId: string }) => {
 
       <Card className="space-y-3">
         <div>
-          <h2 className="font-bold">Drop-off per lesson</h2>
-          <p className="text-sm text-muted-foreground">How many of the {stats.enrolled} members who started completed each lesson.</p>
+          <h2 className="font-bold">{t('courses.builder.stats.dropOff')}</h2>
+          <p className="text-sm text-muted-foreground">{t('courses.builder.stats.dropOffBody', { count: stats.enrolled })}</p>
         </div>
         {lessonTotal === 0 ? (
-          <p className="text-sm text-muted-foreground">No lessons yet.</p>
+          <p className="text-sm text-muted-foreground">{t('courses.builder.stats.noLessons')}</p>
         ) : (
           <ol className="space-y-2">
             {stats.lessons.map((lesson, index) => {
@@ -48,7 +51,7 @@ export const StatsTab = ({ courseId }: { courseId: string }) => {
                   <span className="h-2 overflow-hidden rounded-full bg-muted">
                     <span className="block h-full rounded-full bg-primary" style={{ width: `${Math.round(share * 100)}%` }} />
                   </span>
-                  <span className="text-right tabular-nums text-muted-foreground">{lesson.completedCount}</span>
+                  <span className="text-end tabular-nums text-muted-foreground">{lesson.completedCount}</span>
                 </li>
               );
             })}
@@ -58,20 +61,20 @@ export const StatsTab = ({ courseId }: { courseId: string }) => {
 
       <Card padding="none">
         <div className="px-5 pt-5">
-          <h2 className="font-bold">Members</h2>
-          {!showEmails && <p className="text-sm text-muted-foreground">Names and progress only; contact details stay with the team.</p>}
+          <h2 className="font-bold">{t('courses.builder.stats.members')}</h2>
+          {!showEmails && <p className="text-sm text-muted-foreground">{t('courses.builder.stats.namesOnly')}</p>}
         </div>
         {stats.members.length === 0 ? (
-          <p className="px-5 py-4 text-sm text-muted-foreground">Nobody has started yet.</p>
+          <p className="px-5 py-4 text-sm text-muted-foreground">{t('courses.builder.stats.nobody')}</p>
         ) : (
           <div className="overflow-x-auto p-2">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="text-left text-xs text-muted-foreground">
-                  <th className="px-3 py-2 font-semibold">Member</th>
-                  <th className="px-3 py-2 font-semibold">Progress</th>
-                  <th className="px-3 py-2 font-semibold">Started</th>
-                  <th className="px-3 py-2 font-semibold">Last active</th>
+                <tr className="text-start text-xs text-muted-foreground">
+                  <th className="px-3 py-2 text-start font-semibold">{t('courses.builder.stats.member')}</th>
+                  <th className="px-3 py-2 text-start font-semibold">{t('courses.builder.stats.progress')}</th>
+                  <th className="px-3 py-2 text-start font-semibold">{t('courses.builder.stats.startedCol')}</th>
+                  <th className="px-3 py-2 text-start font-semibold">{t('courses.builder.stats.lastActive')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -88,12 +91,12 @@ export const StatsTab = ({ courseId }: { courseId: string }) => {
                     </td>
                     <td className="px-3 py-2">
                       {member.completedAt ? (
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">Finished</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{t('courses.builder.stats.finishedCell')}</span>
                       ) : (
                         `${member.completedLessons} / ${lessonTotal}`
                       )}
                     </td>
-                    <td className="px-3 py-2 text-muted-foreground">{new Date(member.startedAt).toLocaleDateString()}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{new Date(member.startedAt).toLocaleDateString(activeIntl())}</td>
                     <td className="px-3 py-2 text-muted-foreground">{formatRelativeDate(member.lastActivityAt)}</td>
                   </tr>
                 ))}

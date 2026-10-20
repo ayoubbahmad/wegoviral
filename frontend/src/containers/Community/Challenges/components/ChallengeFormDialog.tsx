@@ -10,12 +10,13 @@ import { Textarea } from '@/components/Textarea';
 import { useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { useTiers } from '@/containers/Admin/api/moderation';
-import { levelOptions } from '@/containers/Admin/Spaces/AccessEditor';
+import { levelOptions } from '@/lib/levels';
 import { useHowPointsWork } from '@/containers/Community/Leaderboard/api';
 import { ChallengeDetail, ChallengeInput, ChallengeStatus, CheckInType } from '@/types/challenges';
 import { uploadImage } from '../../api';
 import type { AccessRuleInput } from '../../Events/api';
 import { useChallengeAccess, useSaveChallenge, useSaveChallengeAccess } from '../api';
+import { useT } from '@/i18n/provider';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -52,9 +53,10 @@ interface Props {
 
 /** Loads the current access rule first when editing. */
 export const ChallengeFormDialog = ({ challenge, onClose, onSaved }: Props) => {
+  const t = useT();
   const { data: rule, isPending } = useChallengeAccess(challenge?.id);
   return (
-    <Modal isOpen onClose={onClose} title={challenge ? 'Edit challenge' : 'New challenge'} maxWidth="2xl">
+    <Modal isOpen onClose={onClose} title={challenge ? t('challenges.form.edit') : t('challenges.form.new')} maxWidth="2xl">
       {challenge && isPending ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : (
@@ -70,6 +72,7 @@ export const ChallengeFormDialog = ({ challenge, onClose, onSaved }: Props) => {
 };
 
 const ChallengeForm = ({ challenge, initialRule, onClose, onSaved }: Props & { initialRule: AccessRuleInput }) => {
+  const t = useT();
   const can = useCan();
   const { showToast } = useToast();
   const save = useSaveChallenge();
@@ -112,7 +115,7 @@ const ChallengeForm = ({ challenge, initialRule, onClose, onSaved }: Props & { i
     try {
       update({ coverUrl: await uploadImage(file) });
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Could not upload the cover', 'error');
+      showToast(error instanceof Error ? error.message : t('challenges.form.coverFailed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -138,132 +141,132 @@ const ChallengeForm = ({ challenge, initialRule, onClose, onSaved }: Props & { i
     try {
       const saved = await save.mutateAsync({ id: challenge?.id, input });
       await saveAccess.mutateAsync({ id: saved.id, rule });
-      showToast(challenge ? 'Challenge updated' : form.status === 'PUBLISHED' ? 'Challenge published' : 'Draft saved: publish it when ready');
+      showToast(challenge ? t('challenges.form.updated') : form.status === 'PUBLISHED' ? t('challenges.form.published') : t('challenges.form.draftSaved'));
       onSaved(saved);
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Could not save the challenge', 'error');
+      showToast(error instanceof Error ? error.message : t('challenges.form.saveFailed'), 'error');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <Field label="Title">
-        <input value={form.title} maxLength={120} onChange={(e) => update({ title: e.target.value })} placeholder="e.g. 30 days of Reels" className={inputClass} />
+      <Field label={t('challenges.form.title')}>
+        <input value={form.title} maxLength={120} onChange={(e) => update({ title: e.target.value })} placeholder={t('challenges.form.titlePlaceholder')} className={inputClass} />
       </Field>
-      <Field label="Short description" hint="Shown on the challenge card.">
+      <Field label={t('challenges.form.short')} hint={t('challenges.form.shortHint')}>
         <input value={form.description} maxLength={1000} onChange={(e) => update({ description: e.target.value })} className={inputClass} />
       </Field>
-      <Field label="Rules" hint="What counts as a check-in, and anything else members should know.">
+      <Field label={t('challenges.form.rules')} hint={t('challenges.form.rulesHint')}>
         <Textarea value={form.rules} maxLength={5000} onChange={(e) => update({ rules: e.target.value })} className="min-h-[110px]" />
       </Field>
-      <Field label="Prizes">
-        <input value={form.prizes} maxLength={1000} onChange={(e) => update({ prizes: e.target.value })} placeholder="e.g. A 1:1 strategy call for the winner" className={inputClass} />
+      <Field label={t('challenges.form.prizes')}>
+        <input value={form.prizes} maxLength={1000} onChange={(e) => update({ prizes: e.target.value })} placeholder={t('challenges.form.prizesPlaceholder')} className={inputClass} />
       </Field>
 
       <div className="space-y-1.5">
-        <span className="text-xs font-semibold text-muted-foreground">Cover image</span>
+        <span className="text-xs font-semibold text-muted-foreground">{t('challenges.form.cover')}</span>
         {form.coverUrl ? (
           <div className="relative">
             <img src={form.coverUrl} alt="" className="h-36 w-full rounded-xl object-cover" />
-            <button type="button" aria-label="Remove cover" onClick={() => update({ coverUrl: null })} className="absolute right-2 top-2 rounded-lg bg-background/90 p-1.5">
+            <button type="button" aria-label={t('challenges.form.removeCover')} onClick={() => update({ coverUrl: null })} className="absolute end-2 top-2 rounded-lg bg-background/90 p-1.5">
               <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <label className="flex h-24 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border text-sm text-muted-foreground hover:bg-secondary/30">
-            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />} Upload a cover
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />} {t('challenges.form.uploadCover')}
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleCover} className="hidden" />
           </label>
         )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Starts">
+        <Field label={t('challenges.form.starts')}>
           <input type="datetime-local" value={form.startsAt} onChange={(e) => update({ startsAt: e.target.value })} className={inputClass} />
         </Field>
-        <Field label="Ends">
+        <Field label={t('challenges.form.ends')}>
           <input type="datetime-local" value={form.endsAt} onChange={(e) => update({ endsAt: e.target.value })} className={inputClass} />
         </Field>
       </div>
-      <p className="-mt-2 text-xs text-muted-foreground">Days and streaks follow the {(challenge?.timezone ?? viewerTimezone()).replace('_', ' ')} time zone.</p>
+      <p className="-mt-2 text-xs text-muted-foreground">{t('challenges.form.zoneNote', { zone: (challenge?.timezone ?? viewerTimezone()).replace('_', ' ') })}</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Check-ins">
+        <Field label={t('challenges.form.checkIns')}>
           <Select
-            aria-label="Check-ins"
+            aria-label={t('challenges.form.checkIns')}
             value={form.checkInType}
             onChange={(e) => update({ checkInType: e.target.value as CheckInType })}
             options={[
-              { value: 'DAILY', label: 'Daily (streaks count)' },
-              { value: 'ONE_TIME', label: 'One submission' },
+              { value: 'DAILY', label: t('challenges.form.daily') },
+              { value: 'ONE_TIME', label: t('challenges.form.once') },
             ]}
           />
         </Field>
         {form.checkInType === 'DAILY' && (
-          <Field label="Check-ins to finish" hint="Leave empty to require every day.">
-            <input type="number" min={1} value={form.requiredCheckIns} onChange={(e) => update({ requiredCheckIns: e.target.value })} placeholder="Every day" className={inputClass} />
+          <Field label={t('challenges.form.toFinish')} hint={t('challenges.form.toFinishHint')}>
+            <input type="number" min={1} value={form.requiredCheckIns} onChange={(e) => update({ requiredCheckIns: e.target.value })} placeholder={t('challenges.form.everyDay')} className={inputClass} />
           </Field>
         )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field label="Status">
+        <Field label={t('challenges.form.status')}>
           <Select
-            aria-label="Status"
+            aria-label={t('challenges.form.status')}
             value={form.status}
             onChange={(e) => update({ status: e.target.value as ChallengeStatus })}
             options={[
-              { value: 'DRAFT', label: 'Draft' },
-              { value: 'PUBLISHED', label: 'Published' },
-              ...(challenge ? [{ value: 'CANCELLED', label: 'Cancelled' }] : []),
+              { value: 'DRAFT', label: t('common.draft') },
+              { value: 'PUBLISHED', label: t('common.published') },
+              ...(challenge ? [{ value: 'CANCELLED', label: t('common.cancelled') }] : []),
             ]}
           />
         </Field>
-        <Field label="Extra badge for finishing">
-          <Select aria-label="Extra badge for finishing" value={form.completionBadgeId} onChange={(e) => update({ completionBadgeId: e.target.value })} options={badgeOptions('None')} />
+        <Field label={t('challenges.form.finishBadge')}>
+          <Select aria-label={t('challenges.form.finishBadge')} value={form.completionBadgeId} onChange={(e) => update({ completionBadgeId: e.target.value })} options={badgeOptions(t('common.none'))} />
         </Field>
-        <Field label="Extra badge for winners">
-          <Select aria-label="Extra badge for winners" value={form.winnerBadgeId} onChange={(e) => update({ winnerBadgeId: e.target.value })} options={badgeOptions('None')} />
+        <Field label={t('challenges.form.winnerBadge')}>
+          <Select aria-label={t('challenges.form.winnerBadge')} value={form.winnerBadgeId} onChange={(e) => update({ winnerBadgeId: e.target.value })} options={badgeOptions(t('common.none'))} />
         </Field>
       </div>
-      <p className="-mt-2 text-xs text-muted-foreground">Everyone who finishes gets 🔥 Challenge finisher and points; winners get 🏆 Challenge winner and points.</p>
+      <p className="-mt-2 text-xs text-muted-foreground">{t('challenges.form.rewardsNote')}</p>
 
       <div className="space-y-3 rounded-xl border border-border p-4">
-        <p className="text-sm font-bold">Who can take part</p>
+        <p className="text-sm font-bold">{t('challenges.form.whoCanTakePart')}</p>
         <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Role">
+          <Field label={t('common.access.role')}>
             <Select
-              aria-label="Minimum role"
+              aria-label={t('common.access.minRole')}
               value={rule.minRole ?? ''}
               onChange={(e) => setRule({ ...rule, minRole: e.target.value || null })}
               options={[
-                { value: '', label: 'Every member' },
-                { value: 'INSTRUCTOR', label: 'Instructors and the team' },
+                { value: '', label: t('common.access.everyMember') },
+                { value: 'INSTRUCTOR', label: t('common.access.instructorsTeam') },
               ]}
             />
           </Field>
-          <Field label="Days in the community">
+          <Field label={t('common.access.days')}>
             <input
               type="number"
               min={1}
               value={rule.minDays ?? ''}
               onChange={(e) => setRule({ ...rule, minDays: e.target.value ? Number(e.target.value) : null })}
-              placeholder="No minimum"
+              placeholder={t('common.access.noMinimum')}
               className={inputClass}
             />
           </Field>
-          <Field label="Level">
+          <Field label={t('common.access.level')}>
             <Select
-              aria-label="Minimum level"
+              aria-label={t('common.access.minLevel')}
               value={rule.minLevel ? String(rule.minLevel) : ''}
               onChange={(e) => setRule({ ...rule, minLevel: e.target.value ? Number(e.target.value) : null })}
-              options={levelOptions(points?.levels)}
+              options={levelOptions(points?.levels, t)}
             />
           </Field>
         </div>
         {canSetTiers && tiers.length > 0 && (
           <div className="flex flex-wrap gap-3">
-            <span className="w-full text-xs font-semibold text-muted-foreground">Tiers (none ticked = every tier)</span>
+            <span className="w-full text-xs font-semibold text-muted-foreground">{t('common.access.tiers')}</span>
             {tiers.map((tier) => (
               <label key={tier.id} className="flex items-center gap-2 text-sm">
                 <input
@@ -280,9 +283,9 @@ const ChallengeForm = ({ challenge, initialRule, onClose, onSaved }: Props & { i
       </div>
 
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button type="button" variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
         <Button type="submit" variant="primary" disabled={!valid || save.isPending || saveAccess.isPending || uploading}>
-          {save.isPending || saveAccess.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : challenge ? 'Save' : 'Create challenge'}
+          {save.isPending || saveAccess.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : challenge ? t('common.save') : t('challenges.form.create')}
         </Button>
       </div>
     </form>

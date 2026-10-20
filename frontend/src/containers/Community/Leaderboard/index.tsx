@@ -14,18 +14,17 @@ import { MemberBadges } from '@/components/MemberBadges';
 import { avatarFor, cn } from '@/lib/utils';
 import { Leaderboard, LeaderboardEntry, LeaderboardPeriod, MemberLevel } from '@/types/communityFeed';
 import { useHowPointsWork, useLeaderboard } from './api';
+import { useT } from '@/i18n/provider';
+import { T } from '@/i18n/T';
 
-const PERIODS: { id: LeaderboardPeriod; label: string }[] = [
-  { id: '7d', label: 'Last 7 days' },
-  { id: '30d', label: 'Last 30 days' },
-  { id: 'all', label: 'All time' },
-];
+const PERIODS: LeaderboardPeriod[] = ['7d', '30d', 'all'];
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 const displayName = (member: { name?: string | null; username: string }) => member.name || `@${member.username}`;
 
 export const CommunityLeaderboardContainer = () => {
+  const t = useT();
   const [period, setPeriod] = useState<LeaderboardPeriod>('30d');
   const [showHelp, setShowHelp] = useState(false);
   const { data, isPending, error } = useLeaderboard(period);
@@ -34,11 +33,11 @@ export const CommunityLeaderboardContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/community/help/points-levels-badges"
-        title="Leaderboard"
-        description="Earn points by posting, commenting and showing up. Level up to unlock more of the community."
+        title={t('leaderboard.title')}
+        description={t('leaderboard.description')}
         actions={
           <Button variant="outline" onClick={() => setShowHelp(true)}>
-            <HelpCircle className="w-4 h-4" /> How do points work?
+            <HelpCircle className="w-4 h-4" /> {t('leaderboard.howPoints')}
           </Button>
         }
       />
@@ -50,19 +49,19 @@ export const CommunityLeaderboardContainer = () => {
         </div>
 
         <div className="min-w-0 space-y-4">
-          <div role="tablist" aria-label="Period" className="flex gap-1 rounded-xl border border-border bg-card p-1">
+          <div role="tablist" aria-label={t('leaderboard.period')} className="flex gap-1 rounded-xl border border-border bg-card p-1">
             {PERIODS.map((option) => (
               <button
-                key={option.id}
+                key={option}
                 role="tab"
-                aria-selected={period === option.id}
-                onClick={() => setPeriod(option.id)}
+                aria-selected={period === option}
+                onClick={() => setPeriod(option)}
                 className={cn(
                   'flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
-                  period === option.id ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
+                  period === option ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {option.label}
+                {t(`leaderboard.periods.${option}`)}
               </button>
             ))}
           </div>
@@ -75,7 +74,7 @@ export const CommunityLeaderboardContainer = () => {
           ) : error ? (
             <p className="text-sm text-muted-foreground">{error.message}</p>
           ) : data.entries.length === 0 ? (
-            <EmptyState icon={Trophy} title="No points yet" description="Be the first: publish a post or join an event to get on the board." />
+            <EmptyState icon={Trophy} title={t('leaderboard.emptyTitle')} description={t('leaderboard.emptyBody')} />
           ) : (
             <>
               <Podium entries={data.entries.slice(0, 3)} />
@@ -100,11 +99,12 @@ export const CommunityLeaderboardContainer = () => {
 
 const LevelChip = ({ level }: { level: MemberLevel }) => (
   <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-    Lv {level.level} · {level.name}
+    <T k="leaderboard.levelChip" vars={{ level: level.level, name: level.name }} />
   </span>
 );
 
 const MyLevelCard = ({ data }: { data: Leaderboard }) => {
+  const t = useT();
   const { member, level, rank, periodPoints } = data.me;
   const span = level.next ? level.next.minPoints - level.minPoints : 1;
   return (
@@ -116,38 +116,31 @@ const MyLevelCard = ({ data }: { data: Leaderboard }) => {
             <span className="truncate">{displayName(member)}</span>
             <MemberBadges badges={member.badges} />
           </p>
-          <p className="text-sm text-muted-foreground">
-            Level {level.level} · {level.name}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('leaderboard.levelLine', { level: level.level, name: level.name })}</p>
         </div>
       </div>
       <div className="space-y-1.5">
         <ProgressBar value={level.next ? member.points - level.minPoints : 1} max={span} />
         <p className="text-xs text-muted-foreground">
           {level.next
-            ? `${member.points.toLocaleString()} points · ${level.next.pointsToGo.toLocaleString()} more to reach Level ${level.next.level} (${level.next.name})`
-            : `${member.points.toLocaleString()} points · you've reached the top level`}
+            ? t('leaderboard.progressNext', { points: member.points, toGo: level.next.pointsToGo, level: level.next.level, name: level.next.name })
+            : t('leaderboard.progressTop', { points: member.points })}
         </p>
       </div>
       <p className="rounded-lg bg-secondary/50 px-3 py-2 text-sm">
-        {rank ? (
-          <>
-            You&apos;re <span className="font-bold">#{rank}</span> with {periodPoints.toLocaleString()} points in this period.
-          </>
-        ) : (
-          'Earn points in this period to show up on the board.'
-        )}
+        {rank ? t('leaderboard.myRank', { rank, points: periodPoints }) : t('leaderboard.notRanked')}
       </p>
     </Card>
   );
 };
 
 const LevelsCard = ({ current }: { current?: MemberLevel }) => {
+  const t = useT();
   const { data } = useHowPointsWork();
   if (!data) return null;
   return (
     <Card padding="none">
-      <p className="px-5 pt-4 text-sm font-bold">Levels</p>
+      <p className="px-5 pt-4 text-sm font-bold">{t('leaderboard.levels')}</p>
       <ul className="p-2">
         {data.levels.map((level) => {
           const reached = current ? level.level <= current.level : false;
@@ -163,7 +156,7 @@ const LevelsCard = ({ current }: { current?: MemberLevel }) => {
               <span className="w-6 text-center text-xs font-bold">{level.level}</span>
               <span className="flex-1">{level.name}</span>
               {!reached && <Lock className="w-3.5 h-3.5" />}
-              <span className="text-xs">{level.minPoints.toLocaleString()} pts</span>
+              <span className="text-xs">{t('leaderboard.pts', { count: level.minPoints })}</span>
             </li>
           );
         })}
@@ -172,11 +165,13 @@ const LevelsCard = ({ current }: { current?: MemberLevel }) => {
   );
 };
 
-const Podium = ({ entries }: { entries: LeaderboardEntry[] }) => (
+const Podium = ({ entries }: { entries: LeaderboardEntry[] }) => {
+  const t = useT();
+  return (
   <div className="grid gap-3 sm:grid-cols-3">
     {entries.map((entry, index) => (
       <Card key={entry.member.id} className={cn('flex flex-col items-center gap-2 text-center', index === 0 && 'border-amber-500/40 bg-amber-500/5')}>
-        <span className="text-2xl" aria-label={`Rank ${entry.rank}`}>
+        <span className="text-2xl" aria-label={t('leaderboard.rank', { rank: entry.rank })}>
           {MEDALS[entry.rank - 1] ?? `#${entry.rank}`}
         </span>
         <img src={avatarFor(entry.member)} alt="" className="h-14 w-14 rounded-full border border-border" />
@@ -185,11 +180,12 @@ const Podium = ({ entries }: { entries: LeaderboardEntry[] }) => (
           <MemberBadges badges={entry.member.badges} className="mt-1 justify-center" />
         </div>
         <LevelChip level={entry.level} />
-        <p className="text-lg font-bold">{entry.points.toLocaleString()} pts</p>
+        <p className="text-lg font-bold">{t('leaderboard.pts', { count: entry.points })}</p>
       </Card>
     ))}
   </div>
-);
+  );
+};
 
 const LeaderboardRow = ({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) => (
   <li className={cn('flex items-center gap-3 px-5 py-3', isMe && 'bg-primary/5')}>
@@ -201,29 +197,30 @@ const LeaderboardRow = ({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolea
         <MemberBadges badges={entry.member.badges} />
       </p>
       <p className="text-xs text-muted-foreground">
-        Level {entry.level.level} · {entry.level.name}
+        <T k="leaderboard.levelLine" vars={{ level: entry.level.level, name: entry.level.name }} />
       </p>
     </div>
-    <span className="shrink-0 text-sm font-bold">{entry.points.toLocaleString()} pts</span>
+    <span className="shrink-0 text-sm font-bold"><T k="leaderboard.pts" vars={{ count: entry.points }} /></span>
   </li>
 );
 
 const HowPointsWorkDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const t = useT();
   const { data } = useHowPointsWork(isOpen);
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="How points work" maxWidth="2xl">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('leaderboard.dialogTitle')} maxWidth="2xl">
       {!data ? (
         <Skeleton className="h-64 rounded-xl" />
       ) : (
         <div className="space-y-6 text-sm">
           <section className="space-y-2">
-            <h3 className="font-bold">Earning points</h3>
+            <h3 className="font-bold">{t('leaderboard.earning')}</h3>
             <ul className="divide-y divide-border/50 rounded-xl border border-border">
               {data.rules.map((rule) => (
                 <li key={rule.action} className="flex items-center gap-3 px-4 py-2.5">
                   <span className="flex-1">{rule.label}</span>
-                  {rule.dailyCap && rule.points > 0 && <span className="text-xs text-muted-foreground">up to {rule.dailyCap}/day</span>}
-                  <span className={cn('w-14 text-right font-bold', rule.points < 0 ? 'text-red-500' : 'text-emerald-500')}>
+                  {rule.dailyCap && rule.points > 0 && <span className="text-xs text-muted-foreground">{t('leaderboard.upToPerDay', { count: rule.dailyCap })}</span>}
+                  <span className={cn('w-14 text-end font-bold', rule.points < 0 ? 'text-red-500' : 'text-emerald-500')}>
                     {rule.points > 0 ? '+' : ''}
                     {rule.points}
                   </span>
@@ -231,24 +228,24 @@ const HowPointsWorkDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: ()
               ))}
             </ul>
             <p className="text-xs text-muted-foreground">
-              Deleting a post or comment, or taking back a like, also takes back its points. The leaderboard periods count the points earned in that time.
+              {t('leaderboard.earningNote')}
             </p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="font-bold">Levels</h3>
-            <p className="text-muted-foreground">Your level comes from your total points. Some spaces and events open at a level.</p>
+            <h3 className="font-bold">{t('leaderboard.levels')}</h3>
+            <p className="text-muted-foreground">{t('leaderboard.levelsNote')}</p>
             <div className="flex flex-wrap gap-2">
               {data.levels.map((level) => (
                 <span key={level.level} className="rounded-full border border-border px-3 py-1 text-xs">
-                  <span className="font-bold">{level.level}</span> {level.name} · {level.minPoints.toLocaleString()} pts
+                  <span className="font-bold">{level.level}</span> {level.name} · {t('leaderboard.pts', { count: level.minPoints })}
                 </span>
               ))}
             </div>
           </section>
 
           <section className="space-y-2">
-            <h3 className="font-bold">Badges</h3>
+            <h3 className="font-bold">{t('leaderboard.badges')}</h3>
             <ul className="grid gap-2 sm:grid-cols-2">
               {data.badges.map((badge) => (
                 <li key={badge.id} className="flex items-start gap-3 rounded-xl border border-border p-3">

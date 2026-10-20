@@ -1,4 +1,8 @@
 import type { CourseSummary } from '@/types/courses';
+import { activeLocale } from '@/i18n/active';
+import { translate } from '@/i18n/translate';
+import { messages, type MessageKey } from '@/i18n/messages';
+import type { Vars } from '@/i18n/types';
 
 /** Turns a YouTube, Vimeo or Loom link into an embeddable player URL; other links play as a video file. */
 export function videoSource(url: string): { kind: 'embed' | 'file'; src: string } {
@@ -24,14 +28,18 @@ export function videoSource(url: string): { kind: 'embed' | 'file'; src: string 
   return { kind: 'file', src: url };
 }
 
+const tr = (key: MessageKey, vars?: Vars) => translate(messages[activeLocale()], messages.en, activeLocale(), key, vars);
+
 export const formatMinutes = (minutes: number) => {
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return tr('common.units.minutes', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  return minutes % 60 ? `${hours} h ${minutes % 60} min` : `${hours} h`;
+  return minutes % 60 ? tr('common.units.hoursMinutes', { hours, minutes: minutes % 60 }) : tr('common.units.hours', { hours });
 };
 
 export const formatBytes = (bytes: number) =>
-  bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  bytes < 1024 * 1024
+    ? tr('common.units.kb', { count: Math.max(1, Math.round(bytes / 1024)) })
+    : tr('common.units.mb', { count: (bytes / 1024 / 1024).toFixed(1) });
 
 export const progressPercent = (course: Pick<CourseSummary, 'progress' | 'lessonCount'>) =>
   course.progress && course.lessonCount ? Math.round((course.progress.completedLessons / course.lessonCount) * 100) : 0;

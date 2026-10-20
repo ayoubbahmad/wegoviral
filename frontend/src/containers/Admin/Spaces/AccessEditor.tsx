@@ -10,6 +10,8 @@ import { ROLE_LABELS, UserRole } from '@/lib/roles';
 import { useHowPointsWork } from '@/containers/Community/Leaderboard/api';
 import { useSaveSpaceAccess, useTiers } from '../api/moderation';
 import { AccessRule, AdminSpace, Tier } from '../types';
+import { useT } from '@/i18n/provider';
+import { levelOptions } from '@/lib/levels';
 
 /** Short summary for lists, e.g. "Pro · 30+ days". */
 export function summarizeAccess(rule: AccessRule | null, tiers: Tier[] = []) {
@@ -23,12 +25,6 @@ export function summarizeAccess(rule: AccessRule | null, tiers: Tier[] = []) {
   return parts.length ? parts.join(' · ') : null;
 }
 
-/** "Any level" plus every level above the first. */
-export const levelOptions = (levels: { level: number; name: string; minPoints: number }[] = []) => [
-  { value: '', label: 'Any level' },
-  ...levels.filter((level) => level.level > 1).map((level) => ({ value: String(level.level), label: `Level ${level.level} · ${level.name} (${level.minPoints} pts)` })),
-];
-
 const ROLE_OPTIONS: { value: '' | UserRole; label: string }[] = [
   { value: '', label: 'Every member' },
   { value: 'INSTRUCTOR', label: 'Instructors and the team' },
@@ -38,6 +34,7 @@ const ROLE_OPTIONS: { value: '' | UserRole; label: string }[] = [
 
 /** Who can open a space. All conditions must match; staff always can. */
 export const AccessEditor = ({ space }: { space: AdminSpace }) => {
+  const t = useT();
   const can = useCan();
   const { showToast } = useToast();
   const save = useSaveSpaceAccess();
@@ -87,7 +84,7 @@ export const AccessEditor = ({ space }: { space: AdminSpace }) => {
         </label>
         <label className="space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">Level</span>
-          <Select aria-label="Minimum level" value={minLevel} onChange={(e) => setMinLevel(e.target.value)} options={levelOptions(points?.levels)} />
+          <Select aria-label="Minimum level" value={minLevel} onChange={(e) => setMinLevel(e.target.value)} options={levelOptions(points?.levels, t)} />
         </label>
       </div>
       <div className="space-y-1.5">

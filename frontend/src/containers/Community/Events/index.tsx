@@ -16,6 +16,7 @@ import { EventCard } from './components/EventCard';
 import { CalendarView } from './components/CalendarView';
 import { EventDetailDialog } from './components/EventDetailDialog';
 import { EventFormDialog } from './components/EventFormDialog';
+import { useT } from '@/i18n/provider';
 
 type View = 'cards' | 'calendar';
 const VIEW_KEY = 'wgv_events_view';
@@ -43,6 +44,7 @@ const Chip = ({ active, onClick, children }: { active: boolean; onClick: () => v
 );
 
 export const CommunityEventsContainer = () => {
+  const t = useT();
   const can = useCan();
   const router = useRouter();
   const pathname = usePathname();
@@ -75,29 +77,29 @@ export const CommunityEventsContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/community/help/events"
-        title="Events"
-        description="Live sessions, workshops and meetups hosted by the community."
+        title={t('events.title')}
+        description={t('events.description')}
         actions={
           can('events.create') && (
             <Button variant="primary" onClick={() => setEditing('new')}>
-              <Plus className="w-4 h-4" /> New event
+              <Plus className="w-4 h-4" /> {t('events.newEvent')}
             </Button>
           )
         }
       />
 
       <div className="flex items-center gap-3">
-        <div role="tablist" aria-label="Event categories" className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Chip active={!category} onClick={() => setCategory(undefined)}>All</Chip>
+        <div role="tablist" aria-label={t('events.categories')} className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Chip active={!category} onClick={() => setCategory(undefined)}>{t('common.all')}</Chip>
           {categories.map((name) => (
             <Chip key={name} active={category === name} onClick={() => setCategory(name)}>
               {name}
             </Chip>
           ))}
         </div>
-        <div role="group" aria-label="View" className="flex shrink-0 rounded-xl border border-border bg-card p-1">
+        <div role="group" aria-label={t('events.view')} className="flex shrink-0 rounded-xl border border-border bg-card p-1">
           <button
-            aria-label="Cards view"
+            aria-label={t('events.cardsView')}
             aria-pressed={view === 'cards'}
             onClick={() => changeView('cards')}
             className={cn('rounded-lg p-2 transition-colors', view === 'cards' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
@@ -105,7 +107,7 @@ export const CommunityEventsContainer = () => {
             <LayoutGrid className="w-4 h-4" />
           </button>
           <button
-            aria-label="Calendar view"
+            aria-label={t('events.calendarView')}
             aria-pressed={view === 'calendar'}
             onClick={() => changeView('calendar')}
             className={cn('rounded-lg p-2 transition-colors', view === 'calendar' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
@@ -146,6 +148,7 @@ interface CardsViewProps {
 }
 
 const CardsView = ({ category, timeframe, onTimeframe, onOpen }: CardsViewProps) => {
+  const t = useT();
   const { data: events = [], isPending, error } = useEvents(timeframe, category);
 
   return (
@@ -157,7 +160,7 @@ const CardsView = ({ category, timeframe, onTimeframe, onOpen }: CardsViewProps)
             onClick={() => onTimeframe(option)}
             className={cn('border-b-2 pb-1 transition-colors', timeframe === option ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground')}
           >
-            {option === 'upcoming' ? 'Upcoming' : 'Past'}
+            {option === 'upcoming' ? t('events.upcoming') : t('events.past')}
           </button>
         ))}
       </div>
@@ -172,8 +175,8 @@ const CardsView = ({ category, timeframe, onTimeframe, onOpen }: CardsViewProps)
       ) : events.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
-          title={timeframe === 'upcoming' ? 'No upcoming events' : 'No past events'}
-          description={timeframe === 'upcoming' ? 'New events will show up here.' : undefined}
+          title={timeframe === 'upcoming' ? t('events.noUpcoming') : t('events.noPast')}
+          description={timeframe === 'upcoming' ? t('events.newWillShow') : undefined}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

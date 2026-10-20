@@ -19,22 +19,19 @@ import { cn } from '@/lib/utils';
 import { CourseSummary } from '@/types/courses';
 import { useCourses, useCreateCourse } from './api';
 import { formatMinutes, progressPercent } from './utils';
+import { useT } from '@/i18n/provider';
 
 type Filter = 'all' | 'progress' | 'done' | 'mine';
 
-const FILTERS: { id: Filter; label: string; match: (course: CourseSummary) => boolean }[] = [
-  { id: 'all', label: 'All courses', match: () => true },
-  { id: 'progress', label: 'In progress', match: (c) => Boolean(c.progress && !c.progress.completedAt) },
-  { id: 'done', label: 'Completed', match: (c) => Boolean(c.progress?.completedAt) },
-  { id: 'mine', label: 'I teach', match: (c) => c.canManage },
+const FILTERS: { id: Filter; match: (course: CourseSummary) => boolean }[] = [
+  { id: 'all', match: () => true },
+  { id: 'progress', match: (c) => Boolean(c.progress && !c.progress.completedAt) },
+  { id: 'done', match: (c) => Boolean(c.progress?.completedAt) },
+  { id: 'mine', match: (c) => c.canManage },
 ];
 
-const STATUS_BADGE: Partial<Record<CourseSummary['status'], string>> = {
-  DRAFT: 'Draft',
-  ARCHIVED: 'Archived',
-};
-
 export const CommunityCoursesContainer = () => {
+  const t = useT();
   const can = useCan();
   const { data: courses = [], isPending, error } = useCourses();
   const [filter, setFilter] = useState<Filter>('all');
@@ -52,12 +49,12 @@ export const CommunityCoursesContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/community/help/courses"
-        title="Courses"
-        description="Learn from the community's playbooks, trainings and replays."
+        title={t('courses.title')}
+        description={t('courses.description')}
         actions={
           canCreate && (
             <Button variant="primary" onClick={() => setCreating(true)}>
-              <Plus className="w-4 h-4" /> New course
+              <Plus className="w-4 h-4" /> {t('courses.newCourse')}
             </Button>
           )
         }
@@ -65,7 +62,7 @@ export const CommunityCoursesContainer = () => {
 
       {current && <ContinueCard course={current} />}
 
-      <div role="tablist" aria-label="Filter courses" className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+      <div role="tablist" aria-label={t('courses.filters.label')} className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
         {visibleFilters.map((option) => (
           <button
             key={option.id}
@@ -77,7 +74,7 @@ export const CommunityCoursesContainer = () => {
               filter === option.id ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card/50 text-muted-foreground hover:text-foreground',
             )}
           >
-            {option.label}
+            {t(`courses.filters.${option.id}`)}
           </button>
         ))}
       </div>
@@ -93,8 +90,8 @@ export const CommunityCoursesContainer = () => {
       ) : shown.length === 0 ? (
         <EmptyState
           icon={GraduationCap}
-          title={filter === 'all' ? 'No courses yet' : 'Nothing here yet'}
-          description={filter === 'all' ? (canCreate ? 'Create the first course for the community.' : 'New courses will show up here.') : undefined}
+          title={filter === 'all' ? t('courses.emptyAll') : t('courses.emptyFiltered')}
+          description={filter === 'all' ? (canCreate ? t('courses.emptyCreate') : t('courses.emptyMember')) : undefined}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -119,6 +116,7 @@ const Cover = ({ course, className }: { course: CourseSummary; className?: strin
   );
 
 const ContinueCard = ({ course }: { course: CourseSummary }) => {
+  const t = useT();
   const percent = progressPercent(course);
   const href = `/community/courses/${course.id}${course.progress?.lastLessonId ? `?lesson=${course.progress.lastLessonId}` : ''}`;
   return (
@@ -126,18 +124,18 @@ const ContinueCard = ({ course }: { course: CourseSummary }) => {
       <div className="flex flex-col sm:flex-row">
         <Cover course={course} className="h-36 w-full sm:h-auto sm:w-56" />
         <div className="flex flex-1 flex-col justify-center gap-3 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Continue where you left off</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">{t('courses.continueTitle')}</p>
           <h2 className="text-lg font-bold">{course.title}</h2>
           <div className="space-y-1.5">
             <ProgressBar value={percent} />
             <p className="text-xs text-muted-foreground">
-              {course.progress!.completedLessons} of {course.lessonCount} lessons · {percent}%
+              {t('courses.lessonsOf', { done: course.progress!.completedLessons, total: course.lessonCount, percent })}
             </p>
           </div>
           <div>
             <Link href={href}>
               <Button variant="primary" size="sm">
-                <Play className="w-4 h-4" /> Continue
+                <Play className="w-4 h-4 rtl:rotate-180" /> {t('courses.page.continue')}
               </Button>
             </Link>
           </div>
@@ -148,29 +146,30 @@ const ContinueCard = ({ course }: { course: CourseSummary }) => {
 };
 
 const CourseCard = ({ course }: { course: CourseSummary }) => {
+  const t = useT();
   const percent = progressPercent(course);
-  const status = STATUS_BADGE[course.status];
+  const status = course.status === 'PUBLISHED' ? null : t(`common.status.${course.status}`);
   return (
     <Link href={`/community/courses/${course.id}`} className="group block">
       <Card padding="none" hover className={cn('flex h-full flex-col overflow-hidden', course.status === 'DRAFT' && 'border-dashed')}>
         <div className="relative">
           <Cover course={course} className="h-40 w-full" />
-          {status && <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-bold">{status}</span>}
+          {status && <span className="absolute start-3 top-3 rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-bold">{status}</span>}
           {course.access.locked && (
-            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-bold">
-              <Lock className="w-3 h-3" /> Locked
+            <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-bold">
+              <Lock className="w-3 h-3" /> {t('common.locked')}
             </span>
           )}
         </div>
         <div className="flex flex-1 flex-col gap-3 p-5">
           <div className="space-y-1">
             <h3 className="font-bold leading-snug group-hover:text-primary">{course.title}</h3>
-            <p className="text-xs text-muted-foreground">by {course.owner.name || `@${course.owner.username}`}</p>
+            <p className="text-xs text-muted-foreground">{t('common.by', { name: course.owner.name || `@${course.owner.username}` })}</p>
           </div>
           {course.description && <p className="line-clamp-2 text-sm text-muted-foreground">{course.description}</p>}
           <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <BookOpen className="w-3.5 h-3.5" /> {course.lessonCount} lesson{course.lessonCount === 1 ? '' : 's'}
+              <BookOpen className="w-3.5 h-3.5" /> {t('courses.lessons', { count: course.lessonCount })}
             </span>
             {course.totalMinutes > 0 && (
               <span className="flex items-center gap-1">
@@ -178,21 +177,21 @@ const CourseCard = ({ course }: { course: CourseSummary }) => {
               </span>
             )}
             {course.completionBadge && (
-              <span title={`Finish it to earn ${course.completionBadge.name}`}>
+              <span title={t('courses.earnBadge', { badge: course.completionBadge.name })}>
                 {course.completionBadge.emoji} {course.completionBadge.name}
               </span>
             )}
           </div>
           {course.access.locked ? (
-            <p className="text-xs text-amber-600 dark:text-amber-400">{course.access.reasons.map(describeLockReason).join(' · ')}</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400">{course.access.reasons.map((reason) => describeLockReason(reason, t)).join(' · ')}</p>
           ) : course.progress?.completedAt ? (
             <p className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="w-4 h-4" /> Completed
+              <CheckCircle2 className="w-4 h-4" /> {t('courses.completed')}
             </p>
           ) : course.progress ? (
             <div className="space-y-1">
               <ProgressBar value={percent} />
-              <p className="text-xs text-muted-foreground">{percent}% done</p>
+              <p className="text-xs text-muted-foreground">{t('courses.percentDone', { percent })}</p>
             </div>
           ) : null}
         </div>
@@ -202,6 +201,7 @@ const CourseCard = ({ course }: { course: CourseSummary }) => {
 };
 
 const NewCourseDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const t = useT();
   const router = useRouter();
   const { showToast } = useToast();
   const create = useCreateCourse();
@@ -219,24 +219,24 @@ const NewCourseDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="New course" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('courses.newDialog.title')} maxWidth="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Title</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('courses.newDialog.label')}</span>
           <input
             autoFocus
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={120}
-            placeholder="e.g. Hooks that stop the scroll"
+            placeholder={t('courses.newDialog.placeholder')}
             className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </label>
-        <p className="text-xs text-muted-foreground">It starts as a draft: add modules and lessons, then publish it.</p>
+        <p className="text-xs text-muted-foreground">{t('courses.newDialog.hint')}</p>
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button type="button" variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
           <Button type="submit" variant="primary" disabled={title.trim().length < 3 || create.isPending}>
-            {create.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create and start building'}
+            {create.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('courses.newDialog.submit')}
           </Button>
         </div>
       </form>

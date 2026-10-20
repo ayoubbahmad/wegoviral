@@ -23,6 +23,7 @@ import { CommunityEvent } from '@/types/communityFeed';
 import { downloadAttendeesCsv, useAttendees, useDeleteEvent, useEvent, useRsvp, useSaveEvent } from '../api';
 import { downloadIcs, formatEventWhen, googleCalendarUrl, isPast, viewerTimezone } from '../utils';
 import { EventBadges } from './EventBadges';
+import { useT } from '@/i18n/provider';
 
 interface EventDetailDialogProps {
   eventId: string;
@@ -31,6 +32,7 @@ interface EventDetailDialogProps {
 }
 
 export const EventDetailDialog = ({ eventId, onClose, onEdit }: EventDetailDialogProps) => {
+  const t = useT();
   const { data: event, isPending, error } = useEvent(eventId);
 
   useEffect(() => {
@@ -44,8 +46,8 @@ export const EventDetailDialog = ({ eventId, onClose, onEdit }: EventDetailDialo
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-150"
       onMouseDown={(mouseEvent) => mouseEvent.target === mouseEvent.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-label="Event details" className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
-        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-10 rounded-lg bg-card/80 p-2 text-muted-foreground backdrop-blur hover:text-foreground">
+      <div role="dialog" aria-modal="true" aria-label={t('events.details')} className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
+        <button onClick={onClose} aria-label={t('common.close')} className="absolute end-3 top-3 z-10 rounded-lg bg-card/80 p-2 text-muted-foreground backdrop-blur hover:text-foreground">
           <X className="w-4 h-4" />
         </button>
         {isPending ? (
@@ -66,6 +68,7 @@ export const EventDetailDialog = ({ eventId, onClose, onEdit }: EventDetailDialo
 const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClose: () => void; onEdit: (event: CommunityEvent) => void }) => {
   const { showToast } = useToast();
   const { user } = useAuth();
+  const t = useT();
   const rsvp = useRsvp();
   const save = useSaveEvent();
   const remove = useDeleteEvent();
@@ -79,24 +82,24 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
     rsvp.mutate(
       { id: event.id, going: !event.goingByMe },
       {
-        onSuccess: (updated) => showToast(updated.goingByMe ? "You're going! Add it to your calendar so you don't miss it." : 'RSVP cancelled'),
+        onSuccess: (updated) => showToast(updated.goingByMe ? t('events.goingToast') : t('events.rsvpCancelled')),
         onError: (err) => showToast(err.message, 'error'),
       },
     );
 
   const setStatus = (status: 'PUBLISHED' | 'CANCELLED') => {
-    if (status === 'CANCELLED' && !window.confirm(`Cancel "${event.title}"? Members who are going will see it as cancelled.`)) return;
+    if (status === 'CANCELLED' && !window.confirm(t('events.cancelConfirm', { title: event.title }))) return;
     save.mutate(
       { id: event.id, input: { status } },
-      { onSuccess: () => showToast(status === 'PUBLISHED' ? 'Event published' : 'Event cancelled'), onError: (err) => showToast(err.message, 'error') },
+      { onSuccess: () => showToast(status === 'PUBLISHED' ? t('events.published') : t('events.cancelledToast')), onError: (err) => showToast(err.message, 'error') },
     );
   };
 
   const handleDelete = () => {
-    if (!window.confirm(`Delete "${event.title}"? This can't be undone.`)) return;
+    if (!window.confirm(t('events.deleteConfirm', { title: event.title }))) return;
     remove.mutate(event.id, {
       onSuccess: () => {
-        showToast('Event deleted');
+        showToast(t('events.deleted'));
         onClose();
       },
       onError: (err) => showToast(err.message, 'error'),
@@ -112,33 +115,34 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
           <h2 className="text-2xl font-bold tracking-tight">{event.title}</h2>
           <p className="text-sm font-medium">{formatEventWhen(event)}</p>
           {hostZone && (
-            <p className="text-xs text-muted-foreground">Times shown in your time zone. The host set it in {event.timezone.replace('_', ' ')}.</p>
+            <p className="text-xs text-muted-foreground">{t('events.timesNote', { zone: event.timezone.replace('_', ' ') })}</p>
           )}
         </div>
 
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
             {event.locationType === 'ONLINE' ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-            {event.locationType === 'ONLINE' ? 'Online' : event.location || 'In person'}
+            {event.locationType === 'ONLINE' ? t('events.online') : event.location || t('events.inPerson')}
           </span>
           <span className="flex items-center gap-1.5">
             <Users className="w-4 h-4" />
-            {event.goingCount}
-            {event.capacity ? ` / ${event.capacity}` : ''} going
+            {event.capacity
+              ? t('events.goingOf', { count: event.goingCount, capacity: event.capacity })
+              : t('events.going', { count: event.goingCount })}
           </span>
           <span className="flex items-center gap-1.5">
             <img src={avatarFor(event.host)} alt="" className="w-5 h-5 rounded-full border border-border" />
-            Hosted by @{event.host.username}
+            {t('events.hostedBy', { username: event.host.username })}
           </span>
         </div>
 
         {event.access.locked ? (
           <div className="space-y-1 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
             <p className="flex items-center gap-2 font-semibold">
-              <Lock className="w-4 h-4" /> This event is locked
+              <Lock className="w-4 h-4" /> {t('events.locked')}
             </p>
             {event.access.reasons.map((reason, index) => (
-              <p key={index} className="text-muted-foreground">{describeLockReason(reason)}</p>
+              <p key={index} className="text-muted-foreground">{describeLockReason(reason, t)}</p>
             ))}
           </div>
         ) : (
@@ -149,24 +153,24 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
         <div className="flex flex-wrap gap-2">
           {canRsvp && canInteract && (
             <Button variant={event.goingByMe ? 'outline' : 'primary'} onClick={toggleGoing} disabled={rsvp.isPending || (!event.goingByMe && event.isFull)}>
-              {rsvp.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : event.goingByMe ? 'Cancel my RSVP' : event.isFull ? 'Event is full' : "I'm going"}
+              {rsvp.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : event.goingByMe ? t('events.cancelRsvp') : event.isFull ? t('events.isFull') : t('events.imGoing')}
             </Button>
           )}
           {event.link && !ended && event.status === 'PUBLISHED' && (
             <a href={event.link} target="_blank" rel="noreferrer">
               <Button variant="primary">
-                <ExternalLink className="w-4 h-4" /> Join link
+                <ExternalLink className="w-4 h-4" /> {t('events.joinLink')}
               </Button>
             </a>
           )}
           {!event.link && event.hasLink && canRsvp && !event.goingByMe && (
-            <p className="self-center text-xs text-muted-foreground">The live link appears once you&apos;re going.</p>
+            <p className="self-center text-xs text-muted-foreground">{t('events.linkAppears')}</p>
           )}
           {!ended && event.status === 'PUBLISHED' && !event.access.locked && (
             <>
               <a href={googleCalendarUrl(event)} target="_blank" rel="noreferrer">
                 <Button variant="ghost">
-                  <CalendarPlus className="w-4 h-4" /> Google Calendar
+                  <CalendarPlus className="w-4 h-4" /> {t('events.googleCalendar')}
                 </Button>
               </a>
               <Button variant="ghost" onClick={() => downloadIcs(event)}>
@@ -177,7 +181,7 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
           {event.recordingUrl && (
             <a href={event.recordingUrl} target="_blank" rel="noreferrer">
               <Button variant="outline">
-                <PlayCircle className="w-4 h-4" /> Watch the recording
+                <PlayCircle className="w-4 h-4" /> {t('events.watchRecording')}
               </Button>
             </a>
           )}
@@ -186,20 +190,20 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
         {/* Host & staff */}
         {event.canManage && (
           <div className="space-y-3 border-t border-border pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Manage</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('events.manage')}</p>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => onEdit(event)}>Edit</Button>
+              <Button variant="outline" size="sm" onClick={() => onEdit(event)}>{t('common.edit')}</Button>
               {event.status === 'DRAFT' && (
-                <Button variant="primary" size="sm" onClick={() => setStatus('PUBLISHED')} disabled={save.isPending}>Publish</Button>
+                <Button variant="primary" size="sm" onClick={() => setStatus('PUBLISHED')} disabled={save.isPending}>{t('events.publish')}</Button>
               )}
               {event.status === 'PUBLISHED' && !ended && (
-                <Button variant="outline" size="sm" onClick={() => setStatus('CANCELLED')} disabled={save.isPending}>Cancel event</Button>
+                <Button variant="outline" size="sm" onClick={() => setStatus('CANCELLED')} disabled={save.isPending}>{t('events.cancelEvent')}</Button>
               )}
               <Button variant="outline" size="sm" onClick={() => setShowAttendees((open) => !open)}>
-                {showAttendees ? 'Hide attendees' : `Attendees (${event.goingCount})`}
+                {showAttendees ? t('events.hideAttendees') : t('events.attendees', { count: event.goingCount })}
               </Button>
               <Button variant="ghost" size="sm" onClick={handleDelete} disabled={remove.isPending} className="text-red-500 hover:bg-red-500/10">
-                Delete
+                {t('common.delete')}
               </Button>
             </div>
             {showAttendees && <AttendeeList event={event} />}
@@ -211,13 +215,14 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
 };
 
 const AttendeeList = ({ event }: { event: CommunityEvent }) => {
+  const t = useT();
   const { showToast } = useToast();
   const { data: attendees = [], isPending } = useAttendees(event.id, true);
   if (isPending) return <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />;
   return (
     <div className="space-y-2">
       {attendees.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nobody yet.</p>
+        <p className="text-sm text-muted-foreground">{t('events.nobodyYet')}</p>
       ) : (
         <ul className="max-h-60 space-y-2 overflow-y-auto">
           {attendees.map((attendee) => (
@@ -235,7 +240,7 @@ const AttendeeList = ({ event }: { event: CommunityEvent }) => {
           size="sm"
           onClick={() => downloadAttendeesCsv(event.id, event.title).catch((err) => showToast(err.message, 'error'))}
         >
-          <Download className="w-4 h-4" /> Export CSV
+          <Download className="w-4 h-4" /> {t('events.exportCsv')}
         </Button>
       )}
     </div>

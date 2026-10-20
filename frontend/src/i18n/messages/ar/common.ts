@@ -82,4 +82,18 @@ export const common: Shape<typeof en> = {
     mb: '{count} م.ب',
   },
   justNow: 'الآن',
+  access: {
+    role: 'الدور',
+    minRole: 'الحد الأدنى للدور',
+    everyMember: 'جميع الأعضاء',
+    instructorsTeam: 'المدرّبون والفريق',
+    moderatorsUp: 'المشرفون فما فوق',
+    days: 'الأيام في المجتمع',
+    noMinimum: 'بلا حد أدنى',
+    level: 'المستوى',
+    minLevel: 'الحد الأدنى للمستوى',
+    anyLevel: 'أي مستوى',
+    levelOption: 'المستوى {level} · {name} ({points} نقطة)',
+    tiers: 'الباقات (عدم التحديد = جميع الباقات)',
+  },
 };

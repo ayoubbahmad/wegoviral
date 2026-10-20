@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/Auth";
+import { useT } from '@/i18n/provider';
 
 /**
  * Landing page after Google sign-in or an email confirmation link.
  * The Supabase client exchanges the ?code= on load; we wait for the profile.
  */
 export function AuthCallbackContainer() {
+    const t = useT();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isLoading } = useAuth();
@@ -26,12 +28,12 @@ export function AuthCallbackContainer() {
                 <div className="inline-flex p-4 rounded-2xl bg-destructive/10 text-destructive">
                     <AlertCircle className="w-8 h-8" />
                 </div>
-                <h1 className="text-xl font-bold">We couldn&apos;t sign you in</h1>
+                <h1 className="text-xl font-bold">{t("auth.callback.failedTitle")}</h1>
                 <p className="text-sm text-muted-foreground">
-                    {providerError || "This link is invalid or has expired. Please try again."}
+                    {providerError || t("auth.callback.failedBody")}
                 </p>
                 <Link href="/login" className="inline-block text-sm font-bold text-primary hover:underline">
-                    Back to log in
+                    {t("auth.backToLogin")}
                 </Link>
             </div>
         );
@@ -40,7 +42,7 @@ export function AuthCallbackContainer() {
     return (
         <div className="flex flex-col items-center gap-4">
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            <p className="text-sm font-medium text-muted-foreground">Signing you in...</p>
+            <p className="text-sm font-medium text-muted-foreground">{t("auth.callback.signingIn")}</p>
         </div>
     );
 }

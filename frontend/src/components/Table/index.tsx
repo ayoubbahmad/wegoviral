@@ -13,7 +13,7 @@ interface TableProps {
 export const Table = ({ children, className }: TableProps) => {
   return (
     <div className={cn("overflow-x-auto rounded-2xl border border-border/50 bg-card", className)}>
-      <table className="w-full text-left border-collapse">
+      <table className="w-full text-start border-collapse">
         {children}
       </table>
     </div>
@@ -39,8 +39,8 @@ interface TableHeadProps {
 
 Table.Head = ({ children, className, align = "left" }: TableHeadProps) => {
   const alignMap = {
-    left: "text-left",
-    right: "text-right",
+    left: "text-start",
+    right: "text-end",
     center: "text-center",
   };
 
@@ -97,8 +97,8 @@ interface TableCellProps {
 
 Table.Cell = ({ children, className, align = "left" }: TableCellProps) => {
   const alignMap = {
-    left: "text-left",
-    right: "text-right",
+    left: "text-start",
+    right: "text-end",
     center: "text-center",
   };
 

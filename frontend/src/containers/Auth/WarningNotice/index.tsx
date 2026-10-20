@@ -5,9 +5,12 @@ import { createPortal } from "react-dom";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { useAuth, useRefreshUser } from "@/providers/Auth";
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 /** Shows warnings from the team one at a time until the member acknowledges them. */
 export function WarningNotice() {
+    const t = useT();
     const { user } = useAuth();
     const refreshUser = useRefreshUser();
     const [isSaving, setIsSaving] = useState(false);
@@ -31,21 +34,21 @@ export function WarningNotice() {
                     <AlertTriangle className="h-8 w-8" />
                 </div>
                 <div className="space-y-2">
-                    <h2 id="warning-title" className="text-xl font-bold">A message from the WeGoViral team</h2>
+                    <h2 id="warning-title" className="text-xl font-bold">{t("auth.warning.title")}</h2>
                     <p className="text-sm text-muted-foreground">
-                        You received a warning on {new Date(warning.createdAt).toLocaleDateString()}.
+                        {t("auth.warningReceived", { date: new Date(warning.createdAt).toLocaleDateString(activeIntl()) })}
                     </p>
                 </div>
-                <p className="rounded-xl bg-secondary/40 p-4 text-left text-sm">{warning.reason}</p>
+                <p className="rounded-xl bg-secondary/40 p-4 text-start text-sm">{warning.reason}</p>
                 <p className="text-xs text-muted-foreground">
-                    Please follow the community guide. Repeated issues can lead to a mute or suspension.
+                    {t("auth.warningFollow")}
                 </p>
                 <button
                     onClick={acknowledge}
                     disabled={isSaving}
                     className="w-full rounded-2xl bg-primary py-3 font-bold text-primary-foreground hover:opacity-90 disabled:opacity-70"
                 >
-                    {isSaving ? <Loader2 className="mx-auto h-5 w-5 animate-spin" /> : "I understand"}
+                    {isSaving ? <Loader2 className="mx-auto h-5 w-5 animate-spin" /> : t("auth.warning.understand")}
                 </button>
             </div>
         </div>,

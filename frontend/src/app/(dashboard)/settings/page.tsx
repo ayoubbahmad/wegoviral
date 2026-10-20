@@ -5,9 +5,12 @@ import { Mail, User as UserIcon, Camera } from 'lucide-react';
 import { ThemeToggle } from '@/containers/settings/ThemeToggle';
 // import { SocialAccountsManager } from '@/containers/settings/SocialAccountsManager';
 import { PageHeader } from '@/components/PageHeader';
+import { useT } from '@/i18n/provider';
+import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 // import { Button } from '@/components/Button';
 
 export default function ProfilePage() {
+  const t = useT();
   const { user, activeSocialAccount } = useAuth();
 
   if (!user) return null;
@@ -15,8 +18,8 @@ export default function ProfilePage() {
   return (
     <div className='space-y-12 pb-32 animate-in fade-in duration-500'>
       <PageHeader
-        title='Your Profile'
-        description='Manage your account and preferences.'
+        title={t('settings.title')}
+        description={t('settings.description')}
       />
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>
@@ -35,10 +38,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className='flex-1 space-y-4 w-full text-center sm:text-left'>
+          <div className='flex-1 space-y-4 w-full text-center sm:text-start'>
             <div>
               <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block'>
-                Full Name
+                {t('settings.fullName')}
               </label>
               <div className='flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border'>
                 <UserIcon className='w-5 h-5 text-muted-foreground' />
@@ -48,7 +51,7 @@ export default function ProfilePage() {
 
             <div>
               <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block'>
-                Email Address
+                {t('settings.email')}
               </label>
               <div className='flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border'>
                 <Mail className='w-5 h-5 text-muted-foreground' />
@@ -61,19 +64,19 @@ export default function ProfilePage() {
                 <div className='p-3 bg-secondary/20 rounded-lg border border-border text-center'>
                   <span className='block text-xl font-bold'>12.5k</span>
                   <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
-                    Followers
+                    {t('settings.followers')}
                   </span>
                 </div>
                 <div className='p-3 bg-secondary/20 rounded-lg border border-border text-center'>
                   <span className='block text-xl font-bold'>4.2%</span>
                   <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
-                    Eng. Rate
+                    {t('settings.engagement')}
                   </span>
                 </div>
                 <div className='p-3 bg-secondary/20 rounded-lg border border-border text-center'>
                   <span className='block text-xl font-bold'>892</span>
                   <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
-                    Avg Likes
+                    {t('settings.avgLikes')}
                   </span>
                 </div>
               </div>
@@ -83,18 +86,20 @@ export default function ProfilePage() {
       </div>
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>
-        <h2 className='text-lg font-semibold mb-6'>Connected Accounts</h2>
+        <h2 className='text-lg font-semibold mb-6'>{t('settings.accounts')}</h2>
+        <div className='text-sm text-muted-foreground text-center py-8'>{t('settings.accountsSoon')}</div>
+      </div>
 
-        {/* This will be replaced with Phase 4.3 UI Components */}
-        <div className='text-sm text-muted-foreground text-center py-8'>
-          Social account management UI coming in Phase 4.3
-        </div>
+      <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl space-y-3'>
+        <h2 className='text-lg font-semibold'>{t('settings.language')}</h2>
+        <p className='text-sm text-muted-foreground'>{t('settings.languageHint')}</p>
+        <LanguageSwitcher />
       </div>
 
       {/* <SocialAccountsManager /> */}
 
       <div className='p-8 rounded-2xl border border-border bg-card shadow-sm max-w-2xl'>
-        <h2 className='text-lg font-semibold mb-6'>Appearance</h2>
+        <h2 className='text-lg font-semibold mb-6'>{t('settings.appearance')}</h2>
         <ThemeToggle />
       </div>
     </div>

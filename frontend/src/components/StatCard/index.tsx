@@ -45,7 +45,7 @@ export const StatCard = ({
             >
               {trend >= 0 ? `+${trend}%` : `${trend}%`}
               <ArrowUpRight
-                className={cn('w-3 h-3 ml-0.5', trend < 0 && 'rotate-90')}
+                className={cn('w-3 h-3 ms-0.5', trend < 0 && 'rotate-90')}
               />
             </span>
           )

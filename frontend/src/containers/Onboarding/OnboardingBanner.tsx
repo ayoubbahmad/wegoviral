@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen } from 'lucide-react';
 import { useAuth } from '@/providers/Auth';
+import { useT } from '@/i18n/provider';
 
 /** Reminder for approved members who still have to accept the guide or pass the quiz. */
 export function OnboardingBanner() {
+  const t = useT();
   const { user } = useAuth();
   const pathname = usePathname();
   const step = user?.onboarding.step;
@@ -17,14 +19,14 @@ export function OnboardingBanner() {
       <BookOpen className="w-5 h-5 shrink-0 text-primary" />
       <div className="flex-1 text-sm">
         <p className="font-semibold">
-          {step === 'RULES' ? 'One last step: accept the community guide' : 'One last step: pass the community quiz'}
+          {step === 'RULES' ? t('onboarding.banner.rules') : t('onboarding.banner.quiz')}
         </p>
         <p className="text-muted-foreground">
-          You can read everything, but posting, commenting and reacting unlock once you&apos;re done.
+          {t('onboarding.banner.body')}
         </p>
       </div>
       <Link href="/community/guide" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
-        {step === 'RULES' ? 'Read the guide' : 'Take the quiz'}
+        {step === 'RULES' ? t('onboarding.banner.readGuide') : t('onboarding.banner.takeQuiz')}
       </Link>
     </div>
   );

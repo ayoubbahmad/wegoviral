@@ -110,7 +110,7 @@ const EventDetails = ({ event, onClose, onEdit }: { event: CommunityEvent; onClo
     <>
       {event.coverUrl && <img src={event.coverUrl} alt="" className="h-48 w-full object-cover" />}
       <div className="space-y-5 p-6">
-        <div className="space-y-2 pr-8">
+        <div className="space-y-2 pe-8">
           <EventBadges event={event} />
           <h2 className="text-2xl font-bold tracking-tight">{event.title}</h2>
           <p className="text-sm font-medium">{formatEventWhen(event)}</p>

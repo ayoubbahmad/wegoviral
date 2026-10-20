@@ -4,11 +4,26 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase, authRedirectUrl } from '@/lib/supabase';
 import { authApi } from '../api';
 import { User, SocialAccount, AuthContextType, AuthResult } from '../types';
+import { activeLocale } from '@/i18n/active';
+import { translate } from '@/i18n/translate';
+import { messages, type MessageKey } from '@/i18n/messages';
 
-const failure = (error: unknown, fallback: string): AuthResult => ({
-  success: false,
-  error: error instanceof Error ? error.message : fallback,
-});
+const tr = (key: MessageKey) => translate(messages[activeLocale()], messages.en, activeLocale(), key);
+
+/** Supabase answers in English; the common cases get a translated message. */
+const SUPABASE_ERRORS: [RegExp, MessageKey][] = [
+  [/invalid login credentials/i, 'auth.errors.invalidCredentials'],
+  [/email not confirmed/i, 'auth.errors.notConfirmed'],
+  [/rate limit|too many requests|security purposes/i, 'auth.errors.rateLimited'],
+  [/password should be|weak password/i, 'auth.errors.weakPassword'],
+  [/already registered|already exists/i, 'auth.errors.exists'],
+];
+
+const failure = (error: unknown, fallback: MessageKey): AuthResult => {
+  const message = error instanceof Error ? error.message : '';
+  const known = SUPABASE_ERRORS.find(([pattern]) => pattern.test(message));
+  return { success: false, error: known ? tr(known[1]) : message || tr(fallback) };
+};
 
 export function useAuthController(): AuthContextType {
   const [user, setUser] = useState<User | null>(null);
@@ -71,7 +86,7 @@ export function useAuthController(): AuthContextType {
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return failure(error, 'Login failed');
+    if (error) return failure(error, 'auth.errors.loginFailed');
     return { success: true };
   };
 
@@ -89,12 +104,12 @@ export function useAuthController(): AuthContextType {
         data: { full_name: name, username: username.toLowerCase() },
       },
     });
-    if (error) return failure(error, 'Registration failed');
+    if (error) return failure(error, 'auth.errors.registerFailed');
     // Supabase hides existing emails by returning a user without identities
     if (data.user && data.user.identities?.length === 0) {
       return {
         success: false,
-        error: 'An account with this email already exists. Try logging in.',
+        error: tr('auth.errors.exists'),
       };
     }
     return { success: true, needsConfirmation: !data.session };
@@ -105,7 +120,7 @@ export function useAuthController(): AuthContextType {
       provider: 'google',
       options: { redirectTo: authRedirectUrl('/auth/callback') },
     });
-    if (error) return failure(error, 'Google sign-in failed');
+    if (error) return failure(error, 'auth.errors.googleFailed');
     return { success: true };
   };
 
@@ -113,13 +128,13 @@ export function useAuthController(): AuthContextType {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: authRedirectUrl('/auth/reset-password'),
     });
-    if (error) return failure(error, 'Could not send the reset email');
+    if (error) return failure(error, 'auth.errors.resetFailed');
     return { success: true };
   };
 
   const updatePassword = async (password: string): Promise<AuthResult> => {
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) return failure(error, 'Could not update the password');
+    if (error) return failure(error, 'auth.errors.updateFailed');
     return { success: true };
   };
 

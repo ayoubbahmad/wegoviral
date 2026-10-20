@@ -10,14 +10,10 @@ import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';
 import { LightMarkdown } from '@/components/LightMarkdown';
 import { useCan } from '@/providers/Auth';
-import { ROLE_LABELS } from '@/lib/roles';
 import { HelpArticleSummary, HelpSpaceId, useHelpArticle, useHelpArticles } from './api';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
-export const HELP_TITLES: Record<HelpSpaceId, { title: string; description: string }> = {
-  community: { title: 'Community help', description: 'How the community works: joining, posting, events, courses, challenges and points.' },
-  creator: { title: 'Creator Space help', description: 'How to use your personal creator tools.' },
-  admin: { title: 'Team guides', description: 'How to run the community, for each role on the team.' },
-};
 
 /** Groups articles by section, keeping the order the team set. */
 const bySection = (articles: HelpArticleSummary[]) => {
@@ -27,23 +23,25 @@ const bySection = (articles: HelpArticleSummary[]) => {
 };
 
 export const HelpCenter = ({ space }: { space: HelpSpaceId }) => {
+  const t = useT();
   const [search, setSearch] = useState('');
   const query = search.trim().length >= 2 ? search.trim() : '';
   const { data: articles = [], isPending, error } = useHelpArticles(space, query);
-  const { title, description } = HELP_TITLES[space];
+  const title = t(`help.titles.${space}.title`);
+  const description = t(`help.titles.${space}.description`);
 
   return (
     <PageContainer>
       <PageHeader title={title} description={description} />
       <label className="relative block max-w-xl">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search the help articles"
-          aria-label="Search the help articles"
-          className="h-11 w-full rounded-xl border border-border bg-card pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          placeholder={t('help.search')}
+          aria-label={t('help.search')}
+          className="h-11 w-full rounded-xl border border-border bg-card ps-10 pe-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </label>
 
@@ -56,7 +54,7 @@ export const HelpCenter = ({ space }: { space: HelpSpaceId }) => {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : articles.length === 0 ? (
-        <EmptyState icon={LifeBuoy} title={query ? `Nothing found for “${query}”` : 'No articles here yet'} description={query ? 'Try another word.' : undefined} />
+        <EmptyState icon={LifeBuoy} title={query ? t('help.nothingFound', { query }) : t('help.noArticles')} description={query ? t('help.tryAnother') : undefined} />
       ) : query ? (
         <Card padding="none">
           <ul className="divide-y divide-border/50">
@@ -83,7 +81,9 @@ export const HelpCenter = ({ space }: { space: HelpSpaceId }) => {
   );
 };
 
-const ArticleRow = ({ space, article, showSection }: { space: HelpSpaceId; article: HelpArticleSummary; showSection?: boolean }) => (
+const ArticleRow = ({ space, article, showSection }: { space: HelpSpaceId; article: HelpArticleSummary; showSection?: boolean }) => {
+  const t = useT();
+  return (
   <li>
     <Link href={`/${space}/help/${article.slug}`} className="group flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-secondary/40">
       <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -93,51 +93,53 @@ const ArticleRow = ({ space, article, showSection }: { space: HelpSpaceId; artic
       </div>
       {article.audience !== 'MEMBER' && (
         <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-          {ROLE_LABELS[article.audience]}s
+          {t('help.audience', { role: t(`common.roles.${article.audience}`) })}
         </span>
       )}
-      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" />
     </Link>
   </li>
-);
+  );
+};
 
 export const HelpArticlePage = ({ space, slug }: { space: HelpSpaceId; slug: string }) => {
+  const t = useT();
   const can = useCan();
   const { data: article, isPending, error } = useHelpArticle(slug);
   return (
     <PageContainer>
       <Link href={`/${space}/help`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> {HELP_TITLES[space].title}
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {t(`help.titles.${space}.title`)}
       </Link>
       {isPending ? (
         <Skeleton className="h-96 rounded-2xl" />
       ) : error ? (
-        <EmptyState icon={LifeBuoy} title="Article not found" description="It may have moved, or it isn't meant for your role." />
+        <EmptyState icon={LifeBuoy} title={t('help.notFoundTitle')} description={t('help.notFoundBody')} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
           <Card className="min-w-0 space-y-4">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {article.category}
-                {article.audience !== 'MEMBER' && ` · for ${ROLE_LABELS[article.audience].toLowerCase()}s and up`}
-                {!article.published && ' · draft'}
+                {article.audience !== 'MEMBER' && t('help.forRole', { role: t(`common.roles.${article.audience}`).toLowerCase() })}
+                {!article.published && t('help.draft')}
               </p>
               <h1 className="text-2xl font-bold tracking-tight">{article.title}</h1>
               {article.summary && <p className="text-muted-foreground">{article.summary}</p>}
             </div>
             <LightMarkdown source={article.body} />
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
-              <span>Updated {new Date(article.updatedAt).toLocaleDateString()}</span>
+              <span>{t('help.updated', { date: new Date(article.updatedAt).toLocaleDateString(activeIntl()) })}</span>
               {can('help.manage') && (
                 <Link href={`/admin/help-articles?space=${article.space.toLowerCase()}&edit=${article.id}`} className="inline-flex items-center gap-1 font-semibold hover:text-foreground">
-                  <Pencil className="h-3.5 w-3.5" /> Edit this article
+                  <Pencil className="h-3.5 w-3.5" /> {t('help.editArticle')}
                 </Link>
               )}
             </div>
           </Card>
           {article.related.length > 0 && (
             <Card padding="none" className="h-fit">
-              <p className="px-5 pt-4 text-sm font-bold">More in {article.category}</p>
+              <p className="px-5 pt-4 text-sm font-bold">{t('help.moreIn', { section: article.category })}</p>
               <ul className="p-2">
                 {article.related.map((related) => (
                   <li key={related.slug}>

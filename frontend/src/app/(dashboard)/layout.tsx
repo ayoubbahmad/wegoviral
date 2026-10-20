@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { RestrictedNotice } from "@/containers/Auth/RestrictedNotice";
 import { ApplicationForm } from "@/containers/Onboarding/ApplicationForm";
 import { JoinStatusScreen } from "@/containers/Onboarding/JoinStatusScreen";
+import { T } from '@/i18n/T';
 
 export default function ProtectedDashboardLayout({
     children,
@@ -29,7 +30,7 @@ export default function ProtectedDashboardLayout({
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                    <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+                    <p className="text-sm font-medium text-muted-foreground"><T k="common.loading" /></p>
                 </div>
             </div>
         );

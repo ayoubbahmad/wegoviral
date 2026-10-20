@@ -12,6 +12,7 @@ import {
     SignupFormValues,
     ForgotPasswordFormValues,
 } from "../forms";
+import { useT } from "@/i18n/provider";
 
 export type AuthMode = "login" | "signup" | "forgot";
 
@@ -22,6 +23,7 @@ export interface EmailSentNotice {
 }
 
 export const useAuthController = () => {
+    const t = useT();
     const searchParams = useSearchParams();
     const router = useRouter();
     const { login, register, loginWithGoogle, requestPasswordReset, user, isLoading } = useAuth();
@@ -58,7 +60,7 @@ export const useAuthController = () => {
         try {
             const result = await login(values.email, values.password);
             if (!result.success) {
-                setError(result.error || "An unexpected error occurred");
+                setError(result.error || t("auth.unexpected"));
             }
         } finally {
             setIsSubmitting(false);
@@ -72,21 +74,21 @@ export const useAuthController = () => {
             const username = values.username.toLowerCase();
             const { available, reason } = await authApi.checkUsername(username);
             if (!available) {
-                signupForm.setError("username", { message: reason || "This username is taken" });
+                signupForm.setError("username", { message: reason || t("auth.usernameTaken") });
                 return;
             }
 
             const result = await register(values.email, username, values.password, values.name);
             if (!result.success) {
-                setError(result.error || "An unexpected error occurred");
+                setError(result.error || t("auth.unexpected"));
             } else if (result.needsConfirmation) {
                 setEmailSent({
-                    title: "Confirm your email",
-                    message: `We sent a confirmation link to ${values.email}. Click it to activate your account.`,
+                    title: t("auth.confirmTitle"),
+                    message: t("auth.confirmBody", { email: values.email }),
                 });
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An unexpected error occurred");
+            setError(err instanceof Error ? err.message : t("auth.unexpected"));
         } finally {
             setIsSubmitting(false);
         }
@@ -98,11 +100,11 @@ export const useAuthController = () => {
         try {
             const result = await requestPasswordReset(values.email);
             if (!result.success) {
-                setError(result.error || "An unexpected error occurred");
+                setError(result.error || t("auth.unexpected"));
             } else {
                 setEmailSent({
-                    title: "Check your inbox",
-                    message: `If an account exists for ${values.email}, you'll get a link to reset your password.`,
+                    title: t("auth.inboxTitle"),
+                    message: t("auth.inboxBody", { email: values.email }),
                 });
             }
         } finally {
@@ -116,7 +118,7 @@ export const useAuthController = () => {
         const result = await loginWithGoogle();
         // On success the browser is already navigating to Google
         if (!result.success) {
-            setError(result.error || "Google sign-in failed");
+            setError(result.error || t("auth.errors.googleFailed"));
             setIsGoogleLoading(false);
         }
     };

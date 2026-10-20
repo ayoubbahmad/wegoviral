@@ -84,13 +84,13 @@ export const LightMarkdown = ({ source, className }: { source: string; className
           return <h3 key={key} className="pt-2 font-bold">{inline(block.text, key)}</h3>;
         case 'ul':
           return (
-            <ul key={key} className="list-disc space-y-1 pl-5">
+            <ul key={key} className="list-disc space-y-1 ps-5">
               {block.items.map((item, i) => <li key={i}>{inline(item, `${key}-${i}`)}</li>)}
             </ul>
           );
         case 'ol':
           return (
-            <ol key={key} className="list-decimal space-y-1 pl-5">
+            <ol key={key} className="list-decimal space-y-1 ps-5">
               {block.items.map((item, i) => <li key={i}>{inline(item, `${key}-${i}`)}</li>)}
             </ol>
           );

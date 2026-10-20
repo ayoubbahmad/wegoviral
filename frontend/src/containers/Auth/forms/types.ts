@@ -1,30 +1,38 @@
 import { z } from "zod";
+import type { MessageKey } from "@/i18n/messages";
+
+type Translate = (key: MessageKey) => string;
+
+// Built with the app's language so field errors read naturally
 
 // --- Login Schema & Types ---
-export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+export const loginSchema = (t: Translate) =>
+  z.object({
+    email: z.string().email(t("auth.validation.email")),
+    password: z.string().min(6, t("auth.validation.password")),
+  });
 
-export type LoginFormValues = z.infer<typeof loginSchema>;
+export type LoginFormValues = z.infer<ReturnType<typeof loginSchema>>;
 
 // --- Signup Schema & Types ---
-export const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be at most 30 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Use only letters, numbers and underscores"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+export const signupSchema = (t: Translate) =>
+  z.object({
+    name: z.string().min(2, t("auth.validation.name")),
+    username: z
+      .string()
+      .min(3, t("auth.validation.usernameMin"))
+      .max(30, t("auth.validation.usernameMax"))
+      .regex(/^[a-zA-Z0-9_]+$/, t("auth.validation.usernameChars")),
+    email: z.string().email(t("auth.validation.email")),
+    password: z.string().min(6, t("auth.validation.password")),
+  });
 
-export type SignupFormValues = z.infer<typeof signupSchema>;
+export type SignupFormValues = z.infer<ReturnType<typeof signupSchema>>;
 
 // --- Forgot Password Schema & Types ---
-export const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
+export const forgotPasswordSchema = (t: Translate) =>
+  z.object({
+    email: z.string().email(t("auth.validation.email")),
+  });
 
-export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+export type ForgotPasswordFormValues = z.infer<ReturnType<typeof forgotPasswordSchema>>;

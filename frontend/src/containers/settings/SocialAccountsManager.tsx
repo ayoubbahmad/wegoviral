@@ -63,7 +63,7 @@ export const SocialAccountsManager = () => {
                       src={account.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`} 
                       className="w-12 h-12 rounded-xl border-2 border-background shadow-sm" 
                     />
-                    <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow-sm border border-border">
+                    <div className="absolute -bottom-1 -end-1 bg-background rounded-full p-0.5 shadow-sm border border-border">
                       <Instagram className="w-3.5 h-3.5 text-pink-600" />
                     </div>
                   </div>
@@ -87,7 +87,7 @@ export const SocialAccountsManager = () => {
             onClick={connectInstagram}
             className="border-dashed border-border mt-4 py-6 rounded-2xl text-muted-foreground"
           >
-            <Instagram className="w-4 h-4 mr-2" />
+            <Instagram className="w-4 h-4 me-2" />
             Connect Another Account
           </Button>
         </div>

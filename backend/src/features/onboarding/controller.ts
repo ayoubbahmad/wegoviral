@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { ZodError } from 'zod';
 import * as onboardingService from './service';
 import { AcceptRulesSchema, ApplicationSchema, OnboardingError, QuizAnswersSchema } from './model';
+import { translateMessage } from '../../lib/i18n';
 
 const handle =
   (action: string, fn: (req: any, res: Response) => Promise<unknown>) =>
@@ -21,7 +22,8 @@ const handle =
   };
 
 export const describeCode = handle('check link', async (req, res) => {
-  res.json(await onboardingService.describeCode(String(req.params.code)));
+  const preview = await onboardingService.describeCode(String(req.params.code));
+  res.json(preview.valid ? preview : { ...preview, reason: translateMessage(preview.reason ?? '', req.locale) });
 });
 
 export const submitApplication = handle('submit application', async (req, res) => {

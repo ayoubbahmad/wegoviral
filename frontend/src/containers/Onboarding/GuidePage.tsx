@@ -12,9 +12,12 @@ import { useAuth, useRefreshUser } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { cn } from '@/lib/utils';
 import { Guide, QuizResult, useAcceptRules, useGuide, useSubmitQuiz } from './api';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 /** The community rules and policy; members accept them (logged) and may need to pass a quiz. */
 export function GuidePage() {
+  const t = useT();
   const { user } = useAuth();
   const { data: guide, isPending, error } = useGuide();
   const step = user?.onboarding.step;
@@ -26,12 +29,12 @@ export function GuidePage() {
         href={isApproved ? '/community/feed' : '/'}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="w-4 h-4" /> {isApproved ? 'Back to the community' : 'Back'}
+        <ArrowLeft className="w-4 h-4 rtl:rotate-180" /> {isApproved ? t('onboarding.guide.backCommunity') : t('onboarding.guide.back')}
       </Link>
 
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Community guide</h1>
-        <p className="text-muted-foreground">The rules and policy every WeGoViral member agrees to.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('onboarding.guide.title')}</h1>
+        <p className="text-muted-foreground">{t('onboarding.guide.intro')}</p>
       </div>
 
       {isPending ? (
@@ -39,7 +42,7 @@ export function GuidePage() {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : guide.version === 0 ? (
-        <EmptyState icon={BookOpen} title="No guide yet" description="The team hasn't published the community guide yet." />
+        <EmptyState icon={BookOpen} title={t('onboarding.guide.noneTitle')} description={t('onboarding.guide.noneBody')} />
       ) : (
         <>
           <div className="space-y-4">
@@ -54,7 +57,7 @@ export function GuidePage() {
                     <img src={section.mediaUrl} alt="" className="max-h-80 rounded-xl border border-border" />
                   ) : (
                     <a href={section.mediaUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-primary hover:underline">
-                      Open the attached video or link ↗
+                      {t('onboarding.guide.openMedia')}
                     </a>
                   ))}
               </Card>
@@ -73,6 +76,7 @@ const AcceptRules = ({ guide }: { guide: Guide }) => {
   const refreshUser = useRefreshUser();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const t = useT();
   const { showToast } = useToast();
   const accept = useAcceptRules();
   const [checked, setChecked] = useState(false);
@@ -82,7 +86,9 @@ const AcceptRules = ({ guide }: { guide: Guide }) => {
     return (
       <p className="flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-500">
         <CheckCircle2 className="w-4 h-4" />
-        You accepted this guide{guide.acceptedAt ? ` on ${new Date(guide.acceptedAt).toLocaleDateString()}` : ''}.
+        {guide.acceptedAt
+          ? t('onboarding.guide.acceptedOn', { date: new Date(guide.acceptedAt).toLocaleDateString(activeIntl()) })
+          : t('onboarding.guide.accepted')}
       </p>
     );
   }
@@ -92,7 +98,7 @@ const AcceptRules = ({ guide }: { guide: Guide }) => {
       onSuccess: async () => {
         await refreshUser();
         await queryClient.invalidateQueries({ queryKey: ['onboarding', 'guide'] });
-        showToast('Thanks for accepting the community guide');
+        showToast(t('onboarding.guide.thanks'));
         if (!guide.quiz) router.push('/community/feed');
       },
       onError: (error) => {
@@ -111,10 +117,10 @@ const AcceptRules = ({ guide }: { guide: Guide }) => {
           onChange={(event) => setChecked(event.target.checked)}
           className="mt-0.5 h-4 w-4 accent-[var(--primary)]"
         />
-        <span>I&apos;ve read the community guide and I accept the rules and policy.</span>
+        <span>{t('onboarding.guide.agree')}</span>
       </label>
       <Button variant="primary" onClick={handleAccept} disabled={!checked || accept.isPending}>
-        {accept.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Accept and continue'}
+        {accept.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('onboarding.guide.accept')}
       </Button>
     </Card>
   );
@@ -124,6 +130,7 @@ const Quiz = ({ guide }: { guide: Guide }) => {
   const refreshUser = useRefreshUser();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const t = useT();
   const { showToast } = useToast();
   const submit = useSubmitQuiz();
   const quiz = guide.quiz!;
@@ -146,7 +153,7 @@ const Quiz = ({ guide }: { guide: Guide }) => {
         if (outcome.passed) {
           await refreshUser();
           await queryClient.invalidateQueries({ queryKey: ['onboarding', 'guide'] });
-          showToast('Quiz passed, welcome to WeGoViral!');
+          showToast(t('onboarding.guide.quizPassed'));
           router.push('/community/feed');
         }
       },
@@ -156,9 +163,9 @@ const Quiz = ({ guide }: { guide: Guide }) => {
   return (
     <Card className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">Quick quiz</h2>
+        <h2 className="text-lg font-bold">{t('onboarding.guide.quizTitle')}</h2>
         <p className="text-sm text-muted-foreground">
-          {quiz.questions.length} questions · you need {quiz.passPercent}% to pass. You can retry as often as you need.
+          {t('onboarding.guide.quizIntro', { count: quiz.questions.length, pass: quiz.passPercent })}
         </p>
       </div>
       {quiz.questions.map((question, index) => (
@@ -192,11 +199,11 @@ const Quiz = ({ guide }: { guide: Guide }) => {
       ))}
       {result && !result.passed && (
         <p className="text-sm font-medium text-red-500">
-          You scored {result.score}% (you need {result.passPercent}%). Check the questions marked in red and try again.
+          {t('onboarding.guide.quizFailed', { score: result.score, pass: result.passPercent })}
         </p>
       )}
       <Button variant="primary" onClick={handleSubmit} disabled={answers.some((answer) => answer === null) || submit.isPending}>
-        {submit.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit answers'}
+        {submit.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('onboarding.guide.submit')}
       </Button>
     </Card>
   );

@@ -5,14 +5,11 @@ import { Zap, Mail, Lock, User, AlertCircle, Loader2, ArrowLeft, MailCheck } fro
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthController, AuthMode } from "./controller";
-
-const HEADINGS: Record<AuthMode, { title: string; subtitle: string }> = {
-    login: { title: "Welcome back", subtitle: "Log in to the WeGoViral community" },
-    signup: { title: "Create account", subtitle: "Join the WeGoViral community today" },
-    forgot: { title: "Reset password", subtitle: "We'll email you a link to choose a new one" },
-};
+import { useT } from '@/i18n/provider';
+import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 
 export function AuthContainer() {
+    const t = useT();
     const {
         mode,
         changeMode,
@@ -50,18 +47,21 @@ export function AuthContainer() {
 
     return (
         <div className="w-full max-w-[440px] z-10">
-            <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 group">
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                Back to home
-            </Link>
+            <div className="mb-8 flex items-center justify-between gap-3">
+                <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                    <ArrowLeft className="w-4 h-4 rtl:rotate-180 group-hover:-translate-x-1 rtl:group-hover:translate-x-1 transition-transform" />
+                    {t("auth.backHome")}
+                </Link>
+                <LanguageSwitcher />
+            </div>
 
             <div className="p-8 md:p-10 rounded-[2.5rem] border border-border bg-card shadow-2xl space-y-8">
                 <div className="text-center">
                     <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20">
                         <Zap className="w-8 h-8 text-primary-foreground" />
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight">{HEADINGS[mode].title}</h1>
-                    <p className="text-muted-foreground mt-2">{HEADINGS[mode].subtitle}</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{t(`auth.headings.${mode}.title`)}</h1>
+                    <p className="text-muted-foreground mt-2">{t(`auth.headings.${mode}.subtitle`)}</p>
                 </div>
 
                 {emailSent ? (
@@ -76,7 +76,7 @@ export function AuthContainer() {
                             onClick={() => changeMode("login")}
                             className="text-sm font-bold text-primary hover:underline"
                         >
-                            Back to log in
+                            {t("auth.backToLogin")}
                         </button>
                     </div>
                 ) : (
@@ -94,39 +94,39 @@ export function AuthContainer() {
                                     {mode === "signup" && (
                                         <>
                                             <Field
-                                                label="Full Name"
+                                                label={t("auth.fullName")}
                                                 icon={<User className="w-4 h-4" />}
                                                 error={signupForm.formState.errors.name?.message}
                                                 type="text"
                                                 autoComplete="name"
-                                                placeholder="John Doe"
+                                                placeholder={t("auth.namePlaceholder")}
                                                 {...signupForm.register("name")}
                                             />
                                             <Field
-                                                label="Username"
+                                                label={t("auth.username")}
                                                 icon={<span className="font-medium">@</span>}
                                                 error={signupForm.formState.errors.username?.message}
                                                 type="text"
                                                 autoComplete="username"
-                                                placeholder="johndoe"
+                                                placeholder={t("auth.usernamePlaceholder")}
                                                 {...signupForm.register("username")}
                                             />
                                         </>
                                     )}
 
                                     <Field
-                                        label="Email address"
+                                        label={t("auth.email")}
                                         icon={<Mail className="w-4 h-4" />}
                                         error={emailField.error}
                                         type="email"
                                         autoComplete="email"
-                                        placeholder="name@company.com"
+                                        placeholder={t("auth.emailPlaceholder")}
                                         {...emailField.props}
                                     />
 
                                     {mode !== "forgot" && (
                                         <Field
-                                            label="Password"
+                                            label={t("auth.password")}
                                             labelAction={
                                                 mode === "login" && (
                                                     <button
@@ -134,7 +134,7 @@ export function AuthContainer() {
                                                         onClick={() => changeMode("forgot")}
                                                         className="text-xs text-primary font-bold hover:underline"
                                                     >
-                                                        Forgot?
+                                                        {t("auth.forgot")}
                                                     </button>
                                                 )
                                             }
@@ -168,11 +168,11 @@ export function AuthContainer() {
                                 {isSubmitting ? (
                                     <Loader2 className="w-6 h-6 animate-spin" />
                                 ) : mode === "login" ? (
-                                    "Sign In"
+                                    t("auth.signIn")
                                 ) : mode === "signup" ? (
-                                    "Create Free Account"
+                                    t("auth.createAccount")
                                 ) : (
-                                    "Send reset link"
+                                    t("auth.sendReset")
                                 )}
                             </button>
                         </form>
@@ -184,7 +184,7 @@ export function AuthContainer() {
                                         <span className="w-full border-t border-border" />
                                     </div>
                                     <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-card px-2 text-muted-foreground font-bold">Or continue with</span>
+                                        <span className="bg-card px-2 text-muted-foreground font-bold">{t("auth.orContinue")}</span>
                                     </div>
                                 </div>
 
@@ -195,7 +195,7 @@ export function AuthContainer() {
                                     className="w-full py-3.5 px-4 flex items-center justify-center gap-3 rounded-2xl border border-border bg-background font-semibold hover:bg-secondary/50 transition-colors disabled:opacity-70"
                                 >
                                     {isGoogleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
-                                    Google
+                                    {t("auth.google")}
                                 </button>
                             </>
                         )}
@@ -207,7 +207,7 @@ export function AuthContainer() {
                                     onClick={() => changeMode("login")}
                                     className="text-sm font-bold text-primary hover:underline"
                                 >
-                                    Back to log in
+                                    {t("auth.backToLogin")}
                                 </button>
                             ) : (
                                 <button
@@ -215,9 +215,9 @@ export function AuthContainer() {
                                     onClick={() => changeMode(mode === "login" ? "signup" : "login")}
                                     className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                    {mode === "login" ? "New here? " : "Already have an account? "}
+                                    {mode === "login" ? t("auth.newHere") : t("auth.haveAccount")}
                                     <span className="text-primary font-bold">
-                                        {mode === "login" ? "Create an account" : "Log in"}
+                                        {mode === "login" ? t("auth.createLink") : t("auth.logIn")}
                                     </span>
                                 </button>
                             )}
@@ -236,21 +236,26 @@ interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
     labelAction?: ReactNode;
 }
 
+// Emails, usernames and passwords are always written left to right, even in Arabic
+const isLatinField = (props: InputHTMLAttributes<HTMLInputElement>) =>
+    props.type === "email" || props.type === "password" || props.autoComplete === "username";
+
 const Field = forwardRef<HTMLInputElement, FieldProps>(({ label, icon, error, labelAction, ...inputProps }, ref) => (
     <div className="space-y-2">
-        <div className="flex justify-between items-center ml-1">
+        <div className="flex justify-between items-center ms-1">
             <label className="text-sm font-semibold">{label}</label>
             {labelAction}
         </div>
         <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</span>
+            <span className="absolute start-4 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</span>
             <input
                 ref={ref}
                 {...inputProps}
-                className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                dir={isLatinField(inputProps) ? "ltr" : undefined}
+                className="w-full px-11 py-3.5 rounded-2xl border border-input bg-muted/30 focus:bg-background transition-all outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
         </div>
-        {error && <p className="text-xs text-destructive ml-1">{error}</p>}
+        {error && <p className="text-xs text-destructive ms-1">{error}</p>}
     </div>
 ));
 Field.displayName = "Field";

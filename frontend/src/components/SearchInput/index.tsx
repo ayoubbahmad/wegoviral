@@ -20,20 +20,20 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   return (
     <div className={cn("relative w-full max-w-xl group", containerClassName)}>
-      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+      <div className="absolute inset-y-0 start-4 flex items-center pointer-events-none">
         <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
       </div>
       <input 
         type="text" 
         className={cn(
-          "w-full h-11 pl-11 pr-20 rounded-lg bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm",
+          "w-full h-11 ps-11 pe-20 rounded-lg bg-card border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all text-sm",
           className
         )}
         {...props}
       />
       <button 
         onClick={() => onSearch?.(props.value as string)}
-        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-md bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn"
+        className="absolute end-1.5 top-1.5 bottom-1.5 px-4 rounded-md bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn"
       >
         {buttonText}
         <span className="text-[10px] opacity-50 group-hover/btn:translate-x-0.5 transition-transform">↵</span>

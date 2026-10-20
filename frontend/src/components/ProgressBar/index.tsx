@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { T } from '@/i18n/T';
 
 interface ProgressBarProps {
   value: number;
@@ -24,7 +25,7 @@ export const ProgressBar = ({
     <div className={cn("w-full space-y-1.5", className)}>
       {showLabel && (
         <div className="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
-          <span>Progress</span>
+          <span><T k='common.progress' /></span>
           <span>{Math.round(percentage)}%</span>
         </div>
       )}

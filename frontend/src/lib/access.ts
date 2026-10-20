@@ -1,18 +1,20 @@
 import type { LockReason } from '@/types/communityFeed';
-import { ROLE_LABELS } from './roles';
+import { activeIntl } from '@/i18n/active';
+import type { MessageKey } from '@/i18n/messages';
+import type { Vars } from '@/i18n/types';
+
+type Translate = (key: MessageKey, vars?: Vars) => string;
 
 /** Plain-language explanation of why something is locked, one line per reason. */
-export function describeLockReason(reason: LockReason): string {
+export function describeLockReason(reason: LockReason, t: Translate): string {
   switch (reason.type) {
     case 'role':
-      return reason.minRole === 'INSTRUCTOR'
-        ? 'Only for instructors and the team'
-        : `Only for ${ROLE_LABELS[reason.minRole].toLowerCase()}s and above`;
+      return reason.minRole === 'INSTRUCTOR' ? t('common.lock.instructors') : t('common.lock.role', { role: t(`common.roles.${reason.minRole}`) });
     case 'tier':
-      return `For ${reason.tiers.map((tier) => tier.name).join(' or ')} members`;
+      return t('common.lock.tier', { tiers: reason.tiers.map((tier) => tier.name).join(t('common.lock.or')) });
     case 'time':
-      return `Unlocks in ${reason.daysLeft} day${reason.daysLeft === 1 ? '' : 's'} (on ${new Date(reason.unlocksAt).toLocaleDateString()})`;
+      return t('common.lock.time', { count: reason.daysLeft, date: new Date(reason.unlocksAt).toLocaleDateString(activeIntl()) });
     case 'level':
-      return `Reach Level ${reason.minLevel} (${reason.levelName}): ${reason.pointsToGo} more point${reason.pointsToGo === 1 ? '' : 's'} to go`;
+      return t('common.lock.level', { level: reason.minLevel, name: reason.levelName, count: reason.pointsToGo });
   }
 }

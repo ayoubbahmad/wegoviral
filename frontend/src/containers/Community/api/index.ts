@@ -18,6 +18,9 @@ import {
   ReportReason,
   TopPost,
 } from '@/types/communityFeed';
+import { activeLocale } from '@/i18n/active';
+import { translate } from '@/i18n/translate';
+import { messages } from '@/i18n/messages';
 
 const PAGE_SIZE = 20;
 const STORAGE_BUCKET = 'community';
@@ -120,7 +123,7 @@ export async function uploadImage(file: File) {
   const { error } = await supabase.storage
     .from(STORAGE_BUCKET)
     .uploadToSignedUrl(data.path, data.token, file, { contentType: file.type });
-  if (error) throw new Error(`Could not upload ${file.name}: ${error.message}`);
+  if (error) throw new Error(translate(messages[activeLocale()], messages.en, activeLocale(), 'feed.toasts.uploadFailed', { file: file.name, error: error.message }));
   return data.publicUrl;
 }
 

@@ -13,10 +13,12 @@ import { useToast } from '@/providers/Toast';
 import { avatarFor, formatRelativeDate } from '@/lib/utils';
 import { CommunityPost } from '@/types/communityFeed';
 import { usePendingReviews, useReviewPost, useSpaces } from '../api';
+import { useT } from '@/i18n/provider';
 
 /** New members' first posts, waiting for a staff member or trusted member to approve them. */
 export const CommunityReviewsContainer = () => {
   const { user } = useAuth();
+  const t = useT();
   const canReview = Boolean(user?.onboarding.canReviewPosts);
   const { data: posts, isPending, error } = usePendingReviews(canReview);
   const { data: spaces = [] } = useSpaces();
@@ -28,20 +30,19 @@ export const CommunityReviewsContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="Review posts"
-        description="New members' first posts wait here until someone checks them."
+        title={t('feed.reviews.title')}
+        description={t('feed.reviews.description')}
       />
 
       <div className="flex items-start gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm">
         <ShieldCheck className="w-5 h-5 shrink-0 text-primary" />
         <p>
-          <strong>You vouch for what you approve.</strong> Your name is saved with the post, and the team can see it if
-          the post is removed later. When in doubt, leave it for someone else.
+          <strong>{t('feed.reviews.vouchTitle')}</strong> {t('feed.reviews.vouchBody')}
         </p>
       </div>
 
       {!canReview ? (
-        <EmptyState icon={ClipboardCheck} title="You can't review posts yet" description="Reviewing opens to members after 30 days and their own first approved posts." />
+        <EmptyState icon={ClipboardCheck} title={t('feed.reviews.cantTitle')} description={user?.onboarding.reviewBlockedReason ?? t('feed.reviews.cantBody')} />
       ) : isPending ? (
         <div className="space-y-3">
           {[0, 1].map((index) => (
@@ -51,7 +52,7 @@ export const CommunityReviewsContainer = () => {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : posts.length === 0 ? (
-        <EmptyState icon={ClipboardCheck} title="All caught up" description="No posts are waiting for review." />
+        <EmptyState icon={ClipboardCheck} title={t('feed.reviews.doneTitle')} description={t('feed.reviews.doneBody')} />
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
@@ -64,6 +65,7 @@ export const CommunityReviewsContainer = () => {
 };
 
 const ReviewCard = ({ post, spaceName }: { post: CommunityPost; spaceName: string }) => {
+  const t = useT();
   const { showToast } = useToast();
   const review = useReviewPost();
   const [rejecting, setRejecting] = useState(false);
@@ -73,7 +75,7 @@ const ReviewCard = ({ post, spaceName }: { post: CommunityPost; spaceName: strin
     review.mutate(
       { postId: post.id, decision, note: note.trim() || undefined },
       {
-        onSuccess: () => showToast(decision === 'approve' ? 'Post approved and published' : 'Post not approved'),
+        onSuccess: () => showToast(decision === 'approve' ? t('feed.reviews.approved') : t('feed.reviews.rejected')),
         onError: (error) => showToast(error.message, 'error'),
       },
     );
@@ -85,7 +87,7 @@ const ReviewCard = ({ post, spaceName }: { post: CommunityPost; spaceName: strin
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate">@{post.author.username}</p>
           <p className="text-xs text-muted-foreground">
-            In {spaceName} · {formatRelativeDate(post.createdAt)}
+            {t('feed.reviews.inSpace', { space: spaceName })} · {formatRelativeDate(post.createdAt)}
           </p>
         </div>
       </div>
@@ -117,26 +119,26 @@ const ReviewCard = ({ post, spaceName }: { post: CommunityPost; spaceName: strin
           <textarea
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Tell the author why (they'll see this)"
+            placeholder={t('feed.reviews.notePlaceholder')}
             maxLength={500}
             className="w-full min-h-[70px] rounded-xl border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <div className="flex justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => setRejecting(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="outline" size="sm" onClick={() => decide('reject')} disabled={review.isPending}>
-              {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm'}
+              {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('feed.reviews.confirm')}
             </Button>
           </div>
         </div>
       ) : (
         <div className="flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={() => setRejecting(true)}>
-            <X className="w-4 h-4" /> Don&apos;t approve
+            <X className="w-4 h-4" /> {t('feed.reviews.dontApprove')}
           </Button>
           <Button variant="primary" size="sm" onClick={() => decide('approve')} disabled={review.isPending}>
-            {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> Approve</>}
+            {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {t('feed.reviews.approve')}</>}
           </Button>
         </div>
       )}

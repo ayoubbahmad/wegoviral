@@ -1,0 +1,52 @@
+import type { Shape } from '../../types';
+import type { nav as en } from '../en/nav';
+
+export const nav: Shape<typeof en> = {
+  spaces: {
+    community: { label: 'Communauté', description: 'Fil d’actualité, événements, formations et plus' },
+    creator: { label: 'Espace créateur', description: 'Vos outils personnels de créateur' },
+    admin: { label: 'Admin', description: 'Gérer les membres et la communauté' },
+  },
+  community: {
+    feed: 'Fil d’actualité',
+    events: 'Événements',
+    leaderboard: 'Classement',
+    courses: 'Formations',
+    members: 'Membres',
+    challenges: 'Défis',
+    reviews: 'Relire les publications',
+  },
+  creator: {
+    home: 'Accueil',
+    videos: 'Vidéos',
+    scripts: 'Scripts',
+    projects: 'Projets',
+    performance: 'Performances',
+    followers: 'Abonnés',
+    automations: 'Automatisations',
+    competitors: 'Concurrents',
+    library: 'Bibliothèque',
+    'design-system': 'Design system',
+  },
+  admin: {
+    overview: 'Vue d’ensemble',
+    stats: 'Statistiques',
+    approvals: 'Validations',
+    members: 'Membres',
+    moderation: 'Modération',
+    spaces: 'Espaces',
+    tiers: 'Niveaux d’abonnement',
+    points: 'Points et badges',
+    onboarding: 'Intégration',
+    invites: 'Liens d’invitation',
+    'help-articles': 'Articles d’aide',
+    activity: 'Journal d’activité',
+  },
+  help: 'Aide',
+  settings: 'Paramètres',
+  signOut: 'Se déconnecter',
+  collapse: 'Réduire la barre latérale',
+  expand: 'Agrandir la barre latérale',
+  switchSpace: '{space} : changer d’espace',
+  switchSpaceTitle: 'Changer d’espace',
+};

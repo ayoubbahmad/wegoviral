@@ -85,6 +85,11 @@ body {
   overflow-y: scroll;
 }
 
+/* Arabic: a font made for it, with Latin text still in Geist */
+html[lang='ar'] body {
+  font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
+}
+
 /* Hide scrollbar for all elements */
 * {
   -ms-overflow-style: none;  /* IE and Edge */

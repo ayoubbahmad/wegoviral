@@ -3,6 +3,7 @@
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommunityPoll } from '@/types/communityFeed';
+import { useT } from '@/i18n/provider';
 
 interface PostPollProps {
   poll: CommunityPoll;
@@ -10,6 +11,7 @@ interface PostPollProps {
 }
 
 export const PostPoll = ({ poll, onVote }: PostPollProps) => {
+  const t = useT();
   const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0);
   const hasVoted = Boolean(poll.votedOptionId);
 
@@ -25,7 +27,7 @@ export const PostPoll = ({ poll, onVote }: PostPollProps) => {
             onClick={() => onVote(option.id)}
             disabled={hasVoted}
             className={cn(
-              'relative flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-left text-sm transition-colors',
+              'relative flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-start text-sm transition-colors',
               hasVoted
                 ? 'cursor-default border-border'
                 : 'border-border hover:border-primary/50 hover:bg-primary/5',
@@ -35,7 +37,7 @@ export const PostPoll = ({ poll, onVote }: PostPollProps) => {
             {hasVoted && (
               <span
                 className={cn(
-                  'absolute inset-y-0 left-0 transition-all duration-500',
+                  'absolute inset-y-0 start-0 transition-all duration-500',
                   isMine ? 'bg-primary/15' : 'bg-secondary/50',
                 )}
                 style={{ width: `${percent}%` }}
@@ -52,8 +54,8 @@ export const PostPoll = ({ poll, onVote }: PostPollProps) => {
         );
       })}
       <p className="text-xs text-muted-foreground">
-        {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
-        {!hasVoted && ' · Vote to see results'}
+        {t('feed.poll.votes', { count: totalVotes })}
+        {!hasVoted && t('feed.poll.voteToSee')}
       </p>
     </div>
   );

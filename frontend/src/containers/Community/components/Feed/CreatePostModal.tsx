@@ -17,6 +17,9 @@ import { Button } from '@/components/Button';
 import { Select } from '@/components/Select';
 import { cn } from '@/lib/utils';
 import { CommunitySpace, NewPostDraft } from '@/types/communityFeed';
+import { useT } from '@/i18n/provider';
+import type { MessageKey } from '@/i18n/messages';
+import type { Vars } from '@/i18n/types';
 
 const EMOJIS = ['🔥', '🚀', '💯', '🎉', '🙌', '👏', '😂', '😍', '🤯', '🤔', '👀', '💡', '🎬', '📈', '💰', '🏆', '❤️', '✨', '✅', '🙏'];
 const MAX_IMAGES = 8;
@@ -30,9 +33,9 @@ interface PickedImage {
 }
 
 /** Returns an error message, or null when the file can be uploaded. */
-const validateImage = (file: File) => {
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return `${file.name}: use PNG, JPG, WebP or GIF`;
-  if (file.size > MAX_IMAGE_BYTES) return `${file.name} is larger than 5 MB`;
+const validateImage = (file: File, t: (key: MessageKey, vars?: Vars) => string) => {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return t('feed.composer.badType', { file: file.name });
+  if (file.size > MAX_IMAGE_BYTES) return t('feed.composer.tooBig', { file: file.name });
   return null;
 };
 
@@ -62,6 +65,7 @@ const CreatePostForm = ({
   canPostInAdminSpaces,
   onSubmit,
 }: CreatePostFormProps) => {
+  const t = useT();
   const canPostIn = (space: CommunitySpace) =>
     (!space.adminOnly || canPostInAdminSpaces) && !space.access.locked;
   const postableSpaces = spaces.filter(canPostIn);
@@ -99,7 +103,7 @@ const CreatePostForm = ({
 
   const handleClose = () => {
     if (isSubmitting) return;
-    if (isDirty && !window.confirm('Discard this post?')) return;
+    if (isDirty && !window.confirm(t('feed.composer.discard'))) return;
     releaseUploads();
     onClose();
   };
@@ -123,7 +127,7 @@ const CreatePostForm = ({
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
-    const invalid = validateImage(file);
+    const invalid = validateImage(file, t);
     if (invalid) return setError(invalid);
     setError(null);
     if (coverUrl) URL.revokeObjectURL(coverUrl);
@@ -133,9 +137,9 @@ const CreatePostForm = ({
   const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []).slice(0, MAX_IMAGES - images.length);
     event.target.value = '';
-    const invalid = files.map(validateImage).find(Boolean);
+    const invalid = files.map((file) => validateImage(file, t)).find(Boolean);
     setError(invalid ?? null);
-    const valid = files.filter((file) => !validateImage(file));
+    const valid = files.filter((file) => !validateImage(file, t));
     setPickedImages((prev) => [
       ...prev,
       ...valid.map((file) => ({ file, url: URL.createObjectURL(file) })),
@@ -174,7 +178,7 @@ const CreatePostForm = ({
       });
       releaseUploads();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not publish the post');
+      setError(err instanceof Error ? err.message : t('feed.composer.failed'));
       setIsSubmitting(false);
     }
   };
@@ -196,20 +200,20 @@ const CreatePostForm = ({
         {/* Header */}
         <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
           <h2 id="create-post-title" className="text-lg font-bold">
-            Create post
+            {t('feed.composer.title')}
           </h2>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => coverInputRef.current?.click()}>
               <ImagePlus className="w-4 h-4" />
-              {coverUrl ? 'Change cover' : 'Add cover'}
+              {coverUrl ? t('feed.composer.changeCover') : t('feed.composer.addCover')}
             </Button>
             <IconButton
-              label={isExpanded ? 'Collapse' : 'Expand'}
+              label={isExpanded ? t('feed.composer.collapse') : t('feed.composer.expand')}
               onClick={() => setIsExpanded((expanded) => !expanded)}
             >
               {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </IconButton>
-            <IconButton label="Close" onClick={handleClose}>
+            <IconButton label={t('common.close')} onClick={handleClose}>
               <X className="w-4 h-4" />
             </IconButton>
           </div>
@@ -225,9 +229,9 @@ const CreatePostForm = ({
                   URL.revokeObjectURL(coverUrl);
                   setCover(undefined);
                 }}
-                className="absolute right-3 top-3 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                className="absolute end-3 top-3 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
               >
-                Remove cover
+                {t('feed.composer.removeCover')}
               </button>
             </div>
           )}
@@ -237,7 +241,7 @@ const CreatePostForm = ({
               ref={titleRef}
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="Title"
+              placeholder={t('feed.composer.titlePlaceholder')}
               maxLength={120}
               className="w-full bg-transparent text-2xl font-bold tracking-tight placeholder:text-muted-foreground/50 focus:outline-none"
             />
@@ -245,7 +249,7 @@ const CreatePostForm = ({
               ref={contentRef}
               value={content}
               onChange={(event) => setContent(event.target.value)}
-              placeholder="Share a win, ask for feedback, start a conversation..."
+              placeholder={t('feed.composer.bodyPlaceholder')}
               className={cn(
                 'w-full resize-none bg-transparent text-sm leading-relaxed placeholder:text-muted-foreground/60 focus:outline-none',
                 isExpanded ? 'min-h-[45vh]' : 'min-h-40',
@@ -259,8 +263,8 @@ const CreatePostForm = ({
                     <img src={url} alt="" className="h-full w-full object-cover" />
                     <button
                       onClick={() => removeImage(url)}
-                      aria-label="Remove image"
-                      className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                      aria-label={t('feed.composer.removeImage')}
+                      className="absolute end-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -273,13 +277,13 @@ const CreatePostForm = ({
               <div className="space-y-2 rounded-xl border border-border bg-secondary/10 p-4">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm font-semibold">
-                    <BarChart3 className="w-4 h-4 text-primary" /> Poll
+                    <BarChart3 className="w-4 h-4 text-primary" /> {t('feed.composer.poll')}
                   </span>
                   <button
                     onClick={() => setPollOptions(null)}
                     className="text-xs font-semibold text-muted-foreground hover:text-red-500 transition-colors"
                   >
-                    Remove poll
+                    {t('feed.composer.removePoll')}
                   </button>
                 </div>
                 {pollOptions.map((option, index) => (
@@ -291,14 +295,14 @@ const CreatePostForm = ({
                           prev!.map((value, i) => (i === index ? event.target.value : value)),
                         )
                       }
-                      placeholder={`Option ${index + 1}`}
+                      placeholder={t('feed.composer.option', { number: index + 1 })}
                       maxLength={80}
                       className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                     {pollOptions.length > 2 && (
                       <button
                         onClick={() => setPollOptions((prev) => prev!.filter((_, i) => i !== index))}
-                        aria-label={`Remove option ${index + 1}`}
+                        aria-label={t('feed.composer.removeOption', { number: index + 1 })}
                         className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                       >
                         <X className="w-4 h-4" />
@@ -311,7 +315,7 @@ const CreatePostForm = ({
                     onClick={() => setPollOptions((prev) => [...prev!, ''])}
                     className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add option
+                    <Plus className="w-3.5 h-3.5" /> {t('feed.composer.addOption')}
                   </button>
                 )}
               </div>
@@ -322,21 +326,21 @@ const CreatePostForm = ({
         {/* Toolbar */}
         <div className="relative flex items-center gap-1 border-t border-border px-4 py-2">
           <IconButton
-            label="Add images"
+            label={t('feed.composer.addImages')}
             onClick={() => imagesInputRef.current?.click()}
             disabled={images.length >= MAX_IMAGES}
           >
             <ImageIcon className="w-4 h-4" />
           </IconButton>
           <IconButton
-            label="Add poll"
+            label={t('feed.composer.addPoll')}
             onClick={() => setPollOptions((prev) => prev ?? ['', ''])}
             active={Boolean(pollOptions)}
           >
             <BarChart3 className="w-4 h-4" />
           </IconButton>
           <IconButton
-            label="Emoji"
+            label={t('feed.composer.emoji')}
             onClick={() => setIsEmojiOpen((open) => !open)}
             active={isEmojiOpen}
           >
@@ -344,7 +348,7 @@ const CreatePostForm = ({
           </IconButton>
 
           {isEmojiOpen && (
-            <div className="absolute bottom-full left-4 mb-2 grid grid-cols-10 gap-1 rounded-xl border border-border bg-card p-2 shadow-xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute bottom-full start-4 mb-2 grid grid-cols-10 gap-1 rounded-xl border border-border bg-card p-2 shadow-xl animate-in fade-in zoom-in-95 duration-150">
               {EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
@@ -368,12 +372,12 @@ const CreatePostForm = ({
         <div className="flex flex-col gap-3 border-t border-border bg-secondary/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full sm:w-60">
             <Select
-              aria-label="Space to post in"
+              aria-label={t('feed.composer.spaceLabel')}
               value={spaceId}
               onChange={(event) => setSpaceId(event.target.value)}
               className="h-10"
               options={[
-                { value: '', label: 'Choose a space…' },
+                { value: '', label: t('feed.composer.chooseSpace') },
                 ...postableSpaces.map((space) => ({
                   value: space.id,
                   label: `${space.emoji} ${space.name}`,
@@ -383,15 +387,15 @@ const CreatePostForm = ({
           </div>
           <div className="flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={handleClose}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="primary" onClick={handlePublish} disabled={!canPublish}>
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Publishing…
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t('feed.composer.publishing')}
                 </>
               ) : (
-                'Publish'
+                t('feed.composer.publish')
               )}
             </Button>
           </div>

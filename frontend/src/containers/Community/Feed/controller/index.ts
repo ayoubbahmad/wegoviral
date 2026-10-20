@@ -17,10 +17,12 @@ import {
   useTopPosts,
   useVotePoll,
 } from '../../api';
+import { useT } from '@/i18n/provider';
 
 export const useFeedController = () => {
   const { user } = useAuth();
   const can = useCan();
+  const t = useT();
   const { showToast } = useToast();
   const { activeSpaceId, setActiveSpaceId, isCreatePostOpen, setIsCreatePostOpen } =
     useCommunityStore();
@@ -75,16 +77,16 @@ export const useFeedController = () => {
     setIsCreatePostOpen(false);
     showToast(
       post.reviewStatus === 'PENDING'
-        ? "Sent for review: new members' first posts are checked before they go live"
-        : 'Post published',
+        ? t('feed.toasts.sentForReview')
+        : t('feed.toasts.published'),
     );
   };
 
   const handleDeletePost = (postId: string) => {
-    if (!window.confirm('Delete this post? This cannot be undone.')) return;
+    if (!window.confirm(t('feed.toasts.deleteConfirm'))) return;
     deletePost.mutate(postId, {
-      onSuccess: () => showToast('Post deleted', 'info'),
-      onError: (error) => reportError(error, 'Could not delete the post'),
+      onSuccess: () => showToast(t('feed.toasts.deleted'), 'info'),
+      onError: (error) => reportError(error, t('feed.toasts.deleteFailed')),
     });
   };
 
@@ -92,8 +94,8 @@ export const useFeedController = () => {
     pinPost.mutate(
       { postId: post.id, pinned: !post.pinned },
       {
-        onSuccess: () => showToast(post.pinned ? 'Post unpinned' : 'Post pinned'),
-        onError: (error) => reportError(error, 'Could not pin the post'),
+        onSuccess: () => showToast(post.pinned ? t('feed.toasts.unpinned') : t('feed.toasts.pinned')),
+        onError: (error) => reportError(error, t('feed.toasts.pinFailed')),
       },
     );
   };
@@ -101,31 +103,31 @@ export const useFeedController = () => {
   const handleLikePost = (post: CommunityPost) =>
     likePost.mutate(
       { postId: post.id, liked: !post.likedByMe },
-      { onError: (error) => reportError(error, 'Could not update the like') },
+      { onError: (error) => reportError(error, t('feed.toasts.likeFailed')) },
     );
 
   const handleBookmarkPost = (post: CommunityPost) =>
     bookmarkPost.mutate(
       { postId: post.id, bookmarked: !post.bookmarkedByMe },
       {
-        onSuccess: () => showToast(post.bookmarkedByMe ? 'Bookmark removed' : 'Post bookmarked'),
-        onError: (error) => reportError(error, 'Could not update the bookmark'),
+        onSuccess: () => showToast(post.bookmarkedByMe ? t('feed.toasts.unbookmarked') : t('feed.toasts.bookmarked')),
+        onError: (error) => reportError(error, t('feed.toasts.bookmarkFailed')),
       },
     );
 
   const handleVotePoll = (postId: string, optionId: string) =>
     votePoll.mutate(
       { postId, optionId },
-      { onError: (error) => reportError(error, 'Could not save your vote') },
+      { onError: (error) => reportError(error, t('feed.toasts.voteFailed')) },
     );
 
   const handleCopyPostLink = async (post: CommunityPost) => {
     const url = `${window.location.origin}/community/feed#post-${post.id}`;
     try {
       await navigator.clipboard.writeText(url);
-      showToast('Link copied');
+      showToast(t('feed.toasts.linkCopied'));
     } catch {
-      showToast('Could not copy the link', 'error');
+      showToast(t('feed.referral.copyFailed'), 'error');
     }
   };
 

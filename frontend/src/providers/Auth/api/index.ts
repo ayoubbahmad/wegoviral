@@ -14,4 +14,8 @@ export const authApi = {
     );
     return response.data;
   },
+
+  setLocale: async (locale: 'en' | 'fr' | 'ar') => {
+    await apiClient.put('/auth/me/locale', { locale });
+  },
 };

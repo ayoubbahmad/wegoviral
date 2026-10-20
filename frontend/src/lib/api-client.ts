@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { supabase } from './supabase';
+import { activeLocale } from '@/i18n/active';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -18,6 +19,8 @@ apiClient.interceptors.request.use(async (config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // The API answers (errors, content) in the app's language
+  config.headers['Accept-Language'] = activeLocale();
   return config;
 });
 

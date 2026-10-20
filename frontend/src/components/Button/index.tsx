@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { T } from '@/i18n/T';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'pill' | 'outline' | 'ghost' | 'secondary' | 'floating';
@@ -68,7 +69,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <div className='flex items-center gap-2'>
             <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
-            <span>Loading...</span>
+            <span><T k='common.loading' /></span>
           </div>
         ) : (
           children

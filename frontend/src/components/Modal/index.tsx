@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/provider';
 
 interface ModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export function Modal({
   maxWidth = 'lg',
 }: ModalProps) {
   // Portals need document.body, which only exists in the browser
+  const t = useT();
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export function Modal({
           <h2 className='text-xl font-semibold'>{title}</h2>
           <button
             onClick={onClose}
-            aria-label='Close'
+            aria-label={t('common.close')}
             className='p-2 rounded-lg hover:bg-secondary transition-colors'
           >
             <X className='w-5 h-5' />

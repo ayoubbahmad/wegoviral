@@ -13,7 +13,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <WarningNotice />
             <main className={cn(
                 "min-h-screen transition-all duration-300 ease-in-out",
-                sidebarCollapsed ? "pl-20" : "pl-64"
+                sidebarCollapsed ? "ps-20" : "ps-64"
             )}>
                 <div className="mx-auto p-8 max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <OnboardingBanner />

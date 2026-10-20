@@ -1,6 +1,7 @@
 import { Flame } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { CommunitySpace, TopPost } from '@/types/communityFeed';
+import { useT } from '@/i18n/provider';
 
 interface TopPostsCardProps {
   posts: TopPost[];
@@ -9,15 +10,16 @@ interface TopPostsCardProps {
 }
 
 export const TopPostsCard = ({ posts, spacesById, onSelect }: TopPostsCardProps) => {
+  const t = useT();
   return (
     <Card padding="sm" className="p-5">
       <h3 className="mb-4 flex items-center gap-2 font-bold text-sm">
         <Flame className="w-4 h-4 text-primary" />
-        Top posts
+        {t('feed.topPosts.title')}
       </h3>
 
       {posts.length === 0 && (
-        <p className="text-sm text-muted-foreground">No trending posts yet. Likes and comments bring posts here.</p>
+        <p className="text-sm text-muted-foreground">{t('feed.topPosts.empty')}</p>
       )}
 
       <ol className="space-y-4">
@@ -27,7 +29,7 @@ export const TopPostsCard = ({ posts, spacesById, onSelect }: TopPostsCardProps)
             <li key={post.id}>
               <button
                 onClick={() => onSelect(post)}
-                className="group flex w-full items-start gap-3 text-left"
+                className="group flex w-full items-start gap-3 text-start"
               >
                 <span className="w-4 shrink-0 pt-0.5 text-sm font-black tabular-nums text-muted-foreground/60">
                   {index + 1}

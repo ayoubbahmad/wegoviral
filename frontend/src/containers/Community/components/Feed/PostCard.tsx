@@ -19,12 +19,13 @@ import {
 import { Card } from '@/components/Card';
 import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
 import { CommunityPost, CommunitySpace, CommunityUser } from '@/types/communityFeed';
-import { ROLE_BADGES } from '@/lib/roles';
 import { MemberBadges } from '@/components/MemberBadges';
 import { PostPoll } from './PostPoll';
 import { CommentsThread } from './CommentsThread';
 import { ReportDialog } from '../Moderation/ReportDialog';
 import { EditPostDialog } from '../Moderation/EditPostDialog';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 // Longer posts are clamped with a "See more" toggle
 const CLAMP_CHARACTERS = 280;
@@ -57,6 +58,7 @@ export const PostCard = ({
   onDelete,
   onSpaceClick,
 }: PostCardProps) => {
+  const t = useT();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const isLong =
@@ -99,12 +101,12 @@ export const PostCard = ({
             <span>
               {post.heldForReview ? (
                 <>
-                  <strong>Held for the team.</strong> It contains a word the team checks first. Only you can see it for now.
+                  <strong>{t('feed.post.held')}</strong> {t('feed.post.heldBody')}
                 </>
               ) : (
                 <>
-                  <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.{' '}
-                  <Link href="/community/help/your-first-posts" className="underline underline-offset-2">Why?</Link>
+                  <strong>{t('feed.post.waiting')}</strong> {t('feed.post.waitingBody')}{' '}
+                  <Link href="/community/help/your-first-posts" className="underline underline-offset-2">{t('feed.post.why')}</Link>
                 </>
               )}
             </span>
@@ -114,13 +116,13 @@ export const PostCard = ({
           <div className="flex items-start gap-2 rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-500">
             <XCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>
-              <strong>Not approved.</strong> Only you can see it.{post.reviewNote ? ` Reviewer's note: “${post.reviewNote}”` : ''}
+              <strong>{t('feed.post.rejected')}</strong> {t('feed.post.rejectedBody')}{post.reviewNote ? ` ${t('feed.post.reviewerNote', { note: post.reviewNote })}` : ''}
             </span>
           </div>
         )}
         {post.pinned && (
           <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-            <Pin className="w-3.5 h-3.5" /> Pinned
+            <Pin className="w-3.5 h-3.5" /> {t('feed.post.pinned')}
           </div>
         )}
 
@@ -141,16 +143,16 @@ export const PostCard = ({
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm truncate">@{post.author.username}</span>
               <MemberBadges badges={post.author.badges} />
-              {post.author.role && ROLE_BADGES[post.author.role] && (
+              {post.author.role && post.author.role !== 'MEMBER' && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                  {ROLE_BADGES[post.author.role]}
+                  {t(`common.roleBadges.${post.author.role}`)}
                 </span>
               )}
               <span className="text-xs text-muted-foreground shrink-0">
                 {formatRelativeDate(post.createdAt)}
                 {post.editedAt && (
-                  <span title={new Date(post.editedAt).toLocaleString()}>
-                    {post.editedByStaff ? ' · edited by the team' : ' · edited'}
+                  <span title={new Date(post.editedAt).toLocaleString(activeIntl())}>
+                    {post.editedByStaff ? t('feed.post.editedByTeam') : t('feed.post.edited')}
                   </span>
                 )}
               </span>
@@ -160,7 +162,7 @@ export const PostCard = ({
                 onClick={() => onSpaceClick?.(space.id)}
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                Posted in {space.emoji} {space.name}
+                {t('feed.post.postedIn', { space: `${space.emoji} ${space.name}` })}
               </button>
             )}
           </div>
@@ -182,7 +184,7 @@ export const PostCard = ({
                 onClick={() => setIsExpanded((expanded) => !expanded)}
                 className="mt-1 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
-                {isExpanded ? 'See less' : 'See more'}
+                {isExpanded ? t('feed.post.seeLess') : t('feed.post.seeMore')}
               </button>
             )}
           </div>
@@ -199,6 +201,7 @@ export const PostCard = ({
           <button
             onClick={() => onLike(post)}
             aria-pressed={post.likedByMe}
+            aria-label={t('feed.post.likes', { count: post.likeCount })}
             className="flex items-center gap-1.5 hover:text-foreground transition-colors"
           >
             <Heart
@@ -209,6 +212,7 @@ export const PostCard = ({
           <button
             onClick={() => setIsCommentsOpen((open) => !open)}
             aria-expanded={isCommentsOpen}
+            aria-label={t('feed.post.comments', { count: post.commentCount })}
             className={cn(
               'flex items-center gap-1.5 hover:text-foreground transition-colors',
               isCommentsOpen && 'text-foreground',
@@ -300,6 +304,7 @@ const PostActions = ({
   onPin,
   onDelete,
 }: PostActionsProps) => {
+  const t = useT();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -335,7 +340,8 @@ const PostActions = ({
       {isPublished && (
         <button
           onClick={() => onBookmark(post)}
-          title={post.bookmarkedByMe ? 'Remove bookmark' : 'Bookmark'}
+          title={post.bookmarkedByMe ? t('feed.post.removeBookmark') : t('feed.post.bookmark')}
+          aria-label={post.bookmarkedByMe ? t('feed.post.removeBookmark') : t('feed.post.bookmark')}
           aria-pressed={post.bookmarkedByMe}
           className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
         >
@@ -350,7 +356,7 @@ const PostActions = ({
           onClick={() => setIsMenuOpen((open) => !open)}
           aria-haspopup="menu"
           aria-expanded={isMenuOpen}
-          aria-label="Post options"
+          aria-label={t('feed.post.options')}
           className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
         >
           <MoreHorizontal className="w-4 h-4" />
@@ -358,19 +364,19 @@ const PostActions = ({
         {isMenuOpen && (
           <div
             role="menu"
-            className="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150"
+            className="absolute end-0 top-full z-20 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150"
           >
-            {menuItem('Copy link', <Link2 className="w-4 h-4" />, () => onCopyLink(post))}
-            {canEdit && menuItem('Edit post', <Pencil className="w-4 h-4" />, onEdit)}
-            {canReport && isPublished && menuItem('Report', <Flag className="w-4 h-4" />, onReport)}
+            {menuItem(t('feed.post.copyLink'), <Link2 className="w-4 h-4" />, () => onCopyLink(post))}
+            {canEdit && menuItem(t('feed.post.edit'), <Pencil className="w-4 h-4" />, onEdit)}
+            {canReport && isPublished && menuItem(t('feed.post.report'), <Flag className="w-4 h-4" />, onReport)}
             {canPin && isPublished &&
               menuItem(
-                post.pinned ? 'Unpin post' : 'Pin post',
+                post.pinned ? t('feed.post.unpin') : t('feed.post.pin'),
                 post.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />,
                 () => onPin(post),
               )}
             {canDelete &&
-              menuItem('Delete post', <Trash2 className="w-4 h-4" />, () => onDelete(post.id), true)}
+              menuItem(t('feed.post.delete'), <Trash2 className="w-4 h-4" />, () => onDelete(post.id), true)}
           </div>
         )}
       </div>

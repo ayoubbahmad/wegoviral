@@ -9,5 +9,6 @@ const router = Router();
 router.get('/me', protectAllowRestricted, authController.getMe);
 router.get('/username-available', authController.checkUsername);
 router.post('/warnings/:id/ack', protectAllowRestricted, authController.acknowledgeWarning);
+router.put('/me/locale', protectAllowRestricted, authController.setLocale);
 
 export default router;

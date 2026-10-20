@@ -1,0 +1,52 @@
+import type { Shape } from '../../types';
+import type { nav as en } from '../en/nav';
+
+export const nav: Shape<typeof en> = {
+  spaces: {
+    community: { label: 'المجتمع', description: 'الصفحة الرئيسية والفعاليات والدورات وغيرها' },
+    creator: { label: 'مساحة صانع المحتوى', description: 'أدواتك الشخصية لصناعة المحتوى' },
+    admin: { label: 'الإدارة', description: 'إدارة الأعضاء والمجتمع' },
+  },
+  community: {
+    feed: 'الصفحة الرئيسية',
+    events: 'الفعاليات',
+    leaderboard: 'لوحة الترتيب',
+    courses: 'الدورات',
+    members: 'الأعضاء',
+    challenges: 'التحدّيات',
+    reviews: 'مراجعة المنشورات',
+  },
+  creator: {
+    home: 'الرئيسية',
+    videos: 'الفيديوهات',
+    scripts: 'النصوص',
+    projects: 'المشاريع',
+    performance: 'الأداء',
+    followers: 'المتابعون',
+    automations: 'الأتمتة',
+    competitors: 'المنافسون',
+    library: 'المكتبة',
+    'design-system': 'نظام التصميم',
+  },
+  admin: {
+    overview: 'نظرة عامة',
+    stats: 'الإحصاءات',
+    approvals: 'طلبات الانضمام',
+    members: 'الأعضاء',
+    moderation: 'الإشراف',
+    spaces: 'المساحات',
+    tiers: 'باقات العضوية',
+    points: 'النقاط والشارات',
+    onboarding: 'الانضمام',
+    invites: 'روابط الدعوة',
+    'help-articles': 'مقالات المساعدة',
+    activity: 'سجلّ النشاط',
+  },
+  help: 'المساعدة',
+  settings: 'الإعدادات',
+  signOut: 'تسجيل الخروج',
+  collapse: 'طيّ الشريط الجانبي',
+  expand: 'توسيع الشريط الجانبي',
+  switchSpace: '{space}: تبديل المساحة',
+  switchSpaceTitle: 'تبديل المساحة',
+};

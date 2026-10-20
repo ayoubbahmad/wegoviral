@@ -6,6 +6,7 @@ import { prisma } from '../../lib/prisma';
 import { probationSummary, reviewerEligibility } from '../../lib/review';
 import { effectiveTierId, getTiers } from '../../lib/access';
 import { badgesSelect, levelFor } from '../../lib/gamification';
+import { isLocale, translateMessage } from '../../lib/i18n';
 
 export const getMe = async (req: any, res: Response) => {
     try {
@@ -36,7 +37,7 @@ export const getMe = async (req: any, res: Response) => {
             }),
             getTiers(),
             effectiveTierId(req.user.tierId),
-            prisma.userProfile.findUniqueOrThrow({ where: { id: req.user.id }, select: { points: true, ...badgesSelect } }),
+            prisma.userProfile.findUniqueOrThrow({ where: { id: req.user.id }, select: { points: true, locale: true, ...badgesSelect } }),
         ]);
         const tier = tiers.find((t) => t.id === tierId);
         res.status(200).json({
@@ -51,6 +52,7 @@ export const getMe = async (req: any, res: Response) => {
                 // Warnings from the team the member hasn't acknowledged yet
                 warnings,
                 tier: tier ? { id: tier.id, name: tier.name } : null,
+                locale: gamification.locale,
                 points: gamification.points,
                 level: await levelFor(gamification.points),
                 badges: gamification.badges.map((row) => row.badge),
@@ -64,6 +66,7 @@ export const getMe = async (req: any, res: Response) => {
                     rejectionNote: joining.joinStatus === 'REJECTED' ? joining.application?.reviewNote ?? null : null,
                     probation,
                     canReviewPosts: reviewing.canReview,
+                    reviewBlockedReason: reviewing.reason ? translateMessage(reviewing.reason, req.locale) : null,
                 },
             },
         });
@@ -80,14 +83,14 @@ export const checkUsername = async (req: Request, res: Response) => {
         if (!authService.isValidUsername(username)) {
             return res.status(200).json({
                 available: false,
-                reason: 'Use 3-30 lowercase letters, numbers or underscores',
+                reason: translateMessage('Use 3-30 lowercase letters, numbers or underscores', req.locale),
             });
         }
 
         const available = await authService.isUsernameAvailable(username);
         res.status(200).json({
             available,
-            reason: available ? undefined : 'This username is already taken',
+            reason: available ? undefined : translateMessage('This username is already taken', req.locale),
         });
     } catch (error) {
         console.error('Check Username Error:', error);
@@ -106,5 +109,18 @@ export const acknowledgeWarning = async (req: any, res: Response) => {
     } catch (error) {
         console.error('Acknowledge Warning Error:', error);
         res.status(500).json({ error: 'Failed to acknowledge the warning' });
+    }
+};
+
+/** Saves the member's language, so it follows them to other devices. */
+export const setLocale = async (req: any, res: Response) => {
+    try {
+        const { locale } = req.body ?? {};
+        if (!isLocale(locale)) return res.status(400).json({ error: 'Invalid request' });
+        await prisma.userProfile.update({ where: { id: req.user.id }, data: { locale } });
+        res.status(204).end();
+    } catch (error) {
+        console.error('Set Locale Error:', error);
+        res.status(500).json({ error: 'Failed to save your language' });
     }
 };

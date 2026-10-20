@@ -13,12 +13,16 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth, useCan } from "@/providers/Auth";
+import { useT } from "@/i18n/provider";
+import type { MessageKey } from "@/i18n/messages";
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
 import { useSidebarStore } from "./slice";
 import { SPACES, getSpaceFromPath } from "./spaces";
 import { SpaceSwitcher } from "./SpaceSwitcher";
 
 export function Sidebar() {
     const pathname = usePathname();
+    const t = useT();
     const { user, logout } = useAuth();
     const { sidebarCollapsed, toggleSidebar, lastSpace, setLastSpace } = useSidebarStore();
 
@@ -39,7 +43,7 @@ export function Sidebar() {
     return (
         <aside
             className={cn(
-                "fixed left-0 top-0 z-40 h-screen border-r border-border bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out",
+                "fixed start-0 top-0 z-40 h-screen border-e border-border bg-card/50 backdrop-blur-xl transition-all duration-300 ease-in-out",
                 sidebarCollapsed ? "w-20" : "w-64"
             )}
         >
@@ -51,23 +55,26 @@ export function Sidebar() {
                 {!sidebarCollapsed && (
                     <button
                         onClick={toggleSidebar}
+                        aria-label={t('nav.collapse')}
                         className="p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground transition-colors"
                     >
-                        <ChevronLeft className="w-4 h-4" />
+                        <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                     </button>
                 )}
                 {sidebarCollapsed && (
                     <button
                         onClick={toggleSidebar}
-                        className="absolute -right-3 top-20 p-1 bg-primary text-primary-foreground rounded-full border border-border shadow-lg z-50 hover:scale-110 transition-transform"
+                        aria-label={t('nav.expand')}
+                        className="absolute -end-3 top-20 p-1 bg-primary text-primary-foreground rounded-full border border-border shadow-lg z-50 hover:scale-110 transition-transform"
                     >
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-4 h-4 rtl:rotate-180" />
                     </button>
                 )}
             </div>
 
             <nav key={activeSpace} className="flex flex-col gap-2 p-4 animate-in fade-in duration-300">
                 {navItems.map((item) => {
+                    const label = t(`nav.${activeSpace}.${item.href.split("/").pop()}` as MessageKey);
                     const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                     const Icon = item.icon;
 
@@ -82,7 +89,7 @@ export function Sidebar() {
                                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
                                 sidebarCollapsed && "px-0 justify-center gap-0"
                             )}
-                            title={sidebarCollapsed ? item.name : ""}
+                            title={sidebarCollapsed ? label : ""}
                         >
                             <AnimatePresence mode="wait">
                                 {isActive && (
@@ -103,7 +110,7 @@ export function Sidebar() {
                                     exit={{ opacity: 0, x: -10 }}
                                     className="relative z-10 whitespace-nowrap"
                                 >
-                                    {item.name}
+                                    {label}
                                 </motion.span>
                             )}
                         </Link>
@@ -111,7 +118,7 @@ export function Sidebar() {
                 })}
             </nav>
 
-            <div className="absolute bottom-4 left-0 right-0 px-4 space-y-2">
+            <div className="absolute bottom-4 inset-x-0 px-4 space-y-2">
                 {user && (
                     <div className={cn(
                         "p-3 rounded-xl bg-secondary/50 border border-border flex items-center gap-3",
@@ -137,7 +144,8 @@ export function Sidebar() {
                             <button
                                 onClick={logout}
                                 className="p-1.5 rounded-lg hover:bg-background text-muted-foreground hover:text-foreground transition-colors"
-                                title="Sign Out"
+                                title={t("nav.signOut")}
+                                aria-label={t("nav.signOut")}
                             >
                                 <LogOut className="w-4 h-4" />
                             </button>
@@ -154,7 +162,7 @@ export function Sidebar() {
                             : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
                         sidebarCollapsed && "px-0 justify-center gap-0"
                     )}
-                    title={sidebarCollapsed ? "Help" : ""}
+                    title={sidebarCollapsed ? t("nav.help") : ""}
                 >
                     <LifeBuoy className="w-5 h-5 shrink-0" />
                     {!sidebarCollapsed && (
@@ -163,7 +171,7 @@ export function Sidebar() {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
                         >
-                            Help
+                            {t("nav.help")}
                         </motion.span>
                     )}
                 </Link>
@@ -174,7 +182,7 @@ export function Sidebar() {
                         "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors justify-start",
                         sidebarCollapsed && "px-0 justify-center gap-0"
                     )}
-                    title={sidebarCollapsed ? "Settings" : ""}
+                    title={sidebarCollapsed ? t("nav.settings") : ""}
                 >
                     <Settings className="w-5 h-5 shrink-0" />
                     {!sidebarCollapsed && (
@@ -183,10 +191,12 @@ export function Sidebar() {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
                         >
-                            Settings
+                            {t("nav.settings")}
                         </motion.span>
                     )}
                 </Link>
+
+                <LanguageSwitcher compact={sidebarCollapsed} className={cn("px-4 py-1", sidebarCollapsed && "px-0 justify-center")} />
             </div>
         </aside>
     );

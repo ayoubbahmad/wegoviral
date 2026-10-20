@@ -16,12 +16,15 @@ import { SpaceChips } from './SpaceChips';
 import { UpcomingEventsCard } from './UpcomingEventsCard';
 import { TopPostsCard } from './TopPostsCard';
 import { ReferralCard } from '@/containers/Onboarding/ReferralCard';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 interface FeedTabProps {
   feed: FeedController;
 }
 
 export const FeedTab = ({ feed }: FeedTabProps) => {
+  const t = useT();
   const {
     spaces,
     activeSpace,
@@ -96,11 +99,11 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
             <VolumeX className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
             <div>
               <p className="font-semibold">
-                You&apos;re muted{mutedUntil ? ` until ${new Date(mutedUntil).toLocaleString()}` : ''}
+                {mutedUntil ? t('feed.mutedUntil', { date: new Date(mutedUntil).toLocaleString(activeIntl()) }) : t('feed.muted')}
               </p>
               <p className="text-muted-foreground">
-                You can still read the community, but not post, comment, react or vote.
-                {muteReason && <> Reason: {muteReason}</>}
+                {t('feed.mutedBody')}
+                {muteReason && <> {t('feed.reason', { reason: muteReason })}</>}
               </p>
             </div>
           </div>
@@ -114,9 +117,8 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
         )}
         {canPostHere && probation?.onProbation && (
           <p className="px-1 text-xs text-muted-foreground">
-            As a new member, your first {probation.required} posts are reviewed before they go live ·{' '}
-            {probation.approvedPosts}/{probation.required} approved
-            {probation.pendingPosts > 0 && `, ${probation.pendingPosts} waiting`}
+            {t('feed.probation', { required: probation.required, approved: probation.approvedPosts })}
+            {probation.pendingPosts > 0 && t('feed.probationWaiting', { count: probation.pendingPosts })}
           </p>
         )}
 
@@ -126,15 +128,15 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
               <Lock className="w-7 h-7 text-muted-foreground" />
             </div>
             <h2 className="text-lg font-bold">
-              {activeSpace.emoji} {activeSpace.name} is locked
+              {t('feed.spaceLocked', { space: `${activeSpace.emoji} ${activeSpace.name}` })}
             </h2>
             <ul className="space-y-1 text-sm text-muted-foreground">
               {activeSpace.access.reasons.map((reason, index) => (
-                <li key={index}>{describeLockReason(reason)}</li>
+                <li key={index}>{describeLockReason(reason, t)}</li>
               ))}
             </ul>
             {activeSpace.access.reasons.some((reason) => reason.type === 'tier') && (
-              <p className="text-xs text-muted-foreground">Upgrading will be available soon.</p>
+              <p className="text-xs text-muted-foreground">{t('feed.upgradeSoon')}</p>
             )}
           </Card>
         ) : isLoadingPosts ? (
@@ -147,18 +149,14 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
               onClick={() => retryPosts()}
               className="text-sm font-semibold text-primary hover:underline"
             >
-              Try again
+              {t('feed.tryAgain')}
             </button>
           </Card>
         ) : posts.length === 0 ? (
           <EmptyState
             icon={MessageSquare}
-            title="No posts here yet"
-            description={
-              canPostHere
-                ? 'Be the first to start the conversation in this space.'
-                : 'The team will post updates here soon.'
-            }
+            title={t('feed.emptyTitle')}
+            description={canPostHere ? t('feed.emptyCanPost') : t('feed.emptyTeam')}
           />
         ) : (
           <>
@@ -186,7 +184,7 @@ export const FeedTab = ({ feed }: FeedTabProps) => {
               </div>
             )}
             {!hasMorePosts && posts.length > 5 && (
-              <p className="py-4 text-center text-xs text-muted-foreground">You&apos;re all caught up ✨</p>
+              <p className="py-4 text-center text-xs text-muted-foreground">{t('feed.caughtUp')}</p>
             )}
           </>
         )}

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { REPORT_REASONS, ReportReason } from '@/types/communityFeed';
 import { useReport } from '../../api';
 import { Dialog } from './Dialog';
+import { useT } from '@/i18n/provider';
 
 interface ReportDialogProps {
   target: 'post' | 'comment';
@@ -17,6 +18,7 @@ interface ReportDialogProps {
 
 export const ReportDialog = ({ target, id, onClose }: ReportDialogProps) => {
   const { showToast } = useToast();
+  const t = useT();
   const report = useReport();
   const [reason, setReason] = useState<ReportReason | null>(null);
   const [note, setNote] = useState('');
@@ -27,7 +29,7 @@ export const ReportDialog = ({ target, id, onClose }: ReportDialogProps) => {
       { target, id, reason, note: note.trim() || undefined },
       {
         onSuccess: () => {
-          showToast('Thanks, the team will take a look');
+          showToast(t('feed.report.thanks'));
           onClose();
         },
         onError: (error) => {
@@ -39,9 +41,9 @@ export const ReportDialog = ({ target, id, onClose }: ReportDialogProps) => {
   };
 
   return (
-    <Dialog title={`Report ${target === 'post' ? 'post' : 'comment'}`} onClose={onClose}>
+    <Dialog title={target === 'post' ? t('feed.report.titlePost') : t('feed.report.titleComment')} onClose={onClose}>
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">Only the team sees reports. What&apos;s wrong?</p>
+        <p className="text-sm text-muted-foreground">{t('feed.report.intro')}</p>
         <div className="space-y-1.5" role="radiogroup">
           {REPORT_REASONS.map((option) => (
             <label
@@ -52,23 +54,23 @@ export const ReportDialog = ({ target, id, onClose }: ReportDialogProps) => {
               )}
             >
               <input type="radio" name="report-reason" checked={reason === option.value} onChange={() => setReason(option.value)} className="accent-[var(--primary)]" />
-              {option.label}
+              {t(`feed.reportReasons.${option.value}`)}
             </label>
           ))}
         </div>
         <textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}
-          placeholder="Anything the team should know? (optional)"
+          placeholder={t('feed.report.notePlaceholder')}
           maxLength={500}
           className="w-full min-h-[70px] rounded-xl border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" onClick={handleSubmit} disabled={!reason || report.isPending}>
-            {report.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send report'}
+            {report.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('feed.report.send')}
           </Button>
         </div>
       </div>

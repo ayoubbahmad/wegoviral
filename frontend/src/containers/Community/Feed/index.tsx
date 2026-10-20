@@ -6,8 +6,10 @@ import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { FeedTab } from '../components';
 import { useFeedController } from './controller';
+import { useT } from '@/i18n/provider';
 
 export const CommunityFeedContainer = () => {
+  const t = useT();
   const feed = useFeedController();
   const canPostHere =
     (!feed.activeSpace?.adminOnly || feed.isStaff) && feed.canInteract && !feed.activeSpace?.access.locked;
@@ -15,12 +17,12 @@ export const CommunityFeedContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="Timeline"
-        description="Share updates, wins and questions with the community."
+        title={t('feed.title')}
+        description={t('feed.description')}
         actions={
           canPostHere && (
             <Button variant="primary" onClick={() => feed.setIsCreatePostOpen(true)}>
-              <Plus className="w-4 h-4" /> New post
+              <Plus className="w-4 h-4" /> {t('feed.newPost')}
             </Button>
           )
         }

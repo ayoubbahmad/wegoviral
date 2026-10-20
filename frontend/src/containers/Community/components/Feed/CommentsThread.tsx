@@ -9,6 +9,7 @@ import { MemberBadges } from '@/components/MemberBadges';
 import { CommunityComment, CommunityUser } from '@/types/communityFeed';
 import { useComments, useCreateComment, useDeleteComment, useEditComment } from '../../api';
 import { ReportDialog } from '../Moderation/ReportDialog';
+import { useT } from '@/i18n/provider';
 
 interface CommentsThreadProps {
   postId: string;
@@ -19,6 +20,7 @@ interface CommentsThreadProps {
 export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadProps) => {
   const { showToast } = useToast();
   const { user } = useAuth();
+  const t = useT();
   const [draft, setDraft] = useState('');
   const commentsQuery = useComments(postId, true);
   const createComment = useCreateComment(postId);
@@ -30,14 +32,14 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
     if (!content) return;
     createComment.mutate(content, {
       onSuccess: () => setDraft(''),
-      onError: (error) => showToast(error.message || 'Could not add the comment', 'error'),
+      onError: (error) => showToast(error.message || t('feed.comments.addFailed'), 'error'),
     });
   };
 
   const handleDelete = (commentId: string) => {
-    if (!window.confirm('Delete this comment?')) return;
+    if (!window.confirm(t('feed.comments.deleteConfirm'))) return;
     deleteComment.mutate(commentId, {
-      onError: (error) => showToast(error.message || 'Could not delete the comment', 'error'),
+      onError: (error) => showToast(error.message || t('feed.comments.deleteFailed'), 'error'),
     });
   };
 
@@ -49,13 +51,13 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
         </div>
       ) : commentsQuery.isError ? (
         <p className="text-sm text-muted-foreground">
-          Could not load comments.{' '}
+          {t('feed.commentsLoadFailed')}{' '}
           <button onClick={() => commentsQuery.refetch()} className="font-semibold text-primary hover:underline">
-            Retry
+            {t('feed.comments.retry')}
           </button>
         </p>
       ) : commentsQuery.data.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No comments yet. Start the conversation.</p>
+        <p className="text-sm text-muted-foreground">{t('feed.comments.empty')}</p>
       ) : (
         <ul className="space-y-3">
           {commentsQuery.data.map((comment) => (
@@ -72,9 +74,9 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
       )}
 
       {user?.status === 'MUTED' ? (
-        <p className="text-xs text-muted-foreground">You&apos;re muted, so you can&apos;t comment for now.</p>
+        <p className="text-xs text-muted-foreground">{t('feed.comments.muted')}</p>
       ) : user?.onboarding.step !== 'DONE' ? (
-        <p className="text-xs text-muted-foreground">Accept the community guide to join the conversation.</p>
+        <p className="text-xs text-muted-foreground">{t('feed.comments.acceptGuide')}</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           {currentUser && (
@@ -87,14 +89,14 @@ export const CommentsThread = ({ postId, currentUser, isStaff }: CommentsThreadP
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="Write a comment..."
+            placeholder={t('feed.comments.placeholder')}
             maxLength={2000}
             className="h-10 flex-1 rounded-full border border-border bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <button
             type="submit"
             disabled={!draft.trim() || createComment.isPending}
-            aria-label="Send comment"
+            aria-label={t('feed.comments.send')}
             className="p-2.5 rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             {createComment.isPending ? (
@@ -118,6 +120,7 @@ interface CommentItemProps {
 }
 
 const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemProps) => {
+  const t = useT();
   const { showToast } = useToast();
   const editComment = useEditComment(postId);
   const [isEditing, setIsEditing] = useState(false);
@@ -132,7 +135,7 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
       { commentId: comment.id, content },
       {
         onSuccess: () => setIsEditing(false),
-        onError: (error) => showToast(error.message || 'Could not edit the comment', 'error'),
+        onError: (error) => showToast(error.message || t('feed.comments.editFailed'), 'error'),
       },
     );
   };
@@ -149,21 +152,21 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
           <MemberBadges badges={comment.author.badges} />
           <span className="text-[11px] text-muted-foreground">
             {formatRelativeDate(comment.createdAt)}
-            {comment.editedAt && (comment.editedByStaff ? ' · edited by the team' : ' · edited')}
+            {comment.editedAt && (comment.editedByStaff ? t('feed.post.editedByTeam') : t('feed.post.edited'))}
           </span>
-          <span className="ml-auto flex items-center gap-0.5">
+          <span className="ms-auto flex items-center gap-0.5">
             {canManage && !isEditing && (
-              <button onClick={() => setIsEditing(true)} aria-label="Edit comment" className={`${iconButton} hover:text-foreground`}>
+              <button onClick={() => setIsEditing(true)} aria-label={t('feed.comments.edit')} className={`${iconButton} hover:text-foreground`}>
                 <Pencil className="w-3.5 h-3.5" />
               </button>
             )}
             {!isOwn && !comment.heldForReview && (
-              <button onClick={() => setIsReporting(true)} aria-label="Report comment" className={`${iconButton} hover:text-foreground`}>
+              <button onClick={() => setIsReporting(true)} aria-label={t('feed.comments.report')} className={`${iconButton} hover:text-foreground`}>
                 <Flag className="w-3.5 h-3.5" />
               </button>
             )}
             {canManage && (
-              <button onClick={() => onDelete(comment.id)} aria-label="Delete comment" className={`${iconButton} hover:text-red-500`}>
+              <button onClick={() => onDelete(comment.id)} aria-label={t('feed.comments.delete')} className={`${iconButton} hover:text-red-500`}>
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
@@ -171,7 +174,7 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
         </div>
         {comment.heldForReview && (
           <p className="mt-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-            Held for the team: only you can see it until they check it.
+            {t('feed.comments.held')}
           </p>
         )}
         {isEditing ? (
@@ -185,10 +188,10 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
             />
             <div className="flex justify-end gap-2 text-xs font-semibold">
               <button onClick={() => { setDraft(comment.content); setIsEditing(false); }} className="text-muted-foreground hover:text-foreground">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button onClick={save} disabled={editComment.isPending} className="text-primary hover:underline disabled:opacity-60">
-                {editComment.isPending ? 'Saving…' : 'Save'}
+                {editComment.isPending ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </div>

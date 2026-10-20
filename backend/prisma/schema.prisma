@@ -41,6 +41,10 @@ model UserProfile {
   tierId               String?
   // All-time points (sum of the points ledger); levels are derived from it
   points               Int                    @default(0)
+  /**
+   * App language: en, fr or ar (null until the member's first visit)
+   */
+  locale               String?
   tier                 MembershipTier?        @relation(fields: [tierId], references: [id], onDelete: SetNull)
   automations          Automation[]
   competitors          Competitor[]

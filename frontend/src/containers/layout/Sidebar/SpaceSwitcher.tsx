@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n/provider";
 import { useCan } from "@/providers/Auth";
 import { SPACES, SPACE_LIST, type SpaceId } from "./spaces";
 
@@ -16,6 +17,7 @@ interface SpaceSwitcherProps {
 export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
     const router = useRouter();
     const can = useCan();
+    const t = useT();
     const availableSpaces = SPACE_LIST.filter((space) => !space.requires || can(space.requires));
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -51,10 +53,10 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                 onClick={() => setIsOpen((open) => !open)}
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
-                title={collapsed ? `${current.label} — switch space` : undefined}
+                title={collapsed ? t('nav.switchSpace', { space: t(`nav.spaces.${current.id}.label`) }) : undefined}
                 className={cn(
-                    "flex items-center gap-3 rounded-xl p-1 pr-2 text-left hover:bg-secondary/50 transition-colors min-w-0",
-                    collapsed && "pr-1"
+                    "flex items-center gap-3 rounded-xl p-1 pe-2 text-start hover:bg-secondary/50 transition-colors min-w-0",
+                    collapsed && "pe-1"
                 )}
             >
                 <div className="p-1.5 bg-primary rounded-lg shrink-0 shadow-lg shadow-primary/20">
@@ -71,7 +73,7 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                                 WeGoViral
                             </p>
                             <p className="text-sm font-bold tracking-tight truncate leading-none">
-                                {current.label}
+                                {t(`nav.spaces.${current.id}.label`)}
                             </p>
                         </div>
                         <ChevronsUpDown className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -89,11 +91,11 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                         transition={{ duration: 0.15 }}
                         className={cn(
                             "absolute z-50 w-64 rounded-xl border border-border bg-card p-1.5 shadow-2xl",
-                            collapsed ? "left-full top-0 ml-3" : "left-0 top-full mt-2"
+                            collapsed ? "start-full top-0 ms-3" : "start-0 top-full mt-2"
                         )}
                     >
                         <p className="px-2.5 pt-1.5 pb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                            Switch space
+                            {t('nav.switchSpaceTitle')}
                         </p>
                         {availableSpaces.map((space) => {
                             const Icon = space.icon;
@@ -105,7 +107,7 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                                     role="menuitem"
                                     onClick={() => handleSelect(space.id)}
                                     className={cn(
-                                        "flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors",
+                                        "flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-start transition-colors",
                                         isActive ? "bg-secondary/70" : "hover:bg-secondary/50"
                                     )}
                                 >
@@ -116,8 +118,8 @@ export function SpaceSwitcher({ activeSpace, collapsed }: SpaceSwitcherProps) {
                                         <Icon className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold truncate">{space.label}</p>
-                                        <p className="text-xs text-muted-foreground truncate">{space.description}</p>
+                                        <p className="text-sm font-semibold truncate">{t(`nav.spaces.${space.id}.label`)}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{t(`nav.spaces.${space.id}.description`)}</p>
                                     </div>
                                     {isActive && <Check className="w-4 h-4 text-primary shrink-0" />}
                                 </button>

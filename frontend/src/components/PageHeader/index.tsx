@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { LifeBuoy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BackNavigation } from '@/components/BackNavigation';
+import { T } from '@/i18n/T';
 
 interface PageHeaderProps {
   title: string;
@@ -22,7 +23,7 @@ export const PageHeader = ({
   actions,
   className,
   backUrl,
-  backLabel = 'Back',
+  backLabel,
   onClickBack,
   helpHref,
 }: PageHeaderProps) => {
@@ -48,7 +49,7 @@ export const PageHeader = ({
           )}
           {helpHref && (
             <Link href={helpHref} className='inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline'>
-              <LifeBuoy className='w-4 h-4' /> How does this work?
+              <LifeBuoy className='w-4 h-4' /> <T k='common.howDoesThisWork' />
             </Link>
           )}
         </div>

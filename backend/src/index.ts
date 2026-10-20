@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import { localeMiddleware } from './middleware/locale.middleware';
 import pinoHttp from 'pino-http';
 import logger from './lib/logger';
 
@@ -57,6 +58,7 @@ app.use(
 app.use(pinoHttp({ logger })); // Use pino-http middleware
 
 app.use(express.json());
+app.use(localeMiddleware);
 
 // Routes
 app.use('/api/hooks', hooksRoutes);

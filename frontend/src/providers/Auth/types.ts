@@ -16,6 +16,8 @@ export interface Onboarding {
     /** New members' first posts are reviewed before others see them */
     probation: Probation;
     canReviewPosts: boolean;
+    /** Why the member can't review yet, in their language */
+    reviewBlockedReason?: string | null;
 }
 
 export type Probation =
@@ -40,6 +42,8 @@ export interface User {
     warnings: { id: string; reason: string; createdAt: string }[];
     /** Membership tier (falls back to the default tier) */
     tier: { id: string; name: string } | null;
+    /** App language saved on the profile (null until first set) */
+    locale: 'en' | 'fr' | 'ar' | null;
     points: number;
     level: MemberLevel;
     /** Up to 3 most recent badges */

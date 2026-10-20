@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommunitySpace } from '@/types/communityFeed';
 import { ALL_SPACES_ID } from '../../slice';
+import { useT } from '@/i18n/provider';
 
 interface SpaceChipsProps {
   spaces: CommunitySpace[];
@@ -18,15 +19,16 @@ export const SpaceChips = ({
   postCountBySpace,
   onChange,
 }: SpaceChipsProps) => {
+  const t = useT();
   const chips = [
-    { id: ALL_SPACES_ID, name: 'All', emoji: '✨', locked: false },
+    { id: ALL_SPACES_ID, name: t('common.all'), emoji: '✨', locked: false },
     ...spaces.map((space) => ({ ...space, locked: space.access.locked })),
   ];
 
   return (
     <div
       role="tablist"
-      aria-label="Filter feed by space"
+      aria-label={t('feed.chips.label')}
       className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {chips.map((chip) => {
@@ -48,7 +50,7 @@ export const SpaceChips = ({
           >
             <span aria-hidden>{chip.emoji}</span>
             {chip.name}
-            {chip.locked && <Lock className="w-3 h-3 opacity-70" aria-label="Locked" />}
+            {chip.locked && <Lock className="w-3 h-3 opacity-70" aria-label={t('common.locked')} />}
             <span
               className={cn(
                 'min-w-5 rounded-full px-1.5 text-[11px] font-bold tabular-nums',

@@ -1,6 +1,7 @@
 import { LayoutGrid, Table2, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../Button';
+import { T } from '@/i18n/T';
 
 interface ViewToggleProps {
   mode: 'grid' | 'table';
@@ -27,9 +28,10 @@ export const ViewToggle = ({ mode, onChange, className }: ViewToggleProps) => {
           'p-2 rounded-lg transition-all',
           mode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : '',
         )}
-        title='Table View'
+        aria-label='Table view'
       >
         <Table2 className='w-4 h-4' />
+        <span className='sr-only'><T k='common.tableView' /></span>
       </Button>
       <Button
         variant='ghost'
@@ -39,9 +41,10 @@ export const ViewToggle = ({ mode, onChange, className }: ViewToggleProps) => {
           'p-2 rounded-lg transition-all',
           mode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : '',
         )}
-        title='Grid View'
+        aria-label='Grid view'
       >
         <LayoutGrid className='w-4 h-4' />
+        <span className='sr-only'><T k='common.gridView' /></span>
       </Button>
     </div>
   );

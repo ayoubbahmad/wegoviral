@@ -224,6 +224,16 @@ Shipped; **acceptance pending** (Ayoub). 5 automated help center tests.
 - ✅ **Editable by admins** (Admin → Help articles): write with a live preview (light Markdown: headings, lists, bold, links), choose the section and audience, save as draft or publish, reorder; changes are logged.
   - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides in Admin; in the Creator Space, only Creator Space articles show. *(Automated test passes.)*
 
+## Phase 12 — Languages: Arabic, French, English
+
+Requested 2026-10-20. Decisions: **Modern Standard Arabic** (right-to-left, Western digits as used in Morocco), first visit in the **browser's language** (falling back to French), the choice saved to the member's profile. Besides the app itself, the team's own content is translatable: **help articles, the community guide and quiz, and the names of spaces, badges and levels**. Members' posts are not translated (a "Translate" button could come later).
+
+- ⬜ **12a · Foundations and the member side**: translation engine with typed messages (plural rules for Arabic), language switcher (sidebar, settings, sign-in pages), right-to-left layout and an Arabic font, dates and numbers in the member's language, server messages (errors, lock reasons) translated; all Community, joining, sign-in, sidebar and help center screens in the three languages.
+  - *Accept:* switching to Arabic flips the layout and translates every Community screen; the choice survives a reload and a new device after signing in.
+- ⬜ **12b · Admin space** in the three languages.
+- ⬜ **12c · Team content**: language tabs to write help articles, the guide, the quiz and the names of spaces, badges and levels per language (members see theirs, or the original if missing); the starter content translated.
+- ⬜ **12d · Creator Space and landing page** in the three languages.
+
 ## Phase 9 — Monetization (Stripe) · Super Admin only · moved to the end
 
 *Postponed on 2026-10-19 until the Stripe details are ready (open question 6); the other phases go first.*

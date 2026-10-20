@@ -25,7 +25,7 @@ interface TableHeaderProps {
   className?: string;
 }
 
-Table.Header = ({ children, className }: TableHeaderProps) => (
+const TableHeader = ({ children, className }: TableHeaderProps) => (
   <thead className={cn("bg-muted/30 border-b border-border/50", className)}>
     <tr>{children}</tr>
   </thead>
@@ -37,7 +37,7 @@ interface TableHeadProps {
   align?: "left" | "right" | "center";
 }
 
-Table.Head = ({ children, className, align = "left" }: TableHeadProps) => {
+const TableHead = ({ children, className, align = "left" }: TableHeadProps) => {
   const alignMap = {
     left: "text-start",
     right: "text-end",
@@ -62,7 +62,7 @@ interface TableBodyProps {
   className?: string;
 }
 
-Table.Body = ({ children, className }: TableBodyProps) => (
+const TableBody = ({ children, className }: TableBodyProps) => (
   <tbody className={cn("divide-y divide-border/30", className)}>
     {children}
   </tbody>
@@ -75,7 +75,7 @@ interface TableRowProps {
   hover?: boolean;
 }
 
-Table.Row = ({ children, className, onClick, hover = true }: TableRowProps) => (
+const TableRow = ({ children, className, onClick, hover = true }: TableRowProps) => (
   <tr 
     onClick={onClick}
     className={cn(
@@ -95,7 +95,7 @@ interface TableCellProps {
   align?: "left" | "right" | "center";
 }
 
-Table.Cell = ({ children, className, align = "left" }: TableCellProps) => {
+const TableCell = ({ children, className, align = "left" }: TableCellProps) => {
   const alignMap = {
     left: "text-start",
     right: "text-end",
@@ -115,8 +115,8 @@ Table.Cell = ({ children, className, align = "left" }: TableCellProps) => {
   );
 };
 
-Table.Header.displayName = 'Table.Header';
-Table.Head.displayName = 'Table.Head';
-Table.Body.displayName = 'Table.Body';
-Table.Row.displayName = 'Table.Row';
-Table.Cell.displayName = 'Table.Cell';
+Table.Header = TableHeader;
+Table.Head = TableHead;
+Table.Body = TableBody;
+Table.Row = TableRow;
+Table.Cell = TableCell;

@@ -73,6 +73,7 @@ model UserProfile {
   createdChallenges    Challenge[]            @relation("ChallengeCreator")
   challengeEntries     ChallengeParticipant[]
   challengeCheckIns    ChallengeCheckIn[]
+  editedHelpArticles   HelpArticle[]
   eventRsvps           EventRsvp[]
   pointEvents          PointEvent[]
   badges               MemberBadge[]          @relation("BadgeHolder")
@@ -1000,4 +1001,35 @@ model ChallengeCheckIn {
   @@unique([challengeId, userId, day])
   @@index([challengeId, createdAt])
   @@map("challenge_check_ins")
+}
+
+// ─── Help center (Phase 11) ───────────────────────────────────────────────────
+
+enum HelpSpace {
+  COMMUNITY
+  CREATOR
+  ADMIN
+}
+
+/**
+ * One help article, shown in one space to one audience (that role and above).
+ */
+model HelpArticle {
+  id          String       @id @default(uuid())
+  slug        String       @unique
+  space       HelpSpace
+  audience    UserRole     @default(MEMBER)
+  category    String // section heading in the help center, e.g. "Getting started"
+  title       String
+  summary     String       @default("")
+  body        String       @default("") // light Markdown: ## headings, lists, **bold**, [links](url)
+  position    Int          @default(0)
+  published   Boolean      @default(false)
+  updatedById String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  updatedBy   UserProfile? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([space, published, position])
+  @@map("help_articles")
 }

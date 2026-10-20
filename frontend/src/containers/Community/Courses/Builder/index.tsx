@@ -49,11 +49,16 @@ export const CourseBuilder = ({ courseId }: { courseId: string }) => {
                 {STATUS_LABEL[course.status]} · by {course.owner.name || `@${course.owner.username}`}
               </p>
             </div>
-            <Link href={`/community/courses/${courseId}`}>
-              <Button variant="outline" size="sm">
-                <Eye className="w-4 h-4" /> Preview
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/community/help/creating-a-course" className="text-sm font-semibold text-primary hover:underline">
+                How does this work?
+              </Link>
+              <Link href={`/community/courses/${courseId}`}>
+                <Button variant="outline" size="sm">
+                  <Eye className="w-4 h-4" /> Preview
+                </Button>
+              </Link>
+            </div>
           </div>
           <div role="tablist" aria-label="Course builder" className="flex gap-4 border-b border-border text-sm font-semibold">
             {TABS.map((option) => (

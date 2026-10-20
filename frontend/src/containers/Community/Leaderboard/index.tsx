@@ -33,6 +33,7 @@ export const CommunityLeaderboardContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/community/help/points-levels-badges"
         title="Leaderboard"
         description="Earn points by posting, commenting and showing up. Level up to unlock more of the community."
         actions={

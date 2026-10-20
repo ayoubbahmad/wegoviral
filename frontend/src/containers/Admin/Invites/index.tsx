@@ -33,6 +33,7 @@ export const AdminInvitesContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/admin/help/invite-links"
         title="Invite links"
         description="Links that let people join without waiting for approval, e.g. for a campaign or special guests."
       />

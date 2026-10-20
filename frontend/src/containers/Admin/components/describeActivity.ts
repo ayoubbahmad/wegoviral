@@ -153,6 +153,16 @@ export function describeActivity(entry: ActivityEntry): string {
       return `picked ${details.winners} winner${details.winners === 1 ? '' : 's'} for “${target}”${details.mode === 'top' ? ' (top of the board)' : ''}`;
     case 'challenge.winners_cleared':
       return `cleared the winners of “${target}”`;
+    case 'help.created':
+      return `wrote the help article “${target}”`;
+    case 'help.updated':
+      return `edited the help article “${target}”`;
+    case 'help.published':
+      return `published the help article “${target}”`;
+    case 'help.unpublished':
+      return `unpublished the help article “${target}”`;
+    case 'help.deleted':
+      return `deleted the help article “${target}”`;
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

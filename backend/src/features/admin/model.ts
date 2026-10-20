@@ -22,7 +22,7 @@ export const RestrictMemberSchema = z.object({
 });
 
 export const ListActivityQuerySchema = z.object({
-  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier', 'event', 'badge', 'course', 'challenge']).optional(),
+  targetType: z.enum(['member', 'post', 'comment', 'space', 'settings', 'guide', 'invite', 'tier', 'event', 'badge', 'course', 'challenge', 'help']).optional(),
   targetId: z.string().optional(),
   actorId: z.string().optional(),
   cursor: z.string().optional(),

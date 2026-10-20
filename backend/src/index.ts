@@ -27,6 +27,7 @@ import eventsRoutes from './features/events/routes';
 import leaderboardRoutes from './features/leaderboard/routes';
 import coursesRoutes from './features/courses/routes';
 import challengesRoutes from './features/challenges/routes';
+import helpRoutes from './features/help/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -79,6 +80,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/challenges', challengesRoutes);
+app.use('/api/help', helpRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

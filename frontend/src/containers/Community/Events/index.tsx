@@ -74,6 +74,7 @@ export const CommunityEventsContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/community/help/events"
         title="Events"
         description="Live sessions, workshops and meetups hosted by the community."
         actions={

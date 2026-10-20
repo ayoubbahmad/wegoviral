@@ -29,7 +29,8 @@ export const AdminOnboardingContainer = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Onboarding" description="How new members join: approval, community guide and quiz." />
+      <PageHeader
+        helpHref="/admin/help/onboarding-settings" title="Onboarding" description="How new members join: approval, community guide and quiz." />
       {settings.isPending || guide.isPending ? (
         <Skeleton className="h-64 rounded-2xl" />
       ) : settings.error || guide.error ? (

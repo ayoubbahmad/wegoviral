@@ -55,6 +55,8 @@ export const PERMISSIONS = {
   'courses.manage': atLeast('ADMIN'),
   /** Create and run challenges, pick winners, remove check-ins */
   'challenges.manage': atLeast('MODERATOR'),
+  /** Write and publish help center articles */
+  'help.manage': atLeast('ADMIN'),
   /** Point rules, levels, badges; award badges and adjust points */
   'gamification.manage': atLeast('ADMIN'),
 } satisfies Record<string, UserRole[]>;

@@ -23,7 +23,8 @@ export type Permission =
   | 'gamification.manage'
   | 'courses.create'
   | 'courses.manage'
-  | 'challenges.manage';
+  | 'challenges.manage'
+  | 'help.manage';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   MEMBER: 'Member',

@@ -1,4 +1,6 @@
 import { ReactNode } from 'react';
+import Link from 'next/link';
+import { LifeBuoy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BackNavigation } from '@/components/BackNavigation';
 
@@ -10,6 +12,8 @@ interface PageHeaderProps {
   backUrl?: string;
   backLabel?: string;
   onClickBack?: () => void;
+  /** Help article for this screen, e.g. "/community/help/events" */
+  helpHref?: string;
 }
 
 export const PageHeader = ({
@@ -20,6 +24,7 @@ export const PageHeader = ({
   backUrl,
   backLabel = 'Back',
   onClickBack,
+  helpHref,
 }: PageHeaderProps) => {
   return (
     <div className={cn('space-y-6 mb-8', className)}>
@@ -40,6 +45,11 @@ export const PageHeader = ({
             <div className='text-muted-foreground font-medium'>
               {description}
             </div>
+          )}
+          {helpHref && (
+            <Link href={helpHref} className='inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline'>
+              <LifeBuoy className='w-4 h-4' /> How does this work?
+            </Link>
           )}
         </div>
         {actions && <div className='flex items-center gap-3'>{actions}</div>}

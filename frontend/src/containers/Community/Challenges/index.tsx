@@ -36,6 +36,7 @@ export const CommunityChallengesContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/community/help/challenges"
         title="Challenges"
         description="Sprints that build the habit: check in, keep your streak, finish strong and win."
         actions={

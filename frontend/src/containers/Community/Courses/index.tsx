@@ -51,6 +51,7 @@ export const CommunityCoursesContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/community/help/courses"
         title="Courses"
         description="Learn from the community's playbooks, trainings and replays."
         actions={

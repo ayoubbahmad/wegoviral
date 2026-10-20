@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import {
   Bookmark,
@@ -102,7 +103,8 @@ export const PostCard = ({
                 </>
               ) : (
                 <>
-                  <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.
+                  <strong>Waiting for review.</strong> Only you can see it until a reviewer approves it.{' '}
+                  <Link href="/community/help/your-first-posts" className="underline underline-offset-2">Why?</Link>
                 </>
               )}
             </span>

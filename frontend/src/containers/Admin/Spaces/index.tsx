@@ -23,6 +23,7 @@ export const AdminSpacesContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/admin/help/spaces"
         title="Spaces"
         description="The topics members post in. Archived spaces disappear from the feed filters and close to new posts; their posts stay."
         actions={

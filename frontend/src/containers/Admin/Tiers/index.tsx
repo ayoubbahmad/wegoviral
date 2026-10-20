@@ -22,6 +22,7 @@ export const AdminTiersContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/admin/help/tiers-and-access"
         title="Tiers"
         description="Membership levels like Free and Pro. Limit spaces to some tiers in Admin → Spaces. Until payments are connected, assign tiers by hand in the member panel."
         actions={

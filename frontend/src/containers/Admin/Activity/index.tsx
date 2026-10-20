@@ -19,6 +19,7 @@ const FILTERS = [
   { id: 'badge', label: 'Badges' },
   { id: 'course', label: 'Courses' },
   { id: 'challenge', label: 'Challenges' },
+  { id: 'help', label: 'Help' },
 ] as const;
 
 export const AdminActivityContainer = () => {
@@ -29,7 +30,8 @@ export const AdminActivityContainer = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Activity log" description="Every action taken with the admin tools." />
+      <PageHeader
+        helpHref="/admin/help/activity-log" title="Activity log" description="Every action taken with the admin tools." />
 
       <div className="flex gap-2" role="tablist" aria-label="Filter activity">
         {FILTERS.map((filter) => (

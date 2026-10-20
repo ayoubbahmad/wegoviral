@@ -69,7 +69,8 @@ Until launch, development and testing use the **production database** (the commu
 - ⬜ **Separate development database**: new Supabase project for development and testing, Railway `staging` environment, Vercel previews pointing to it, and local `backend/.env` switched to it (remove the duplicate `DATABASE_URL`).
   - *Accept:* creating a post on staging or locally doesn't show up in production, and the reverse.
 - ⬜ **Run the API test suite in CI** against staging (needs the separate database).
-- ⬜ **Clear demo/test data** from production (`yarn demo:clear`).
+- ⬜ **Clear demo/test data** from production (`yarn demo:clear`; demo courses and challenges go with the demo members).
+- ⬜ **Any new database** (staging, or a fresh project) needs the storage buckets (see DEPLOYMENT.md) and the starter help articles (`yarn help:seed`).
 
 ## Phase 1 — Roles, Admin space & members
 
@@ -214,14 +215,14 @@ Admin → Stats (moderators and up), for the last 30 days (by day), 90 days (by 
 
 ## Phase 11 — Help center & documentation
 
-In-app documentation of how WeGoViral works, written for each audience (requested 2026-10-18).
+Shipped; **acceptance pending** (Ayoub). 5 automated help center tests.
 
-- ⬜ **Help in every space**: a "Help" entry in the sidebar of each space (Community, Creator Space, Admin) opens the docs for *that* space only.
-- ⬜ **Role-aware articles**: each article has a space and an audience (everyone, instructors, moderators, admins, Super Admins); members only see what applies to their role, staff also see the staff guides (e.g. how to handle reports).
-- ⬜ **First set of articles** written from the shipped features: joining and the guide, posting and review, reporting, spaces, events, courses, points and badges, Creator Space tools; staff guides for every admin page.
-- ⬜ **Search** across the articles you can see, and links from relevant screens ("How does review work?").
-- ⬜ **Editable by admins** (create, edit, reorder, publish), so the docs stay current without a code change.
-  - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides; in the Creator Space, only Creator Space articles show.
+- ✅ **Help in every space**: a **Help** link above Settings in the sidebar opens the help for the space you're in (Community, Creator Space, Admin); each has its own articles, sections and search.
+- ✅ **Role-aware articles**: each article has a space and an audience (everyone, instructors, moderators, admins, Super Admins = that role and up). The API never sends an article to someone below its audience; drafts are admin-only. Readable while waiting for approval.
+- ✅ **First set of articles** (34): joining, the guide, first-post review, invites, posting and spaces, reactions, reporting, restrictions, events, courses, challenges, points and the leaderboard; instructor guides (courses, events); the Creator Space tools; team guides for every admin page, by role. Kept in `backend/prisma/help-articles.ts`; `yarn help:seed` adds missing ones without touching edited ones.
+- ✅ **Search** across the articles you can see, and **"How does this work?"** links on the Events, Courses, Challenges, Leaderboard and course builder pages, on every admin page, and on a post waiting for review.
+- ✅ **Editable by admins** (Admin → Help articles): write with a live preview (light Markdown: headings, lists, bold, links), choose the section and audience, save as draft or publish, reorder; changes are logged.
+  - *Accept:* a member in the Community space sees only member-level Community articles; a moderator also sees the moderation guides in Admin; in the Creator Space, only Creator Space articles show. *(Automated test passes.)*
 
 ## Phase 9 — Monetization (Stripe) · Super Admin only · moved to the end
 

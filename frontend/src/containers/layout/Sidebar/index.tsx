@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+    LifeBuoy,
     Settings,
     LogOut,
     ChevronLeft,
@@ -143,6 +144,29 @@ export function Sidebar() {
                         )}
                     </div>
                 )}
+
+                <Link
+                    href={`${SPACES[activeSpace].basePath}/help`}
+                    className={cn(
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors justify-start",
+                        pathname.startsWith(`${SPACES[activeSpace].basePath}/help`)
+                            ? "bg-secondary text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
+                        sidebarCollapsed && "px-0 justify-center gap-0"
+                    )}
+                    title={sidebarCollapsed ? "Help" : ""}
+                >
+                    <LifeBuoy className="w-5 h-5 shrink-0" />
+                    {!sidebarCollapsed && (
+                        <motion.span
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                        >
+                            Help
+                        </motion.span>
+                    )}
+                </Link>
 
                 <Link
                     href="/settings"

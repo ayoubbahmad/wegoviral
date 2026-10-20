@@ -33,7 +33,8 @@ export const AdminStatsContainer = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Stats" description="How the community is growing and what members do. Times follow your time zone; every table exports to CSV." />
+      <PageHeader
+        helpHref="/admin/help/stats" title="Stats" description="How the community is growing and what members do. Times follow your time zone; every table exports to CSV." />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="tablist" aria-label="Stats" className="flex gap-4 border-b border-border text-sm font-semibold">
           {tabs.map((option) => (

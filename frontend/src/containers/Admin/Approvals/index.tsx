@@ -25,7 +25,8 @@ export const AdminApprovalsContainer = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Approvals" description="New members waiting to join the community." />
+      <PageHeader
+        helpHref="/admin/help/approving-members" title="Approvals" description="New members waiting to join the community." />
 
       <div className="flex gap-2" role="tablist" aria-label="Application status">
         {TABS.map((tab) => (

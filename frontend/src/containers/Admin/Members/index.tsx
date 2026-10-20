@@ -74,6 +74,7 @@ export const AdminMembersContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/admin/help/member-panel"
         title="Members"
         description={data ? `${data.total} member${data.total === 1 ? '' : 's'}` : 'Everyone in the community'}
       />

@@ -59,7 +59,8 @@ export const AdminModerationContainer = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="Moderation" description="Reports from members, content held by the word filter, and recently deleted content." />
+      <PageHeader
+        helpHref="/admin/help/handling-reports" title="Moderation" description="Reports from members, content held by the word filter, and recently deleted content." />
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Moderation">
         <TabButton active={tab === 'reports'} onClick={() => setTab('reports')}>Reports</TabButton>
         <TabButton active={tab === 'held'} onClick={() => setTab('held')}>Held by filter</TabButton>

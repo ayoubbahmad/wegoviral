@@ -23,6 +23,7 @@ export const AdminPointsContainer = () => {
   return (
     <PageContainer>
       <PageHeader
+        helpHref="/admin/help/points-and-badges-admin"
         title="Points & badges"
         description="Members earn points for taking part, level up as their points grow, and collect badges. Spaces and events can open at a level."
       />

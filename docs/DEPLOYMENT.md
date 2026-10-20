@@ -94,6 +94,7 @@ yarn demo:clear   # removes all demo data
 yarn demo:courses     # adds the demo courses to existing demo members (no reseed)
 yarn demo:challenges  # same for the demo challenges
 yarn points:backfill  # gives points (and automatic badges) for existing activity; run after seeding
+yarn help:seed        # adds the starter help center articles that don't exist yet (never overwrites edits)
 ```
 
 Demo members use `@demo.wegoviral.test` emails and can't log in. Clearing deletes only them and their content, never real members. Clear it before launch.

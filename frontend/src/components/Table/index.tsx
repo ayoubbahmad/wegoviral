@@ -114,3 +114,9 @@ Table.Cell = ({ children, className, align = "left" }: TableCellProps) => {
     </td>
   );
 };
+
+Table.Header.displayName = 'Table.Header';
+Table.Head.displayName = 'Table.Head';
+Table.Body.displayName = 'Table.Body';
+Table.Row.displayName = 'Table.Row';
+Table.Cell.displayName = 'Table.Cell';

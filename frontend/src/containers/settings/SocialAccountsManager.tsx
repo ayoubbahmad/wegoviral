@@ -17,13 +17,6 @@ export const SocialAccountsManager = () => {
     connectInstagram 
   } = useAutomationsController();
 
-  useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      handleCallback(code);
-    }
-  }, [searchParams]);
-
   const handleCallback = async (code: string) => {
     try {
       await handleOAuthCallback(code);
@@ -34,6 +27,13 @@ export const SocialAccountsManager = () => {
       alert("Failed to connect Instagram account.");
     }
   };
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      handleCallback(code);
+    }
+  }, [searchParams]);
 
   return (
     <div className="space-y-4">

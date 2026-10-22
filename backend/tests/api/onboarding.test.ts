@@ -1,6 +1,6 @@
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { CommunitySettings, GuideSection, QuizQuestion } from '@prisma/client';
+import { CommunitySettings, GuideSection, Prisma, QuizQuestion } from '@prisma/client';
 import { callApi, cleanupTestData, createTestUser, prisma, TestUser } from './support';
 
 const application = (overrides: Record<string, unknown> = {}) => ({
@@ -52,9 +52,9 @@ describe('onboarding', () => {
   after(async () => {
     await prisma.$transaction([
       prisma.guideSection.deleteMany(),
-      prisma.guideSection.createMany({ data: savedSections }),
+      prisma.guideSection.createMany({ data: savedSections.map((row) => ({ ...row, translations: row.translations as Prisma.InputJsonValue })) }),
       prisma.quizQuestion.deleteMany(),
-      prisma.quizQuestion.createMany({ data: savedQuestions }),
+      prisma.quizQuestion.createMany({ data: savedQuestions.map((row) => ({ ...row, translations: row.translations as Prisma.InputJsonValue })) }),
     ]);
     const { id, updatedAt, ...settings } = savedSettings;
     // Through the API so the server's settings cache is refreshed

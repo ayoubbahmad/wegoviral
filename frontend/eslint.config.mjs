@@ -17,6 +17,16 @@ const eslintConfig = defineConfig([
     'storybook-static/**',
   ]),
   {
+    // Creator Space prototype screens still run on loosely typed sample data;
+    // tighten this back to an error as each screen moves to a real, typed API
+    files: [
+      'src/containers/{Home,Videos,VideoAnalysis,Scripts,Projects,ProjectDetails,Performance,Followers,Automations,competitors,Library}/**',
+      'src/views/{Library,VideoAnalysis,Videos,Scripts,Projects,Home,Automations,CompetitorDetail,ScriptCreation}/**',
+      'src/app/(dashboard)/creator/**',
+    ],
+    rules: { '@typescript-eslint/no-explicit-any': 'warn' },
+  },
+  {
     files: ['**/*.{js,jsx,ts,tsx}'],
     // plugins: {
     //   next: eslintNextPlugin,

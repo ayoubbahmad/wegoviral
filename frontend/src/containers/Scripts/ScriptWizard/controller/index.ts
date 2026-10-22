@@ -52,17 +52,19 @@ export const useScriptWizardController = (scriptId?: string) => {
     enabled: !!scriptId,
   });
 
-  // Initialize state from script data
+  // Fill the wizard once when the saved script arrives (during render, not in an effect)
+  const [loadedScript, setLoadedScript] = useState<typeof scriptData>(undefined);
+  if (scriptData && scriptData !== loadedScript) {
+    setLoadedScript(scriptData);
+    setSelectedHooks(scriptData.content?.hooks || []);
+    setSelectedStyle(scriptData.content?.style || null);
+    setEditableContent((scriptData.content as { generatedContent?: string })?.generatedContent || '');
+    setResearchComplete(true);
+    setScriptGenerated(true);
+    setActiveStep('script');
+  }
   useEffect(() => {
-    if (scriptData) {
-      topicForm.reset({ topic: scriptData.content?.topic || '' });
-      setSelectedHooks(scriptData.content?.hooks || []);
-      setSelectedStyle(scriptData.content?.style || null);
-      setEditableContent((scriptData.content as any)?.generatedContent || '');
-      setResearchComplete(true);
-      setScriptGenerated(true);
-      setActiveStep('script');
-    }
+    if (scriptData) topicForm.reset({ topic: scriptData.content?.topic || '' });
   }, [scriptData, topicForm]);
 
   // Persistence mutations

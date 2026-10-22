@@ -244,6 +244,22 @@ Requested 2026-10-22. Decisions: Settings with a **side menu and one panel per s
 - ⬜ **13b · Member profiles and directory**: clicking a name opens the member's profile (photo, bio, niche, links if shown, level, badges, recent posts); the Members page becomes a searchable directory.
 - ⬜ **13c · Notifications**: in-app bell for replies, mentions, likes, approvals, event and challenge reminders and warnings, with a Notifications section in Settings to choose what you get.
 
+## Phase 14 — UI/UX consistency audit
+
+Requested 2026-10-21. Every page should feel like the same app, so members learn it once.
+
+- ⬜ **Phones first**: the app has no phone layout yet (the sidebar stays open and squeezes every page); add a collapsible menu and check every screen at phone width.
+- ⬜ **One set of building blocks**: buttons (one style per role, consistent shadows), cards, page headers, tabs, form fields, empty states, toggles (`components/Switch`) and modals used the same way on every page.
+- ⬜ **Icons instead of emojis**: medals, space and badge icons, defaults, the "All" chip, the composer's emoji picker; our own icon set where lucide has nothing suitable.
+
+## Phase 15 — Performance audit
+
+Requested 2026-10-22: "the app feels slow, each screen takes time to load".
+
+- ⬜ **Measure first**: time each screen's load in production (server response times, number and size of requests, JavaScript size per page) to find what's actually slow.
+- ⬜ **Likely suspects to check**: distance between Railway and the Supabase database (eu-central-1), every page waiting for `/auth/me` before showing anything, pages built entirely in the browser, repeated requests with no caching between screens, large images and avatars, slow database queries without indexes.
+- ⬜ **Fix the biggest wins**, then measure again and report before/after numbers.
+
 ## Phase 9 — Monetization (Stripe) · Super Admin only · moved to the end
 
 *Postponed on 2026-10-19 until the Stripe details are ready (open question 6); the other phases go first.*

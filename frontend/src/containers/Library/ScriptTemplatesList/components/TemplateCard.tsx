@@ -3,6 +3,7 @@ import { cn, formatRelativeDate } from '@/lib/utils';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { ScriptTemplate } from '../../types';
+import { useT } from '@/i18n/provider';
 
 interface TemplateCardProps {
   template: ScriptTemplate;
@@ -19,6 +20,7 @@ export function TemplateCard({
   onDelete,
   className,
 }: TemplateCardProps) {
+  const t = useT();
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete?.();
@@ -40,10 +42,10 @@ export function TemplateCard({
     >
       <Card.Header
         icon={Palette}
-        title={template.category}
+        title={t(`creator.library.categories.${template.category as 'Sales'}`)}
         actions={
           <span className='text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold uppercase tracking-wider'>
-            Template
+            {t('creator.library.template')}
           </span>
         }
       />
@@ -53,7 +55,7 @@ export function TemplateCard({
           {template.title}
         </h3>
         <p className='text-muted-foreground text-sm line-clamp-3 mb-6 leading-relaxed font-medium'>
-          {template.excerpt || 'No excerpt available for this template.'}
+          {template.excerpt || t('creator.library.noExcerpt')}
         </p>
       </Card.Content>
 
@@ -66,7 +68,7 @@ export function TemplateCard({
             />
             <Card.MetaItem
               icon={Layers}
-              label={`${template.content.length} steps`}
+              label={t('creator.library.steps', { count: template.content.length })}
             />
           </>
         }
@@ -77,6 +79,7 @@ export function TemplateCard({
               size='sm'
               className='h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors'
               onClick={handleDelete}
+              aria-label={t('creator.library.delete')}
             >
               <Trash2 className='w-3.5 h-3.5' />
             </Button>

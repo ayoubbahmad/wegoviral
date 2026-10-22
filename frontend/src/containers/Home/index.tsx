@@ -22,8 +22,18 @@ import { StatCard } from '@/components/StatCard';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ProgressBar } from '@/components/ProgressBar';
 import { ScriptCard } from '@/containers/Scripts/components/ScriptCard';
+import { useT } from '@/i18n/provider';
+
+/** The server sends sample stats with English labels */
+const STAT_KEYS: Record<string, 'views' | 'engagement' | 'viralPosts' | 'growth'> = {
+  'Total Views': 'views',
+  Engagement: 'engagement',
+  'Viral Posts': 'viralPosts',
+  Growth: 'growth',
+};
 
 export const HomeContainer = () => {
+  const t = useT();
   const router = useRouter();
   const { stats, isLoading, videos, scripts, projects, challenges } =
     useHomeController();
@@ -35,8 +45,8 @@ export const HomeContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title='Home'
-        description='Welcome back. Everything you need to scale your influence in one place.'
+        title={t('creator.home.title')}
+        description={t('creator.home.description')}
       />
 
       {/* Stats Overview */}
@@ -44,7 +54,7 @@ export const HomeContainer = () => {
         {stats?.map((stat) => (
           <StatCard
             key={stat.label}
-            label={stat.label}
+            label={stat.label in STAT_KEYS ? t(`creator.home.stats.${STAT_KEYS[stat.label]}`) : stat.label}
             value={stat.value}
             icon={stat.icon}
             trend={stat.trend}
@@ -56,7 +66,7 @@ export const HomeContainer = () => {
         {/* Videos Section */}
         <div className='space-y-4'>
           <SectionHeader
-            title='Videos'
+            title={t('nav.creator.videos')}
             icon={Video}
             href='/creator/videos'
             titleClassName='text-primary'
@@ -64,7 +74,7 @@ export const HomeContainer = () => {
 
           <Button variant='outline' className='w-full border-dashed group'>
             <Plus className='w-4 h-4 text-primary group-hover:scale-110 transition-transform' />
-            Analyze New Video
+            {t('creator.home.analyzeVideo')}
           </Button>
 
           <div className='space-y-3 pt-1'>
@@ -79,12 +89,12 @@ export const HomeContainer = () => {
                     <Play className='w-5 h-5 text-white fill-white' />
                   </div>
                 </div>
-                <div className='absolute bottom-3 left-3 right-3 z-20'>
+                <div className='absolute bottom-3 start-3 end-3 z-20'>
                   <p className='text-xs font-bold text-white line-clamp-1'>
                     {video.title}
                   </p>
                   <p className='text-[10px] text-zinc-400'>
-                    {video.views} views • {video.postedAt}
+                    {t('creator.home.videoMeta', { views: video.views, when: video.postedAt })}
                   </p>
                 </div>
               </div>
@@ -95,7 +105,7 @@ export const HomeContainer = () => {
         {/* Scripts Section */}
         <div className='space-y-4'>
           <SectionHeader
-            title='Scripts'
+            title={t('nav.creator.scripts')}
             icon={FileText}
             href='/creator/scripts'
             titleClassName='text-purple-500'
@@ -107,7 +117,7 @@ export const HomeContainer = () => {
               className='w-full border-dashed border-purple-500/20 text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/50 group'
             >
               <Plus className='w-4 h-4 group-hover:scale-110 transition-transform' />
-              Create New Script
+              {t('creator.home.newScript')}
             </Button>
           </Link>
 
@@ -122,9 +132,9 @@ export const HomeContainer = () => {
                   excerpt:
                     script.excerpt ||
                     script.content?.topic?.substring(0, 100) ||
-                    'No content...',
+                    t('creator.home.noContent'),
                   status: script.status || 'Draft',
-                  lastUpdated: script.updatedAt || 'Just now',
+                  lastUpdated: script.updatedAt || t('creator.home.justNow'),
                   wordCount: script.wordCount || 0,
                 }}
                 onClick={() => router.push(`/creator/scripts/${script.id}`)}
@@ -136,7 +146,7 @@ export const HomeContainer = () => {
         {/* Projects Section */}
         <div className='space-y-4'>
           <SectionHeader
-            title='Projects'
+            title={t('nav.creator.projects')}
             icon={FolderOpen}
             href='/creator/projects'
             titleClassName='text-amber-500'
@@ -147,7 +157,7 @@ export const HomeContainer = () => {
             className='w-full border-dashed border-amber-500/20 text-amber-500 hover:bg-amber-500/5 hover:border-amber-500/50 group'
           >
             <Plus className='w-4 h-4 group-hover:scale-110 transition-transform' />
-            Start New Project
+            {t('creator.home.newProject')}
           </Button>
 
           <div className='space-y-3 pt-1'>
@@ -172,7 +182,7 @@ export const HomeContainer = () => {
         {/* Challenges Section */}
         <div className='space-y-4'>
           <SectionHeader
-            title='Challenges'
+            title={t('nav.community.challenges')}
             icon={Trophy}
             href='/community/challenges'
             titleClassName='text-emerald-500'
@@ -184,14 +194,14 @@ export const HomeContainer = () => {
               className='border-dashed border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/50 group'
             >
               <Globe className='w-4 h-4 group-hover:rotate-12 transition-transform' />
-              Join
+              {t('creator.home.join')}
             </Button>
             <Button
               variant='outline'
               className='border-dashed border-emerald-800/20 text-emerald-600 hover:bg-emerald-800/5 hover:border-emerald-800/50 group'
             >
               <Plus className='w-4 h-4 group-hover:scale-110 transition-transform' />
-              Create
+              {t('creator.home.create')}
             </Button>
           </div>
 
@@ -202,10 +212,10 @@ export const HomeContainer = () => {
                 className='p-4 rounded-xl bg-card border border-border/50 hover:border-emerald-500/50 transition-all cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden group'
               >
                 {challenge.hot && (
-                  <div className='absolute top-0 right-0'>
-                    <div className='bg-orange-500 text-[8px] font-black text-white px-2 py-0.5 rounded-bl-lg flex items-center gap-1 uppercase tracking-tighter shadow-sm animate-pulse'>
+                  <div className='absolute top-0 end-0'>
+                    <div className='bg-orange-500 text-[8px] font-black text-white px-2 py-0.5 rounded-es-lg flex items-center gap-1 uppercase tracking-tighter shadow-sm animate-pulse'>
                       <Flame className='w-2.5 h-2.5' />
-                      Hot
+                      {t('creator.home.hot')}
                     </div>
                   </div>
                 )}
@@ -225,7 +235,7 @@ export const HomeContainer = () => {
                     ))}
                   </div>
                   <span className='text-[10px] text-muted-foreground font-bold'>
-                    {challenge.recruits} joining
+                    {t('creator.home.joining', { count: challenge.recruits })}
                   </span>
                 </div>
               </div>

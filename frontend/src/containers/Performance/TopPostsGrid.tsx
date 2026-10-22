@@ -2,12 +2,15 @@
 
 import { PerformancePost } from "@/types/performance";
 import { Heart, MessageCircle, Bookmark, Share2, BarChart2 } from "lucide-react";
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 interface TopPostsGridProps {
     posts: PerformancePost[];
 }
 
 export function TopPostsGrid({ posts }: TopPostsGridProps) {
+    const t = useT();
     return (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map(post => (
@@ -15,10 +18,10 @@ export function TopPostsGrid({ posts }: TopPostsGridProps) {
                     <div className="relative aspect-[4/5] bg-secondary">
                         <img
                             src={post.thumbnailUrl}
-                            alt="Thumbnail"
+                            alt={t('creator.performance.thumbnail')}
                             className="w-full h-full object-cover"
                         />
-                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold rounded uppercase">
+                        <div className="absolute top-2 start-2 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold rounded uppercase">
                             {post.type}
                         </div>
                     </div>
@@ -27,7 +30,7 @@ export function TopPostsGrid({ posts }: TopPostsGridProps) {
                         <div className="flex justify-between items-start mb-4">
                             <p className="font-medium text-sm line-clamp-1">{post.caption}</p>
                             <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(post.postedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                {new Date(post.postedAt).toLocaleDateString(activeIntl(), { month: 'short', day: 'numeric' })}
                             </span>
                         </div>
 
@@ -52,7 +55,7 @@ export function TopPostsGrid({ posts }: TopPostsGridProps) {
 
                         <div className="mt-2 p-2 bg-secondary/30 rounded-lg flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <BarChart2 className="w-3.5 h-3.5" /> Reach
+                                <BarChart2 className="w-3.5 h-3.5" /> {t('creator.performance.reach')}
                             </div>
                             <span className="text-sm font-bold">{(post.metrics.reach / 1000).toFixed(1)}k</span>
                         </div>

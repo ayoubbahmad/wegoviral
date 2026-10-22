@@ -6,8 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Hook } from '../../types';
 import { HookSchema, HookFormValues } from './schema';
 import { hookApi } from '../api';
+import { useT } from '@/i18n/provider';
 
 export function useAddHookForm(editItem?: Hook | null, isOpen?: boolean) {
+  const t = useT();
   const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
   const [metadata, setMetadata] = useState<any>(null);
   const [tagInput, setTagInput] = useState('');
@@ -22,7 +24,7 @@ export function useAddHookForm(editItem?: Hook | null, isOpen?: boolean) {
   };
 
   const form = useForm<HookFormValues>({
-    resolver: zodResolver(HookSchema),
+    resolver: zodResolver(HookSchema(t)),
     defaultValues,
   });
 

@@ -4,12 +4,14 @@ import {
   Zap,
   FileText as FileIcon,
 } from 'lucide-react';
+import { useT } from '@/i18n/provider';
 
 export interface DescriptionSectionProps {
   description: string;
 }
 
 export function DescriptionSection({ description }: DescriptionSectionProps) {
+  const t = useT();
   return (
     <section
       id='description'
@@ -18,21 +20,22 @@ export function DescriptionSection({ description }: DescriptionSectionProps) {
       <div className='flex items-center gap-2 mb-6 text-blue-500'>
         <AlignLeft className='w-5 h-5' />
         <h3 className='font-bold text-xl tracking-tight uppercase'>
-          Description
+          {t('creator.video.sections.description')}
         </h3>
       </div>
       <p className='text-sm leading-[1.8] text-muted-foreground font-medium whitespace-pre-wrap'>
         {description}
       </p>
       <button className='mt-6 flex items-center gap-2 p-2 px-4 rounded-xl bg-secondary/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-secondary transition-all'>
-        Show full description
-        <ArrowUpRight className='w-3 h-3' />
+        {t('creator.video.showFull')}
+        <ArrowUpRight className='w-3 h-3 rtl:-scale-x-100' />
       </button>
     </section>
   );
 }
 
 export function TranscriptSection() {
+  const t = useT();
   return (
     <section
       id='transcript'
@@ -42,12 +45,12 @@ export function TranscriptSection() {
         <div className='flex items-center gap-2 text-purple-500'>
           <FileIcon className='w-5 h-5' />
           <h3 className='font-bold text-xl tracking-tight uppercase'>
-            Transcript
+            {t('creator.video.sections.transcript')}
           </h3>
         </div>
         <div className='flex items-center gap-4'>
           <span className='text-[10px] font-black text-muted-foreground uppercase bg-secondary/50 px-3 py-1 rounded-full'>
-            Extracting...
+            {t('creator.video.extracting')}
           </span>
         </div>
       </div>
@@ -55,11 +58,10 @@ export function TranscriptSection() {
         <Zap className='w-8 h-8 text-primary animate-pulse' />
         <div>
           <h4 className='font-bold text-foreground mb-1'>
-            Transcript processing
+            {t('creator.video.transcriptProcessing')}
           </h4>
           <p className='text-xs text-muted-foreground max-w-[280px]'>
-            We're currently extracting the transcript for this video. This
-            usually takes a few seconds.
+            {t('creator.video.transcriptBody')}
           </p>
         </div>
       </div>

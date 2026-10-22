@@ -1,12 +1,13 @@
-import { PageHeader } from "@/components/PageHeader";
+'use client';
+
+import { PageHeader } from '@/components/PageHeader';
+import { useT } from '@/i18n/provider';
 
 export default function ExportsPage() {
-    return (
-        <div className="space-y-12 pb-32">
-            <PageHeader 
-                title="Exports"
-                description="View your downloaded reports and exports."
-            />
-        </div>
-    );
+  const t = useT();
+  return (
+    <div className='space-y-12 pb-32'>
+      <PageHeader title={t('creator.exports.title')} description={t('creator.exports.description')} />
+    </div>
+  );
 }

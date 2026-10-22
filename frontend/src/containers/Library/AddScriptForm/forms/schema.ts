@@ -1,17 +1,23 @@
 import { z } from 'zod';
+import type { MessageKey } from '@/i18n/messages';
 
-export const ScriptStepSchema = z.object({
-  step: z.string().min(1, 'Step name is required'),
-  description: z.string().optional(),
-});
+type Translate = (key: MessageKey) => string;
 
-export const ScriptTemplateSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  category: z.enum(['Educational', 'Entertainment', 'Sales', 'Storytelling']),
-  content: z.array(ScriptStepSchema).min(1, 'At least one step is required'),
-  sourceUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
-  tags: z.array(z.string()).optional(),
-  sourceMetadata: z.any().optional(),
-});
+// Built with the app's language so field errors read naturally
+export const ScriptStepSchema = (t: Translate) =>
+  z.object({
+    step: z.string().min(1, t('creator.library.errors.stepName')),
+    description: z.string().optional(),
+  });
 
-export type ScriptTemplateFormValues = z.infer<typeof ScriptTemplateSchema>;
+export const ScriptTemplateSchema = (t: Translate) =>
+  z.object({
+    title: z.string().min(1, t('creator.library.errors.title')),
+    category: z.enum(['Educational', 'Entertainment', 'Sales', 'Storytelling']),
+    content: z.array(ScriptStepSchema(t)).min(1, t('creator.library.errors.oneStep')),
+    sourceUrl: z.string().url(t('creator.library.errors.url')).optional().or(z.literal('')),
+    tags: z.array(z.string()).optional(),
+    sourceMetadata: z.any().optional(),
+  });
+
+export type ScriptTemplateFormValues = z.infer<ReturnType<typeof ScriptTemplateSchema>>;

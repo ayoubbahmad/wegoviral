@@ -12,8 +12,10 @@ import { CompetitorTableView } from '@/containers/competitors/components/Competi
 import { WatchlistSidebar } from '@/containers/competitors/components/WatchlistSidebar';
 import { CreateWatchlistModal } from '@/containers/competitors/components/CreateWatchlistModal';
 import { CompetitorsSkeleton } from '@/containers/competitors/CompetitorsSkeleton';
+import { useT } from '@/i18n/provider';
 
 export default function CompetitorsPage() {
+  const t = useT();
   const { competitors, isLoading, deleteCompetitor } =
     useCompetitorsController();
   const {
@@ -38,8 +40,8 @@ export default function CompetitorsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title='Competitor Tracking'
-        description='Monitor top creators in your niche and analyze their winning strategies.'
+        title={t('creator.competitors.title')}
+        description={t('creator.competitors.description')}
         actions={
           <div className='flex items-center gap-3'>
             <div className='flex items-center bg-secondary/20 p-1 rounded-xl border border-border/50'>
@@ -50,7 +52,8 @@ export default function CompetitorsPage() {
                     ? 'bg-background text-primary shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                title='Grid View'
+                title={t('creator.competitors.gridView')}
+                aria-label={t('creator.competitors.gridView')}
               >
                 <LayoutGrid className='w-4 h-4' />
               </button>
@@ -61,7 +64,8 @@ export default function CompetitorsPage() {
                     ? 'bg-background text-primary shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                title='Table View'
+                title={t('creator.competitors.tableView')}
+                aria-label={t('creator.competitors.tableView')}
               >
                 <List className='w-4 h-4' />
               </button>
@@ -71,7 +75,7 @@ export default function CompetitorsPage() {
               size='md'
               onClick={() => setIsModalOpen(true)}
             >
-              <Plus className='w-4 h-4' /> Add Competitor
+              <Plus className='w-4 h-4' /> {t('creator.competitors.add')}
             </Button>
           </div>
         }
@@ -83,7 +87,7 @@ export default function CompetitorsPage() {
             <Search className='w-4 h-4 text-muted-foreground/50' />
             <input
               type='text'
-              placeholder='Search competitors...'
+              placeholder={t('creator.competitors.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className='flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 font-medium'

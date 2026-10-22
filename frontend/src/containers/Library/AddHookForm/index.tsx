@@ -2,6 +2,7 @@ import { Modal } from '@/components/Modal';
 import { HookForm } from './components/HookForm';
 import { useAddHookController } from './controller';
 import { Hook } from '../types';
+import { useT } from '@/i18n/provider';
 
 interface AddHookFormProps {
   onAddHook?: (hook: any) => Promise<{ success: boolean; error?: string }>;
@@ -13,6 +14,7 @@ interface AddHookFormProps {
 }
 
 export function AddHookForm(props: AddHookFormProps) {
+  const t = useT();
   const {
     isOpen,
     isEditing,
@@ -32,7 +34,7 @@ export function AddHookForm(props: AddHookFormProps) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={isEditing ? 'Edit Hook' : 'Add New Hook'}
+      title={isEditing ? t('creator.library.editHook') : t('creator.library.addHook')}
     >
       <div className='max-h-[75vh] overflow-y-auto px-1'>
         <HookForm

@@ -3,7 +3,7 @@
 import { usePerformance } from '@/hooks/usePerformance';
 import { PostingTimeHeatmap } from '@/containers/Performance/PostingTimeHeatmap';
 import { TopPostsGrid } from '@/containers/Performance/TopPostsGrid';
-import { Clock, TrendingUp } from 'lucide-react';
+import { Clock, Lightbulb, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/providers/Auth';
 import Link from 'next/link';
@@ -13,8 +13,12 @@ import { Button } from '@/components/Button';
 import { PageContainer } from '@/components/PageContainer';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ProgressBar } from '@/components/ProgressBar';
+import { useT } from '@/i18n/provider';
+
+const FORMATS = { Reels: true, Carousels: true };
 
 export default function PerformancePage() {
+  const t = useT();
   const { activeSocialAccount } = useAuth();
   const { posts, insights, isLoading } = usePerformance();
 
@@ -27,17 +31,17 @@ export default function PerformancePage() {
   return (
     <PageContainer className='animate-in fade-in duration-500'>
       <PageHeader
-        title='Performance Insights'
-        description='Understand what works and when to post for maximum impact.'
+        title={t('creator.performance.title')}
+        description={t('creator.performance.description')}
       />
 
       <div className='grid lg:grid-cols-3 gap-8'>
         {/* Heatmap Section */}
         <div className='lg:col-span-2 p-6 rounded-2xl bg-card border border-border shadow-sm relative overflow-hidden'>
           <SectionHeader
-            title='Best Time to Post'
+            title={t('creator.performance.bestTime')}
             icon={Clock}
-            description='Based on historical engagement rates.'
+            description={t('creator.performance.bestTimeBody')}
             className='mb-6'
             titleClassName='text-lg'
           />
@@ -51,13 +55,12 @@ export default function PerformancePage() {
               </div>
               <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-4'>
                 <div className='p-3 bg-background/80 backdrop-blur-md rounded-xl border border-border shadow-lg max-w-sm'>
-                  <h3 className='font-semibold mb-1'>Connect Social Account</h3>
+                  <h3 className='font-semibold mb-1'>{t('creator.performance.connectTitle')}</h3>
                   <p className='text-xs text-muted-foreground mb-3'>
-                    Connect your account to analyze your specific audience
-                    activity and find your best posting times.
+                    {t('creator.performance.connectBody')}
                   </p>
                   <Button onClick={() => (window.location.href = '/settings')}>
-                    Connect Now
+                    {t('creator.performance.connect')}
                   </Button>
                 </div>
               </div>
@@ -67,20 +70,17 @@ export default function PerformancePage() {
 
         {/* Quick Stats or Insight */}
         <div className='space-y-6'>
-          <div className='p-6 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/20'>
-            <h3 className='font-semibold text-purple-700 dark:text-purple-300 mb-2'>
-              💡 Quick Insight
+          <div className='p-6 rounded-2xl bg-gradient-to-br rtl:bg-gradient-to-bl from-purple-500/10 to-indigo-500/10 border border-purple-500/20'>
+            <h3 className='flex items-center gap-2 font-semibold text-purple-700 dark:text-purple-300 mb-2'>
+              <Lightbulb className='w-4 h-4' aria-hidden /> {t('creator.performance.insight')}
             </h3>
             <p className='text-sm text-foreground/80 leading-relaxed'>
-              Your audience is most active on{' '}
-              <strong>{insights?.bestTime || 'Tuesdays at 6 PM'}</strong>. Try
-              scheduling your most important content (Reels/Carousels) for this
-              window.
+              {t('creator.performance.insightBody', { time: insights?.bestTime || t('creator.performance.sampleTime') })}
             </p>
           </div>
           <div className='p-6 rounded-2xl bg-card border border-border'>
             <SectionHeader
-              title='Content Mix'
+              title={t('creator.performance.contentMix')}
               className='mb-4'
               titleClassName='text-base'
             />
@@ -88,7 +88,7 @@ export default function PerformancePage() {
               {contentMix.map((item: any, i: number) => (
                 <div key={i} className='space-y-1.5'>
                   <div className='flex justify-between text-xs font-medium'>
-                    <span>{item.label}</span>
+                    <span>{item.label in FORMATS ? t(`creator.performance.formats.${item.label as 'Reels'}`) : item.label}</span>
                     <span className='text-muted-foreground'>{item.value}%</span>
                   </div>
                   <ProgressBar value={item.value} color={item.color} />
@@ -101,13 +101,13 @@ export default function PerformancePage() {
 
       <div className='border-t border-border pt-8'>
         <SectionHeader
-          title='Top Performing Content'
+          title={t('creator.performance.top')}
           icon={TrendingUp}
           className='mb-6'
         />
         {isLoading ? (
           <div className='p-12 text-center text-muted-foreground'>
-            Loading posts...
+            {t('creator.performance.loading')}
           </div>
         ) : (
           <TopPostsGrid posts={dataPosts} />

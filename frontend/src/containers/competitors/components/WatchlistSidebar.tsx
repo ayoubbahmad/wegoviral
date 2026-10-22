@@ -19,8 +19,10 @@ import { useCompetitorsPageSlice } from '../slice/pageSlice';
 import { useWatchlistSlice } from '../slice/watchlistSlice';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { useT } from '@/i18n/provider';
 
 export function WatchlistSidebar() {
+  const t = useT();
   const { selectedWatchlistId, setSelectedWatchlistId } =
     useCompetitorsPageSlice();
   const { setIsCreateModalOpen } = useWatchlistSlice();
@@ -69,7 +71,7 @@ export function WatchlistSidebar() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this watchlist?')) {
+    if (window.confirm(t('creator.competitors.confirmDeleteWatchlist'))) {
       deleteMutation.mutate(id);
     }
     setMenuOpenId(null);
@@ -91,12 +93,13 @@ export function WatchlistSidebar() {
       <div className='bg-card rounded-2xl border border-border/50 p-4 space-y-4 shadow-sm h-fit'>
         <div className='flex items-center justify-between px-2'>
           <h3 className='text-xs font-black uppercase tracking-widest text-muted-foreground'>
-            Watchlists
+            {t('creator.competitors.watchlists')}
           </h3>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className='p-1.5 rounded-lg hover:bg-secondary text-primary transition-colors'
-            title='Create Watchlist'
+            title={t('creator.competitors.createWatchlist')}
+            aria-label={t('creator.competitors.createWatchlist')}
           >
             <FolderPlus className='w-4 h-4' />
           </button>
@@ -120,7 +123,7 @@ export function WatchlistSidebar() {
                   : 'text-muted-foreground group-hover:text-foreground',
               )}
             />
-            <span>All Channels</span>
+            <span>{t('creator.competitors.allChannels')}</span>
           </button>
 
           {isLoading ? (
@@ -146,12 +149,14 @@ export function WatchlistSidebar() {
                     />
                     <button
                       onClick={() => handleSave(watchlist.id)}
+                      aria-label={t('creator.competitors.save')}
                       className='text-green-500 hover:text-green-600 p-1'
                     >
                       <Check className='w-3 h-3' />
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
+                      aria-label={t('creator.competitors.cancelEdit')}
                       className='text-red-500 hover:text-red-600 p-1'
                     >
                       <X className='w-3 h-3' />
@@ -182,7 +187,7 @@ export function WatchlistSidebar() {
                       {watchlist._count && watchlist._count.competitors > 0 && (
                         <span
                           className={cn(
-                            'text-[10px] px-1.5 py-0.5 rounded-md font-bold mr-6',
+                            'text-[10px] px-1.5 py-0.5 rounded-md font-bold me-6',
                             selectedWatchlistId === watchlist.id
                               ? 'bg-primary/20 text-primary'
                               : 'bg-secondary text-muted-foreground',
@@ -194,7 +199,7 @@ export function WatchlistSidebar() {
                     </button>
 
                     {/* Action Menu Trigger */}
-                    <div className='absolute right-1 top-1/2 -translate-y-1/2'>
+                    <div className='absolute end-1 top-1/2 -translate-y-1/2'>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -202,6 +207,7 @@ export function WatchlistSidebar() {
                             menuOpenId === watchlist.id ? null : watchlist.id,
                           );
                         }}
+                        aria-label={t('creator.competitors.moreOptions')}
                         className='p-1.5 rounded-lg hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors'
                       >
                         <MoreVertical className='w-3 h-3' />
@@ -211,20 +217,20 @@ export function WatchlistSidebar() {
                     {/* Action Menu Dropdown */}
                     {menuOpenId === watchlist.id && (
                       <div
-                        className='absolute right-0 top-full mt-1 w-32 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden py-1'
+                        className='absolute end-0 top-full mt-1 w-32 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden py-1'
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
                           onClick={() => handleEdit(watchlist)}
-                          className='w-full text-left px-3 py-2 text-xs font-medium hover:bg-secondary flex items-center gap-2 text-foreground'
+                          className='w-full text-start px-3 py-2 text-xs font-medium hover:bg-secondary flex items-center gap-2 text-foreground'
                         >
-                          <Edit2 className='w-3 h-3' /> Rename
+                          <Edit2 className='w-3 h-3' /> {t('creator.competitors.rename')}
                         </button>
                         <button
                           onClick={() => handleDelete(watchlist.id)}
-                          className='w-full text-left px-3 py-2 text-xs font-medium hover:bg-red-500/10 text-red-500 flex items-center gap-2'
+                          className='w-full text-start px-3 py-2 text-xs font-medium hover:bg-red-500/10 text-red-500 flex items-center gap-2'
                         >
-                          <Trash2 className='w-3 h-3' /> Delete
+                          <Trash2 className='w-3 h-3' /> {t('creator.competitors.delete')}
                         </button>
                       </div>
                     )}

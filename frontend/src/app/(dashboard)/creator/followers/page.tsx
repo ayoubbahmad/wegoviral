@@ -11,8 +11,10 @@ import { Button } from '@/components/Button';
 import { Tabs } from '@/components/Tabs';
 import { PageContainer } from '@/components/PageContainer';
 import { StatCard } from '@/components/StatCard';
+import { useT } from '@/i18n/provider';
 
 export default function FollowersPage() {
+  const t = useT();
   const { followers, summary, isLoading } = useFollowers();
   const [filter, setFilter] = useState<'All' | 'VIP' | 'New' | 'TopLikers'>(
     'All',
@@ -47,32 +49,32 @@ export default function FollowersPage() {
   return (
     <PageContainer>
       <PageHeader
-        title='Follower Intelligence'
-        description='Identify your most valuable fans and understand who is engaging with you.'
+        title={t('creator.followers.title')}
+        description={t('creator.followers.description')}
       />
 
       {/* Health Stats */}
       <div className='grid gap-6 md:grid-cols-3'>
         <StatCard
-          label='Total Followers'
+          label={t('creator.followers.total')}
           value={summary.total || '12,345'}
           icon={Users}
           trend={summary.total ? undefined : 12}
         />
 
         <StatCard
-          label='Loyal Fans (VIP)'
+          label={t('creator.followers.loyal')}
           value={summary.vips || '482'}
           icon={UserCheck}
-          description='Fans with highly consistent engagement.'
+          description={t('creator.followers.loyalBody')}
           className='[&_svg]:text-yellow-600 [&_.bg-primary\/10]:bg-yellow-500/10'
         />
 
         <StatCard
-          label='New Faces'
+          label={t('creator.followers.newFaces')}
           value={summary.newThisMonth || '145'}
           icon={UserPlus}
-          description='Joined in the last 30 days.'
+          description={t('creator.followers.newFacesBody')}
           className='[&_svg]:text-blue-600 [&_.bg-primary\/10]:bg-blue-500/10'
         />
       </div>
@@ -82,10 +84,10 @@ export default function FollowersPage() {
         activeId={filter}
         onChange={(id) => setFilter(id as any)}
         items={[
-          { id: 'All', label: 'All Members', icon: Users },
-          { id: 'VIP', label: 'Loyal & VIP', icon: UserCheck },
-          { id: 'TopLikers', label: 'Top Likers', icon: ThumbsUp },
-          { id: 'New', label: 'New Faces', icon: UserPlus },
+          { id: 'All', label: t('creator.followers.tabs.All'), icon: Users },
+          { id: 'VIP', label: t('creator.followers.tabs.VIP'), icon: UserCheck },
+          { id: 'TopLikers', label: t('creator.followers.tabs.TopLikers'), icon: ThumbsUp },
+          { id: 'New', label: t('creator.followers.tabs.New'), icon: UserPlus },
         ]}
         containerClassName='!justify-start'
       />
@@ -93,7 +95,7 @@ export default function FollowersPage() {
       {/* List */}
       {isLoading ? (
         <div className='p-12 text-center text-muted-foreground'>
-          Loading follower data...
+          {t('creator.followers.loading')}
         </div>
       ) : (
         <FollowerList followers={displayedFollowers} />

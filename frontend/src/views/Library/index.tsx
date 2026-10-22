@@ -25,8 +25,12 @@ import { useHooksListController } from '@/containers/Library/HooksList/controlle
 import { useLibraryStore } from '@/containers/Library/HooksList/logic';
 import { hookApi } from '@/containers/Library/AddHookForm/api';
 import { scriptApi } from '@/containers/Library/AddScriptForm/api';
+import { useT } from '@/i18n/provider';
+import { useLocale } from '@/i18n/provider';
 
 export const LibraryView = () => {
+  const t = useT();
+  const isRtl = useLocale().locale === 'ar';
   const { hooks = [], isLoading: hooksLoading } = useHooksListController();
 
   // We need to fetch templates for orchestration as well
@@ -97,14 +101,14 @@ export const LibraryView = () => {
   return (
     <PageContainer>
       <PageHeader
-        title='Library'
-        description='Manage your creative assets, hooks, and script structures.'
+        title={t('creator.library.title')}
+        description={t('creator.library.description')}
         actions={
           <Button
             onClick={handleAddNew}
             leftSection={<Plus className='w-4 h-4' />}
           >
-            Add New Asset
+            {t('creator.library.addNew')}
           </Button>
         }
       />
@@ -160,7 +164,7 @@ export const LibraryView = () => {
             <SearchInput
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={`Search ${activeTab}...`}
+              placeholder={t(`creator.library.search.${activeTab}`)}
             />
           </div>
 
@@ -180,9 +184,9 @@ export const LibraryView = () => {
           >
             <Tabs
               items={[
-                { id: 'hooks', label: 'Hooks', icon: Anchor },
-                { id: 'scripts', label: 'Templates', icon: Palette },
-                { id: 'videos', label: 'Videos', icon: Video },
+                { id: 'hooks', label: t('creator.library.tabs.hooks'), icon: Anchor },
+                { id: 'scripts', label: t('creator.library.tabs.scripts'), icon: Palette },
+                { id: 'videos', label: t('creator.library.tabs.videos'), icon: Video },
               ]}
               activeId={activeTab}
               onChange={(id: any) => setActiveTab(id)}
@@ -195,7 +199,7 @@ export const LibraryView = () => {
               ) : activeTab === 'scripts' ? (
                 <ScriptTemplatesList />
               ) : (
-                <div>Videos Tab Coming Soon</div>
+                <div className='text-sm text-muted-foreground'>{t('creator.library.videosSoon')}</div>
               )}
             </div>
           </div>
@@ -204,9 +208,9 @@ export const LibraryView = () => {
           <AnimatePresence>
             {selectedItemId && (
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
+                exit={{ opacity: 0, x: isRtl ? -20 : 20 }}
                 className='w-full lg:w-auto'
               >
                 <AssetDetailsPanel

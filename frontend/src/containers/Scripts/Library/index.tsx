@@ -25,8 +25,10 @@ import { cn, formatRelativeDate } from '@/lib/utils';
 import { ViewToggle } from '@/components/ViewToggle';
 import { ScriptCard } from '../components/ScriptCard';
 import { useScriptsController } from './controller';
+import { useT } from '@/i18n/provider';
 
 export const ScriptsLibraryContainer = () => {
+  const t = useT();
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const { scripts, isLoading, handleDeleteScript } = useScriptsController();
@@ -35,8 +37,8 @@ export const ScriptsLibraryContainer = () => {
     return (
       <PageContainer>
         <PageHeader
-          title='Scripts Library'
-          description='Manage and organize all your video scripts in one place.'
+          title={t('creator.scripts.title')}
+          description={t('creator.scripts.description')}
         />
         <div className='flex items-center justify-center p-32'>
           <div className='w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin' />
@@ -48,13 +50,13 @@ export const ScriptsLibraryContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title='Scripts Library'
-        description='Manage and organize all your video scripts in one place.'
+        title={t('creator.scripts.title')}
+        description={t('creator.scripts.description')}
         actions={
           <Link href='/creator/scripts/new'>
             <Button variant='primary' size='md'>
               <Plus className='w-4 h-4' />
-              Create New Script
+              {t('creator.scripts.newScript')}
             </Button>
           </Link>
         }
@@ -62,7 +64,7 @@ export const ScriptsLibraryContainer = () => {
 
       <div className='space-y-6'>
         <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between'>
-          <SearchInput placeholder='Search scripts by title or content...' />
+          <SearchInput placeholder={t('creator.scripts.search')} />
           <div className='flex items-center gap-3'>
             <ViewToggle mode={viewMode} onChange={setViewMode} />
             <Link
@@ -70,11 +72,11 @@ export const ScriptsLibraryContainer = () => {
               className='text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-secondary/50'
             >
               <Calendar className='w-3.5 h-3.5' />
-              Ingredients
+              {t('creator.scripts.ingredients')}
             </Link>
             <button className='text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-secondary/50'>
               <Sparkles className='w-3.5 h-3.5' />
-              AI Generate
+              {t('creator.scripts.aiGenerate')}
             </button>
           </div>
         </div>
@@ -94,20 +96,20 @@ export const ScriptsLibraryContainer = () => {
             </div>
           ) : (
             <div className='bg-card rounded-2xl border border-border/50 overflow-hidden'>
-              <table className='w-full text-left border-collapse'>
+              <table className='w-full text-start border-collapse'>
                 <thead>
                   <tr className='border-b border-border/50 bg-secondary/30'>
                     <th className='p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>
-                      Title
+                      {t('creator.scripts.columns.title')}
                     </th>
                     <th className='p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-center'>
-                      Status
+                      {t('creator.scripts.columns.status')}
                     </th>
                     <th className='p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>
-                      Words
+                      {t('creator.scripts.columns.words')}
                     </th>
                     <th className='p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>
-                      Last Updated
+                      {t('creator.scripts.columns.updated')}
                     </th>
                     <th className='p-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground'></th>
                   </tr>
@@ -137,7 +139,7 @@ export const ScriptsLibraryContainer = () => {
                               : 'bg-purple-500/10 text-purple-500'
                           }`}
                         >
-                          {script.status}
+                          {t(`creator.scripts.statuses.${script.status as 'Draft'}`)}
                         </span>
                       </td>
                       <td className='p-4'>
@@ -152,7 +154,7 @@ export const ScriptsLibraryContainer = () => {
                           {formatRelativeDate(script.lastUpdated)}
                         </div>
                       </td>
-                      <td className='p-4 text-right'>
+                      <td className='p-4 text-end'>
                         <div className='flex items-center justify-end gap-2'>
                           <Button
                             variant='ghost'
@@ -162,6 +164,7 @@ export const ScriptsLibraryContainer = () => {
                               e.stopPropagation();
                               handleDeleteScript(script.id);
                             }}
+                            aria-label={t('creator.scripts.delete')}
                           >
                             <Trash2 className='w-4 h-4' />
                           </Button>
@@ -169,8 +172,9 @@ export const ScriptsLibraryContainer = () => {
                             variant='ghost'
                             size='sm'
                             className='h-8 w-8 p-0 rounded-lg'
+                            aria-label={t('creator.scripts.open')}
                           >
-                            <ChevronRight className='w-4 h-4' />
+                            <ChevronRight className='w-4 h-4 rtl:rotate-180' />
                           </Button>
                         </div>
                       </td>
@@ -182,11 +186,11 @@ export const ScriptsLibraryContainer = () => {
           )
         ) : (
           <EmptyState
-            title='No scripts found'
-            description="You haven't created any scripts yet. Start your first one now!"
+            title={t('creator.scripts.emptyTitle')}
+            description={t('creator.scripts.emptyBody')}
             icon={FileText}
-            actionText='Create Script'
-            onAction={() => (window.location.href = '/scripts/new')}
+            actionText={t('creator.scripts.create')}
+            onAction={() => router.push('/creator/scripts/new')}
           />
         )}
       </div>

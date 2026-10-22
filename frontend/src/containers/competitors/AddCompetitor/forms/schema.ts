@@ -1,15 +1,20 @@
 import * as z from 'zod';
+import type { MessageKey } from '@/i18n/messages';
 
-export const watchlistSchema = z.object({
-  competitors: z
-    .array(
-      z.object({
-        platform: z.string().min(1, 'Platform is required'),
-        value: z.string().min(1, 'URL or username is required'),
-      }),
-    )
-    .min(1, 'At least one competitor is required'),
-  watchlistId: z.string().optional(),
-});
+type Translate = (key: MessageKey) => string;
 
-export type WatchlistFormValues = z.infer<typeof watchlistSchema>;
+// Built with the app's language so field errors read naturally
+export const watchlistSchema = (t: Translate) =>
+  z.object({
+    competitors: z
+      .array(
+        z.object({
+          platform: z.string().min(1, t('creator.competitors.platformRequired')),
+          value: z.string().min(1, t('creator.competitors.valueRequired')),
+        }),
+      )
+      .min(1, t('creator.competitors.oneRequired')),
+    watchlistId: z.string().optional(),
+  });
+
+export type WatchlistFormValues = z.infer<ReturnType<typeof watchlistSchema>>;

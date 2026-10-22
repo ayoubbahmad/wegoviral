@@ -13,8 +13,10 @@ import {
   SocialAccount,
 } from '../api/social-accounts';
 import { useAutomationsStore } from '../slice';
+import { useT } from '@/i18n/provider';
 
 export const useAutomationsController = () => {
+  const t = useT();
   const { data: automations = [], isLoading, refetch } = useGetAutomations();
   const createMutation = useCreateAutomation();
   const updateMutation = useUpdateAutomation();
@@ -60,9 +62,7 @@ export const useAutomationsController = () => {
       window.location.href = url; // Redirect to FB
     } catch (err) {
       console.error('Failed to get auth URL', err);
-      alert(
-        'Failed to initiate Instagram connection. Check if API is running.',
-      );
+      alert(t('creator.automations.connectFailed'));
     }
   };
 
@@ -98,11 +98,11 @@ export const useAutomationsController = () => {
 
   const handleDelete = useCallback(
     async (id: string) => {
-      if (confirm('Are you sure you want to delete this automation?')) {
+      if (confirm(t('creator.automations.confirmDelete'))) {
         return deleteMutation.mutateAsync(id);
       }
     },
-    [deleteMutation],
+    [deleteMutation, t],
   );
 
   const handleToggleActive = useCallback(

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Loader2, Link, Tags, Plus } from 'lucide-react';
+import { Loader2, Link, Tags, X } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
@@ -9,6 +9,7 @@ import { FormInput } from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
 import { FormTextarea } from '@/components/forms/FormTextarea';
 import { HookFormValues } from '../forms/schema';
+import { useT } from '@/i18n/provider';
 
 interface HookFormProps {
   form: UseFormReturn<HookFormValues>;
@@ -33,13 +34,14 @@ export function HookForm({
   onRemoveTag,
   onSubmit,
 }: HookFormProps) {
+  const t = useT();
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
       <FormTextarea
         control={form.control}
         name='content'
-        label='Content'
-        placeholder='Write your hook here...'
+        label={t('creator.library.content')}
+        placeholder={t('creator.library.contentPlaceholder')}
         className='min-h-[120px]'
       />
 
@@ -47,26 +49,14 @@ export function HookForm({
         <FormSelect
           control={form.control}
           name='type'
-          label='Type'
-          options={[
-            { value: 'Verbal', label: 'Verbal' },
-            { value: 'Visual', label: 'Visual' },
-            { value: 'Text', label: 'Text' },
-            { value: 'Audio', label: 'Audio' },
-          ]}
+          label={t('creator.library.type')}
+          options={(['Verbal', 'Visual', 'Text', 'Audio'] as const).map((value) => ({ value, label: t(`creator.library.hookTypes.${value}`) }))}
         />
         <FormSelect
           control={form.control}
           name='emotion'
-          label='Emotion'
-          options={[
-            { value: 'Curiosity', label: 'Curiosity' },
-            { value: 'Fear', label: 'Fear' },
-            { value: 'Humor', label: 'Humor' },
-            { value: 'Desire', label: 'Desire' },
-            { value: 'Surprise', label: 'Surprise' },
-            { value: 'Inspiration', label: 'Inspiration' },
-          ]}
+          label={t('creator.library.emotion')}
+          options={(['Curiosity', 'Fear', 'Humor', 'Desire', 'Surprise', 'Inspiration'] as const).map((value) => ({ value, label: t(`creator.library.emotions.${value}`) }))}
         />
       </div>
 
@@ -75,8 +65,8 @@ export function HookForm({
           <FormInput
             control={form.control}
             name='sourceUrl'
-            label='Source URL'
-            placeholder='Paste TikTok, IG, or YT link...'
+            label={t('creator.library.sourceUrl')}
+            placeholder={t('creator.library.sourcePlaceholder')}
             leftIcon={<Link className='w-4 h-4' />}
             className='flex-1'
             onBlur={(e) => onFetchMetadata(e.target.value)}
@@ -91,7 +81,7 @@ export function HookForm({
             {isFetchingMetadata ? (
               <Loader2 className='w-4 h-4 animate-spin' />
             ) : (
-              'Fetch'
+              t('creator.library.fetch')
             )}
           </Button>
         </div>
@@ -103,7 +93,7 @@ export function HookForm({
             <div className='relative w-20 h-28 shrink-0 rounded-lg overflow-hidden bg-muted border border-border'>
               <Image
                 src={metadata.thumbnail}
-                alt='Preview'
+                alt={t('creator.library.preview')}
                 fill
                 className='object-cover'
               />
@@ -111,7 +101,7 @@ export function HookForm({
           )}
           <div className='flex flex-col gap-2 py-1 overflow-hidden'>
             <h5 className='text-sm font-bold line-clamp-2 leading-snug'>
-              {metadata.title || 'Untitled Video'}
+              {metadata.title || t('creator.library.untitledVideo')}
             </h5>
             <p className='text-[10px] text-muted-foreground line-clamp-2 leading-relaxed italic'>
               {metadata.description}
@@ -122,30 +112,31 @@ export function HookForm({
 
       <div className='space-y-2'>
         <div className='relative'>
-          <label className='text-sm font-medium mb-1.5 block'>Tags</label>
+          <label className='text-sm font-medium mb-1.5 block'>{t('creator.library.tags')}</label>
           <div className='relative'>
-            <Tags className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+            <Tags className='absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
             <input
               type='text'
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={onAddTag}
-              className='flex h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0'
-              placeholder='Type tag and press Enter...'
+              className='flex h-11 w-full rounded-lg border border-border bg-background ps-10 pe-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0'
+              placeholder={t('creator.library.tagPlaceholder')}
             />
           </div>
         </div>
         {form.watch('tags')?.length ? (
           <div className='flex flex-wrap gap-2'>
             {form.watch('tags')?.map((tag) => (
-              <Badge key={tag} variant='secondary' className='gap-1 pr-1'>
+              <Badge key={tag} variant='secondary' className='gap-1 pe-1'>
                 {tag}
                 <button
                   type='button'
                   onClick={() => onRemoveTag(tag)}
+                  aria-label={t('creator.library.removeTag', { tag })}
                   className='hover:text-destructive transition-colors'
                 >
-                  <Plus className='w-3 h-3 rotate-45' />
+                  <X className='w-3 h-3' />
                 </button>
               </Badge>
             ))}
@@ -160,9 +151,9 @@ export function HookForm({
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting && (
-            <Loader2 className='w-4 h-4 animate-spin mr-2' />
+            <Loader2 className='w-4 h-4 animate-spin me-2' />
           )}
-          Save Hook
+          {t('creator.library.saveHook')}
         </Button>
       </div>
     </form>

@@ -4,35 +4,37 @@ import { Video } from './VideoCard';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { AddToProjectModal } from '@/containers/Projects/components/AddToProjectModal';
+import { useT } from '@/i18n/provider';
 
 interface VideoTableProps {
   videos: Video[];
 }
 
 export function VideoTable({ videos }: VideoTableProps) {
+  const t = useT();
   return (
     <div className='rounded-xl border border-border bg-card overflow-hidden'>
       <div className='overflow-x-auto'>
-        <table className='w-full text-left border-collapse'>
+        <table className='w-full text-start border-collapse'>
           <thead>
             <tr className='border-b border-border bg-muted/50'>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                Video
+                {t('creator.videos.columns.video')}
               </th>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-center text-green-500'>
-                Outlier
+                {t('creator.videos.columns.outlier')}
               </th>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                Platform
+                {t('creator.videos.columns.platform')}
               </th>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                Views
+                {t('creator.videos.columns.views')}
               </th>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                Engagement
+                {t('creator.videos.columns.engagement')}
               </th>
               <th className='p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                Date
+                {t('creator.videos.columns.date')}
               </th>
             </tr>
           </thead>
@@ -48,6 +50,7 @@ export function VideoTable({ videos }: VideoTableProps) {
 }
 
 function VideoTableRow({ video }: { video: Video }) {
+  const t = useT();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -96,7 +99,7 @@ function VideoTableRow({ video }: { video: Video }) {
           {video.metrics.views}
         </td>
         <td className='p-4 text-sm font-semibold text-blue-500 tabular-nums'>
-          {video.metrics.engagementRate || 'N/A'}
+          {video.metrics.engagementRate || t('creator.videos.notAvailable')}
         </td>
         <td className='p-4'>
           <div className='flex items-center justify-between gap-4'>
@@ -110,7 +113,7 @@ function VideoTableRow({ video }: { video: Video }) {
                 setIsModalOpen(true);
               }}
               className='p-2 rounded-lg bg-secondary/50 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all hover:text-primary hover:bg-primary/10'
-              title='Save to Project'
+              title={t('creator.videos.saveToProject')}
             >
               <FolderPlus className='w-4 h-4' />
             </button>

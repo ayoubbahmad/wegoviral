@@ -10,20 +10,23 @@ import {
 } from '../forms';
 import { scriptsApi } from '../../Library/api';
 import { Script } from '../../Library/api/types';
+import { useT } from '@/i18n/provider';
 
 // Types
 export type Step = 'topic' | 'research' | 'angle' | 'hook' | 'style' | 'script';
 
+/** Labels come from creator.wizard.steps.<id> */
 export const STEPS = [
-  { id: 'topic', label: 'Topic' },
-  { id: 'research', label: 'Research' },
-  { id: 'angle', label: 'Angle' },
-  { id: 'hook', label: 'Hook' },
-  { id: 'style', label: 'Style' },
-  { id: 'script', label: 'Script' },
+  { id: 'topic' },
+  { id: 'research' },
+  { id: 'angle' },
+  { id: 'hook' },
+  { id: 'style' },
+  { id: 'script' },
 ] as const;
 
 export const useScriptWizardController = (scriptId?: string) => {
+  const t = useT();
   const router = useRouter();
   const { data: hookTemplates = [] } = useGetHookTemplates();
   const { data: styleTemplates = [] } = useGetStyleTemplates();
@@ -125,23 +128,23 @@ export const useScriptWizardController = (scriptId?: string) => {
           [
             {
               id: 'angle-1',
-              title: 'The Scientific Approach',
+              title: t('creator.wizard.sampleAngles.scientific.title'),
               icon: 'Sparkles',
-              description: 'Focus on technical breakdown and facts.',
+              description: t('creator.wizard.sampleAngles.scientific.description'),
               shockScore: 8.5,
             },
             {
               id: 'angle-2',
-              title: 'The Personal Journey',
+              title: t('creator.wizard.sampleAngles.personal.title'),
               icon: 'Users',
-              description: 'Human experience and emotional narrative.',
+              description: t('creator.wizard.sampleAngles.personal.description'),
               shockScore: 7.2,
             },
             {
               id: 'angle-3',
-              title: 'The Disruptor',
+              title: t('creator.wizard.sampleAngles.disruptor.title'),
               icon: 'Zap',
-              description: 'Challenging status quo and bold predictions.',
+              description: t('creator.wizard.sampleAngles.disruptor.description'),
               shockScore: 9.8,
             },
           ].sort((a, b) => b.shockScore - a.shockScore),
@@ -149,7 +152,7 @@ export const useScriptWizardController = (scriptId?: string) => {
         scrollToSection('research');
       }, 2000);
     },
-    [scrollToSection],
+    [scrollToSection, t],
   );
 
   const toggleHookSelection = useCallback((id: number) => {
@@ -171,11 +174,11 @@ export const useScriptWizardController = (scriptId?: string) => {
       console.log('Refining script with:', values.refinement);
       // Simulate AI refinement by appending text for now
       setEditableContent(
-        (prev) => prev + `\n\n[AI Refinement: ${values.refinement}]`,
+        (prev) => prev + `\n\n${t('creator.wizard.refinementNote', { text: values.refinement })}`,
       );
       refinementForm.reset();
     },
-    [refinementForm],
+    [refinementForm, t],
   );
 
   const handleSaveScript = async () => {
@@ -199,7 +202,7 @@ export const useScriptWizardController = (scriptId?: string) => {
       }
     } catch (err) {
       console.error('Failed to save script:', err);
-      alert('Failed to save script. Please try again.');
+      alert(t('creator.wizard.saveFailed'));
     }
   };
 

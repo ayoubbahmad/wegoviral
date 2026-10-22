@@ -14,6 +14,7 @@ import {
   ToggleRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/provider';
 
 interface AutomationCardProps {
   automation: {
@@ -52,6 +53,7 @@ export function AutomationCard({
   onDelete,
   onToggle,
 }: AutomationCardProps) {
+  const t = useT();
   return (
     <Card hover className='flex flex-col overflow-hidden'>
       <Card.Header
@@ -61,6 +63,7 @@ export function AutomationCard({
           <div className='flex items-center gap-2'>
             <button
               onClick={() => onToggle(automation.id, automation.active)}
+              aria-label={t('creator.automations.toggle')}
               className='transition-colors'
             >
               {automation.active ? (
@@ -78,7 +81,7 @@ export function AutomationCard({
                     : 'bg-zinc-500/10 text-zinc-500',
                 )}
               >
-                {automation.active ? 'Active' : 'Paused'}
+                {automation.active ? t('creator.automations.active') : t('creator.automations.paused')}
               </span>
               <div className='flex items-center gap-1 mt-0.5 bg-muted/50 px-1 py-0.5 rounded text-muted-foreground uppercase text-[7px] font-black tracking-tighter'>
                 {automation.isGlobal ? (
@@ -86,7 +89,7 @@ export function AutomationCard({
                 ) : (
                   <Clapperboard className='w-2 h-2 text-primary' />
                 )}
-                <span>{automation.isGlobal ? 'Global' : 'Post'}</span>
+                <span>{automation.isGlobal ? t('creator.automations.global') : t('creator.automations.post')}</span>
               </div>
             </div>
           </div>
@@ -99,7 +102,7 @@ export function AutomationCard({
           <MessageSquare className='w-3.5 h-3.5 text-primary flex-shrink-0' />
           <div className='min-w-0'>
             <p className='text-[9px] font-bold uppercase text-muted-foreground/60 leading-none'>
-              Trigger
+              {t('creator.automations.trigger')}
             </p>
             <p className='text-xs font-mono font-bold text-foreground mt-0.5 truncate'>
               &quot;{automation.triggerKeyword}&quot;
@@ -112,24 +115,24 @@ export function AutomationCard({
           <Settings2 className='w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0' />
           <div className='space-y-1 content-center'>
             <p className='text-[9px] font-bold uppercase text-muted-foreground/60 leading-none'>
-              Action Flow
+              {t('creator.automations.flow')}
             </p>
             <div className='flex flex-col gap-1.5 mt-1 min-w-0'>
               <div className='flex items-center gap-2 min-w-0'>
                 <div className='px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[8px] font-black uppercase flex-shrink-0'>
-                  DM
+                  {t('creator.automations.dm')}
                 </div>
                 <p className='text-[10px] text-foreground truncate italic opacity-80 min-w-0'>
-                  {automation.responseMessage || 'No message set...'}
+                  {automation.responseMessage || t('creator.automations.noMessage')}
                 </p>
               </div>
               {automation.commentReplyEnabled && (
                 <div className='flex items-center gap-2 min-w-0'>
                   <div className='px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[8px] font-black uppercase flex-shrink-0'>
-                    Reply
+                    {t('creator.automations.reply')}
                   </div>
                   <p className='text-[10px] text-foreground truncate italic opacity-80 min-w-0'>
-                    {automation.commentReplyMessage || 'No message set...'}
+                    {automation.commentReplyMessage || t('creator.automations.noMessage')}
                   </p>
                 </div>
               )}
@@ -143,11 +146,11 @@ export function AutomationCard({
         metadata={
           <div className='flex flex-col gap-0.5'>
             <Card.MetaItem
-              label={`Platform: ${automation.platform || 'Instagram'}`}
+              label={t('creator.automations.platformMeta', { platform: automation.platform || 'Instagram' })}
               className='text-[9px]'
             />
             <Card.MetaItem
-              label={`Runs: ${automation.runCount || 0}`}
+              label={t('creator.automations.runsMeta', { count: automation.runCount || 0 })}
               className='text-[9px]'
             />
           </div>
@@ -159,6 +162,7 @@ export function AutomationCard({
               size='sm'
               className='text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg h-7 w-7 p-0'
               onClick={() => onEdit(automation)}
+              aria-label={t('creator.automations.edit')}
             >
               <Edit2 className='w-3.5 h-3.5' />
             </Button>
@@ -167,6 +171,7 @@ export function AutomationCard({
               size='sm'
               className='text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg h-7 w-7 p-0'
               onClick={() => onDelete(automation.id)}
+              aria-label={t('creator.automations.delete')}
             >
               <Trash2 className='w-3.5 h-3.5' />
             </Button>

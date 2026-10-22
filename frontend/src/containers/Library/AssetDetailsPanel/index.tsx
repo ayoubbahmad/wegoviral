@@ -18,6 +18,7 @@ import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
 import { cn, formatRelativeDate } from '@/lib/utils';
 import { Hook, ScriptTemplate } from '../types';
+import { useT } from '@/i18n/provider';
 
 interface DetailsPanelProps {
   item: Hook | ScriptTemplate | null;
@@ -32,6 +33,7 @@ export function AssetDetailsPanel({
   onClose,
   onEdit,
 }: DetailsPanelProps) {
+  const t = useT();
   if (!item) return null;
 
   const isHook = type === 'hooks';
@@ -46,8 +48,9 @@ export function AssetDetailsPanel({
           <Button
             variant='ghost'
             size='sm'
-            className='absolute right-4 top-4 h-8 w-8 p-0 rounded-full'
+            className='absolute end-4 top-4 h-8 w-8 p-0 rounded-full'
             onClick={onClose}
+            aria-label={t('creator.library.close')}
           >
             <X className='w-4 h-4' />
           </Button>
@@ -62,10 +65,10 @@ export function AssetDetailsPanel({
             </div>
             <div>
               <h2 className='font-black text-xs uppercase tracking-widest text-muted-foreground'>
-                {isHook ? 'Hook Details' : 'Script Template'}
+                {isHook ? t('creator.library.hookDetails') : t('creator.library.scriptTemplate')}
               </h2>
               <p className='text-xs font-medium text-muted-foreground mt-0.5'>
-                {isHook ? hook?.type : script?.category}
+                {isHook ? (hook ? t(`creator.library.hookTypes.${hook.type as 'Verbal'}`) : '') : script ? t(`creator.library.categories.${script.category as 'Sales'}`) : ''}
               </p>
             </div>
           </div>
@@ -81,20 +84,20 @@ export function AssetDetailsPanel({
           <section>
             <h4 className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2'>
               <Layout className='w-3 h-3' />
-              Content
+              {t('creator.library.content')}
             </h4>
             {isHook ? (
               <div className='p-4 rounded-xl bg-secondary/50 border border-border italic text-lg font-medium leading-relaxed'>
-                "{hook?.content}"
+                “{hook?.content}”
               </div>
             ) : (
               <div className='space-y-4'>
                 {script?.content.map((step: any, index: number) => (
                   <div
                     key={index}
-                    className='relative pl-6 border-l-2 border-primary/20'
+                    className='relative ps-6 border-s-2 border-primary/20'
                   >
-                    <div className='absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-primary' />
+                    <div className='absolute -start-[5px] top-1 w-2 h-2 rounded-full bg-primary' />
                     <p className='text-xs font-black uppercase tracking-widest text-primary mb-1'>
                       {step.step}
                     </p>
@@ -112,7 +115,7 @@ export function AssetDetailsPanel({
             <div className='p-3 rounded-xl bg-muted/50 border border-border'>
               <div className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1'>
                 <Clock className='w-3 h-3' />
-                Added
+                {t('creator.library.added')}
               </div>
               <p className='text-xs font-bold'>
                 {formatRelativeDate(isHook ? hook?.addedAt : script?.createdAt)}
@@ -122,7 +125,7 @@ export function AssetDetailsPanel({
               <div className='p-3 rounded-xl bg-muted/50 border border-border'>
                 <div className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1'>
                   <Star className='w-3 h-3' />
-                  Rating
+                  {t('creator.library.rating')}
                 </div>
                 <div className='flex items-center gap-1 text-yellow-500'>
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -146,7 +149,7 @@ export function AssetDetailsPanel({
             <section>
               <h4 className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2'>
                 <TagIcon className='w-3 h-3' />
-                Tags
+                {t('creator.library.tags')}
               </h4>
               <div className='flex flex-wrap gap-2'>
                 {item.tags.map((tag) => (
@@ -162,7 +165,7 @@ export function AssetDetailsPanel({
           {item.sourceUrl && (
             <section>
               <h4 className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3'>
-                Origin
+                {t('creator.library.origin')}
               </h4>
               <a
                 href={item.sourceUrl}
@@ -173,7 +176,7 @@ export function AssetDetailsPanel({
                 <span className='text-sm font-bold truncate max-w-[200px]'>
                   {item.sourceUrl}
                 </span>
-                <ExternalLink className='w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform' />
+                <ExternalLink className='w-4 h-4 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 rtl:-scale-x-100 group-hover:-translate-y-0.5 transition-transform' />
               </a>
             </section>
           )}
@@ -187,10 +190,11 @@ export function AssetDetailsPanel({
               leftSection={<Edit2 className='w-4 h-4' />}
               onClick={onEdit}
             >
-              Edit Asset
+              {t('creator.library.editAsset')}
             </Button>
             <Button
               variant='outline'
+              aria-label={t('creator.library.deleteAsset')}
               className='aspect-square p-0 w-11 hover:bg-red-50 hover:text-red-500 hover:border-red-200'
             >
               <Trash2 className='w-4 h-4' />

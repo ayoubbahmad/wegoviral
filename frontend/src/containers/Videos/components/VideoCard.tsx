@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { AddToProjectModal } from '@/containers/Projects/components/AddToProjectModal';
 import { Card } from '@/components/Card';
+import { useT } from '@/i18n/provider';
 
 export interface Video {
   id: string;
@@ -28,6 +29,7 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ video }: VideoCardProps) {
+  const t = useT();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -46,7 +48,7 @@ export function VideoCard({ video }: VideoCardProps) {
                 alt={video.title}
                 className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
               />
-              <div className='absolute top-2 right-2'>
+              <div className='absolute top-2 end-2'>
                 {video.platform === 'youtube' && (
                   <div className='bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold'>
                     YT
@@ -113,6 +115,7 @@ export function VideoCard({ video }: VideoCardProps) {
                       e.stopPropagation();
                       setIsModalOpen(true);
                     }}
+                    aria-label={t('creator.videos.saveToProject')}
                     className='p-1.5 rounded-lg text-muted-foreground/40 transition-all hover:bg-primary/10 hover:text-primary'
                   >
                     <FolderPlus className='w-4 h-4' />

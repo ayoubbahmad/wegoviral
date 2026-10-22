@@ -11,6 +11,7 @@ interface ProjectCardProps {
 }
 
 import { Card } from '@/components/Card';
+import { useT } from '@/i18n/provider';
 
 export function ProjectCard({
   id,
@@ -18,6 +19,7 @@ export function ProjectCard({
   items,
   lastModified,
 }: ProjectCardProps) {
+  const t = useT();
   const router = useRouter();
 
   return (
@@ -33,6 +35,7 @@ export function ProjectCard({
             onClick={(e) => {
               e.stopPropagation();
             }}
+            aria-label={t('creator.projects.more')}
             className='p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors'
           >
             <MoreHorizontal className='w-5 h-5' />
@@ -49,7 +52,7 @@ export function ProjectCard({
       <Card.Footer
         metadata={
           <>
-            <Card.MetaItem icon={FileText} label={`${items} items`} />
+            <Card.MetaItem icon={FileText} label={t('creator.projects.items', { count: items })} />
             <Card.MetaItem icon={Clock} label={lastModified} />
           </>
         }
@@ -59,6 +62,7 @@ export function ProjectCard({
 }
 
 export const NewProjectCard = ({ onClick }: { onClick?: () => void }) => {
+  const t = useT();
   return (
     <button
       onClick={onClick}
@@ -68,7 +72,7 @@ export const NewProjectCard = ({ onClick }: { onClick?: () => void }) => {
         <Folder className='w-8 h-8' />
       </div>
       <p className='text-sm text-text-secondary group-hover:text-primary transition-colors'>
-        Create New Project
+        {t('creator.projects.createCard')}
       </p>
     </button>
   );

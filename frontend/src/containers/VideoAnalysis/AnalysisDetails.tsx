@@ -1,8 +1,10 @@
 import { Anchor, Layout, Palette } from 'lucide-react';
 import { Badge } from '@/components/Badge';
+import { useT } from '@/i18n/provider';
 
 interface AnalysisItemProps {
   title: string;
+  bulletsLabel: string;
   type: string;
   description: string;
   bullets?: string[];
@@ -12,12 +14,14 @@ interface AnalysisItemProps {
 
 function AnalysisCard({
   title,
+  bulletsLabel,
   type,
   description,
   bullets,
   icon: Icon,
   iconColor,
 }: AnalysisItemProps) {
+  const t = useT();
   return (
     <div className='p-8 rounded-3xl bg-card/30 border border-border shadow-sm hover:border-primary/50 transition-all'>
       <div className='flex items-center gap-2 mb-6'>
@@ -25,14 +29,14 @@ function AnalysisCard({
         <h3
           className={`text-xl font-bold tracking-tight uppercase ${iconColor}`}
         >
-          {title} Analysis
+          {title}
         </h3>
       </div>
 
       <div className='space-y-6'>
         <div>
           <div className='text-xs font-black text-foreground mb-2 uppercase tracking-widest opacity-60'>
-            Type
+            {t('creator.video.type')}
           </div>
           <Badge variant='secondary' shape='pill'>
             {type}
@@ -41,7 +45,7 @@ function AnalysisCard({
 
         <div>
           <div className='text-xs font-black text-foreground mb-2 uppercase tracking-widest opacity-60'>
-            Description
+            {t('creator.video.descriptionLabel')}
           </div>
           <p className='text-sm leading-[1.8] text-muted-foreground font-medium'>
             {description}
@@ -51,13 +55,13 @@ function AnalysisCard({
         {bullets && (
           <div>
             <div className='text-xs font-black text-foreground mb-3 uppercase tracking-widest opacity-60'>
-              {title === 'Style' ? 'Attributes' : 'Frameworks'}
+              {bulletsLabel}
             </div>
             <div className='space-y-3'>
               {bullets.map((bullet, i) => (
                 <div
                   key={i}
-                  className='flex gap-3 text-sm text-muted-foreground border-l-2 border-primary/20 pl-4 py-1'
+                  className='flex gap-3 text-sm text-muted-foreground border-s-2 border-primary/20 ps-4 py-1'
                 >
                   <span className='font-medium'>{bullet}</span>
                 </div>
@@ -71,49 +75,55 @@ function AnalysisCard({
 }
 
 export function HookAnalysis({ analysis }: { analysis?: any }) {
+  const t = useT();
   return (
     <AnalysisCard
-      title='Hook'
+      title={t('creator.video.hookAnalysis')}
+      bulletsLabel={t('creator.video.frameworks')}
       icon={Anchor}
       iconColor='text-blue-500'
-      type={analysis?.type || 'Secret Reveal'}
+      type={analysis?.type || t('creator.video.samples.hookType')}
       description={
         analysis?.description ||
-        "Suggests unknown insight or future implication that the viewer doesn't know but would inform what is happening."
+        t('creator.video.samples.hookBody')
       }
-      bullets={analysis?.bullets || ['Hook line 1', 'Hook line 2']}
+      bullets={analysis?.bullets || [t('creator.video.samples.hookLines.first'), t('creator.video.samples.hookLines.second')]}
     />
   );
 }
 
 export function StructureAnalysis({ analysis }: { analysis?: any }) {
+  const t = useT();
   return (
     <AnalysisCard
-      title='Structure'
+      title={t('creator.video.structureAnalysis')}
+      bulletsLabel={t('creator.video.frameworks')}
       icon={Layout}
       iconColor='text-purple-500'
-      type={analysis?.type || 'Breakdown'}
+      type={analysis?.type || t('creator.video.samples.structureType')}
       description={
         analysis?.description ||
-        'Explains the foundational principles and building blocks of a topic.'
+        t('creator.video.samples.structureBody')
       }
-      bullets={analysis?.bullets || ['Point 1', 'Point 2']}
+      bullets={analysis?.bullets || [t('creator.video.samples.structurePoints.first'), t('creator.video.samples.structurePoints.second')]}
     />
   );
 }
 
 export function StyleAnalysis({ analysis }: { analysis?: any }) {
+  const t = useT();
   return (
     <AnalysisCard
-      title='Style'
+      title={t('creator.video.styleAnalysis')}
+      bulletsLabel={t('creator.video.attributes')}
       icon={Palette}
       iconColor='text-amber-500'
-      type={analysis?.type || 'Educational/Instructive'}
+      type={analysis?.type || t('creator.video.samples.styleType')}
       description={
         analysis?.description ||
-        'Professional and authoritative delivery designed to foster trust and establish expertise.'
+        t('creator.video.samples.styleBody')
       }
-      bullets={analysis?.bullets || ['Tone: Professional', 'Pacing: Steady']}
+      bullets={analysis?.bullets || [t('creator.video.samples.styleTraits.first'), t('creator.video.samples.styleTraits.second')]}
     />
   );
 }

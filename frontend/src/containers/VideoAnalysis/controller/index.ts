@@ -14,15 +14,16 @@ import {
   AlignLeft,
 } from 'lucide-react';
 
+/** Labels come from creator.video.sections.<id> */
 export const JUMP_LINKS = [
-  { label: 'Actions', id: 'actions', icon: ActionIcon },
-  { label: 'Metrics', id: 'metrics', icon: BarChart2 },
-  { label: 'Description', id: 'description', icon: AlignLeft },
-  { label: 'Transcript', id: 'transcript', icon: FileIcon },
-  { label: 'Hook', id: 'hook', icon: Anchor },
-  { label: 'Structure', id: 'structure', icon: Layout },
-  { label: 'Style', id: 'style', icon: Palette },
-];
+  { id: 'actions', icon: ActionIcon },
+  { id: 'metrics', icon: BarChart2 },
+  { id: 'description', icon: AlignLeft },
+  { id: 'transcript', icon: FileIcon },
+  { id: 'hook', icon: Anchor },
+  { id: 'structure', icon: Layout },
+  { id: 'style', icon: Palette },
+] as const;
 
 export function useVideoAnalysisController(id: string) {
   const router = useRouter();

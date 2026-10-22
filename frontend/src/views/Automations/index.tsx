@@ -6,15 +6,17 @@ import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { Plus, XCircle } from 'lucide-react';
 import { useAutomationsController } from '@/containers/Automations/controller';
+import { useT } from '@/i18n/provider';
 
 export const AutomationsView = () => {
+  const t = useT();
   const { isAdding, toggleAdding } = useAutomationsController();
 
   return (
     <PageContainer>
       <PageHeader
-        title='Automations'
-        description='Trigger automatic messages based on keywords in comments or mentions.'
+        title={t('creator.automations.title')}
+        description={t('creator.automations.description')}
         actions={
           <Button
             onClick={toggleAdding}
@@ -26,7 +28,7 @@ export const AutomationsView = () => {
             ) : (
               <Plus className='w-4 h-4' />
             )}
-            {isAdding ? 'Cancel' : 'New Automation'}
+            {isAdding ? t('common.cancel') : t('creator.automations.new')}
           </Button>
         }
       />

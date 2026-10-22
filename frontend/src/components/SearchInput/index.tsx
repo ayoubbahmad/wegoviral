@@ -1,6 +1,7 @@
-import { Search } from "lucide-react";
+import { CornerDownLeft, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputHTMLAttributes } from "react";
+import { T } from "@/i18n/T";
 
 interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onSearch?: (value: string) => void;
@@ -9,11 +10,11 @@ interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 /**
- * Premium search input with integrated "Go" button and keyboard shortcut visual.
+ * Search input with an integrated search button and keyboard shortcut visual.
  */
 export const SearchInput = ({
   onSearch,
-  buttonText = "Go",
+  buttonText,
   containerClassName,
   className,
   ...props
@@ -32,11 +33,12 @@ export const SearchInput = ({
         {...props}
       />
       <button 
+        type="button"
         onClick={() => onSearch?.(props.value as string)}
         className="absolute end-1.5 top-1.5 bottom-1.5 px-4 rounded-md bg-secondary border border-border/50 text-xs font-bold hover:bg-secondary/80 transition-colors flex items-center gap-2 group/btn"
       >
-        {buttonText}
-        <span className="text-[10px] opacity-50 group-hover/btn:translate-x-0.5 transition-transform">↵</span>
+        {buttonText ?? <T k="common.search" />}
+        <CornerDownLeft className="w-3 h-3 opacity-50 rtl:-scale-x-100" aria-hidden />
       </button>
     </div>
   );

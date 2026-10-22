@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { scriptsApi } from "../api";
 import { Script } from "../api/types";
+import { useT } from '@/i18n/provider';
 
 export const useScriptsController = () => {
+  const t = useT();
   const queryClient = useQueryClient();
 
   // Fetch Scripts
@@ -20,7 +22,7 @@ export const useScriptsController = () => {
   });
 
   const handleDeleteScript = async (id: string) => {
-    if (confirm("Are you sure you want to delete this script?")) {
+    if (confirm(t('creator.scripts.confirmDelete'))) {
       try {
         await deleteMutation.mutateAsync(id);
       } catch (err) {

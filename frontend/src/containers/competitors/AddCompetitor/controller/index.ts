@@ -4,9 +4,11 @@ import { useAddCompetitorSlice } from '../slice';
 import { useToast } from '@/providers/Toast';
 import { getUrlFromRow } from '../forms/utils';
 import { WatchlistFormValues } from '../forms/schema';
+import { useT } from '@/i18n/provider';
 
 export function useAddCompetitorController() {
   const { showToast } = useToast();
+  const t = useT();
   const queryClient = useQueryClient();
   const {
     setPrevStep,
@@ -34,7 +36,7 @@ export function useAddCompetitorController() {
       setPrevStep(true);
     },
     onError: () => {
-      showToast('Failed to fetch previews', 'error');
+      showToast(t('creator.competitors.previewFailed'), 'error');
     },
   });
 
@@ -52,20 +54,17 @@ export function useAddCompetitorController() {
     },
     onSuccess: (result) => {
       if (result?.success) {
-        showToast(
-          `${result.competitors.length} competitors added successfully!`,
-          'success',
-        );
+        showToast(t('creator.competitors.added', { count: result.competitors.length }), 'success');
         queryClient.invalidateQueries({ queryKey: ['competitors'] });
         queryClient.invalidateQueries({ queryKey: ['watchlists'] });
         return result;
       } else {
-        showToast(result?.error || 'Failed to add competitors', 'error');
+        showToast(result?.error || t('creator.competitors.addFailed'), 'error');
         return result;
       }
     },
     onError: () => {
-      showToast('An unexpected error occurred', 'error');
+      showToast(t('creator.competitors.unexpected'), 'error');
     },
   });
 

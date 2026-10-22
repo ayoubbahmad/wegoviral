@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Card } from '@/components/Card';
 import { Badge } from '@/components/Badge';
+import { useT } from '@/i18n/provider';
 
 interface HookCardProps {
   hook: Hook;
@@ -15,7 +16,10 @@ interface HookCardProps {
   onClick?: () => void;
 }
 
+const EMOTIONS = { Curiosity: 1, Fear: 1, Humor: 1, Desire: 1, Surprise: 1, Inspiration: 1 };
+
 export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -26,7 +30,7 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
   };
 
   const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this hook?')) {
+    if (onDelete) {
       setIsDeleting(true);
       await onDelete?.(hook.id);
       setIsDeleting(false);
@@ -48,7 +52,7 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
         title={hook.topic}
         actions={
           <div className='flex items-center gap-2'>
-            <div className='flex items-center gap-1 text-yellow-500 mr-2'>
+            <div className='flex items-center gap-1 text-yellow-500 me-2'>
               {Array.from({ length: hook.performanceRating || 0 }).map(
                 (_, i) => (
                   <Star key={i} className='w-3 h-3 fill-current' />
@@ -68,7 +72,7 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
                   'bg-purple-500/10 text-purple-500 border-purple-500/20',
               )}
             >
-              {hook.type}
+              {t(`creator.library.hookTypes.${hook.type as 'Verbal'}`)}
             </Badge>
           </div>
         }
@@ -76,11 +80,11 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
 
       <Card.Content>
         <p className='text-lg font-medium leading-relaxed mb-6 line-clamp-3'>
-          "{hook.content}"
+          “{hook.content}”
         </p>
         <div className='flex items-center gap-2 mb-4'>
           <Badge variant='secondary' icon={Tag}>
-            {hook.emotion}
+            {hook.emotion in EMOTIONS ? t(`creator.library.emotions.${hook.emotion as 'Fear'}`) : hook.emotion}
           </Badge>
         </div>
       </Card.Content>
@@ -89,7 +93,7 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
         metadata={
           (hook.usageCount || 0) > 0 ? (
             <Card.MetaItem
-              label={`Used ${hook.usageCount} time${hook.usageCount !== 1 ? 's' : ''}`}
+              label={t('creator.library.usedTimes', { count: hook.usageCount || 0 })}
             />
           ) : undefined
         }
@@ -101,7 +105,8 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
                 copyToClipboard();
               }}
               className='p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors'
-              title='Copy content'
+              title={t('creator.library.copy')}
+              aria-label={t('creator.library.copy')}
             >
               <Copy className={cn('w-4 h-4', copied && 'text-green-500')} />
             </button>
@@ -112,7 +117,8 @@ export function HookCard({ hook, onDelete, isActive, onClick }: HookCardProps) {
               }}
               disabled={isDeleting}
               className='p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors'
-              title='Delete hook'
+              title={t('creator.library.deleteHook')}
+              aria-label={t('creator.library.deleteHook')}
             >
               <Trash2 className='w-4 h-4' />
             </button>

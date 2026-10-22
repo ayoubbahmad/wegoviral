@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
+import { useT } from '@/i18n/provider';
 
 export interface JumpNavProps {
-  links: {
-    label: string;
+  links: readonly {
     id: string;
     icon: LucideIcon;
   }[];
@@ -12,6 +12,7 @@ export interface JumpNavProps {
 }
 
 export function JumpNav({ links, activeSection, onScrollTo }: JumpNavProps) {
+  const t = useT();
   return (
     <div className='sticky top-8 z-20 flex justify-center'>
       <div className='flex items-center gap-3 px-4 py-3 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50'>
@@ -31,7 +32,7 @@ export function JumpNav({ links, activeSection, onScrollTo }: JumpNavProps) {
               )}
             >
               <link.icon className='w-3.5 h-3.5' />
-              {link.label}
+              {t(`creator.video.sections.${link.id as 'actions'}`)}
             </button>
           ))}
         </div>

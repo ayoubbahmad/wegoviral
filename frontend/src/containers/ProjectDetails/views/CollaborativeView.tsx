@@ -5,27 +5,29 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 
 import { Project } from '../../Projects/api/types';
+import { useT } from '@/i18n/provider';
 
 export const CollaborativeView = ({ project }: { project: Project }) => {
+  const t = useT();
   return (
     <div className='space-y-8 mt-6'>
       <div className='flex items-center justify-between'>
         <div className='space-y-1'>
           <div className='flex items-center gap-3'>
             <span className='text-[10px] font-black text-green-500 uppercase tracking-widest px-2 py-0.5 rounded-md bg-green-500/10 border border-green-500/20'>
-              Collaborative
+              {t('creator.projects.types.COLLABORATIVE.label')}
             </span>
             <h1 className='text-3xl font-bold tracking-tight text-text-primary'>
               {project.name}
             </h1>
           </div>
           <p className='text-text-secondary font-medium'>
-            Shared workspace for you and your team
+            {t('creator.project.collab.intro')}
           </p>
         </div>
         <div className='flex items-center gap-3'>
           <Button variant='outline'>
-            <Share2 className='w-4 h-4' /> Invite
+            <Share2 className='w-4 h-4' /> {t('creator.project.collab.invite')}
           </Button>
         </div>
       </div>
@@ -35,14 +37,14 @@ export const CollaborativeView = ({ project }: { project: Project }) => {
           <div className='flex items-center justify-between mb-6'>
             <div className='flex items-center gap-3'>
               <Users className='w-5 h-5 text-green-500' />
-              <h3 className='font-bold text-text-primary'>Collaborators</h3>
+              <h3 className='font-bold text-text-primary'>{t('creator.project.collab.collaborators')}</h3>
             </div>
             <Button
               size='sm'
               variant='ghost'
               className='text-green-500 p-0 h-auto'
             >
-              Manage
+              {t('creator.project.collab.manage')}
             </Button>
           </div>
 
@@ -64,22 +66,22 @@ export const CollaborativeView = ({ project }: { project: Project }) => {
         <Card className='p-6'>
           <div className='flex items-center gap-3 mb-6'>
             <MessageSquare className='w-5 h-5 text-primary' />
-            <h3 className='font-bold text-text-primary'>Activity Feed</h3>
+            <h3 className='font-bold text-text-primary'>{t('creator.project.collab.activity')}</h3>
           </div>
           <div className='text-sm text-text-secondary italic'>
-            No recent activity.
+            {t('creator.project.collab.noActivity')}
           </div>
         </Card>
       </div>
 
       <div className='bg-card border border-border rounded-2xl p-6'>
-        <h3 className='font-bold mb-6 text-text-primary'>Shared Assets</h3>
+        <h3 className='font-bold mb-6 text-text-primary'>{t('creator.project.collab.assets')}</h3>
         <div className='text-center py-20 border border-dashed border-border rounded-xl'>
           <p className='text-text-secondary'>
-            Drop files here or add existing scripts to this project.
+            {t('creator.project.collab.assetsBody')}
           </p>
           <Button variant='secondary' className='mt-4'>
-            Add Asset
+            {t('creator.project.collab.addAsset')}
           </Button>
         </div>
       </div>

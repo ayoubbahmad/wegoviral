@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 import { ProjectType } from '../constants';
 import { TProjectType } from '../types';
+import { useT } from '@/i18n/provider';
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -24,36 +25,11 @@ interface NewProjectModalProps {
   isSubmitting?: boolean;
 }
 
-const PROJECT_TYPES: {
-  type: TProjectType;
-  label: string;
-  description: string;
-  icon: any;
-}[] = [
-  {
-    type: ProjectType.GENERAL,
-    label: 'General Project',
-    description: 'A standard project folder for mixed content.',
-    icon: Folder,
-  },
-  {
-    type: ProjectType.CASE_STUDY,
-    label: 'Case Study',
-    description: 'Analyze videos, identify patterns, and extract insights.',
-    icon: Video,
-  },
-  {
-    type: ProjectType.CONTENT_SERIES,
-    label: 'Content Series',
-    description: 'Plan episodes, manage a calendar, and define global ideas.',
-    icon: ListOrdered,
-  },
-  {
-    type: ProjectType.COLLABORATIVE,
-    label: 'Collaborative',
-    description: 'Work with others on shared content goals.',
-    icon: Users,
-  },
+const PROJECT_TYPES: { type: TProjectType; icon: any }[] = [
+  { type: ProjectType.GENERAL, icon: Folder },
+  { type: ProjectType.CASE_STUDY, icon: Video },
+  { type: ProjectType.CONTENT_SERIES, icon: ListOrdered },
+  { type: ProjectType.COLLABORATIVE, icon: Users },
 ];
 
 export const NewProjectModal = ({
@@ -62,6 +38,7 @@ export const NewProjectModal = ({
   onSubmit,
   isSubmitting,
 }: NewProjectModalProps) => {
+  const t = useT();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedType, setSelectedType] = useState<TProjectType>(
@@ -77,16 +54,16 @@ export const NewProjectModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title='Create New Project'
+      title={t('creator.projects.createTitle')}
       maxWidth='2xl'
     >
       <form onSubmit={handleSubmit} className='space-y-6'>
         <div className='space-y-4'>
           <div className='space-y-1.5'>
-            <Label htmlFor='name'>Project Name</Label>
+            <Label htmlFor='name'>{t('creator.projects.name')}</Label>
             <Input
               id='name'
-              placeholder='e.g. My Awesome Series'
+              placeholder={t('creator.projects.namePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -94,10 +71,10 @@ export const NewProjectModal = ({
             />
           </div>
           <div className='space-y-1.5'>
-            <Label htmlFor='description'>Description (Optional)</Label>
+            <Label htmlFor='description'>{t('creator.projects.descriptionOptional')}</Label>
             <Textarea
               id='description'
-              placeholder='What is this project about?'
+              placeholder={t('creator.projects.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -107,16 +84,16 @@ export const NewProjectModal = ({
 
         <div className='space-y-3'>
           <label className='text-sm font-medium text-text-primary'>
-            Project Type
+            {t('creator.projects.type')}
           </label>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {PROJECT_TYPES.map(({ type, label, description, icon: Icon }) => (
+            {PROJECT_TYPES.map(({ type, icon: Icon }) => (
               <button
                 key={String(type)}
                 type='button'
                 onClick={() => setSelectedType(type)}
                 className={cn(
-                  'flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  'flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-start',
                   selectedType === type
                     ? 'border-primary bg-primary/5 ring-1 ring-primary'
                     : 'border-border hover:border-border-hover bg-card',
@@ -133,9 +110,9 @@ export const NewProjectModal = ({
                   <Icon className='w-5 h-5' />
                 </div>
                 <div>
-                  <div className='font-semibold text-text-primary'>{label}</div>
+                  <div className='font-semibold text-text-primary'>{t(`creator.projects.types.${type as keyof typeof ProjectType}.label`)}</div>
                   <div className='text-xs text-text-secondary mt-1 leading-relaxed'>
-                    {description}
+                    {t(`creator.projects.types.${type as keyof typeof ProjectType}.description`)}
                   </div>
                 </div>
               </button>
@@ -145,7 +122,7 @@ export const NewProjectModal = ({
 
         <div className='flex justify-end gap-3 pt-4 border-t border-border'>
           <Button variant='secondary' onClick={onClose} type='button'>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant='primary'
@@ -153,7 +130,7 @@ export const NewProjectModal = ({
             isLoading={isSubmitting}
             disabled={!name.trim()}
           >
-            Create Project
+            {t('creator.projects.create')}
           </Button>
         </div>
       </form>

@@ -3,13 +3,15 @@
 import { VideosContainer } from '@/containers/Videos';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
+import { useT } from '@/i18n/provider';
 
 export const VideosView = () => {
+  const t = useT();
   return (
     <PageContainer>
       <PageHeader
-        title='Videos'
-        description="Discover what's gone viral in your niche, and why it worked."
+        title={t('creator.videos.title')}
+        description={t('creator.videos.description')}
       />
       <VideosContainer />
     </PageContainer>

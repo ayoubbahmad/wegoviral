@@ -9,8 +9,10 @@ import { PageContainer } from '@/components/PageContainer';
 
 import { ProjectCard, NewProjectCard, NewProjectModal } from './components';
 import { useProjectsController } from './controller';
+import { useT } from '@/i18n/provider';
 
 export const ProjectsContainer = () => {
+  const t = useT();
   const {
     projects,
     isLoading,
@@ -27,15 +29,15 @@ export const ProjectsContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title='Projects'
-        description='Organize your content into dedicated project folders.'
+        title={t('creator.projects.title')}
+        description={t('creator.projects.description')}
         actions={
           <Button
             variant='primary'
             size='md'
             onClick={() => setIsModalOpen(true)}
           >
-            <Plus className='w-4 h-4' /> New Project
+            <Plus className='w-4 h-4' /> {t('creator.projects.newProject')}
           </Button>
         }
       />

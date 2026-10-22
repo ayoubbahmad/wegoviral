@@ -4,6 +4,7 @@ import { Trash2, Search } from 'lucide-react';
 import { Control, FieldValues, Path } from 'react-hook-form';
 import { FormInput } from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
+import { useT } from '@/i18n/provider';
 
 interface CompetitorSearchRowProps<T extends FieldValues> {
   control: Control<T>;
@@ -26,6 +27,7 @@ export function CompetitorSearchRow<T extends FieldValues>({
   onRemove,
   showRemove = true,
 }: CompetitorSearchRowProps<T>) {
+  const t = useT();
   return (
     <div className='flex gap-3 items-start group'>
       <div className='w-40'>
@@ -41,7 +43,7 @@ export function CompetitorSearchRow<T extends FieldValues>({
         <FormInput
           name={valueName}
           control={control}
-          placeholder='URL or username'
+          placeholder={t('creator.competitors.urlOrUsername')}
           className='h-11'
           leftIcon={<Search className='w-4 h-4 text-muted-foreground/50' />}
         />
@@ -50,6 +52,7 @@ export function CompetitorSearchRow<T extends FieldValues>({
         <button
           type='button'
           onClick={onRemove}
+          aria-label={t('creator.competitors.removeRow')}
           className='mt-2.5 p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100'
         >
           <Trash2 className='w-4 h-4' />

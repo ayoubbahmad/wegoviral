@@ -3,6 +3,7 @@
 import { Competitor } from '@/types/competitor';
 import { Trash2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { useT } from '@/i18n/provider';
 
 interface CompetitorTableViewProps {
   competitors: Competitor[];
@@ -13,26 +14,27 @@ export function CompetitorTableView({
   competitors,
   onDelete,
 }: CompetitorTableViewProps) {
+  const t = useT();
   return (
     <div className='bg-card rounded-2xl border border-border/50 overflow-hidden'>
       <div className='overflow-x-auto overflow-y-hidden'>
-        <table className='w-full text-left border-collapse'>
+        <table className='w-full text-start border-collapse'>
           <thead>
             <tr className='border-b border-border/50 bg-secondary/5'>
               <th className='px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                Channel
+                {t('creator.competitors.columns.channel')}
               </th>
               <th className='px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                Followers
+                {t('creator.competitors.columns.followers')}
               </th>
               <th className='px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                Avg. Likes
+                {t('creator.competitors.columns.avgLikes')}
               </th>
               <th className='px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-center'>
-                Engagement
+                {t('creator.competitors.columns.engagement')}
               </th>
-              <th className='px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-right'>
-                Actions
+              <th className='px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-end'>
+                {t('creator.competitors.columns.actions')}
               </th>
             </tr>
           </thead>
@@ -77,19 +79,21 @@ export function CompetitorTableView({
                     {competitor.stats.engagementRate}
                   </span>
                 </td>
-                <td className='px-6 py-4 text-right'>
+                <td className='px-6 py-4 text-end'>
                   <div className='flex items-center justify-end gap-2'>
                     <Link
                       href={`/creator/competitors/${competitor.id}`}
                       className='p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors'
-                      title='View details'
+                      title={t('creator.competitors.viewDetails')}
+                      aria-label={t('creator.competitors.viewDetails')}
                     >
                       <ExternalLink className='w-4 h-4' />
                     </Link>
                     <button
                       onClick={() => onDelete(competitor.id)}
                       className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors'
-                      title='Stop tracking'
+                      title={t('creator.competitors.stopTracking')}
+                      aria-label={t('creator.competitors.stopTracking')}
                     >
                       <Trash2 className='w-4 h-4' />
                     </button>
@@ -102,7 +106,7 @@ export function CompetitorTableView({
       </div>
       {competitors.length === 0 && (
         <div className='py-20 text-center text-muted-foreground text-sm font-medium'>
-          No competitors found matching your criteria.
+          {t('creator.competitors.noMatch')}
         </div>
       )}
     </div>

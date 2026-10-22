@@ -6,28 +6,29 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 
 import { Project } from '../../Projects/api/types';
+import { useT } from '@/i18n/provider';
 
 export const CaseStudyView = ({ project }: { project: Project }) => {
+  const t = useT();
   return (
     <div className='space-y-8 mt-6'>
       <div className='flex items-center justify-between'>
         <div className='space-y-1'>
           <div className='flex items-center gap-3'>
             <span className='text-[10px] font-black text-primary uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20'>
-              Case Study
+              {t('creator.projects.types.CASE_STUDY.label')}
             </span>
             <h1 className='text-3xl font-bold tracking-tight text-text-primary'>
               {project.name}
             </h1>
           </div>
           <p className='text-text-secondary font-medium'>
-            Analyze {project._count?.items || 0} videos to extract winning
-            patterns
+            {t('creator.project.caseStudy.intro', { count: project._count?.items || 0 })}
           </p>
         </div>
         <div className='flex items-center gap-3'>
           <Button variant='primary' size='md'>
-            <Sparkles className='w-4 h-4' /> AI Pattern Analysis
+            <Sparkles className='w-4 h-4' /> {t('creator.project.caseStudy.aiAnalysis')}
           </Button>
         </div>
       </div>
@@ -39,17 +40,17 @@ export const CaseStudyView = ({ project }: { project: Project }) => {
           </div>
           <div>
             <h3 className='font-bold text-lg text-text-primary'>
-              Source Videos
+              {t('creator.project.caseStudy.sources')}
             </h3>
             <p className='text-sm text-text-secondary'>
-              Videos being studied for this case.
+              {t('creator.project.caseStudy.sourcesBody')}
             </p>
           </div>
           <Button
             variant='outline'
             className='w-full justify-start border-dashed'
           >
-            <Plus className='w-4 h-4 mr-2' /> Add Video
+            <Plus className='w-4 h-4 me-2' /> {t('creator.project.caseStudy.addVideo')}
           </Button>
         </Card>
 
@@ -58,13 +59,13 @@ export const CaseStudyView = ({ project }: { project: Project }) => {
             <Search className='w-6 h-6' />
           </div>
           <div>
-            <h3 className='font-bold text-lg text-text-primary'>Key Hooks</h3>
+            <h3 className='font-bold text-lg text-text-primary'>{t('creator.project.caseStudy.hooks')}</h3>
             <p className='text-sm text-text-secondary'>
-              Extracted hooks that performed best.
+              {t('creator.project.caseStudy.hooksBody')}
             </p>
           </div>
           <div className='text-xs text-text-secondary italic'>
-            No hooks extracted yet.
+            {t('creator.project.caseStudy.noHooks')}
           </div>
         </Card>
 
@@ -74,26 +75,26 @@ export const CaseStudyView = ({ project }: { project: Project }) => {
           </div>
           <div>
             <h3 className='font-bold text-lg text-text-primary'>
-              Retention Patterns
+              {t('creator.project.caseStudy.retention')}
             </h3>
             <p className='text-sm text-text-secondary'>
-              Visualized flow of winning content.
+              {t('creator.project.caseStudy.retentionBody')}
             </p>
           </div>
           <div className='text-xs text-text-secondary italic'>
-            Add videos to start analysis.
+            {t('creator.project.caseStudy.addToStart')}
           </div>
         </Card>
       </div>
 
       <div className='bg-card border border-border rounded-2xl p-6'>
-        <h3 className='font-bold mb-6 text-text-primary'>Videos in Study</h3>
+        <h3 className='font-bold mb-6 text-text-primary'>{t('creator.project.caseStudy.inStudy')}</h3>
         <div className='text-center py-10 border border-dashed border-border rounded-xl'>
           <p className='text-text-secondary'>
-            Search and add videos to analyze them.
+            {t('creator.project.caseStudy.searchAdd')}
           </p>
           <Button variant='secondary' className='mt-4'>
-            <Search className='w-4 h-4 mr-2' /> Search Creators
+            <Search className='w-4 h-4 me-2' /> {t('creator.project.caseStudy.searchCreators')}
           </Button>
         </div>
       </div>

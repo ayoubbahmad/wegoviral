@@ -28,7 +28,6 @@ export const ViewToggle = ({ mode, onChange, className }: ViewToggleProps) => {
           'p-2 rounded-lg transition-all',
           mode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : '',
         )}
-        aria-label='Table view'
       >
         <Table2 className='w-4 h-4' />
         <span className='sr-only'><T k='common.tableView' /></span>
@@ -41,7 +40,6 @@ export const ViewToggle = ({ mode, onChange, className }: ViewToggleProps) => {
           'p-2 rounded-lg transition-all',
           mode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : '',
         )}
-        aria-label='Grid view'
       >
         <LayoutGrid className='w-4 h-4' />
         <span className='sr-only'><T k='common.gridView' /></span>

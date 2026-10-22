@@ -5,8 +5,12 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { TemplateCard } from './components/TemplateCard';
 import { useScriptTemplatesListController } from './controller';
+import { useT } from '@/i18n/provider';
+import { useLocale } from '@/i18n/provider';
 
 export function ScriptTemplatesList() {
+  const t = useT();
+  const isRtl = useLocale().locale === 'ar';
   const {
     scripts,
     isLoading,
@@ -51,20 +55,20 @@ export function ScriptTemplatesList() {
 
   return (
     <div className='rounded-2xl border border-border bg-card overflow-hidden'>
-      <table className='w-full text-left'>
+      <table className='w-full text-start'>
         <thead className='border-b border-border bg-muted/30'>
           <tr>
             <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
-              Template
+              {t('creator.library.columns.template')}
             </th>
             <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
-              Category
+              {t('creator.library.columns.category')}
             </th>
             <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
-              Structure
+              {t('creator.library.columns.structure')}
             </th>
-            <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right'>
-              Actions
+            <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-end'>
+              {t('creator.library.columns.actions')}
             </th>
           </tr>
         </thead>
@@ -75,7 +79,7 @@ export function ScriptTemplatesList() {
               className={cn(
                 'group hover:bg-muted/5 transition-colors cursor-pointer',
                 selectedItemId === script.id &&
-                  'bg-primary/5 border-l-2 border-primary',
+                  'bg-primary/5 border-s-2 border-primary',
               )}
               onClick={() => setSelectedItemId(script.id)}
             >
@@ -87,15 +91,15 @@ export function ScriptTemplatesList() {
               </td>
               <td className='px-6 py-4'>
                 <span className='text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-bold uppercase tracking-widest'>
-                  {script.category}
+                  {t(`creator.library.categories.${script.category as 'Sales'}`)}
                 </span>
               </td>
               <td className='px-6 py-4'>
                 <p className='text-xs text-muted-foreground line-clamp-1'>
-                  {script.content.map((s: any) => s.step).join(' → ')}
+                  {script.content.map((s: any) => s.step).join(isRtl ? ' ← ' : ' → ')}
                 </p>
               </td>
-              <td className='px-6 py-4 text-right'>
+              <td className='px-6 py-4 text-end'>
                 <div className='flex items-center justify-end gap-2'>
                   <button
                     onClick={(e) => {
@@ -109,13 +113,14 @@ export function ScriptTemplatesList() {
                         : 'text-primary transition-opacity',
                     )}
                   >
-                    {copiedId === script.id ? 'Copied' : 'Use'}
+                    {copiedId === script.id ? t('creator.library.copied') : t('creator.library.use')}
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteTemplate(script.id);
                     }}
+                    aria-label={t('creator.library.delete')}
                     className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors'
                   >
                     <Trash2 className='w-4 h-4' />

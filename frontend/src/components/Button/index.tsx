@@ -24,6 +24,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       children,
       disabled,
+      leftSection,
+      rightSection,
       ...props
     },
     ref,
@@ -72,7 +74,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <span><T k='common.loading' /></span>
           </div>
         ) : (
-          children
+          <>
+            {leftSection}
+            {children}
+            {rightSection}
+          </>
         )}
       </button>
     );

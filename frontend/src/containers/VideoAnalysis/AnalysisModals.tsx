@@ -11,6 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/provider';
 
 interface ModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ function Modal({
   children,
   actionLabel,
 }: ModalProps) {
+  const t = useT();
   if (!isOpen) return null;
 
   return (
@@ -40,7 +42,8 @@ function Modal({
       <div className='relative w-full max-w-lg bg-card border border-border shadow-2xl rounded-2xl p-6 animate-in zoom-in-95 duration-200'>
         <button
           onClick={onClose}
-          className='absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors'
+          aria-label={t('common.close')}
+          className='absolute top-4 end-4 p-2 text-muted-foreground hover:text-foreground transition-colors'
         >
           <X className='w-4 h-4' />
         </button>
@@ -57,7 +60,7 @@ function Modal({
             onClick={onClose}
             className='px-4 py-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors'
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button className='px-5 py-2 text-sm font-bold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all'>
             {actionLabel}
@@ -69,44 +72,21 @@ function Modal({
 }
 
 export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
+  const t = useT();
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
   const actions = [
-    {
-      id: 'remix',
-      label: 'Remix idea',
-      icon: Sparkles,
-      desc: 'Write a new script using this video as inspiration.',
-      title: 'Remix this video',
-    },
-    {
-      id: 'project',
-      label: 'Add to project',
-      icon: Plus,
-      desc: 'Save this video to an existing or new project.',
-      title: 'Save to project',
-    },
-    {
-      id: 'library',
-      label: 'Save to library',
-      icon: Bookmark,
-      desc: 'Extract templates and style guides for later use.',
-      title: 'Add to library',
-    },
-    {
-      id: 'prompt',
-      label: 'Create prompt',
-      icon: Send,
-      desc: 'Get a writing prompt for your favorite AI model.',
-      title: 'Get AI writing prompt',
-    },
-  ];
+    { id: 'remix', icon: Sparkles },
+    { id: 'project', icon: Plus },
+    { id: 'library', icon: Bookmark },
+    { id: 'prompt', icon: Send },
+  ] as const;
 
   return (
     <div className='p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-blue-500/30 transition-all'>
       <div className='flex items-center gap-2 mb-6'>
         <Sparkles className='w-5 h-5 text-blue-500' />
-        <h3 className='text-lg font-bold text-blue-500'>Actions</h3>
+        <h3 className='text-lg font-bold text-blue-500'>{t('creator.video.sections.actions')}</h3>
       </div>
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
@@ -118,7 +98,7 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
           >
             <action.icon className='w-6 h-6 text-muted-foreground group-hover:text-blue-500 transition-colors' />
             <span className='text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors text-center'>
-              {action.label}
+              {t(`creator.video.actions.${action.id}.label`)}
             </span>
           </button>
         ))}
@@ -128,16 +108,16 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
       <Modal
         isOpen={activeModal === 'remix'}
         onClose={() => setActiveModal(null)}
-        title='Remix this video'
-        description='The system will write a script using this video as inspiration. You can customize it after a draft is generated.'
-        actionLabel='Write Script'
+        title={t('creator.video.actions.remix.title')}
+        description={t('creator.video.remixBody')}
+        actionLabel={t('creator.video.writeScript')}
       >
         <div className='p-4 rounded-xl bg-muted/30 border border-border/50'>
           <div className='text-xs font-bold mb-2 uppercase opacity-60'>
-            Source Video
+            {t('creator.video.sourceVideo')}
           </div>
           <div className='text-sm font-semibold truncate leading-none'>
-            {videoTitle || 'Source Video'}
+            {videoTitle || t('creator.video.sourceVideo')}
           </div>
         </div>
       </Modal>
@@ -145,14 +125,14 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
       <Modal
         isOpen={activeModal === 'project'}
         onClose={() => setActiveModal(null)}
-        title='Save to project'
-        description='You can choose an existing project, or create a new one.'
-        actionLabel='Add to Project'
+        title={t('creator.video.actions.project.title')}
+        description={t('creator.video.projectBody')}
+        actionLabel={t('creator.video.addToProject')}
       >
         <div className='relative group/select'>
           <button className='w-full flex items-center justify-between px-4 py-3 rounded-xl bg-card border border-border group-hover/select:border-primary/50 transition-colors'>
             <span className='text-sm text-muted-foreground'>
-              Select a project
+              {t('creator.video.selectProject')}
             </span>
             <ChevronDown className='w-4 h-4 text-muted-foreground' />
           </button>
@@ -162,19 +142,19 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
       <Modal
         isOpen={activeModal === 'library'}
         onClose={() => setActiveModal(null)}
-        title='Add to library'
-        description='Extract the hook, style, or both from this video and save it to your library.'
-        actionLabel='Save to library'
+        title={t('creator.video.actions.library.title')}
+        description={t('creator.video.libraryBody')}
+        actionLabel={t('creator.video.saveToLibrary')}
       >
         <div className='space-y-4'>
           <div>
             <label className='block text-xs font-bold text-foreground mb-2 uppercase opacity-60'>
-              Name
+              {t('creator.video.name')}
             </label>
             <input
               type='text'
               className='w-full px-4 py-3 rounded-xl bg-muted/30 border border-border/50 focus:border-primary/50 outline-none text-sm font-medium'
-              defaultValue='Fast for 30 Days library Item'
+              defaultValue={t('creator.video.libraryItem', { title: videoTitle ?? '' })}
             />
           </div>
           <div className='space-y-3'>
@@ -188,9 +168,9 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
                 <Check className='w-3 h-3 text-white' />
               </div>
               <div>
-                <div className='text-sm font-bold'>Save hook</div>
+                <div className='text-sm font-bold'>{t('creator.video.saveHook')}</div>
                 <div className='text-[10px] text-muted-foreground'>
-                  Extract the first 3 lines as a template
+                  {t('creator.video.saveHookBody')}
                 </div>
               </div>
             </label>
@@ -203,9 +183,9 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
                 <Check className='w-3 h-3 text-white' />
               </div>
               <div>
-                <div className='text-sm font-bold'>Save style</div>
+                <div className='text-sm font-bold'>{t('creator.video.saveStyle')}</div>
                 <div className='text-[10px] text-muted-foreground'>
-                  Save the pace and tone for future scripts
+                  {t('creator.video.saveStyleBody')}
                 </div>
               </div>
             </label>
@@ -216,17 +196,17 @@ export function AnalysisModals({ videoTitle }: { videoTitle?: string }) {
       <Modal
         isOpen={activeModal === 'prompt'}
         onClose={() => setActiveModal(null)}
-        title='Get AI writing prompt'
-        description='You can paste this prompt into ChatGPT, Claude, or Gemini to generate a script.'
-        actionLabel='Copy Prompt'
+        title={t('creator.video.actions.prompt.title')}
+        description={t('creator.video.promptBody')}
+        actionLabel={t('creator.video.copyPrompt')}
       >
         <div className='relative group'>
-          <div className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-            <button className='p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border/50 text-muted-foreground hover:text-foreground transition-colors shadow-lg'>
+          <div className='absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+            <button aria-label={t('creator.video.copy')} className='p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border/50 text-muted-foreground hover:text-foreground transition-colors shadow-lg'>
               <Copy className='w-3.5 h-3.5' />
             </button>
           </div>
-          <div className='max-h-[250px] overflow-auto p-4 rounded-xl bg-muted/50 border border-border/50 font-mono text-[10px] text-muted-foreground leading-relaxed'>
+          <div dir='ltr' className='max-h-[250px] overflow-auto p-4 rounded-xl bg-muted/50 border border-border/50 font-mono text-[10px] text-muted-foreground leading-relaxed'>
             {`<system_instructions>
   <job>World-class short-form script writer</job>
   <goal>Create high-quality viral content</goal>

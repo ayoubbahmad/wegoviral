@@ -25,11 +25,13 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 interface VideoAnalysisViewProps {
   video: any;
   activeSection: string;
-  jumpLinks: { label: string; id: string; icon: LucideIcon }[];
+  jumpLinks: readonly { id: string; icon: LucideIcon }[];
   onScrollTo: (id: string) => void;
   onBack: () => void;
 }
@@ -41,8 +43,9 @@ export function VideoAnalysisView({
   onScrollTo,
   onBack,
 }: VideoAnalysisViewProps) {
+  const t = useT();
   const isYoutube = video.competitor.handle.includes('youtube');
-  const publishedDate = new Date(video.postedAt).toLocaleDateString(undefined, {
+  const publishedDate = new Date(video.postedAt).toLocaleDateString(activeIntl(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -59,13 +62,13 @@ export function VideoAnalysisView({
         <PageHeader
           title={video.captionExcerpt}
           onClickBack={onBack}
-          backLabel='Back to Content'
+          backLabel={t('creator.video.back')}
           description={
             <div className='flex items-center gap-2 mt-2'>
               <div className='flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border/50 group cursor-pointer hover:border-primary/50 transition-colors'>
                 <img
                   src={video.competitor.avatarUrl}
-                  alt='Channel'
+                  alt={t('creator.video.channel')}
                   className='w-5 h-5 rounded-full border border-border/50'
                 />
                 <span className='text-sm font-bold text-foreground truncate'>
@@ -104,7 +107,7 @@ export function VideoAnalysisView({
 
             {/* Actions Section */}
             <section id='actions' className='space-y-6'>
-              <SectionHeader title='Quick Actions' icon={Sparkles} />
+              <SectionHeader title={t('creator.video.quickActions')} icon={Sparkles} />
               <AnalysisModals videoTitle={video.captionExcerpt} />
             </section>
 
@@ -113,7 +116,7 @@ export function VideoAnalysisView({
               id='metrics'
               className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
             >
-              <SectionHeader title='Performance Metrics' icon={BarChart2} />
+              <SectionHeader title={t('creator.video.performance')} icon={BarChart2} />
               <VideoMetrics metrics={video.metrics} />
             </section>
 
@@ -121,7 +124,7 @@ export function VideoAnalysisView({
               id='description'
               className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
             >
-              <SectionHeader title='Description' icon={AlignLeft} />
+              <SectionHeader title={t('creator.video.sections.description')} icon={AlignLeft} />
               <DescriptionSection description={video.captionExcerpt} />
             </section>
 
@@ -129,23 +132,23 @@ export function VideoAnalysisView({
               id='transcript'
               className='p-8 rounded-3xl border border-border bg-card/30 space-y-6'
             >
-              <SectionHeader title='Transcript' icon={FileText} />
+              <SectionHeader title={t('creator.video.sections.transcript')} icon={FileText} />
               <TranscriptSection />
             </section>
 
             {/* Deep Analysis Details */}
             <section id='hook' className='space-y-6'>
-              <SectionHeader title='Hook Analysis' icon={Anchor} />
+              <SectionHeader title={t('creator.video.hookAnalysis')} icon={Anchor} />
               <HookAnalysis analysis={video.analysis?.hook} />
             </section>
 
             <section id='structure' className='space-y-6'>
-              <SectionHeader title='Structure Analysis' icon={Layout} />
+              <SectionHeader title={t('creator.video.structureAnalysis')} icon={Layout} />
               <StructureAnalysis analysis={video.analysis?.structure} />
             </section>
 
             <section id='style' className='space-y-6'>
-              <SectionHeader title='Style Analysis' icon={Palette} />
+              <SectionHeader title={t('creator.video.styleAnalysis')} icon={Palette} />
               <StyleAnalysis analysis={video.analysis?.style} />
             </section>
           </div>

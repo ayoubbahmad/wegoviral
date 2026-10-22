@@ -10,6 +10,7 @@ import { useAddCompetitorSlice } from './slice';
 import { useQuery } from '@tanstack/react-query';
 import { watchlistsApi as globalWatchlistsApi } from '../api/watchlists';
 import { FormSelect } from '@/components/forms/FormSelect';
+import { useT } from '@/i18n/provider';
 
 interface AddCompetitorModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export function AddCompetitorModal({
   isOpen,
   onClose,
 }: AddCompetitorModalProps) {
+  const t = useT();
   const { previewMutation, bulkCreateMutation, resetSlice } =
     useAddCompetitorController();
   const { prevStep, previews, setPrevStep } = useAddCompetitorSlice();
@@ -61,7 +63,7 @@ export function AddCompetitorModal({
   const loading = previewMutation.isPending || bulkCreateMutation.isPending;
 
   const watchlistOptions = [
-    { label: 'None (Uncategorized)', value: '' },
+    { label: t('creator.competitors.noWatchlist'), value: '' },
     ...(watchlists?.map((w: any) => ({ label: w.name, value: w.id })) || []),
   ];
 
@@ -69,7 +71,7 @@ export function AddCompetitorModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={prevStep ? 'Review Watchlist' : 'Build Your Watchlist'}
+      title={prevStep ? t('creator.competitors.reviewTitle') : t('creator.competitors.buildTitle')}
       maxWidth='2xl'
     >
       {!prevStep ? (
@@ -78,7 +80,7 @@ export function AddCompetitorModal({
             <FormSelect
               name='watchlistId'
               control={control}
-              label='Categorize under Watchlist'
+              label={t('creator.competitors.categorize')}
               options={watchlistOptions}
             />
           </div>
@@ -103,7 +105,7 @@ export function AddCompetitorModal({
             onClick={() => append({ platform: 'instagram', value: '' })}
             className='mt-4 flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-3 rounded-xl border border-primary/20 w-full justify-center border-dashed'
           >
-            <Plus className='w-4 h-4' /> Add Another Channel
+            <Plus className='w-4 h-4' /> {t('creator.competitors.addChannel')}
           </button>
 
           <div className='flex justify-end gap-3 pt-4 border-t border-border/50'>
@@ -112,7 +114,7 @@ export function AddCompetitorModal({
               onClick={handleClose}
               className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type='submit'
@@ -124,15 +126,14 @@ export function AddCompetitorModal({
               ) : (
                 <Search className='w-4 h-4' />
               )}
-              Preview Watchlist
+              {t('creator.competitors.preview')}
             </button>
           </div>
         </form>
       ) : (
         <div className='space-y-6'>
           <p className='text-sm text-muted-foreground font-medium'>
-            We found {previews.length} channels. Review them below before adding
-            to your watchlist.
+            {t('creator.competitors.found', { count: previews.length })}
           </p>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto custom-scrollbar -m-2 p-2 mb-2'>
@@ -162,7 +163,7 @@ export function AddCompetitorModal({
               onClick={() => setPrevStep(false)}
               className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
             >
-              Back
+              {t('creator.competitors.back')}
             </button>
             <div className='flex gap-3'>
               <button
@@ -170,7 +171,7 @@ export function AddCompetitorModal({
                 onClick={handleClose}
                 className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type='button'
@@ -183,7 +184,7 @@ export function AddCompetitorModal({
                 ) : (
                   <Users className='w-4 h-4' />
                 )}
-                Start Tracking {previews.length} Channels
+                {t('creator.competitors.startTracking', { count: previews.length })}
               </button>
             </div>
           </div>

@@ -12,19 +12,21 @@ interface CompetitorCardProps {
 }
 
 import { Card } from '@/components/Card';
+import { useT } from '@/i18n/provider';
 
 export function CompetitorCard({
   competitor,
   onDelete,
   variant = 'full',
 }: CompetitorCardProps) {
+  const t = useT();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (
-      confirm(`Are you sure you want to stop tracking ${competitor.handle}?`)
+      confirm(t('creator.competitors.confirmStop', { handle: competitor.handle }))
     ) {
       setIsDeleting(true);
       await onDelete?.(competitor.id);
@@ -55,6 +57,7 @@ export function CompetitorCard({
           <button
             onClick={handleDelete}
             disabled={isDeleting}
+            aria-label={t('creator.competitors.stopTracking')}
             className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 transition-opacity'
           >
             <Trash2 className='w-3.5 h-3.5' />
@@ -72,12 +75,13 @@ export function CompetitorCard({
             <div className='flex items-center gap-2'>
               {competitor.isFollowing && (
                 <span className='text-[10px] font-bold px-2 py-0.5 rounded-md bg-green-500/10 text-green-600 uppercase tracking-wider'>
-                  Tracking
+                  {t('creator.competitors.tracking')}
                 </span>
               )}
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
+                aria-label={t('creator.competitors.stopTracking')}
                 className='p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors'
               >
                 <Trash2 className='w-3.5 h-3.5' />
@@ -121,7 +125,7 @@ export function CompetitorCard({
 
         <Card.Footer
           metadata={
-            <div className='grid grid-cols-3 w-full divide-x divide-border/30 text-center'>
+            <div className='grid grid-cols-3 w-full divide-x rtl:divide-x-reverse divide-border/30 text-center'>
               <div className='px-1'>
                 <Card.MetaItem
                   icon={Users}
@@ -129,7 +133,7 @@ export function CompetitorCard({
                   className='justify-center mb-0.5'
                 />
                 <span className='text-[9px] uppercase tracking-tighter text-muted-foreground/50'>
-                  Followers
+                  {t('creator.competitors.columns.followers')}
                 </span>
               </div>
               <div className='px-1'>
@@ -139,7 +143,7 @@ export function CompetitorCard({
                   className='justify-center mb-0.5'
                 />
                 <span className='text-[9px] uppercase tracking-tighter text-muted-foreground/50'>
-                  Avg. Likes
+                  {t('creator.competitors.columns.avgLikes')}
                 </span>
               </div>
               <div className='px-1'>
@@ -149,7 +153,7 @@ export function CompetitorCard({
                   className='justify-center mb-0.5 text-green-500'
                 />
                 <span className='text-[9px] uppercase tracking-tighter text-muted-foreground/50'>
-                  Engagement
+                  {t('creator.competitors.columns.engagement')}
                 </span>
               </div>
             </div>

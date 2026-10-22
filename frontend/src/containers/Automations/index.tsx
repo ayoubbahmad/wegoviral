@@ -24,8 +24,10 @@ import { Table } from '@/components/Table';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { mockedPosts } from './constants';
+import { useT } from '@/i18n/provider';
 
 export const AutomationsContainer = () => {
+  const t = useT();
   const {
     automations,
     isLoading,
@@ -62,10 +64,10 @@ export const AutomationsContainer = () => {
               >
                 <div className='space-y-2'>
                   <label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                    Automation Name
+                    {t('creator.automations.name')}
                   </label>
                   <Input
-                    placeholder='e.g. Community Access'
+                    placeholder={t('creator.automations.namePlaceholder')}
                     value={formData.name}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -74,10 +76,10 @@ export const AutomationsContainer = () => {
                 </div>
                 <div className='space-y-2'>
                   <label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                    Keyword Trigger
+                    {t('creator.automations.keyword')}
                   </label>
                   <Input
-                    placeholder='e.g. community'
+                    placeholder={t('creator.automations.keywordPlaceholder')}
                     value={formData.triggerKeyword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setFormData({
@@ -90,10 +92,10 @@ export const AutomationsContainer = () => {
                 </div>
                 <div className='space-y-2'>
                   <label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                    Response Message
+                    {t('creator.automations.response')}
                   </label>
                   <Input
-                    placeholder='Hey! Here is the link...'
+                    placeholder={t('creator.automations.responsePlaceholder')}
                     value={formData.responseMessage}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setFormData({
@@ -107,11 +109,10 @@ export const AutomationsContainer = () => {
                   <div className='flex items-center justify-between'>
                     <div className='space-y-0.5'>
                       <p className='text-sm font-bold'>
-                        Automated Comment Reply
+                        {t('creator.automations.commentReply')}
                       </p>
                       <p className='text-xs text-muted-foreground'>
-                        Automatically reply to the viewer&apos;s comment after
-                        sending the DM.
+                        {t('creator.automations.commentReplyBody')}
                       </p>
                     </div>
                     <button
@@ -122,6 +123,8 @@ export const AutomationsContainer = () => {
                           commentReplyEnabled: !formData.commentReplyEnabled,
                         })
                       }
+                      aria-label={t('creator.automations.commentReply')}
+                      aria-pressed={formData.commentReplyEnabled}
                       className='transition-colors'
                     >
                       {formData.commentReplyEnabled ? (
@@ -141,11 +144,11 @@ export const AutomationsContainer = () => {
                       >
                         <div className='space-y-2'>
                           <label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                            Comment Text
+                            {t('creator.automations.commentText')}
                           </label>
 
                           <Input
-                            placeholder='e.g. Just sent you a DM! Check it out.'
+                            placeholder={t('creator.automations.commentTextPlaceholder')}
                             value={formData.commentReplyMessage}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
@@ -166,10 +169,9 @@ export const AutomationsContainer = () => {
                 <div className='md:col-span-3 space-y-4 pt-2 border-t border-border/50'>
                   <div className='flex items-center justify-between'>
                     <div className='space-y-0.5'>
-                      <p className='text-sm font-bold'>Target Specific Post</p>
+                      <p className='text-sm font-bold'>{t('creator.automations.targetPost')}</p>
                       <p className='text-xs text-muted-foreground'>
-                        Link this automation to a specific Instagram post or
-                        Reel.
+                        {t('creator.automations.targetPostBody')}
                       </p>
                     </div>
                     <div className='flex bg-muted/50 p-1 rounded-xl'>
@@ -184,7 +186,7 @@ export const AutomationsContainer = () => {
                         }
                         className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${formData.isGlobal ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
                       >
-                        Global
+                        {t('creator.automations.global')}
                       </button>
                       <button
                         type='button'
@@ -193,7 +195,7 @@ export const AutomationsContainer = () => {
                         }
                         className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${!formData.isGlobal ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
                       >
-                        Specific Post
+                        {t('creator.automations.specificPost')}
                       </button>
                     </div>
                   </div>
@@ -243,7 +245,7 @@ export const AutomationsContainer = () => {
                 <div className='md:col-span-3 flex justify-end'>
                   <Button type='submit' variant='primary'>
                     <CheckCircle2 className='w-4 h-4' />
-                    {editingId ? 'Update Automation' : 'Save Automation'}
+                    {editingId ? t('creator.automations.update') : t('creator.automations.save')}
                   </Button>
                 </div>
               </form>
@@ -256,7 +258,7 @@ export const AutomationsContainer = () => {
         {/* Controls Bar */}
         <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
           <SearchInput
-            placeholder='Search automations...'
+            placeholder={t('creator.automations.search')}
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setSearchTerm(e.target.value)
@@ -271,7 +273,7 @@ export const AutomationsContainer = () => {
                 onClick={() => setSelectedPlatform('all')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedPlatform === 'all' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
               >
-                All
+                {t('creator.automations.all')}
               </button>
               <button
                 onClick={() => setSelectedPlatform('instagram')}
@@ -300,10 +302,9 @@ export const AutomationsContainer = () => {
                   <div className='w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6'>
                     <Zap className='w-10 h-10 text-muted-foreground/30' />
                   </div>
-                  <h3 className='text-xl font-bold'>No results found</h3>
+                  <h3 className='text-xl font-bold'>{t('creator.automations.noResults')}</h3>
                   <p className='text-muted-foreground text-sm leading-relaxed'>
-                    Try adjusting your search or filters to find what
-                    you&apos;re looking for.
+                    {t('creator.automations.noResultsBody')}
                   </p>
                   <Button
                     variant='outline'
@@ -312,7 +313,7 @@ export const AutomationsContainer = () => {
                       setSelectedPlatform('all');
                     }}
                   >
-                    Clear Filters
+                    {t('creator.automations.clearFilters')}
                   </Button>
                 </div>
               </Card>
@@ -337,12 +338,12 @@ export const AutomationsContainer = () => {
             ) : (
               <Table>
                 <Table.Header>
-                  <Table.Head>Automation</Table.Head>
-                  <Table.Head>Platform</Table.Head>
-                  <Table.Head>Keyword</Table.Head>
-                  <Table.Head>Action Flow</Table.Head>
-                  <Table.Head>Runs</Table.Head>
-                  <Table.Head align='right'>Actions</Table.Head>
+                  <Table.Head>{t('creator.automations.columns.automation')}</Table.Head>
+                  <Table.Head>{t('creator.automations.columns.platform')}</Table.Head>
+                  <Table.Head>{t('creator.automations.columns.keyword')}</Table.Head>
+                  <Table.Head>{t('creator.automations.columns.flow')}</Table.Head>
+                  <Table.Head>{t('creator.automations.columns.runs')}</Table.Head>
+                  <Table.Head align='right'>{t('creator.automations.columns.actions')}</Table.Head>
                 </Table.Header>
                 <Table.Body>
                   {automations.map((automation) => (
@@ -365,8 +366,8 @@ export const AutomationsContainer = () => {
                             </p>
                             <p className='text-[9px] text-muted-foreground uppercase tracking-wider font-black opacity-60 mt-0.5'>
                               {automation.isGlobal
-                                ? 'Global rule'
-                                : 'Post-specific'}
+                                ? t('creator.automations.globalRule')
+                                : t('creator.automations.postRule')}
                             </p>
                           </div>
                         </div>
@@ -387,13 +388,13 @@ export const AutomationsContainer = () => {
                       <Table.Cell>
                         <div className='flex items-center gap-1.5'>
                           <div className='px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[8px] font-black uppercase leading-none'>
-                            DM
+                            {t('creator.automations.dm')}
                           </div>
                           {automation.commentReplyEnabled && (
                             <>
-                              <ChevronRight className='w-3 h-3 text-muted-foreground/30' />
+                              <ChevronRight className='w-3 h-3 rtl:rotate-180 text-muted-foreground/30' />
                               <div className='px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 text-[8px] font-black uppercase leading-none'>
-                                REPLY
+                                {t('creator.automations.reply')}
                               </div>
                             </>
                           )}
@@ -413,6 +414,7 @@ export const AutomationsContainer = () => {
                                 automation.active,
                               )
                             }
+                            aria-label={t('creator.automations.toggle')}
                             className='p-1.5 hover:bg-muted rounded-lg transition-colors'
                           >
                             {automation.active ? (
@@ -423,12 +425,14 @@ export const AutomationsContainer = () => {
                           </button>
                           <button
                             onClick={() => startEdit(automation)}
+                            aria-label={t('creator.automations.edit')}
                             className='p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-primary transition-colors'
                           >
                             <Edit2 className='w-4 h-4' />
                           </button>
                           <button
                             onClick={() => handleDelete(automation.id)}
+                            aria-label={t('creator.automations.delete')}
                             className='p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-red-500 transition-colors'
                           >
                             <Trash2 className='w-4 h-4' />
@@ -447,45 +451,38 @@ export const AutomationsContainer = () => {
             <Card className='p-6 bg-amber-500/5 border-amber-500/20'>
               <div className='flex items-center gap-2 text-amber-500 mb-4'>
                 <AlertTriangle className='w-5 h-5' />
-                <h4 className='font-bold'>Instagram Safety</h4>
+                <h4 className='font-bold'>{t('creator.automations.safety')}</h4>
               </div>
               <div className='space-y-4'>
                 <div className='space-y-1'>
                   <p className='text-[11px] font-bold uppercase text-muted-foreground'>
-                    Monthly Limits
+                    {t('creator.automations.limits')}
                   </p>
                   <p className='text-xs leading-relaxed'>
-                    Safety limit:{' '}
-                    <span className='font-bold text-foreground'>
-                      200 automated messages/hour
-                    </span>{' '}
-                    to avoid account flags.
+                    {t('creator.automations.limitsBody', { limit: t('creator.automations.limitValue') })}
                   </p>
                 </div>
                 <div className='space-y-1'>
                   <p className='text-[11px] font-bold uppercase text-muted-foreground'>
-                    7-Day Window
+                    {t('creator.automations.window')}
                   </p>
                   <p className='text-xs leading-relaxed'>
-                    Automations only trigger for comments made within the last 7
-                    days.
+                    {t('creator.automations.windowBody')}
                   </p>
                 </div>
                 <div className='space-y-1'>
                   <p className='text-[11px] font-bold uppercase text-muted-foreground'>
-                    One Rule Per Post
+                    {t('creator.automations.oneRule')}
                   </p>
                   <p className='text-xs leading-relaxed'>
-                    Only the first matched automation will trigger per
-                    interaction.
+                    {t('creator.automations.oneRuleBody')}
                   </p>
                 </div>
                 <div className='pt-2 border-t border-amber-500/10'>
                   <div className='flex items-start gap-2 text-xs text-amber-700/70 italic'>
                     <Info className='w-3 h-3 mt-0.5 shrink-0' />
                     <p>
-                      We use the official Instagram Business API to keep your
-                      account safe.
+                      {t('creator.automations.officialApi')}
                     </p>
                   </div>
                 </div>
@@ -493,17 +490,16 @@ export const AutomationsContainer = () => {
             </Card>
 
             <Card className='p-6 bg-primary/5 border-primary/20'>
-              <h4 className='font-bold mb-4'>Post Binding</h4>
+              <h4 className='font-bold mb-4'>{t('creator.automations.binding')}</h4>
               <p className='text-xs text-muted-foreground leading-relaxed mb-4'>
-                Link your automations to specific posts to run different
-                campaigns on each Reel or post.
+                {t('creator.automations.bindingBody')}
               </p>
               <div className='p-3 bg-background rounded-2xl border border-border/50 text-center'>
                 <p className='text-[10px] font-bold text-primary italic'>
-                  Pro Tip
+                  {t('creator.automations.tip')}
                 </p>
                 <p className='text-[11px] mt-1'>
-                  Global rules act as a backup for all other posts.
+                  {t('creator.automations.tipBody')}
                 </p>
               </div>
             </Card>

@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { scriptListApi } from '../api';
 import { useLibraryStore } from '../../HooksList/logic';
 import { ScriptTemplate } from '../../types';
+import { useT } from '@/i18n/provider';
 
 export function useScriptTemplatesListController() {
+  const t = useT();
   const queryClient = useQueryClient();
   const { searchTerm, viewType, selectedItemId, setSelectedItemId } =
     useLibraryStore();
@@ -32,7 +34,7 @@ export function useScriptTemplatesListController() {
   );
 
   const handleDeleteTemplate = async (id: string) => {
-    if (confirm('Are you sure you want to delete this template?')) {
+    if (confirm(t('creator.library.confirmDeleteTemplate'))) {
       try {
         await deleteTemplateMutation.mutateAsync(id);
         if (selectedItemId === id) setSelectedItemId(null);

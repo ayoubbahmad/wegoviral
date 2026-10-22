@@ -10,14 +10,17 @@ import { watchlistsApi } from '../api/watchlists';
 import { useWatchlistSlice } from '../slice/watchlistSlice';
 import { Loader2, Plus } from 'lucide-react';
 import { useToast } from '@/providers/Toast';
+import { useT } from '@/i18n/provider';
 
-const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-});
+const schema = (nameRequired: string) =>
+  z.object({
+    name: z.string().min(1, nameRequired),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof schema>>;
 
 export function CreateWatchlistModal() {
+  const t = useT();
   const { isCreateModalOpen, setIsCreateModalOpen } = useWatchlistSlice();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -28,7 +31,7 @@ export function CreateWatchlistModal() {
     reset,
     formState: { isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(t('creator.competitors.nameRequired'))),
     defaultValues: { name: '' },
   });
 
@@ -36,12 +39,12 @@ export function CreateWatchlistModal() {
     mutationFn: watchlistsApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['watchlists'] });
-      showToast('Watchlist created successfully', 'success');
+      showToast(t('creator.competitors.watchlistCreated'), 'success');
       handleClose();
     },
     onError: (error: any) => {
       showToast(
-        error.response?.data?.error || 'Failed to create watchlist',
+        error.response?.data?.error || t('creator.competitors.watchlistFailed'),
         'error',
       );
     },
@@ -60,15 +63,15 @@ export function CreateWatchlistModal() {
     <Modal
       isOpen={isCreateModalOpen}
       onClose={handleClose}
-      title='Create New Watchlist'
+      title={t('creator.competitors.newWatchlist')}
       maxWidth='md'
     >
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         <FormInput
           name='name'
           control={control}
-          label='Watchlist Name'
-          placeholder='e.g., Tech Competitors, Lifestyle Inspo...'
+          label={t('creator.competitors.watchlistName')}
+          placeholder={t('creator.competitors.watchlistNamePlaceholder')}
         />
 
         <div className='flex justify-end gap-3 pt-4 border-t border-border/50'>
@@ -77,7 +80,7 @@ export function CreateWatchlistModal() {
             onClick={handleClose}
             className='px-6 py-2.5 text-sm font-medium hover:bg-secondary rounded-xl transition-colors'
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type='submit'
@@ -89,7 +92,7 @@ export function CreateWatchlistModal() {
             ) : (
               <Plus className='w-4 h-4' />
             )}
-            Create Watchlist
+            {t('creator.competitors.createWatchlistButton')}
           </button>
         </div>
       </form>

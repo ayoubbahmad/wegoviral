@@ -10,8 +10,11 @@ import { ViewToggle } from '@/components/ViewToggle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { activeVideosApi, Video } from './api';
 import { useToast } from '@/providers/Toast';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 export const VideosContainer = () => {
+  const t = useT();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -24,11 +27,11 @@ export const VideosContainer = () => {
       // Backend now returns flattened posts with competitor context
       return posts.map((post: any) => ({
         id: post.id,
-        title: post.captionExcerpt || 'No Title',
+        title: post.captionExcerpt || t('creator.videos.noTitle'),
         thumbnailUrl: post.thumbnailUrl,
-        channelName: post.competitor?.handle || 'Unknown',
+        channelName: post.competitor?.handle || t('creator.videos.unknown'),
         channelAvatarUrl: post.competitor?.avatarUrl,
-        publishedAt: new Date(post.postedAt).toLocaleDateString(),
+        publishedAt: new Date(post.postedAt).toLocaleDateString(activeIntl()),
         views: post.metrics?.views || '0',
         likes: post.metrics?.likes || '0',
         platform: (post.metrics?.url?.includes('tiktok')
@@ -47,18 +50,18 @@ export const VideosContainer = () => {
   const syncMutation = useMutation({
     mutationFn: activeVideosApi.syncAll,
     onSuccess: (data) => {
-      showToast(`Synced ${data.count} videos`, 'success');
+      showToast(t('creator.videos.synced', { count: data.count }), 'success');
       queryClient.invalidateQueries({ queryKey: ['videos'] });
     },
     onError: () => {
-      showToast('Failed to sync videos', 'error');
+      showToast(t('creator.videos.syncFailed'), 'error');
     },
   });
 
   return (
     <>
       <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between'>
-        <SearchInput placeholder='Search for videos by topic...' />
+        <SearchInput placeholder={t('creator.videos.search')} />
 
         {/* View Controls */}
         <div className='flex items-center gap-2'>
@@ -69,9 +72,9 @@ export const VideosContainer = () => {
             disabled={syncMutation.isPending}
           >
             <RefreshCw
-              className={`w-4 h-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`}
+              className={`w-4 h-4 me-2 ${syncMutation.isPending ? 'animate-spin' : ''}`}
             />
-            {syncMutation.isPending ? 'Syncing...' : 'Sync Videos'}
+            {syncMutation.isPending ? t('creator.videos.syncing') : t('creator.videos.sync')}
           </Button>
 
           <ViewToggle
@@ -81,18 +84,18 @@ export const VideosContainer = () => {
 
           <Button variant='outline' className='h-11 px-4 text-sm font-medium'>
             <ArrowUpDown className='w-4 h-4' />
-            Sort
+            {t('creator.videos.sort')}
           </Button>
 
           <Button variant='outline' className='h-11 px-4 text-sm font-medium'>
             <Filter className='w-4 h-4' />
-            Filters
+            {t('creator.videos.filters')}
           </Button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className='flex justify-center p-12'>Loading videos...</div>
+        <div className='flex justify-center p-12'>{t('creator.videos.loading')}</div>
       ) : viewMode === 'cards' ? (
         <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
           {videos.map((video) => (
@@ -100,7 +103,7 @@ export const VideosContainer = () => {
           ))}
           {videos.length === 0 && (
             <div className='col-span-full text-center p-12 text-gray-500'>
-              No videos found. Try syncing!
+              {t('creator.videos.empty')}
             </div>
           )}
         </div>

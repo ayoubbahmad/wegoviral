@@ -3,8 +3,10 @@
 import { VideoAnalysisView } from '@/views/VideoAnalysis';
 import { PageContainer } from '@/components/PageContainer';
 import { useVideoAnalysisController } from './controller';
+import { useT } from '@/i18n/provider';
 
 export function VideoAnalysisContainer({ id }: { id: string }) {
+  const t = useT();
   const {
     video,
     isLoading,
@@ -20,7 +22,7 @@ export function VideoAnalysisContainer({ id }: { id: string }) {
         <div className='flex flex-col items-center gap-4'>
           <div className='w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin' />
           <p className='text-muted-foreground font-medium animate-pulse'>
-            Analyzing video content...
+            {t('creator.video.analyzing')}
           </p>
         </div>
       </PageContainer>

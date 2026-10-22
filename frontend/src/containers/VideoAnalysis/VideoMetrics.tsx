@@ -1,5 +1,6 @@
 import { TrendingUp, Eye, Zap, MessageSquare, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/provider';
 
 interface MetricCardProps {
   label: string;
@@ -33,33 +34,34 @@ export function MetricCard({
 }
 
 export function VideoMetrics({ metrics }: { metrics: any }) {
+  const t = useT();
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
       <MetricCard
-        label='outlier score'
+        label={t('creator.video.metrics.outlier')}
         value={metrics?.outlierScore || '1.0x'}
         icon={TrendingUp}
         showInfo
       />
-      <MetricCard label='views' value={metrics?.views || '0'} icon={Eye} />
+      <MetricCard label={t('creator.video.metrics.views')} value={metrics?.views || '0'} icon={Eye} />
       <MetricCard
-        label='engagement rate'
+        label={t('creator.video.metrics.engagement')}
         value={metrics?.engagementRate || '0%'}
         icon={Zap}
         showInfo
       />
       <MetricCard
-        label='likes'
+        label={t('creator.video.metrics.likes')}
         value={metrics?.likes || '0'}
         icon={TrendingUp}
       />
       <MetricCard
-        label='comments'
+        label={t('creator.video.metrics.comments')}
         value={metrics?.comments || '0'}
         icon={MessageSquare}
       />
       <MetricCard
-        label='platform'
+        label={t('creator.video.metrics.platform')}
         value={metrics?.url?.includes('youtube') ? 'YouTube' : 'Instagram'}
         icon={Zap}
       />

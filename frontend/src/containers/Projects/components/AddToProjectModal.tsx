@@ -4,6 +4,7 @@ import { Modal } from "@/components/Modal";
 import { Folder, Plus, Check, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from '@/i18n/provider';
 
 interface AddToProjectModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const MOCK_PROJECTS = [
 ];
 
 export function AddToProjectModal({ isOpen, onClose, videoTitle }: AddToProjectModalProps) {
+  const t = useT();
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -35,25 +37,25 @@ export function AddToProjectModal({ isOpen, onClose, videoTitle }: AddToProjectM
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Save to Project">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('creator.projects.saveTitle')}>
       <div className="space-y-6">
         <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Saving Video</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('creator.projects.savingVideo')}</p>
             <h3 className="text-sm font-bold text-foreground line-clamp-1">{videoTitle}</h3>
         </div>
 
         <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
                 type="text" 
-                placeholder="Search or create project..." 
+                placeholder={t('creator.projects.searchOrCreate')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-secondary/20 border border-border/50 rounded-xl pl-10 pr-4 py-2 text-sm font-medium outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-secondary/20 border border-border/50 rounded-xl ps-10 pe-4 py-2 text-sm font-medium outline-none focus:border-primary/50 transition-colors"
             />
         </div>
 
-        <div className="space-y-1 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-1 max-h-[300px] overflow-y-auto pe-2 custom-scrollbar">
             {filteredProjects.map((project) => (
                 <button
                     key={project.id}
@@ -72,12 +74,12 @@ export function AddToProjectModal({ isOpen, onClose, videoTitle }: AddToProjectM
                         )}>
                             <Folder className="w-4 h-4" />
                         </div>
-                        <div className="text-left">
+                        <div className="text-start">
                             <p className={cn(
                                 "text-sm font-bold transition-colors",
                                 selectedProjectIds.includes(project.id) ? "text-primary" : "text-foreground"
                             )}>{project.name}</p>
-                            <p className="text-[10px] font-medium text-muted-foreground">{project.items} items</p>
+                            <p className="text-[10px] font-medium text-muted-foreground">{t('creator.projects.items', { count: project.items })}</p>
                         </div>
                     </div>
                     {selectedProjectIds.includes(project.id) && (
@@ -89,25 +91,25 @@ export function AddToProjectModal({ isOpen, onClose, videoTitle }: AddToProjectM
             ))}
 
             {filteredProjects.length === 0 && searchQuery && (
-                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/30 transition-all text-left">
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/30 transition-all text-start">
                     <div className="p-2 rounded-lg bg-primary/10 text-primary">
                         <Plus className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-bold">Create new project "{searchQuery}"</span>
+                    <span className="text-sm font-bold">{t('creator.projects.createNamed', { name: searchQuery })}</span>
                 </button>
             )}
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-border/50">
             <p className="text-xs font-bold text-muted-foreground">
-                {selectedProjectIds.length} projects selected
+                {t('creator.projects.selected', { count: selectedProjectIds.length })}
             </p>
             <div className="flex gap-3">
                 <button 
                     onClick={onClose}
                     className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
                 >
-                    Cancel
+                    {t('common.cancel')}
                 </button>
                 <button 
                     onClick={() => {
@@ -117,7 +119,7 @@ export function AddToProjectModal({ isOpen, onClose, videoTitle }: AddToProjectM
                     disabled={selectedProjectIds.length === 0}
                     className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:shadow-none"
                 >
-                    Save Changes
+                    {t('creator.projects.saveChanges')}
                 </button>
             </div>
         </div>

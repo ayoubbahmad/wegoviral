@@ -5,8 +5,13 @@ import { useHooksListController } from './controller';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/Badge';
 import { Trash2 } from 'lucide-react';
+import { useT } from '@/i18n/provider';
+
+const HOOK_TYPES = { Verbal: 1, Visual: 1, Text: 1, Audio: 1 };
 
 export function HooksList() {
+  const t = useT();
+  const hookTypeLabel = (type: string) => (type in HOOK_TYPES ? t(`creator.library.hookTypes.${type as 'Verbal'}`) : type);
   const {
     hooks,
     isLoading,
@@ -42,17 +47,17 @@ export function HooksList() {
 
   return (
     <div className='rounded-2xl border border-border bg-card overflow-hidden'>
-      <table className='w-full text-left'>
+      <table className='w-full text-start'>
         <thead>
           <tr className='border-b border-border bg-muted/30'>
             <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
-              Hook
+              {t('creator.library.columns.hook')}
             </th>
             <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground'>
-              Type
+              {t('creator.library.columns.type')}
             </th>
-            <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right'>
-              Actions
+            <th className='px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-end'>
+              {t('creator.library.columns.actions')}
             </th>
           </tr>
         </thead>
@@ -63,26 +68,27 @@ export function HooksList() {
               className={cn(
                 'hover:bg-muted/5 transition-colors cursor-pointer group',
                 selectedItemId === hook.id &&
-                  'bg-primary/5 border-l-2 border-primary',
+                  'bg-primary/5 border-s-2 border-primary',
               )}
               onClick={() => setSelectedItemId(hook.id)}
             >
               <td className='px-6 py-4'>
                 <p className='text-sm font-medium line-clamp-1'>
-                  "{hook.content}"
+                  “{hook.content}”
                 </p>
               </td>
               <td className='px-6 py-4'>
                 <Badge variant='secondary' className='text-[10px]'>
-                  {hook.type}
+                  {hookTypeLabel(hook.type)}
                 </Badge>
               </td>
-              <td className='px-6 py-4 text-right'>
+              <td className='px-6 py-4 text-end'>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteHook(hook.id);
                   }}
+                  aria-label={t('creator.library.deleteHook')}
                   className='p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100'
                 >
                   <Trash2 className='w-4 h-4' />

@@ -11,9 +11,11 @@ import {
   useCreateCreator,
   useGetCreator,
 } from '../../api/creators';
+import { useT } from '@/i18n/provider';
 
 export const useCompetitorDetailController = (id: string) => {
   const { showToast } = useToast();
+  const t = useT();
   const queryClient = useQueryClient();
   const [savedHooks, setSavedHooks] = useState<string[]>([]);
   const [savedStructures, setSavedStructures] = useState<string[]>([]);
@@ -39,9 +41,9 @@ export const useCompetitorDetailController = (id: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['competitor', id] });
       queryClient.invalidateQueries({ queryKey: ['watchlists'] });
-      showToast('Added to watchlist', 'success');
+      showToast(t('creator.competitor.addedToWatchlist'), 'success');
     },
-    onError: () => showToast('Failed to add to watchlist', 'error'),
+    onError: () => showToast(t('creator.competitor.addToWatchlistFailed'), 'error'),
   });
 
   const removeMutation = useMutation({
@@ -50,9 +52,9 @@ export const useCompetitorDetailController = (id: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['competitor', id] });
       queryClient.invalidateQueries({ queryKey: ['watchlists'] });
-      showToast('Removed from watchlist', 'success');
+      showToast(t('creator.competitor.removedFromWatchlist'), 'success');
     },
-    onError: () => showToast('Failed to remove from watchlist', 'error'),
+    onError: () => showToast(t('creator.competitor.removeFromWatchlistFailed'), 'error'),
   });
 
   const posts = competitor?.posts || [];
@@ -60,10 +62,10 @@ export const useCompetitorDetailController = (id: string) => {
   const handleSave = (postId: string, type: 'hook' | 'structure') => {
     if (type === 'hook') {
       setSavedHooks((prev) => [...prev, postId]);
-      showToast('Hook saved to Library!', 'success');
+      showToast(t('creator.competitor.hookSaved'), 'success');
     } else {
       setSavedStructures((prev) => [...prev, postId]);
-      showToast('Script Structure saved to Library!', 'success');
+      showToast(t('creator.competitor.structureSaved'), 'success');
     }
   };
 
@@ -71,14 +73,14 @@ export const useCompetitorDetailController = (id: string) => {
     linkCompetitor(
       { competitorId: id, creatorId },
       {
-        onSuccess: () => showToast('Linked to creator successfully', 'success'),
+        onSuccess: () => showToast(t('creator.competitor.linked'), 'success'),
       },
     );
   };
 
   const handleUnlinkCreator = () => {
     unlinkCompetitor(id, {
-      onSuccess: () => showToast('Unlinked from creator', 'success'),
+      onSuccess: () => showToast(t('creator.competitor.unlinked'), 'success'),
     });
   };
 

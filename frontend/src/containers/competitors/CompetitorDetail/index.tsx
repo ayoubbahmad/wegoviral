@@ -16,17 +16,22 @@ import {
   Users,
   Link as LinkIcon,
   Unlink,
+  Lightbulb,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { CompetitorCalendar } from '@/containers/competitors/CompetitorCalendar';
 import { BackNavigation } from '@/components/BackNavigation';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 interface CompetitorDetailProps {
   id: string;
 }
 
 export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
+  const t = useT();
   const {
     competitor,
     posts,
@@ -53,7 +58,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
       <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
         <Loader2 className='w-8 h-8 animate-spin text-primary' />
         <p className='text-muted-foreground animate-pulse'>
-          Analyzing competitor data...
+          {t('creator.competitor.analyzing')}
         </p>
       </div>
     );
@@ -67,20 +72,19 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
         </div>
         <div>
           <h2 className='text-2xl font-bold tracking-tight'>
-            Access Denied or Not Found
+            {t('creator.competitor.notFound')}
           </h2>
           <p className='text-muted-foreground mt-2 max-w-sm mx-auto'>
             {error instanceof Error
               ? error.message
-              : error ||
-                "This competitor doesn't exist or you don't have permission to view it."}
+              : error || t('creator.competitor.notFoundBody')}
           </p>
         </div>
         <Link
           href='/creator/competitors'
           className='px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
         >
-          Return to List
+          {t('creator.competitor.backToList')}
         </Link>
       </div>
     );
@@ -90,7 +94,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
     <div className='space-y-8 animate-in fade-in duration-500'>
       {/* Header */}
       <div className='flex flex-col gap-6 border-b border-border pb-8'>
-        <BackNavigation href='/creator/competitors' label='Back to List' />
+        <BackNavigation href='/creator/competitors' label={t('creator.competitor.backToList')} />
 
         <div className='flex flex-col md:flex-row md:items-start justify-between gap-6'>
           <div className='flex items-center gap-4'>
@@ -128,8 +132,8 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
 
               {/* Watchlists */}
               <div className='flex items-center gap-2 mt-4'>
-                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1'>
-                  Watchlists:
+                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground me-1'>
+                  {t('creator.competitor.watchlists')}
                 </span>
                 <div className='flex flex-wrap gap-2'>
                   {competitor.watchlists?.map((wl: any) => (
@@ -141,8 +145,9 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                       {wl.name}
                       <button
                         onClick={() => removeFromWatchlist(wl.id)}
-                        className='ml-1 hover:text-red-500 transition-colors'
-                        title='Remove from watchlist'
+                        className='ms-1 hover:text-red-500 transition-colors'
+                        title={t('creator.competitor.removeFromWatchlist')}
+                        aria-label={t('creator.competitor.removeFromWatchlist')}
                       >
                         <Trash2 className='w-2.5 h-2.5' />
                       </button>
@@ -150,12 +155,12 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                   ))}
                   <div className='relative group'>
                     <button className='text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 flex items-center gap-1 font-bold transition-colors'>
-                      <Plus className='w-3 h-3' /> Manage
+                      <Plus className='w-3 h-3' /> {t('creator.competitor.manage')}
                     </button>
-                    <div className='absolute left-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all'>
+                    <div className='absolute start-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all'>
                       <div className='px-3 py-1 border-b border-border/50 mb-1'>
                         <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
-                          Select Watchlists
+                          {t('creator.competitor.selectWatchlists')}
                         </span>
                       </div>
                       <div className='max-h-48 overflow-y-auto custom-scrollbar px-1'>
@@ -171,7 +176,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                                   ? removeFromWatchlist(wl.id)
                                   : addToWatchlist(wl.id)
                               }
-                              className='w-full text-left px-3 py-2 rounded-lg text-xs font-medium hover:bg-secondary flex items-center justify-between transition-colors'
+                              className='w-full text-start px-3 py-2 rounded-lg text-xs font-medium hover:bg-secondary flex items-center justify-between transition-colors'
                             >
                               <span className='truncate'>{wl.name}</span>
                               {isMember && (
@@ -183,7 +188,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                       </div>
                       {allWatchlists.length === 0 && (
                         <div className='px-3 py-2 text-xs text-muted-foreground italic'>
-                          No watchlists created.
+                          {t('creator.competitor.noWatchlists')}
                         </div>
                       )}
                     </div>
@@ -193,8 +198,8 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
 
               {/* Creator Linking */}
               <div className='flex items-center gap-2 mt-4 pt-4 border-t border-border/40'>
-                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1'>
-                  Creator Brand:
+                <span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground me-1'>
+                  {t('creator.competitor.brand')}
                 </span>
                 {linkedCreator ? (
                   <div className='flex items-center gap-2'>
@@ -205,7 +210,8 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     <button
                       onClick={() => unlinkCreator()}
                       className='p-1 hover:bg-red-500/10 hover:text-red-500 rounded transition-colors'
-                      title='Unlink from creator'
+                      title={t('creator.competitor.unlink')}
+                      aria-label={t('creator.competitor.unlink')}
                     >
                       <Unlink className='w-3 h-3' />
                     </button>
@@ -215,7 +221,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     onClick={() => setIsLinkingModalOpen(true)}
                     className='text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 flex items-center gap-1 font-bold transition-colors'
                   >
-                    <LinkIcon className='w-3 h-3' /> Link Creator
+                    <LinkIcon className='w-3 h-3' /> {t('creator.competitor.link')}
                   </button>
                 )}
               </div>
@@ -228,23 +234,23 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                 {competitor.stats.followers}
               </span>
               <span className='text-xs text-muted-foreground uppercase tracking-wider font-medium'>
-                Followers
+                {t('creator.competitor.followers')}
               </span>
             </div>
-            <div className='text-center border-l border-border pl-8'>
+            <div className='text-center border-s border-border ps-8'>
               <span className='block text-2xl font-bold'>
                 {competitor.stats.avgLikes}
               </span>
               <span className='text-xs text-muted-foreground uppercase tracking-wider font-medium'>
-                Avg Likes
+                {t('creator.competitor.avgLikes')}
               </span>
             </div>
-            <div className='text-center border-l border-border pl-8'>
+            <div className='text-center border-s border-border ps-8'>
               <span className='block text-2xl font-bold text-green-500'>
                 {competitor.stats.engagementRate}
               </span>
               <span className='text-xs text-muted-foreground uppercase tracking-wider font-medium'>
-                Eng. Rate
+                {t('creator.competitor.engagement')}
               </span>
             </div>
           </div>
@@ -260,7 +266,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
               <div className='p-1.5 bg-purple-500/10 rounded-lg'>
                 <Zap className='w-5 h-5 text-purple-600 dark:text-purple-400' />
               </div>
-              <h2 className='text-xl font-bold'>Viral Hits & Analysis</h2>
+              <h2 className='text-xl font-bold'>{t('creator.competitor.viralHits')}</h2>
             </div>
 
             {posts.length > 0 ? (
@@ -274,12 +280,12 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     <div className='relative w-full lg:w-48 aspect-[4/5] bg-secondary rounded-xl overflow-hidden shrink-0 group'>
                       <img
                         src={post.thumbnailUrl}
-                        alt='Post thumbnail'
+                        alt={t('creator.competitor.thumbnail')}
                         className='w-full h-full object-cover transition-transform group-hover:scale-105'
                       />
                       {post.isViral && (
-                        <div className='absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold uppercase rounded shadow-sm flex items-center gap-1'>
-                          <TrendingUp className='w-3 h-3' /> Viral
+                        <div className='absolute top-2 end-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold uppercase rounded shadow-sm flex items-center gap-1'>
+                          <TrendingUp className='w-3 h-3' /> {t('creator.competitor.viral')}
                         </div>
                       )}
                       <div className='absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity'>
@@ -290,22 +296,22 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     {/* Content Data */}
                     <div className='flex-1 space-y-4'>
                       <div className='flex justify-between items-start'>
-                        <p className='font-medium text-lg leading-snug line-clamp-2 pr-4'>
+                        <p className='font-medium text-lg leading-snug line-clamp-2 pe-4'>
                           {post.captionExcerpt}
                         </p>
                         <span className='text-xs text-muted-foreground whitespace-nowrap'>
-                          {new Date(post.postedAt).toLocaleDateString()}
+                          {new Date(post.postedAt).toLocaleDateString(activeIntl())}
                         </span>
                       </div>
 
                       <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                         <span className='flex items-center gap-1'>
                           <Heart className='w-4 h-4' />{' '}
-                          {post.metrics.likes.toLocaleString()}
+                          {post.metrics.likes.toLocaleString(activeIntl())}
                         </span>
                         <span className='flex items-center gap-1'>
                           <MessageCircle className='w-4 h-4' />{' '}
-                          {post.metrics.comments.toLocaleString()}
+                          {post.metrics.comments.toLocaleString(activeIntl())}
                         </span>
                       </div>
 
@@ -315,7 +321,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                           <div className='grid md:grid-cols-2 gap-4'>
                             <div>
                               <span className='text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1'>
-                                Hook Strategy
+                                {t('creator.competitor.hookStrategy')}
                               </span>
                               <div className='flex items-center gap-2'>
                                 <p className='text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex-1 flex items-center gap-2'>
@@ -331,7 +337,8 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                                       ? 'bg-green-500/10 border-green-500/20 text-green-600'
                                       : 'bg-background border-border hover:bg-secondary text-muted-foreground hover:text-foreground',
                                   )}
-                                  title='Save Hook to Library'
+                                  title={t('creator.competitor.saveHook')}
+                                  aria-label={t('creator.competitor.saveHook')}
                                 >
                                   {savedHooks.includes(post.id) ? (
                                     <Check className='w-4 h-4' />
@@ -343,7 +350,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                             </div>
                             <div>
                               <span className='text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1'>
-                                Structure
+                                {t('creator.competitor.structure')}
                               </span>
                               <div className='flex items-center gap-2'>
                                 <p className='text-sm font-medium text-foreground bg-background px-3 py-2 rounded-lg border border-border flex-1 flex items-center gap-2'>
@@ -361,7 +368,8 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                                       ? 'bg-green-500/10 border-green-500/20 text-green-600'
                                       : 'bg-background border-border hover:bg-secondary text-muted-foreground hover:text-foreground',
                                   )}
-                                  title='Save Structure to Library'
+                                  title={t('creator.competitor.saveStructure')}
+                                  aria-label={t('creator.competitor.saveStructure')}
                                 >
                                   {savedStructures.includes(post.id) ? (
                                     <Check className='w-4 h-4' />
@@ -374,10 +382,10 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                           </div>
                           <div className='pt-2'>
                             <span className='text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1'>
-                              Why it worked
+                              {t('creator.competitor.whyItWorked')}
                             </span>
                             <p className='text-sm text-muted-foreground italic'>
-                              "{post.analysis.notes}"
+                              “{post.analysis.notes}”
                             </p>
                           </div>
                         </div>
@@ -389,7 +397,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
             ) : (
               <div className='text-center py-12 rounded-xl border border-dashed border-border bg-secondary/10'>
                 <p className='text-muted-foreground'>
-                  No posts tracked for this competitor yet.
+                  {t('creator.competitor.noPosts')}
                 </p>
               </div>
             )}
@@ -401,12 +409,12 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
           <CompetitorCalendar posts={posts} />
 
           {/* Quick Actions (Future) */}
-          <div className='p-6 rounded-xl bg-gradient-to-br from-indigo-500/5 to-purple-500/5 border border-indigo-500/10'>
-            <h3 className='font-semibold text-sm mb-2'>💡 Analysis Tips</h3>
-            <ul className='text-xs text-muted-foreground space-y-2 list-disc pl-4'>
-              <li>Look for patterns in successful hooks.</li>
-              <li>Check if they post more frequently on weekends.</li>
-              <li>Note the editing pace of viral clips.</li>
+          <div className='p-6 rounded-xl bg-gradient-to-br rtl:bg-gradient-to-bl from-indigo-500/5 to-purple-500/5 border border-indigo-500/10'>
+            <h3 className='flex items-center gap-2 font-semibold text-sm mb-2'><Lightbulb className='w-4 h-4' aria-hidden /> {t('creator.competitor.tips')}</h3>
+            <ul className='text-xs text-muted-foreground space-y-2 list-disc ps-4'>
+              <li>{t('creator.competitor.tipHooks')}</li>
+              <li>{t('creator.competitor.tipWeekends')}</li>
+              <li>{t('creator.competitor.tipPace')}</li>
             </ul>
           </div>
         </div>
@@ -417,18 +425,18 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
         <div className='fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200'>
           <div className='bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-6 animate-in zoom-in-95 duration-200'>
             <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-bold'>Link to Creator Brand</h3>
+              <h3 className='text-lg font-bold'>{t('creator.competitor.linkTitle')}</h3>
               <button
                 onClick={() => setIsLinkingModalOpen(false)}
+                aria-label={t('common.close')}
                 className='p-1 hover:bg-secondary rounded-lg transition-colors'
               >
-                <Plus className='w-5 h-5 rotate-45' />
+                <X className='w-5 h-5' />
               </button>
             </div>
 
             <p className='text-sm text-muted-foreground'>
-              Group multiple platform profiles (YouTube, TikTok, Instagram)
-              under one Brand name.
+              {t('creator.competitor.linkBody')}
             </p>
 
             <div className='space-y-4'>
@@ -436,9 +444,9 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
               {allCreators.length > 0 && (
                 <div className='space-y-2'>
                   <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
-                    Select Existing
+                    {t('creator.competitor.selectExisting')}
                   </span>
-                  <div className='grid gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1'>
+                  <div className='grid gap-2 max-h-40 overflow-y-auto custom-scrollbar pe-1'>
                     {allCreators.map((creator: any) => (
                       <button
                         key={creator.id}
@@ -446,7 +454,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                           linkCreator(creator.id);
                           setIsLinkingModalOpen(false);
                         }}
-                        className='flex items-center justify-between w-full px-4 py-3 bg-secondary/50 hover:bg-secondary rounded-xl text-left transition-colors group'
+                        className='flex items-center justify-between w-full px-4 py-3 bg-secondary/50 hover:bg-secondary rounded-xl text-start transition-colors group'
                       >
                         <span className='font-medium'>{creator.name}</span>
                         <LinkIcon className='w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity' />
@@ -461,19 +469,19 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                   <span className='w-full border-t border-border' />
                 </div>
                 <div className='relative flex justify-center text-xs uppercase'>
-                  <span className='bg-card px-2 text-muted-foreground'>or</span>
+                  <span className='bg-card px-2 text-muted-foreground'>{t('creator.competitor.or')}</span>
                 </div>
               </div>
 
               {/* Create New */}
               <div className='space-y-2'>
                 <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
-                  Create New Brand
+                  {t('creator.competitor.createBrand')}
                 </span>
                 <div className='flex gap-2'>
                   <input
                     type='text'
-                    placeholder='Brand Name (e.g., MrBeast)'
+                    placeholder={t('creator.competitor.brandPlaceholder')}
                     value={newCreatorName}
                     onChange={(e) => setNewCreatorName(e.target.value)}
                     className='flex-1 bg-secondary border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all'
@@ -487,7 +495,7 @@ export const CompetitorDetail = ({ id }: CompetitorDetailProps) => {
                     }}
                     className='px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all'
                   >
-                    Create
+                    {t('creator.competitor.create')}
                   </button>
                 </div>
               </div>

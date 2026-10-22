@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { hookListApi } from '../api';
 import { useLibraryStore } from '../logic';
 import { Hook } from '../../types';
+import { useT } from '@/i18n/provider';
 
 export function useHooksListController() {
+  const t = useT();
   const queryClient = useQueryClient();
   const { searchTerm, viewType, selectedItemId, setSelectedItemId } =
     useLibraryStore();
@@ -32,7 +34,7 @@ export function useHooksListController() {
   );
 
   const handleDeleteHook = async (id: string) => {
-    if (confirm('Are you sure you want to delete this hook?')) {
+    if (confirm(t('creator.library.confirmDeleteHook'))) {
       try {
         await deleteHookMutation.mutateAsync(id);
         if (selectedItemId === id) setSelectedItemId(null);

@@ -3,6 +3,7 @@ import { cn, formatRelativeDate } from '@/lib/utils';
 
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
+import { useT } from '@/i18n/provider';
 
 export interface Script {
   id: string;
@@ -28,6 +29,7 @@ export function ScriptCard({
   onDelete,
   className,
 }: ScriptCardProps) {
+  const t = useT();
   const isCompact = variant === 'compact';
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -60,7 +62,7 @@ export function ScriptCard({
                 : 'bg-purple-500/10 text-purple-500',
             )}
           >
-            {script.status}
+            {t(`creator.scripts.statuses.${script.status}`)}
           </span>
         }
       />
@@ -90,7 +92,7 @@ export function ScriptCard({
               icon={Clock}
               label={formatRelativeDate(script.lastUpdated)}
             />
-            <Card.MetaItem icon={Layers} label={`${script.wordCount} words`} />
+            <Card.MetaItem icon={Layers} label={t('creator.scripts.words', { count: script.wordCount })} />
           </>
         }
         actions={
@@ -100,6 +102,7 @@ export function ScriptCard({
               size='sm'
               className='h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors'
               onClick={handleDelete}
+              aria-label={t('creator.scripts.delete')}
             >
               <Trash2 className='w-3.5 h-3.5' />
             </Button>

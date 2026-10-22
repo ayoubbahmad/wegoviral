@@ -4,9 +4,11 @@ import { useToast } from '@/providers/Toast';
 import { Competitor } from '@/types/competitor';
 
 import { useCompetitorsPageSlice } from '../slice/pageSlice';
+import { useT } from '@/i18n/provider';
 
 export function useCompetitorsController() {
   const { showToast } = useToast();
+  const t = useT();
   const queryClient = useQueryClient();
   const { selectedWatchlistId } = useCompetitorsPageSlice();
 
@@ -19,11 +21,11 @@ export function useCompetitorsController() {
   const deleteMutation = useMutation({
     mutationFn: competitorsSharedApi.delete,
     onSuccess: () => {
-      showToast('Competitor removed successfully', 'success');
+      showToast(t('creator.competitors.removed'), 'success');
       queryClient.invalidateQueries({ queryKey: ['competitors'] });
     },
     onError: () => {
-      showToast('Failed to remove competitor', 'error');
+      showToast(t('creator.competitors.removeFailed'), 'error');
     },
   });
 
@@ -36,11 +38,11 @@ export function useCompetitorsController() {
       updates: Partial<Competitor>;
     }) => competitorsSharedApi.update(id, updates),
     onSuccess: () => {
-      showToast('Competitor updated successfully', 'success');
+      showToast(t('creator.competitors.updated'), 'success');
       queryClient.invalidateQueries({ queryKey: ['competitors'] });
     },
     onError: () => {
-      showToast('Failed to update competitor', 'error');
+      showToast(t('creator.competitors.updateFailed'), 'error');
     },
   });
 

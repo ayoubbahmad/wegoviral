@@ -44,6 +44,8 @@ export interface MemberDetail extends AdminMember {
   history: ActivityEntry[];
   joining: MemberJoining;
   points: number;
+  /** When the member asked the team to delete their account */
+  deletionRequestedAt: string | null;
   level: MemberLevel;
   badges: MemberBadgeRow[];
   allowedActions: {

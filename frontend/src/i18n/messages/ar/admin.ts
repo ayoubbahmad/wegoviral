@@ -64,6 +64,7 @@ export const admin: Shape<typeof en> = {
     nextPage: 'الصفحة التالية',
   },
   panel: {
+    deletionRequested: 'طلب حذف حسابه في {date}.',
     label: 'تفاصيل العضو',
     posts: 'المنشورات',
     comments: 'التعليقات',

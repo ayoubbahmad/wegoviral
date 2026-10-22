@@ -228,7 +228,7 @@ export async function getMember(actor: Actor, id: string) {
         awardedBy: { select: { username: true } },
       },
     }),
-    prisma.userProfile.findUniqueOrThrow({ where: { id }, select: { points: true } }),
+    prisma.userProfile.findUniqueOrThrow({ where: { id }, select: { points: true, deletionRequestedAt: true } }),
   ]);
 
   const isSelf = actor.id === id;
@@ -239,6 +239,7 @@ export async function getMember(actor: Actor, id: string) {
     likesReceived,
     history,
     points: profilePoints.points,
+    deletionRequestedAt: profilePoints.deletionRequestedAt,
     level: await levelFor(profilePoints.points),
     badges,
     joining: {

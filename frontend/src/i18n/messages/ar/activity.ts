@@ -37,6 +37,8 @@ export const activity: Shape<typeof en> = {
   member_referral_restricted: 'قيّد {target}، الذي انضم عبر رابط إحالة هذا العضو',
   reports_dismissed: { one: 'رفض بلاغًا واحدًا عن: «{target}»', other: 'رفض {count} بلاغات عن: «{target}»' },
   reports_resolved: { one: 'عالج بلاغًا واحدًا ({resolution}) عن: «{target}»', other: 'عالج {count} بلاغات ({resolution}) عن: «{target}»' },
+  member_deletion_requested: 'طلب من الفريق حذف حسابه',
+  member_deletion_cancelled: 'ألغى طلب حذف حسابه',
   member_warned: 'نبّه {target}{reason}',
   post_edited: 'عدّل منشورًا: «{target}»',
   comment_edited: 'عدّل تعليقًا: «{target}»',

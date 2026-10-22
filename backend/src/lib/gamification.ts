@@ -195,4 +195,11 @@ export const badgesSelect = {
     where: { badge: { archivedAt: null } },
     select: { badge: { select: { id: true, name: true, emoji: true, color: true, translations: true } } },
   },
+  showBadges: true,
 } satisfies Prisma.UserProfileSelect;
+
+/** Badges as a flat list for display; empty when the member chose to hide them. */
+export const flattenBadges = <T extends { badges: { badge: unknown }[]; showBadges?: boolean }>(member: T) => {
+  const { showBadges, ...rest } = member;
+  return { ...rest, badges: showBadges === false ? [] : member.badges.map((row) => row.badge) };
+};

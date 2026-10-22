@@ -61,6 +61,7 @@ export const admin = {
     nextPage: 'Next page',
   },
   panel: {
+    deletionRequested: 'Asked the team to delete their account on {date}.',
     label: 'Member details',
     posts: 'Posts',
     comments: 'Comments',

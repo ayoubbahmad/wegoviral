@@ -37,7 +37,7 @@ export const getMe = async (req: any, res: Response) => {
             }),
             getTiers(),
             effectiveTierId(req.user.tierId),
-            prisma.userProfile.findUniqueOrThrow({ where: { id: req.user.id }, select: { points: true, locale: true, ...badgesSelect } }),
+            prisma.userProfile.findUniqueOrThrow({ where: { id: req.user.id }, select: { points: true, locale: true, preferences: true, deletionRequestedAt: true, ...badgesSelect } }),
         ]);
         const tier = tiers.find((t) => t.id === tierId);
         res.status(200).json({
@@ -53,6 +53,9 @@ export const getMe = async (req: any, res: Response) => {
                 warnings,
                 tier: tier ? { id: tier.id, name: tier.name } : null,
                 locale: gamification.locale,
+                // Theme and reduced motion follow the member across devices
+                preferences: gamification.preferences,
+                deletionRequestedAt: gamification.deletionRequestedAt,
                 points: gamification.points,
                 level: await levelFor(gamification.points),
                 badges: gamification.badges.map((row) => row.badge),

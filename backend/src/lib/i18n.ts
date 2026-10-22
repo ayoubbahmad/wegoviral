@@ -149,6 +149,10 @@ const MESSAGES: Record<string, Translations> = {
   'Pick a section': { fr: 'Choisissez une rubrique', ar: 'اختر قسمًا' },
   'Use lowercase letters, numbers and dashes, e.g. how-points-work': { fr: 'Utilisez des minuscules, des chiffres et des tirets, par ex. how-points-work', ar: 'استخدم حروفًا لاتينية صغيرة وأرقامًا وشرطات، مثل how-points-work' },
 
+  // Profile and settings
+  'Enter your name': { fr: 'Saisissez votre nom', ar: 'أدخل اسمك' },
+  'Keep your bio under 300 characters': { fr: 'Votre bio doit faire moins de 300 caractères', ar: 'يجب ألا تتجاوز نبذتك 300 حرف' },
+  'Pick a photo under 2 MB': { fr: 'Choisissez une photo de moins de 2 Mo', ar: 'اختر صورة أصغر من 2 ميغابايت' },
   // Creator Space
   'A watchlist with this name already exists': { fr: 'Une liste porte déjà ce nom', ar: 'توجد قائمة بهذا الاسم بالفعل' },
   'Automation not found': { fr: 'Automatisation introuvable', ar: 'الأتمتة غير موجودة' },

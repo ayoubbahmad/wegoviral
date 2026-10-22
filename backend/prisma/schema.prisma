@@ -45,6 +45,18 @@ model UserProfile {
    * App language: en, fr or ar (null until the member's first visit)
    */
   locale               String?
+  // Profile (Phase 13): shown next to posts and on the member's profile
+  bio                  String?
+  niche                String?
+  socialLinks          Json                   @default("[]") // [{ platform, url }]
+  // App preferences that follow the member across devices: { theme, reducedMotion }
+  preferences          Json                   @default("{}")
+  // Privacy
+  showOnLeaderboard    Boolean                @default(true)
+  showBadges           Boolean                @default(true)
+  showSocialLinks      Boolean                @default(true)
+  // The member asked the team to delete their account
+  deletionRequestedAt  DateTime?
   tier                 MembershipTier?        @relation(fields: [tierId], references: [id], onDelete: SetNull)
   automations          Automation[]
   competitors          Competitor[]

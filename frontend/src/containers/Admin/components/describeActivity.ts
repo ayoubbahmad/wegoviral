@@ -12,7 +12,7 @@ const SIMPLE = new Set([
   'post.deleted', 'post.pinned', 'post.unpinned', 'post.edited', 'post.restored', 'post.approved',
   'comment.deleted', 'comment.edited', 'comment.restored', 'comment.released',
   'member.special_granted', 'member.special_removed', 'guide.published', 'invite.revoked',
-  'member.vouched_post_removed', 'member.referral_restricted',
+  'member.vouched_post_removed', 'member.referral_restricted', 'member.deletion_requested', 'member.deletion_cancelled',
   'space.created', 'space.updated', 'space.archived', 'space.unarchived', 'spaces.reordered',
   'tier.created', 'tier.deleted',
   'event.created', 'event.published', 'event.updated', 'event.cancelled', 'event.deleted',

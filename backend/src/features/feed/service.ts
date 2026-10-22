@@ -7,7 +7,7 @@ import { logActivity } from '../../lib/activity';
 import { countApprovedReviewedPosts, isOnProbation, reviewerEligibility } from '../../lib/review';
 import { getSettings } from '../../lib/settings';
 import { findFlaggedWord } from '../../lib/contentFilter';
-import { awardPoints, badgesSelect, revokePoints } from '../../lib/gamification';
+import { awardPoints, badgesSelect, flattenBadges, revokePoints } from '../../lib/gamification';
 import { AccessViewer, accessByResource, describeLock, evaluateRule, getRule, lockedResourceIds } from '../../lib/access';
 import type { AuthenticatedUser } from '../../middleware/auth.middleware';
 import { CreatePostInput, EditPostInput, FeedError, ReportInput } from './model';
@@ -33,10 +33,7 @@ const authorSelect = {
 } satisfies Prisma.UserProfileSelect;
 
 /** Authors come with their latest badges, flattened for display next to the name. */
-const flattenAuthor = <T extends { badges: { badge: unknown }[] }>(author: T) => ({
-  ...author,
-  badges: author.badges.map((row) => row.badge),
-});
+const flattenAuthor = flattenBadges;
 
 /** Everything needed to render a post for one viewer. */
 const postInclude = (viewerId: string) =>

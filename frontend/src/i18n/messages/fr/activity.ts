@@ -37,6 +37,8 @@ export const activity: Shape<typeof en> = {
   member_referral_restricted: 'a restreint {target}, arrivé via le lien de parrainage de ce membre',
   reports_dismissed: { one: 'a classé {count} signalement sur : « {target} »', other: 'a classé {count} signalements sur : « {target} »' },
   reports_resolved: { one: 'a traité {count} signalement ({resolution}) sur : « {target} »', other: 'a traité {count} signalements ({resolution}) sur : « {target} »' },
+  member_deletion_requested: 'a demandé à l’équipe de supprimer son compte',
+  member_deletion_cancelled: 'a annulé sa demande de suppression de compte',
   member_warned: 'a averti {target}{reason}',
   post_edited: 'a modifié une publication : « {target} »',
   comment_edited: 'a modifié un commentaire : « {target} »',

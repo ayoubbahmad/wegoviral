@@ -29,6 +29,7 @@ import leaderboardRoutes from './features/leaderboard/routes';
 import coursesRoutes from './features/courses/routes';
 import challengesRoutes from './features/challenges/routes';
 import helpRoutes from './features/help/routes';
+import profileRoutes from './features/profile/routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -83,6 +84,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/challenges', challengesRoutes);
 app.use('/api/help', helpRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Basic health check
 app.get('/health', (req, res) => {

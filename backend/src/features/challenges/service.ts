@@ -9,7 +9,7 @@ import { prisma } from '../../lib/prisma';
 import { logActivity } from '../../lib/activity';
 import { can } from '../../lib/permissions';
 import { AccessResult, AccessViewer, accessByResource, describeLock, getRule } from '../../lib/access';
-import { awardPoints, badgesSelect, revokePoints } from '../../lib/gamification';
+import { awardPoints, badgesSelect, flattenBadges, revokePoints } from '../../lib/gamification';
 import {
   ChallengeError,
   CheckInInput,
@@ -25,7 +25,7 @@ const ONCE = 'once';
 const personSelect = { id: true, username: true, name: true, avatarUrl: true, role: true } satisfies Prisma.UserProfileSelect;
 const memberSelect = { ...personSelect, ...badgesSelect } satisfies Prisma.UserProfileSelect;
 
-const flatten = <T extends { badges: { badge: unknown }[] }>(member: T) => ({ ...member, badges: member.badges.map((row) => row.badge) });
+const flatten = flattenBadges;
 
 const challengeInclude = {
   createdBy: { select: personSelect },

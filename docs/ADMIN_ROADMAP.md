@@ -234,6 +234,16 @@ Requested 2026-10-20. Decisions: **Modern Standard Arabic** (right-to-left, West
 - ✅ **12c · Team content** (shipped; **acceptance pending**, Ayoub): English / Français / العربية tabs in the editors of spaces, badges, levels, the guide, the quiz and help articles, with a dot on languages still missing text; members get the text in their language, or the English when a translation is empty (help search looks in both); the 12 starter spaces, 11 badges, 9 levels and 34 help articles translated into French and Arabic.
 - ✅ **12d · Creator Space and landing page** (shipped; **acceptance pending**, Ayoub): every Creator Space screen (home, videos and video analysis, scripts and the script writer, the 7 variables, projects, library, performance, followers, automations, competitors and watchlists, channels, exports) in the three languages and right to left, with translated form errors and server messages; the landing page rewritten around the community (no more trial or enterprise claims) with a language switcher; icons instead of the last emojis there; unused components removed.
 
+## Phase 13 — Settings, member profiles and notifications
+
+Requested 2026-10-22. Decisions: Settings with a **side menu and one panel per section** (a list to tap into on phones); first sections **Profile, Account and security, Preferences, Membership and privacy**; **notifications** built next (in-app bell first, email later); **member profiles are public inside the community**.
+
+- ✅ **13a · Settings** (shipped; **acceptance pending**, Ayoub; 5 automated tests): /settings/profile (photo upload, name, username with live availability check, bio, niche, up to 7 social links), /settings/account (email, sign-in methods, change or set a password, sign out of other devices, ask the team to delete the account; admins see the request in the member panel and the activity log), /settings/preferences (language, theme and reduced motion saved to the profile and applied on every device; the device time zone shown), /settings/membership (tier, level progress, badges, invite link, guide version, and privacy: appear on the leaderboard, show my badges, show my social links).
+  - *Accept:* change your photo and bio and see them in the sidebar; turn "Appear on the leaderboard" off and check from another account that you're gone; set dark mode and reduced motion, sign in on another browser and see them applied.
+  - *Not included:* a manual time zone (times follow the device), changing the email address, deleting the account directly (the team handles it).
+- ⬜ **13b · Member profiles and directory**: clicking a name opens the member's profile (photo, bio, niche, links if shown, level, badges, recent posts); the Members page becomes a searchable directory.
+- ⬜ **13c · Notifications**: in-app bell for replies, mentions, likes, approvals, event and challenge reminders and warnings, with a Notifications section in Settings to choose what you get.
+
 ## Phase 9 — Monetization (Stripe) · Super Admin only · moved to the end
 
 *Postponed on 2026-10-19 until the Stripe details are ready (open question 6); the other phases go first.*

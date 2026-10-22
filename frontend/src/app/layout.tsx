@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/providers/Theme';
 import { QueryProvider } from '@/providers/Query';
 import { I18nProvider } from '@/i18n/provider';
 import { LocaleSync } from '@/i18n/LocaleSync';
+import { PreferencesSync } from '@/containers/settings/PreferencesSync';
 import { directionOf, isLocale, LOCALE_COOKIE, pickLocale } from '@/i18n/config';
 
 const geistSans = Geist({
@@ -54,7 +55,9 @@ export default async function RootLayout({
             <ThemeProvider>
               <AuthProvider>
                 <LocaleSync />
-                <ToastProvider>{children}</ToastProvider>
+                <PreferencesSync>
+                  <ToastProvider>{children}</ToastProvider>
+                </PreferencesSync>
               </AuthProvider>
             </ThemeProvider>
           </I18nProvider>

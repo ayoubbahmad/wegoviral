@@ -1,5 +1,6 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
-import { AUTO_BADGE_TYPES, AutoBadgeType, badgesSelect, getLevels, levelFor, POINT_ACTIONS } from '../../lib/gamification';
+import { AUTO_BADGE_TYPES, AutoBadgeType, badgesSelect, flattenBadges, getLevels, levelFor, POINT_ACTIONS } from '../../lib/gamification';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const TOP = 50;
@@ -16,19 +17,19 @@ const memberSelect = {
   ...badgesSelect,
 };
 
-/** Only members in good standing appear on the leaderboard. */
-const rankable = { joinStatus: 'APPROVED' as const, status: { not: 'BANNED' as const } };
-
-const flattenBadges = <T extends { badges: { badge: unknown }[] }>(member: T) => ({
-  ...member,
-  badges: member.badges.map((row) => row.badge),
+/** Only members in good standing who chose to appear; viewers always see their own rank. */
+const rankable = (viewerId: string): Prisma.UserProfileWhereInput => ({
+  joinStatus: 'APPROVED',
+  status: { not: 'BANNED' },
+  OR: [{ showOnLeaderboard: true }, { id: viewerId }],
 });
 
+
 /** Points per member for the period, highest first. */
-async function scores(period: Period) {
+async function scores(period: Period, viewerId: string) {
   if (period === 'all') {
     const members = await prisma.userProfile.findMany({
-      where: { ...rankable, points: { gt: 0 } },
+      where: { ...rankable(viewerId), points: { gt: 0 } },
       orderBy: [{ points: 'desc' }, { createdAt: 'asc' }],
       select: { id: true, points: true },
     });
@@ -37,7 +38,7 @@ async function scores(period: Period) {
   const since = new Date(Date.now() - (period === '7d' ? 7 : 30) * DAY_MS);
   const rows = await prisma.pointEvent.groupBy({
     by: ['userId'],
-    where: { createdAt: { gte: since }, user: rankable },
+    where: { createdAt: { gte: since }, user: rankable(viewerId) },
     _sum: { points: true },
   });
   return rows
@@ -47,7 +48,7 @@ async function scores(period: Period) {
 }
 
 export async function getLeaderboard(viewerId: string, period: Period) {
-  const ranked = await scores(period);
+  const ranked = await scores(period, viewerId);
   const top = ranked.slice(0, TOP);
   const members = await prisma.userProfile.findMany({ where: { id: { in: top.map((row) => row.userId) } }, select: memberSelect });
   const byId = new Map(members.map((member) => [member.id, member]));

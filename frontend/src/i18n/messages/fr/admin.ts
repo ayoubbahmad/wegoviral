@@ -64,6 +64,7 @@ export const admin: Shape<typeof en> = {
     nextPage: 'Page suivante',
   },
   panel: {
+    deletionRequested: 'A demandé la suppression de son compte le {date}.',
     label: 'Détails du membre',
     posts: 'Publications',
     comments: 'Commentaires',

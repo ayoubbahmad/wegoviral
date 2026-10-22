@@ -34,6 +34,8 @@ export const activity = {
   member_referral_restricted: 'restricted {target}, who joined through this member’s referral link',
   reports_dismissed: { one: 'dismissed {count} report on: “{target}”', other: 'dismissed {count} reports on: “{target}”' },
   reports_resolved: { one: 'handled {count} report ({resolution}) on: “{target}”', other: 'handled {count} reports ({resolution}) on: “{target}”' },
+  member_deletion_requested: 'asked the team to delete their account',
+  member_deletion_cancelled: 'cancelled their request to delete their account',
   member_warned: 'warned {target}{reason}',
   post_edited: 'edited a post: “{target}”',
   comment_edited: 'edited a comment: “{target}”',

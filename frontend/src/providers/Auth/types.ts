@@ -49,6 +49,10 @@ export interface User {
     /** Up to 3 most recent badges */
     badges: BadgeChip[];
     socialAccounts?: SocialAccount[];
+    /** Saved app preferences (theme, reduced motion) */
+    preferences?: { theme?: 'light' | 'dark' | 'system'; reducedMotion?: boolean };
+    /** Set when the member asked the team to delete their account */
+    deletionRequestedAt?: string | null;
 }
 
 export interface SocialAccount {

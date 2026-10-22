@@ -40,7 +40,7 @@ export const PointsSection = ({ member }: { member: MemberDetail }) => {
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">
                   {row.badge.name}
-                  {row.badge.archivedAt && <span className="ml-1 text-xs font-normal text-muted-foreground">{t('admin.pointsSection.archived')}</span>}
+                  {row.badge.archivedAt && <span className="ms-1 text-xs font-normal text-muted-foreground">{t('admin.pointsSection.archived')}</span>}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {row.awardedBy ? t('admin.pointsSection.givenBy', { username: row.awardedBy.username }) : t('admin.pointsSection.automatic')} · {formatRelativeDate(row.awardedAt)}

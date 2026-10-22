@@ -103,6 +103,7 @@ export async function getHowItWorks() {
         emoji: badge.emoji,
         color: badge.color,
         description: badge.description,
+        autoRule: auto,
         howToEarn: auto ? `${auto.threshold.toLocaleString('en')} ${(AUTO_BADGE_TYPES[auto.type]?.label ?? auto.type).toLowerCase()}` : 'Given by the team',
       };
     }),

@@ -230,7 +230,7 @@ Requested 2026-10-20. Decisions: **Modern Standard Arabic** (right-to-left, West
 
 - ✅ **12a · Foundations and the member side** (shipped; **acceptance pending**, Ayoub; 5 automated language tests; how it works: [I18N.md](I18N.md)): translation engine with typed messages (plural rules for Arabic), language switcher (sidebar, settings, sign-in pages), right-to-left layout and an Arabic font, dates and numbers in the member's language, server messages (errors, lock reasons) translated; all Community, joining, sign-in, sidebar and help center screens in the three languages.
   - *Accept:* switching to Arabic flips the layout and translates every Community screen; the choice survives a reload and a new device after signing in.
-- ⬜ **12b · Admin space** in the three languages.
+- ✅ **12b · Admin space** (shipped; **acceptance pending**, Ayoub): every Admin page (overview, activity log, members and member panel, approvals, moderation, spaces and access, tiers, invites, points and badges, onboarding, help articles, stats and CSV exports) in the three languages and right to left; activity log sentences, badge "how to earn" rules and the leaderboard's "how points work" built from translated templates; admin server errors translated; icons instead of emojis for the theme switcher, challenge prizes and check-ins.
 - ⬜ **12c · Team content**: language tabs to write help articles, the guide, the quiz and the names of spaces, badges and levels per language (members see theirs, or the original if missing); the starter content translated.
 - ⬜ **12d · Creator Space and landing page** in the three languages.
 

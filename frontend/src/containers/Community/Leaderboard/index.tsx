@@ -16,6 +16,7 @@ import { Leaderboard, LeaderboardEntry, LeaderboardPeriod, MemberLevel } from '@
 import { useHowPointsWork, useLeaderboard } from './api';
 import { useT } from '@/i18n/provider';
 import { T } from '@/i18n/T';
+import { howToEarn } from '@/lib/badges';
 
 const PERIODS: LeaderboardPeriod[] = ['7d', '30d', 'all'];
 
@@ -218,7 +219,7 @@ const HowPointsWorkDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             <ul className="divide-y divide-border/50 rounded-xl border border-border">
               {data.rules.map((rule) => (
                 <li key={rule.action} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="flex-1">{rule.label}</span>
+                  <span className="flex-1">{t(`points.actions.${rule.action as 'POST_PUBLISHED'}`)}</span>
                   {rule.dailyCap && rule.points > 0 && <span className="text-xs text-muted-foreground">{t('leaderboard.upToPerDay', { count: rule.dailyCap })}</span>}
                   <span className={cn('w-14 text-end font-bold', rule.points < 0 ? 'text-red-500' : 'text-emerald-500')}>
                     {rule.points > 0 ? '+' : ''}
@@ -255,7 +256,7 @@ const HowPointsWorkDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                   <div className="min-w-0">
                     <p className="font-semibold">{badge.name}</p>
                     {badge.description && <p className="text-xs text-muted-foreground">{badge.description}</p>}
-                    <p className="text-xs text-muted-foreground">{badge.howToEarn}</p>
+                    <p className="text-xs text-muted-foreground">{howToEarn(badge.autoRule, t)}</p>
                   </div>
                 </li>
               ))}

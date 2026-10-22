@@ -11,54 +11,51 @@ import { avatarFor, cn } from '@/lib/utils';
 import { useContentStats, useEngagementStats, useMemberStats } from '../api/stats';
 import type { EngagementStats, StatsRange } from '../types';
 import { BarChart, bucketLabel, ExportButton, Panel, percent, Stat } from './charts';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
-const RANGES: { id: StatsRange; label: string }[] = [
-  { id: '30d', label: '30 days' },
-  { id: '90d', label: '90 days' },
-  { id: '12m', label: '12 months' },
-];
+const RANGES: StatsRange[] = ['30d', '90d', '12m'];
+
+// Weekday names as the API sends them (Monday first)
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 type Tab = 'members' | 'engagement' | 'content' | 'revenue';
 
 export const AdminStatsContainer = () => {
+  const t = useT();
   const can = useCan();
   const [range, setRange] = useState<StatsRange>('30d');
   const [tab, setTab] = useState<Tab>('members');
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'members', label: 'Members' },
-    { id: 'engagement', label: 'Engagement' },
-    { id: 'content', label: 'Content' },
-    ...(can('tiers.manage') ? [{ id: 'revenue' as const, label: 'Revenue' }] : []),
-  ];
+  const tabs: Tab[] = ['members', 'engagement', 'content', ...(can('tiers.manage') ? (['revenue'] as const) : [])];
 
   return (
     <PageContainer>
       <PageHeader
-        helpHref="/admin/help/stats" title="Stats" description="How the community is growing and what members do. Times follow your time zone; every table exports to CSV." />
+        helpHref="/admin/help/stats" title={t('admin.statsPage.title')} description={t('admin.statsPage.description')} />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="Stats" className="flex gap-4 border-b border-border text-sm font-semibold">
+        <div role="tablist" aria-label={t('admin.statsPage.tabsLabel')} className="flex gap-4 border-b border-border text-sm font-semibold">
           {tabs.map((option) => (
             <button
-              key={option.id}
+              key={option}
               role="tab"
-              aria-selected={tab === option.id}
-              onClick={() => setTab(option.id)}
-              className={cn('-mb-px border-b-2 pb-2 transition-colors', tab === option.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground')}
+              aria-selected={tab === option}
+              onClick={() => setTab(option)}
+              className={cn('-mb-px border-b-2 pb-2 transition-colors', tab === option ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground')}
             >
-              {option.label}
+              {t(`admin.statsPage.tabs.${option}`)}
             </button>
           ))}
         </div>
         {tab !== 'revenue' && (
-          <div role="group" aria-label="Period" className="flex gap-1 rounded-xl border border-border bg-card p-1">
+          <div role="group" aria-label={t('admin.statsPage.periodLabel')} className="flex gap-1 rounded-xl border border-border bg-card p-1">
             {RANGES.map((option) => (
               <button
-                key={option.id}
-                aria-pressed={range === option.id}
-                onClick={() => setRange(option.id)}
-                className={cn('rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors', range === option.id ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
+                key={option}
+                aria-pressed={range === option}
+                onClick={() => setRange(option)}
+                className={cn('rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors', range === option ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
               >
-                {option.label}
+                {t(`admin.statsPage.ranges.${option}`)}
               </button>
             ))}
           </div>
@@ -68,7 +65,7 @@ export const AdminStatsContainer = () => {
       {tab === 'engagement' && <EngagementTab range={range} />}
       {tab === 'content' && <ContentTab range={range} />}
       {tab === 'revenue' && (
-        <EmptyState icon={CreditCard} title="Revenue comes with payments" description="Monthly recurring revenue, subscribers, churn and coupon use will show here once Stripe is connected (Phase 9)." />
+        <EmptyState icon={CreditCard} title={t('admin.statsPage.revenueTitle')} description={t('admin.statsPage.revenueBody')} />
       )}
     </PageContainer>
   );
@@ -88,6 +85,8 @@ const Loading = () => (
 // ─── Members ─────────────────────────────────────────────────────────────────
 
 const MembersTab = ({ range }: { range: StatsRange }) => {
+  const t = useT();
+  const stepLabel = (step: string) => t(`admin.statsPage.funnelSteps.${step as 'Approved'}`);
   const { data, isPending, error } = useMemberStats(range);
   if (isPending) return <Loading />;
   if (error) return <p className="text-sm text-muted-foreground">{error.message}</p>;
@@ -97,40 +96,40 @@ const MembersTab = ({ range }: { range: StatsRange }) => {
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-4">
-        <Stat label="Active today" value={data.current.day} />
-        <Stat label="Active this week" value={data.current.week} />
-        <Stat label="Active this month" value={data.current.month} />
-        <Stat label="New members" value={signups} hint={`in the last ${RANGES.find((r) => r.id === range)!.label}`} />
+        <Stat label={t('admin.statsPage.activeToday')} value={data.current.day} />
+        <Stat label={t('admin.statsPage.activeWeek')} value={data.current.week} />
+        <Stat label={t('admin.statsPage.activeMonth')} value={data.current.month} />
+        <Stat label={t('admin.statsPage.newMembers')} value={signups} hint={t('admin.statsPage.inLast', { range: t(`admin.statsPage.ranges.${range}`) })} />
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
         <Panel
-          title="Sign-ups"
-          action={<ExportButton filename={`signups-${range}`} rows={() => [['Period', 'Sign-ups'], ...data.signups.map((p) => [p.bucket, p.value])]} />}
+          title={t('admin.statsPage.signups')}
+          action={<ExportButton filename={`signups-${range}`} rows={() => [[t('admin.statsPage.periodLabel'), t('admin.statsPage.signups')], ...data.signups.map((p) => [p.bucket, p.value])]} />}
         >
           <BarChart data={data.signups} kind={data.bucket} />
         </Panel>
         <Panel
-          title="Active members"
-          description="Posted, commented, liked, voted, RSVPed, completed a lesson or checked in."
-          action={<ExportButton filename={`active-members-${range}`} rows={() => [['Period', 'Active members'], ...data.active.map((p) => [p.bucket, p.value])]} />}
+          title={t('admin.statsPage.activeMembers')}
+          description={t('admin.statsPage.activeHint')}
+          action={<ExportButton filename={`active-members-${range}`} rows={() => [[t('admin.statsPage.periodLabel'), t('admin.statsPage.activeMembers')], ...data.active.map((p) => [p.bucket, p.value])]} />}
         >
           <BarChart data={data.active} kind={data.bucket} color="bg-emerald-500" />
         </Panel>
       </div>
 
       <Panel
-        title="Joining funnel"
-        description="Members who signed up in this period, at each step."
-        action={<ExportButton filename={`joining-funnel-${range}`} rows={() => [['Step', 'Members'], ...data.funnel.map((s) => [s.step, s.count])]} />}
+        title={t('admin.statsPage.funnel')}
+        description={t('admin.statsPage.funnelHint')}
+        action={<ExportButton filename={`joining-funnel-${range}`} rows={() => [[t('admin.statsPage.funnel'), t('admin.statsPage.members')], ...data.funnel.map((s) => [stepLabel(s.step), s.count])]} />}
       >
         <ol className="space-y-2">
           {data.funnel.map((step) => (
             <li key={step.step} className="grid grid-cols-[minmax(0,180px)_1fr_80px] items-center gap-3 text-sm">
-              <span className="truncate">{step.step}</span>
+              <span className="truncate">{stepLabel(step.step)}</span>
               <span className="h-6 overflow-hidden rounded-md bg-muted">
                 <span className="block h-full rounded-md bg-primary/70" style={{ width: `${(step.count / funnelTop) * 100}%` }} />
               </span>
-              <span className="text-right tabular-nums">
+              <span className="text-end tabular-nums">
                 {step.count} <span className="text-xs text-muted-foreground">{percent(step.count / funnelTop)}</span>
               </span>
             </li>
@@ -139,26 +138,26 @@ const MembersTab = ({ range }: { range: StatsRange }) => {
       </Panel>
 
       <Panel
-        title="Retention by sign-up month"
-        description="Share of each month's new members who were active 0, 1, 2… months later."
+        title={t('admin.statsPage.retention')}
+        description={t('admin.statsPage.retentionHint')}
         action={
           <ExportButton
             filename="retention"
-            rows={() => [['Sign-up month', 'Members', ...Array.from({ length: 6 }, (_, i) => `Month ${i}`)], ...data.retention.map((row) => [row.cohort, row.size, ...row.months.map((m) => percent(m.share))])]}
+            rows={() => [[t('admin.statsPage.signedUp'), t('admin.statsPage.members'), ...Array.from({ length: 6 }, (_, i) => t('admin.statsPage.month', { number: i }))], ...data.retention.map((row) => [row.cohort, row.size, ...row.months.map((m) => percent(m.share))])]}
           />
         }
       >
         {data.retention.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No sign-ups in the last 6 months.</p>
+          <p className="text-sm text-muted-foreground">{t('admin.statsPage.noSignups')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="text-left text-xs text-muted-foreground">
-                  <th className="py-2 pr-3 font-semibold">Signed up</th>
-                  <th className="py-2 pr-3 font-semibold">Members</th>
+                <tr className="text-start text-xs text-muted-foreground">
+                  <th className="py-2 pe-3 text-start font-semibold">{t('admin.statsPage.signedUp')}</th>
+                  <th className="py-2 pe-3 text-start font-semibold">{t('admin.statsPage.members')}</th>
                   {Array.from({ length: 6 }, (_, i) => (
-                    <th key={i} className="px-1 py-2 text-center font-semibold">Month {i}</th>
+                    <th key={i} className="px-1 py-2 text-center font-semibold">{t('admin.statsPage.month', { number: i })}</th>
                   ))}
                 </tr>
               </thead>
@@ -168,15 +167,15 @@ const MembersTab = ({ range }: { range: StatsRange }) => {
                   const monthsSince = (new Date().getFullYear() - year) * 12 + new Date().getMonth() + 1 - month;
                   return (
                     <tr key={row.cohort}>
-                      <td className="py-1 pr-3 font-medium">{bucketLabel(`${row.cohort}-01`, 'month')}</td>
-                      <td className="py-1 pr-3 tabular-nums">{row.size}</td>
+                      <td className="py-1 pe-3 font-medium">{bucketLabel(`${row.cohort}-01`, 'month')}</td>
+                      <td className="py-1 pe-3 tabular-nums">{row.size}</td>
                       {row.months.map((cell) => (
                         <td key={cell.offset} className="px-1 py-1">
                           {cell.offset > monthsSince ? (
                             <span className="block h-8" />
                           ) : (
                             <span
-                              title={`${cell.users} of ${row.size}`}
+                              title={t('admin.statsPage.ofTotal', { users: cell.users, size: row.size })}
                               className="flex h-8 items-center justify-center rounded-md text-xs font-semibold"
                               style={{ backgroundColor: `color-mix(in srgb, var(--primary) ${Math.round(cell.share * 85) + 5}%, transparent)` }}
                             >
@@ -200,12 +199,13 @@ const MembersTab = ({ range }: { range: StatsRange }) => {
 // ─── Engagement ──────────────────────────────────────────────────────────────
 
 const METRICS = [
-  { id: 'posts', label: 'Posts', color: 'bg-primary' },
-  { id: 'comments', label: 'Comments', color: 'bg-sky-500' },
-  { id: 'likes', label: 'Likes', color: 'bg-rose-500' },
+  { id: 'posts', color: 'bg-primary' },
+  { id: 'comments', color: 'bg-sky-500' },
+  { id: 'likes', color: 'bg-rose-500' },
 ] as const;
 
 const EngagementTab = ({ range }: { range: StatsRange }) => {
+  const t = useT();
   const { data, isPending, error } = useEngagementStats(range);
   const [metric, setMetric] = useState<(typeof METRICS)[number]['id']>('posts');
   if (isPending) return <Loading />;
@@ -216,14 +216,14 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-3">
         {METRICS.map((m) => (
-          <Stat key={m.id} label={m.label} value={data.totals[m.id]} />
+          <Stat key={m.id} label={t(`admin.statsPage.${m.id}`)} value={data.totals[m.id]} />
         ))}
       </div>
       <Panel
-        title="Activity over time"
+        title={t('admin.statsPage.activityOverTime')}
         action={
           <div className="flex items-center gap-2">
-            <div role="group" aria-label="Metric" className="flex gap-1">
+            <div role="group" aria-label={t('admin.statsPage.metric')} className="flex gap-1">
               {METRICS.map((m) => (
                 <button
                   key={m.id}
@@ -231,11 +231,11 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
                   onClick={() => setMetric(m.id)}
                   className={cn('rounded-full px-2.5 py-0.5 text-xs font-semibold', metric === m.id ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
                 >
-                  {m.label}
+                  {t(`admin.statsPage.${m.id}`)}
                 </button>
               ))}
             </div>
-            <ExportButton filename={`engagement-${range}`} rows={() => [['Period', 'Posts', 'Comments', 'Likes'], ...data.series.map((p) => [p.bucket, p.posts, p.comments, p.likes])]} />
+            <ExportButton filename={`engagement-${range}`} rows={() => [[t('admin.statsPage.periodLabel'), t('admin.statsPage.posts'), t('admin.statsPage.comments'), t('admin.statsPage.likes')], ...data.series.map((p) => [p.bucket, p.posts, p.comments, p.likes])]} />
           </div>
         }
       >
@@ -244,28 +244,28 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Panel
-          title="By space"
-          action={<ExportButton filename={`spaces-${range}`} rows={() => [['Space', 'Posts', 'Comments', 'Likes'], ...data.bySpace.map((s) => [s.name, s.posts, s.comments, s.likes])]} />}
+          title={t('admin.statsPage.bySpace')}
+          action={<ExportButton filename={`spaces-${range}`} rows={() => [[t('admin.statsPage.space'), t('admin.statsPage.posts'), t('admin.statsPage.comments'), t('admin.statsPage.likes')], ...data.bySpace.map((s) => [s.name, s.posts, s.comments, s.likes])]} />}
         >
           {data.bySpace.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No posts in this period.</p>
+            <p className="text-sm text-muted-foreground">{t('admin.statsPage.noPosts')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-muted-foreground">
-                  <th className="py-2 font-semibold">Space</th>
-                  <th className="py-2 text-right font-semibold">Posts</th>
-                  <th className="py-2 text-right font-semibold">Comments</th>
-                  <th className="py-2 text-right font-semibold">Likes</th>
+                <tr className="text-start text-xs text-muted-foreground">
+                  <th className="py-2 text-start font-semibold">{t('admin.statsPage.space')}</th>
+                  <th className="py-2 text-end font-semibold">{t('admin.statsPage.posts')}</th>
+                  <th className="py-2 text-end font-semibold">{t('admin.statsPage.comments')}</th>
+                  <th className="py-2 text-end font-semibold">{t('admin.statsPage.likes')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {data.bySpace.map((space) => (
                   <tr key={space.spaceId}>
                     <td className="py-2">{space.emoji} {space.name}</td>
-                    <td className="py-2 text-right tabular-nums">{space.posts}</td>
-                    <td className="py-2 text-right tabular-nums">{space.comments}</td>
-                    <td className="py-2 text-right tabular-nums">{space.likes}</td>
+                    <td className="py-2 text-end tabular-nums">{space.posts}</td>
+                    <td className="py-2 text-end tabular-nums">{space.comments}</td>
+                    <td className="py-2 text-end tabular-nums">{space.likes}</td>
                   </tr>
                 ))}
               </tbody>
@@ -273,17 +273,17 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
           )}
         </Panel>
         <Panel
-          title="Top contributors"
-          description="Most posts and comments in this period."
+          title={t('admin.statsPage.topContributors')}
+          description={t('admin.statsPage.topHint')}
           action={
             <ExportButton
               filename={`top-contributors-${range}`}
-              rows={() => [['Member', 'Username', 'Posts', 'Comments', 'Likes received'], ...data.topContributors.map((c) => [c.member.name ?? '', `@${c.member.username}`, c.posts, c.comments, c.likesReceived])]}
+              rows={() => [[t('admin.statsPage.members'), '@', t('admin.statsPage.posts'), t('admin.statsPage.comments'), t('admin.statsPage.likes')], ...data.topContributors.map((c) => [c.member.name ?? '', `@${c.member.username}`, c.posts, c.comments, c.likesReceived])]}
             />
           }
         >
           {data.topContributors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nobody posted in this period.</p>
+            <p className="text-sm text-muted-foreground">{t('admin.statsPage.nobodyPosted')}</p>
           ) : (
             <ol className="space-y-2">
               {data.topContributors.map((row, index) => (
@@ -292,7 +292,7 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
                   <img src={avatarFor(row.member)} alt="" className="h-8 w-8 rounded-full border border-border" />
                   <span className="min-w-0 flex-1 truncate font-medium">{row.member.name || `@${row.member.username}`}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">
-                    {row.posts} posts · {row.comments} comments · {row.likesReceived} ❤️
+                    {t('admin.statsPage.contributorLine', { posts: row.posts, comments: row.comments, likes: row.likesReceived })}
                   </span>
                 </li>
               ))}
@@ -308,6 +308,9 @@ const EngagementTab = ({ range }: { range: StatsRange }) => {
 
 /** Weekday × hour grid: darker = more reactions per post; empty = no posts then. */
 const BestTimes = ({ data, range }: { data: EngagementStats; range: StatsRange }) => {
+  const t = useT();
+  // Mon…Sun in the app's language (2024-01-01 was a Monday)
+  const dayName = (index: number) => new Date(2024, 0, 1 + index).toLocaleDateString(activeIntl(), { weekday: 'short' });
   const cells = data.bestTimes.flatMap((day) => day.hours);
   const max = Math.max(0.0001, ...cells.map((cell) => cell.avgEngagement));
   const best = [...data.bestTimes.flatMap((day) => day.hours.map((cell) => ({ ...cell, day: day.day })))]
@@ -316,12 +319,16 @@ const BestTimes = ({ data, range }: { data: EngagementStats; range: StatsRange }
     .slice(0, 3);
   return (
     <Panel
-      title="Best posting times"
-      description={best.length ? `Posts got the most likes and comments on ${best.map((cell) => `${cell.day} ${cell.hour}:00`).join(', ')} (at least 2 posts).` : 'Average likes and comments per post, by when it was posted.'}
+      title={t('admin.statsPage.bestTimes')}
+      description={
+        best.length
+          ? t('admin.statsPage.bestTimesFound', { times: best.map((cell) => `${dayName(DAYS.indexOf(cell.day))} ${cell.hour}:00`).join(', ') })
+          : t('admin.statsPage.bestTimesHint')
+      }
       action={
         <ExportButton
           filename={`posting-times-${range}`}
-          rows={() => [['Day', 'Hour', 'Posts', 'Avg likes + comments'], ...data.bestTimes.flatMap((day) => day.hours.map((cell) => [day.day, cell.hour, cell.posts, cell.avgEngagement.toFixed(2)]))]}
+          rows={() => [[t('admin.statsPage.col.date'), 'h', t('admin.statsPage.posts'), `${t('admin.statsPage.likes')} + ${t('admin.statsPage.comments')}`], ...data.bestTimes.flatMap((day) => day.hours.map((cell) => [day.day, cell.hour, cell.posts, cell.avgEngagement.toFixed(2)]))]}
         />
       }
     >
@@ -333,11 +340,11 @@ const BestTimes = ({ data, range }: { data: EngagementStats; range: StatsRange }
           ))}
           {data.bestTimes.map((day) => (
             <div key={day.day} className="contents">
-              <span className="self-center font-semibold">{day.day}</span>
+              <span className="self-center font-semibold">{dayName(DAYS.indexOf(day.day))}</span>
               {day.hours.map((cell) => (
                 <span
                   key={cell.hour}
-                  title={`${day.day} ${cell.hour}:00 · ${cell.posts} post${cell.posts === 1 ? '' : 's'} · ${cell.avgEngagement.toFixed(1)} avg reactions`}
+                  title={t('admin.statsPage.cellTitle', { day: dayName(DAYS.indexOf(day.day)), hour: cell.hour, posts: cell.posts, avg: cell.avgEngagement.toFixed(1) })}
                   className={cn('h-6 rounded-sm', !cell.posts && 'bg-muted')}
                   style={cell.posts ? { backgroundColor: `color-mix(in srgb, var(--primary) ${Math.round((cell.avgEngagement / max) * 85) + 15}%, transparent)` } : undefined}
                 />
@@ -353,58 +360,59 @@ const BestTimes = ({ data, range }: { data: EngagementStats; range: StatsRange }
 // ─── Content ─────────────────────────────────────────────────────────────────
 
 const ContentTab = ({ range }: { range: StatsRange }) => {
+  const t = useT();
   const { data, isPending, error } = useContentStats(range);
   if (isPending) return <Loading />;
   if (error) return <p className="text-sm text-muted-foreground">{error.message}</p>;
-  const date = (iso: string) => new Date(iso).toLocaleDateString();
+  const date = (iso: string) => new Date(iso).toLocaleDateString(activeIntl());
 
   return (
     <div className="space-y-6">
       <Panel
-        title="Courses"
-        description="All published and archived courses."
+        title={t('admin.statsPage.courses')}
+        description={t('admin.statsPage.coursesHint')}
         action={
           <ExportButton
             filename="courses"
-            rows={() => [['Course', 'Status', 'Lessons', 'Started', 'Started in period', 'Finished', 'Completion rate'], ...data.courses.map((c) => [c.title, c.status, c.lessons, c.enrolled, c.startedInRange, c.completed, percent(c.completionRate)])]}
+            rows={() => [[t('admin.statsPage.col.course'), t('admin.members.colStatus'), t('admin.statsPage.col.lessons'), t('admin.statsPage.col.started'), t('admin.statsPage.col.inPeriod'), t('admin.statsPage.col.finished'), t('admin.statsPage.col.completion')], ...data.courses.map((c) => [c.title, c.status, c.lessons, c.enrolled, c.startedInRange, c.completed, percent(c.completionRate)])]}
           />
         }
       >
         <DataTable
-          empty="No courses yet."
-          headers={['Course', 'Lessons', 'Started', 'In period', 'Finished', 'Completion']}
+          empty={t('admin.statsPage.noCourses')}
+          headers={['course', 'lessons', 'started', 'inPeriod', 'finished', 'completion'].map((key) => t(`admin.statsPage.col.${key as 'course'}`))}
           rows={data.courses.map((c) => [c.title, c.lessons, c.enrolled, c.startedInRange, c.completed, percent(c.completionRate)])}
         />
       </Panel>
       <Panel
-        title="Events"
-        description="Events that started in this period or are coming up."
+        title={t('admin.statsPage.events')}
+        description={t('admin.statsPage.eventsHint')}
         action={
           <ExportButton
             filename={`events-${range}`}
-            rows={() => [['Event', 'Date', 'Status', 'Category', 'Going', 'Capacity', 'Fill rate'], ...data.events.map((e) => [e.title, e.startsAt, e.status, e.category ?? '', e.going, e.capacity ?? '', e.fillRate === null ? '' : percent(e.fillRate)])]}
+            rows={() => [[t('admin.statsPage.col.event'), t('admin.statsPage.col.date'), t('admin.members.colStatus'), t('events.form.category'), t('admin.statsPage.col.going'), t('admin.statsPage.col.capacity'), t('admin.statsPage.col.fillRate')], ...data.events.map((e) => [e.title, e.startsAt, e.status, e.category ?? '', e.going, e.capacity ?? '', e.fillRate === null ? '' : percent(e.fillRate)])]}
           />
         }
       >
         <DataTable
-          empty="No events in this period."
-          headers={['Event', 'Date', 'Going', 'Capacity', 'Fill rate']}
-          rows={data.events.map((e) => [`${e.title}${e.status === 'CANCELLED' ? ' (cancelled)' : ''}`, date(e.startsAt), e.going, e.capacity ?? '∞', e.fillRate === null ? '—' : percent(e.fillRate)])}
+          empty={t('admin.statsPage.noEvents')}
+          headers={['event', 'date', 'going', 'capacity', 'fillRate'].map((key) => t(`admin.statsPage.col.${key as 'event'}`))}
+          rows={data.events.map((e) => [`${e.title}${e.status === 'CANCELLED' ? t('admin.statsPage.cancelledSuffix') : ''}`, date(e.startsAt), e.going, e.capacity ?? '∞', e.fillRate === null ? '—' : percent(e.fillRate)])}
         />
       </Panel>
       <Panel
-        title="Challenges"
-        description="Challenges running or ended in this period."
+        title={t('admin.statsPage.challenges')}
+        description={t('admin.statsPage.challengesHint')}
         action={
           <ExportButton
             filename={`challenges-${range}`}
-            rows={() => [['Challenge', 'Starts', 'Ends', 'Type', 'Taking part', 'Check-ins', 'Finished', 'Finish rate'], ...data.challenges.map((c) => [c.title, c.startsAt, c.endsAt, c.checkInType, c.participants, c.checkIns, c.finished, percent(c.finishRate)])]}
+            rows={() => [[t('admin.statsPage.col.challenge'), t('challenges.form.starts'), t('challenges.form.ends'), t('challenges.form.checkIns'), t('admin.statsPage.col.takingPart'), t('admin.statsPage.col.checkIns'), t('admin.statsPage.col.finished'), t('admin.statsPage.col.finishRate')], ...data.challenges.map((c) => [c.title, c.startsAt, c.endsAt, c.checkInType, c.participants, c.checkIns, c.finished, percent(c.finishRate)])]}
           />
         }
       >
         <DataTable
-          empty="No challenges in this period."
-          headers={['Challenge', 'Dates', 'Taking part', 'Check-ins', 'Finished', 'Finish rate']}
+          empty={t('admin.statsPage.noChallenges')}
+          headers={['challenge', 'dates', 'takingPart', 'checkIns', 'finished', 'finishRate'].map((key) => t(`admin.statsPage.col.${key as 'challenge'}`))}
           rows={data.challenges.map((c) => [c.title, `${date(c.startsAt)} – ${date(c.endsAt)}`, c.participants, c.checkIns, c.finished, percent(c.finishRate)])}
         />
       </Panel>
@@ -419,9 +427,9 @@ const DataTable = ({ headers, rows, empty }: { headers: string[]; rows: React.Re
     <div className="overflow-x-auto">
       <table className="w-full min-w-[560px] text-sm">
         <thead>
-          <tr className="text-left text-xs text-muted-foreground">
+          <tr className="text-start text-xs text-muted-foreground">
             {headers.map((header, index) => (
-              <th key={header} className={cn('py-2 pr-3 font-semibold', index > 0 && 'text-right')}>{header}</th>
+              <th key={header} className={cn('py-2 pe-3 text-start font-semibold', index > 0 && 'text-end')}>{header}</th>
             ))}
           </tr>
         </thead>
@@ -429,7 +437,7 @@ const DataTable = ({ headers, rows, empty }: { headers: string[]; rows: React.Re
           {rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((value, index) => (
-                <td key={index} className={cn('py-2 pr-3', index > 0 ? 'text-right tabular-nums' : 'font-medium')}>{value}</td>
+                <td key={index} className={cn('py-2 pe-3', index > 0 ? 'text-end tabular-nums' : 'font-medium')}>{value}</td>
               ))}
             </tr>
           ))}

@@ -190,7 +190,7 @@ export interface Leaderboard {
 export interface HowPointsWork {
     rules: { action: string; label: string; points: number; dailyCap: number | null }[];
     levels: { level: number; name: string; minPoints: number }[];
-    badges: (BadgeChip & { description: string; howToEarn: string })[];
+    badges: (BadgeChip & { description: string; howToEarn: string; autoRule: { type: string; threshold: number } | null })[];
 }
 
 export type ReportReason = 'SPAM' | 'HARASSMENT' | 'HATE' | 'NSFW' | 'MISINFORMATION' | 'SELF_PROMOTION' | 'OTHER';

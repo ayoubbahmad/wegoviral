@@ -19,18 +19,20 @@ import {
   useUpdateSettings,
 } from '../api/joining';
 import { AdminGuide, CommunitySettings, GuideSectionDraft, QuizQuestionDraft } from '../types';
+import { useT } from '@/i18n/provider';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
 
 export const AdminOnboardingContainer = () => {
+  const t = useT();
   const settings = useCommunitySettings();
   const guide = useAdminGuide();
 
   return (
     <PageContainer>
       <PageHeader
-        helpHref="/admin/help/onboarding-settings" title="Onboarding" description="How new members join: approval, community guide and quiz." />
+        helpHref="/admin/help/onboarding-settings" title={t('admin.onboardingPage.title')} description={t('admin.onboardingPage.description')} />
       {settings.isPending || guide.isPending ? (
         <Skeleton className="h-64 rounded-2xl" />
       ) : settings.error || guide.error ? (
@@ -62,53 +64,54 @@ const Toggle = ({ checked, onChange, label, description }: { checked: boolean; o
       onClick={() => onChange(!checked)}
       className={cn('relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors', checked ? 'bg-primary' : 'bg-secondary')}
     >
-      <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-background shadow transition-all', checked ? 'left-[22px]' : 'left-0.5')} />
+      <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-background shadow transition-all', checked ? 'start-[22px]' : 'start-0.5')} />
     </button>
   </label>
 );
 
 const SettingsCard = ({ settings }: { settings: CommunitySettings }) => {
+  const t = useT();
   const { showToast } = useToast();
   const update = useUpdateSettings();
 
   const save = (changes: Partial<CommunitySettings>) =>
     update.mutate(changes, {
-      onSuccess: () => showToast('Settings saved'),
+      onSuccess: () => showToast(t('admin.onboardingPage.settingsSaved')),
       onError: (error) => showToast(error.message, 'error'),
     });
 
   return (
     <Card className="space-y-5">
-      <h2 className="font-bold">Joining rules</h2>
+      <h2 className="font-bold">{t('admin.onboardingPage.rulesTitle')}</h2>
       <Toggle
         checked={settings.requireApproval}
         onChange={(requireApproval) => save({ requireApproval })}
-        label="Approve new members"
-        description="New members wait for a staff member to approve their application. Invite and referral links skip this."
+        label={t('admin.onboardingPage.approve')}
+        description={t('admin.onboardingPage.approveHint')}
       />
       <Toggle
         checked={settings.requireRules}
         onChange={(requireRules) => save({ requireRules })}
-        label="Require accepting the community guide"
-        description="Members can read but not post, comment or react until they accept the latest guide."
+        label={t('admin.onboardingPage.requireGuide')}
+        description={t('admin.onboardingPage.requireGuideHint')}
       />
       <Toggle
         checked={settings.requireQuiz}
         onChange={(requireQuiz) => save({ requireQuiz })}
-        label="Require passing the quiz"
-        description="After accepting the guide, members answer the quiz below before they can interact."
+        label={t('admin.onboardingPage.requireQuiz')}
+        description={t('admin.onboardingPage.requireQuizHint')}
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <NumberSetting
-          label="Quiz pass mark (%)"
+          label={t('admin.onboardingPage.passMark')}
           value={settings.quizPassPercent}
           min={1}
           max={100}
           onSave={(quizPassPercent) => save({ quizPassPercent })}
         />
         <NumberSetting
-          label="Reviewed posts for new members"
-          hint="New members' first posts wait for review by staff or trusted members. 0 turns review off."
+          label={t('admin.onboardingPage.reviewed')}
+          hint={t('admin.onboardingPage.reviewedHint')}
           value={settings.probationPostCount}
           min={0}
           max={20}
@@ -120,6 +123,7 @@ const SettingsCard = ({ settings }: { settings: CommunitySettings }) => {
 };
 
 const NumberSetting = ({ label, hint, value, min, max, onSave }: { label: string; hint?: string; value: number; min: number; max: number; onSave: (value: number) => void }) => {
+  const t = useT();
   const [draft, setDraft] = useState(String(value));
   const parsed = Number(draft);
   const valid = Number.isInteger(parsed) && parsed >= min && parsed <= max;
@@ -129,7 +133,7 @@ const NumberSetting = ({ label, hint, value, min, max, onSave }: { label: string
       <div className="flex gap-2">
         <input type="number" min={min} max={max} value={draft} onChange={(e) => setDraft(e.target.value)} className={inputClass} />
         <Button variant="outline" size="sm" disabled={!valid || parsed === value} onClick={() => onSave(parsed)}>
-          Save
+          {t('admin.onboardingPage.save')}
         </Button>
       </div>
       {hint && <span className="block text-xs text-muted-foreground">{hint}</span>}
@@ -147,6 +151,7 @@ const move = <T,>(items: T[], index: number, by: number) => {
 };
 
 const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
+  const t = useT();
   const { showToast } = useToast();
   const saveSections = useSaveGuideSections();
   const publish = usePublishGuide();
@@ -160,18 +165,18 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
 
   const handleSave = () =>
     saveSections.mutate(sections, {
-      onSuccess: () => showToast('Draft saved. Publish it when you are ready.'),
+      onSuccess: () => showToast(t('admin.onboardingPage.draftSaved')),
       onError: (error) => showToast(error.message, 'error'),
     });
 
   const handlePublish = () => {
     const message =
       guide.version === 0
-        ? 'Publish the community guide? Every member will be asked to read and accept it.'
-        : `Publish version ${guide.version + 1}? Every member will be asked to accept the guide again.`;
+        ? t('admin.onboardingPage.publishFirst')
+        : t('admin.onboardingPage.publishNext', { version: guide.version + 1 });
     if (!window.confirm(message)) return;
     publish.mutate(undefined, {
-      onSuccess: ({ version }) => showToast(`Guide version ${version} published`),
+      onSuccess: ({ version }) => showToast(t('admin.onboardingPage.published', { version })),
       onError: (error) => showToast(error.message, 'error'),
     });
   };
@@ -180,23 +185,23 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
     <Card className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-bold">Community guide</h2>
+          <h2 className="font-bold">{t('admin.onboardingPage.guideTitle')}</h2>
           <p className="text-xs text-muted-foreground">
             {guide.version === 0
-              ? 'Not published yet.'
-              : `Version ${guide.version} is live · ${guide.stats.acceptedLatest} of ${guide.stats.approvedMembers} members accepted it.`}
+              ? t('admin.onboardingPage.notPublished')
+              : t('admin.onboardingPage.live', { version: guide.version, accepted: guide.stats.acceptedLatest, members: guide.stats.approvedMembers })}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleSave} disabled={!isDirty || !isValid || saveSections.isPending}>
-            {saveSections.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save draft'}
+            {saveSections.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.onboardingPage.saveDraft')}
           </Button>
           <Button variant="primary" size="sm" onClick={handlePublish} disabled={isDirty || !guide.sections.length || publish.isPending}>
-            {publish.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : guide.version === 0 ? 'Publish' : 'Publish new version'}
+            {publish.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : guide.version === 0 ? t('admin.onboardingPage.publish') : t('admin.onboardingPage.publishNew')}
           </Button>
         </div>
       </div>
-      {isDirty && <p className="text-xs text-amber-500">Unsaved changes: save the draft before publishing.</p>}
+      {isDirty && <p className="text-xs text-amber-500">{t('admin.onboardingPage.unsaved')}</p>}
 
       {sections.map((section, index) => (
         <div key={index} className="space-y-2 rounded-xl border border-border p-4">
@@ -205,25 +210,25 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
             <input
               value={section.title}
               onChange={(e) => update(index, { title: e.target.value })}
-              placeholder="Section title, e.g. Be respectful"
+              placeholder={t('admin.onboardingPage.sectionTitle')}
               maxLength={120}
               className={inputClass}
             />
-            <button type="button" aria-label="Move up" disabled={index === 0} onClick={() => setSections((s) => move(s, index, -1))} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
+            <button type="button" aria-label={t('admin.onboardingPage.moveUp')} disabled={index === 0} onClick={() => setSections((s) => move(s, index, -1))} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
               <ArrowUp className="w-4 h-4" />
             </button>
-            <button type="button" aria-label="Move down" disabled={index === sections.length - 1} onClick={() => setSections((s) => move(s, index, 1))} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
+            <button type="button" aria-label={t('admin.onboardingPage.moveDown')} disabled={index === sections.length - 1} onClick={() => setSections((s) => move(s, index, 1))} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
               <ArrowDown className="w-4 h-4" />
             </button>
-            <button type="button" aria-label="Remove section" onClick={() => setSections((s) => s.filter((_, i) => i !== index))} className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
+            <button type="button" aria-label={t('admin.onboardingPage.removeSection')} onClick={() => setSections((s) => s.filter((_, i) => i !== index))} className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
-          <Textarea value={section.body} onChange={(e) => update(index, { body: e.target.value })} placeholder="The rule or policy, in plain words" className="min-h-[100px]" />
+          <Textarea value={section.body} onChange={(e) => update(index, { body: e.target.value })} placeholder={t('admin.onboardingPage.sectionBody')} className="min-h-[100px]" />
           <input
             value={section.mediaUrl ?? ''}
             onChange={(e) => update(index, { mediaUrl: e.target.value })}
-            placeholder="Optional image or video link"
+            placeholder={t('admin.onboardingPage.media')}
             className={inputClass}
           />
         </div>
@@ -233,7 +238,7 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
         onClick={() => setSections((s) => [...s, { title: '', body: '', mediaUrl: '' }])}
         className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
       >
-        <Plus className="w-4 h-4" /> Add section
+        <Plus className="w-4 h-4" /> {t('admin.onboardingPage.addSection')}
       </button>
     </Card>
   );
@@ -242,6 +247,7 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
 // ─── Quiz ────────────────────────────────────────────────────────────────────
 
 const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: CommunitySettings }) => {
+  const t = useT();
   const { showToast } = useToast();
   const saveQuiz = useSaveQuiz();
   const [questions, setQuestions] = useState<QuizQuestionDraft[]>(guide.questions);
@@ -254,7 +260,7 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
 
   const handleSave = () =>
     saveQuiz.mutate(questions, {
-      onSuccess: () => showToast('Quiz saved'),
+      onSuccess: () => showToast(t('admin.onboardingPage.quizSaved')),
       onError: (error) => showToast(error.message, 'error'),
     });
 
@@ -262,13 +268,13 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
     <Card className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-bold">Quiz</h2>
+          <h2 className="font-bold">{t('admin.onboardingPage.quizTitle')}</h2>
           <p className="text-xs text-muted-foreground">
-            {settings.requireQuiz ? 'Required: members must pass it after accepting the guide.' : 'Off: turn on "Require passing the quiz" above to use it.'}
+            {settings.requireQuiz ? t('admin.onboardingPage.quizOn') : t('admin.onboardingPage.quizOff')}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={handleSave} disabled={!isValid || saveQuiz.isPending}>
-          {saveQuiz.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save quiz'}
+          {saveQuiz.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.onboardingPage.saveQuiz')}
         </Button>
       </div>
 
@@ -276,12 +282,12 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
         <div key={index} className="space-y-3 rounded-xl border border-border p-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-muted-foreground">{index + 1}.</span>
-            <input value={question.question} onChange={(e) => update(index, { question: e.target.value })} placeholder="Question" maxLength={300} className={inputClass} />
-            <button type="button" aria-label="Remove question" onClick={() => setQuestions((q) => q.filter((_, i) => i !== index))} className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
+            <input value={question.question} onChange={(e) => update(index, { question: e.target.value })} placeholder={t('admin.onboardingPage.question')} maxLength={300} className={inputClass} />
+            <button type="button" aria-label={t('admin.onboardingPage.removeQuestion')} onClick={() => setQuestions((q) => q.filter((_, i) => i !== index))} className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">Select the correct answer.</p>
+          <p className="text-xs text-muted-foreground">{t('admin.onboardingPage.selectCorrect')}</p>
           {question.options.map((option, optionIndex) => (
             <div key={optionIndex} className="flex items-center gap-2">
               <input
@@ -289,20 +295,20 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
                 name={`correct-${index}`}
                 checked={question.correctIndex === optionIndex}
                 onChange={() => update(index, { correctIndex: optionIndex })}
-                aria-label={`Option ${optionIndex + 1} is correct`}
+                aria-label={t('admin.onboardingPage.optionCorrect', { number: optionIndex + 1 })}
                 className="accent-[var(--primary)]"
               />
               <input
                 value={option}
                 onChange={(e) => update(index, { options: question.options.map((o, i) => (i === optionIndex ? e.target.value : o)) })}
-                placeholder={`Option ${optionIndex + 1}`}
+                placeholder={t('admin.onboardingPage.option', { number: optionIndex + 1 })}
                 maxLength={200}
                 className={inputClass}
               />
               {question.options.length > 2 && (
                 <button
                   type="button"
-                  aria-label="Remove option"
+                  aria-label={t('admin.onboardingPage.removeOption')}
                   onClick={() =>
                     update(index, {
                       options: question.options.filter((_, i) => i !== optionIndex),
@@ -318,7 +324,7 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
           ))}
           {question.options.length < 6 && (
             <button type="button" onClick={() => update(index, { options: [...question.options, ''] })} className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline">
-              <Plus className="w-3.5 h-3.5" /> Add option
+              <Plus className="w-3.5 h-3.5" /> {t('admin.onboardingPage.addOption')}
             </button>
           )}
         </div>
@@ -328,7 +334,7 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
         onClick={() => setQuestions((q) => [...q, { question: '', options: ['', ''], correctIndex: 0 }])}
         className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
       >
-        <Plus className="w-4 h-4" /> Add question
+        <Plus className="w-4 h-4" /> {t('admin.onboardingPage.addQuestion')}
       </button>
     </Card>
   );

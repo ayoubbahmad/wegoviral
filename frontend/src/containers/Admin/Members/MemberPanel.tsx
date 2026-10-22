@@ -9,7 +9,7 @@ import { Textarea } from '@/components/Textarea';
 import { useAuth } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
 import { avatarFor, formatRelativeDate } from '@/lib/utils';
-import { ROLE_LABELS, STATUS_LABELS, UserRole } from '@/lib/roles';
+import { UserRole } from '@/lib/roles';
 import { useAdminMember, useChangeRole, useLiftRestriction, useRestrictMember } from '../api';
 import { RoleBadge, StatusBadge } from '../components/Badges';
 import { describeActivity } from '../components/describeActivity';
@@ -46,12 +46,12 @@ export const MemberPanel = ({ memberId, onClose }: MemberPanelProps) => {
         role="dialog"
         aria-modal="true"
         aria-label={t('admin.panel.label')}
-        className="relative h-full w-full max-w-md overflow-y-auto border-l border-border bg-card shadow-2xl animate-in slide-in-from-right duration-200"
+        className="relative h-full w-full max-w-md overflow-y-auto border-s border-border bg-card shadow-2xl animate-in slide-in-from-right rtl:slide-in-from-left duration-200"
       >
         <button
           onClick={onClose}
           aria-label={t('common.close')}
-          className="absolute right-4 top-4 p-2 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+          className="absolute end-4 top-4 p-2 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
         >
           <X className="w-4 h-4" />
         </button>
@@ -81,7 +81,7 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4 pr-10">
+      <div className="flex items-center gap-4 pe-10">
         <img src={avatarFor(member)} alt="" className="w-14 h-14 rounded-full border border-border" />
         <div className="min-w-0">
           <h2 className="text-lg font-bold truncate">{member.name || `@${member.username}`}</h2>

@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/Skeleton';
 import { Textarea } from '@/components/Textarea';
 import { LightMarkdown } from '@/components/LightMarkdown';
 import { useToast } from '@/providers/Toast';
-import { ROLE_LABELS, UserRole } from '@/lib/roles';
+import type { UserRole } from '@/lib/roles';
 import { cn } from '@/lib/utils';
 import {
   HelpArticle,
@@ -25,20 +25,11 @@ import {
   useReorderArticles,
   useSaveArticle,
 } from '@/containers/Help/api';
+import { useT } from '@/i18n/provider';
 
-const SPACES: { id: HelpSpaceId; label: string }[] = [
-  { id: 'community', label: 'Community' },
-  { id: 'creator', label: 'Creator Space' },
-  { id: 'admin', label: 'Admin (team)' },
-];
+const SPACES: { id: HelpSpaceId }[] = [{ id: 'community' }, { id: 'creator' }, { id: 'admin' }];
 
-const AUDIENCES: { value: UserRole; label: string }[] = [
-  { value: 'MEMBER', label: 'Everyone' },
-  { value: 'INSTRUCTOR', label: 'Instructors and the team' },
-  { value: 'MODERATOR', label: 'Moderators and up' },
-  { value: 'ADMIN', label: 'Admins and up' },
-  { value: 'SUPER_ADMIN', label: 'Super Admins only' },
-];
+const AUDIENCES: UserRole[] = ['MEMBER', 'INSTRUCTOR', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -54,6 +45,7 @@ const slugify = (text: string) =>
 
 /** Admins write the help center: one list per space, ordered, with drafts. */
 export const AdminHelpArticlesContainer = () => {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -71,15 +63,15 @@ export const AdminHelpArticlesContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="Help articles"
-        description="The help center members see from the Help link in each space. Each article has an audience: that role and everyone above it."
+        title={t('admin.helpPage.title')}
+        description={t('admin.helpPage.description')}
         actions={
           <Button variant="primary" onClick={() => go({ edit: 'new' })}>
-            <Plus className="w-4 h-4" /> New article
+            <Plus className="w-4 h-4" /> {t('admin.helpPage.newArticle')}
           </Button>
         }
       />
-      <div role="tablist" aria-label="Space" className="flex gap-4 border-b border-border text-sm font-semibold">
+      <div role="tablist" aria-label={t('admin.helpPage.spaceLabel')} className="flex gap-4 border-b border-border text-sm font-semibold">
         {SPACES.map((option) => (
           <button
             key={option.id}
@@ -88,7 +80,7 @@ export const AdminHelpArticlesContainer = () => {
             onClick={() => go({ space: option.id, edit: null })}
             className={cn('-mb-px border-b-2 pb-2 transition-colors', space === option.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground')}
           >
-            {option.label}
+            {t(`admin.helpPage.spaces.${option.id}`)}
           </button>
         ))}
       </div>
@@ -106,7 +98,7 @@ export const AdminHelpArticlesContainer = () => {
           ) : editing ? (
             <EditLoader key={editing} space={space} summary={articles.find((a) => a.id === editing)} sections={[...new Set(articles.map((a) => a.category))]} onDone={(id) => go({ edit: id })} />
           ) : (
-            <Card className="text-sm text-muted-foreground">Select an article to edit it, or write a new one.</Card>
+            <Card className="text-sm text-muted-foreground">{t('admin.helpPage.selectArticle')}</Card>
           )}
         </div>
       </div>
@@ -115,6 +107,7 @@ export const AdminHelpArticlesContainer = () => {
 };
 
 const ArticleList = ({ space, articles, selectedId, onSelect }: { space: HelpSpaceId; articles: HelpArticleSummary[]; selectedId: string | null; onSelect: (id: string) => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const reorder = useReorderArticles();
   const move = (index: number, direction: -1 | 1) => {
@@ -122,44 +115,46 @@ const ArticleList = ({ space, articles, selectedId, onSelect }: { space: HelpSpa
     [ids[index], ids[index + direction]] = [ids[index + direction], ids[index]];
     reorder.mutate(ids, { onError: (e) => showToast(e.message, 'error') });
   };
-  if (articles.length === 0) return <Card className="text-sm text-muted-foreground">No articles in this space yet.</Card>;
+  if (articles.length === 0) return <Card className="text-sm text-muted-foreground">{t('admin.helpPage.noArticles')}</Card>;
   return (
     <Card padding="none" className="h-fit">
       <ul className="divide-y divide-border/50">
         {articles.map((article, index) => (
           <li key={article.id} className={cn('flex items-center gap-2 px-3 py-2', selectedId === article.id && 'bg-primary/5')}>
-            <button onClick={() => onSelect(article.id)} className="min-w-0 flex-1 text-left">
+            <button onClick={() => onSelect(article.id)} className="min-w-0 flex-1 text-start">
               <p className="truncate text-sm font-semibold">{article.title}</p>
               <p className="truncate text-xs text-muted-foreground">
-                {article.category} · {AUDIENCES.find((a) => a.value === article.audience)?.label}
-                {!article.published && ' · draft'}
+                {article.category} · {t(`admin.helpPage.audiences.${article.audience}`)}
+                {!article.published && t('admin.helpPage.draftSuffix')}
               </p>
             </button>
-            {!article.published && <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase">Draft</span>}
-            <button aria-label={`Move ${article.title} up`} disabled={index === 0 || reorder.isPending} onClick={() => move(index, -1)} className="rounded p-1 text-muted-foreground hover:bg-secondary/60 disabled:opacity-30">
+            {!article.published && <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase">{t('admin.helpPage.draft')}</span>}
+            <button aria-label={t('admin.helpPage.moveUp', { title: article.title })} disabled={index === 0 || reorder.isPending} onClick={() => move(index, -1)} className="rounded p-1 text-muted-foreground hover:bg-secondary/60 disabled:opacity-30">
               <ChevronUp className="w-4 h-4" />
             </button>
-            <button aria-label={`Move ${article.title} down`} disabled={index === articles.length - 1 || reorder.isPending} onClick={() => move(index, 1)} className="rounded p-1 text-muted-foreground hover:bg-secondary/60 disabled:opacity-30">
+            <button aria-label={t('admin.helpPage.moveDown', { title: article.title })} disabled={index === articles.length - 1 || reorder.isPending} onClick={() => move(index, 1)} className="rounded p-1 text-muted-foreground hover:bg-secondary/60 disabled:opacity-30">
               <ChevronDown className="w-4 h-4" />
             </button>
           </li>
         ))}
       </ul>
       <p className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
-        Articles are listed by section in this order. <Link href={`/${space}/help`} className="font-semibold hover:text-foreground">Open the help center</Link>
+        {t('admin.helpPage.orderNote')} <Link href={`/${space}/help`} className="font-semibold hover:text-foreground">{t('admin.helpPage.openCenter')}</Link>
       </p>
     </Card>
   );
 };
 
 const EditLoader = ({ space, summary, sections, onDone }: { space: HelpSpaceId; summary?: HelpArticleSummary; sections: string[]; onDone: (id: string | null) => void }) => {
+  const t = useT();
   const { data, isPending } = useHelpArticle(summary?.slug ?? null);
-  if (!summary) return <Card className="text-sm text-muted-foreground">This article isn&apos;t in this space.</Card>;
+  if (!summary) return <Card className="text-sm text-muted-foreground">{t('admin.helpPage.notInSpace')}</Card>;
   if (isPending || !data) return <Skeleton className="h-96 rounded-2xl" />;
   return <ArticleForm space={space} article={data} sections={sections} onDone={onDone} />;
 };
 
 const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId; article: HelpArticle | null; sections: string[]; onDone: (id: string | null) => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const save = useSaveArticle();
   const remove = useDeleteArticle();
@@ -193,7 +188,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
       {
         onSuccess: (saved) => {
           update({ published });
-          showToast(published && !article?.published ? 'Article published' : 'Article saved');
+          showToast(published && !article?.published ? t('admin.helpPage.published') : t('admin.helpPage.saved'));
           onDone(saved.id);
         },
         onError: (error) => showToast(error.message, 'error'),
@@ -203,22 +198,22 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
   return (
     <Card className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-bold">{article ? 'Edit article' : 'New article'}</h2>
+        <h2 className="font-bold">{article ? t('admin.helpPage.editTitle') : t('admin.helpPage.newTitle')}</h2>
         <div className="flex items-center gap-1">
           {article?.published && (
-            <Link href={`/${space}/help/${article.slug}`} className="rounded-lg p-2 text-muted-foreground hover:bg-secondary/50" aria-label="Open the article">
+            <Link href={`/${space}/help/${article.slug}`} className="rounded-lg p-2 text-muted-foreground hover:bg-secondary/50" aria-label={t('admin.helpPage.open')}>
               <ExternalLink className="w-4 h-4" />
             </Link>
           )}
           {article && (
             <button
-              aria-label="Delete article"
+              aria-label={t('admin.helpPage.delete')}
               disabled={remove.isPending}
               onClick={() =>
-                window.confirm(`Delete “${article.title}”?`) &&
+                window.confirm(t('admin.helpPage.deleteConfirm', { title: article.title })) &&
                 remove.mutate(article.id, {
                   onSuccess: () => {
-                    showToast('Article deleted');
+                    showToast(t('admin.helpPage.deleted'));
                     onDone(null);
                   },
                   onError: (e) => showToast(e.message, 'error'),
@@ -234,7 +229,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5 sm:col-span-2">
-          <span className="text-xs font-semibold text-muted-foreground">Title</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.articleTitle')}</span>
           <input
             value={form.title}
             maxLength={120}
@@ -243,7 +238,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Link</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.link')}</span>
           <input
             value={form.slug}
             maxLength={80}
@@ -256,8 +251,8 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
           <span className="block truncate text-xs text-muted-foreground">/{space}/help/{form.slug || '…'}</span>
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Section</span>
-          <input list="help-sections" value={form.category} maxLength={60} onChange={(e) => update({ category: e.target.value })} placeholder="e.g. Getting started" className={inputClass} />
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.section')}</span>
+          <input list="help-sections" value={form.category} maxLength={60} onChange={(e) => update({ category: e.target.value })} placeholder={t('admin.helpPage.sectionPlaceholder')} className={inputClass} />
           <datalist id="help-sections">
             {sections.map((section) => (
               <option key={section} value={section} />
@@ -265,19 +260,19 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
           </datalist>
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Who sees it</span>
-          <Select aria-label="Who sees it" value={form.audience} onChange={(e) => update({ audience: e.target.value as UserRole })} options={AUDIENCES} />
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.whoSees')}</span>
+          <Select aria-label={t('admin.helpPage.whoSees')} value={form.audience} onChange={(e) => update({ audience: e.target.value as UserRole })} options={AUDIENCES.map((value) => ({ value, label: t(`admin.helpPage.audiences.${value}`) }))} />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Summary</span>
-          <input value={form.summary} maxLength={300} onChange={(e) => update({ summary: e.target.value })} placeholder="One line shown in the list" className={inputClass} />
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.summary')}</span>
+          <input value={form.summary} maxLength={300} onChange={(e) => update({ summary: e.target.value })} placeholder={t('admin.helpPage.summaryPlaceholder')} className={inputClass} />
         </label>
       </div>
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-muted-foreground">Article</span>
-          <div role="group" aria-label="Editor mode" className="flex gap-1">
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.article')}</span>
+          <div role="group" aria-label={t('admin.helpPage.editorMode')} className="flex gap-1">
             {[false, true].map((mode) => (
               <button
                 key={String(mode)}
@@ -285,35 +280,36 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
                 onClick={() => setPreview(mode)}
                 className={cn('rounded-full px-2.5 py-0.5 text-xs font-semibold', preview === mode ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground')}
               >
-                {mode ? 'Preview' : 'Write'}
+                {mode ? t('admin.helpPage.preview') : t('admin.helpPage.write')}
               </button>
             ))}
           </div>
         </div>
         {preview ? (
           <div className="min-h-[320px] rounded-lg border border-border p-4">
-            <LightMarkdown source={form.body || 'Nothing yet.'} />
+            <LightMarkdown source={form.body || t('admin.helpPage.nothingYet')} />
           </div>
         ) : (
           <Textarea value={form.body} maxLength={50000} onChange={(e) => update({ body: e.target.value })} className="min-h-[320px] font-mono text-xs" />
         )}
         <p className="text-xs text-muted-foreground">
-          Formatting: <code>## Heading</code>, lists with <code>-</code> or <code>1.</code>, <code>**bold**</code>, <code>[link](/community/help/…)</code>.
+          {t('admin.helpPage.formatting')} <code>## Heading</code>, lists with <code>-</code> or <code>1.</code>, <code>**bold**</code>, <code>[link](/community/help/…)</code>.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
         <span className="text-sm text-muted-foreground">
-          {form.published ? 'Published' : 'Draft: only admins can see it'} · visible to {ROLE_LABELS[form.audience].toLowerCase()}s{form.audience === 'SUPER_ADMIN' ? '' : ' and up'}
+          {form.published ? t('admin.helpPage.statusPublished') : t('admin.helpPage.statusDraft')}
+          {t(form.audience === 'SUPER_ADMIN' ? 'admin.helpPage.visibleToOnly' : 'admin.helpPage.visibleTo', { role: t(`common.roles.${form.audience}`).toLowerCase() })}
         </span>
         <div className="flex gap-2">
           {form.published ? (
-            <Button variant="ghost" size="sm" disabled={!valid || save.isPending} onClick={() => handleSave(false)}>Unpublish</Button>
+            <Button variant="ghost" size="sm" disabled={!valid || save.isPending} onClick={() => handleSave(false)}>{t('admin.helpPage.unpublish')}</Button>
           ) : (
-            <Button variant="outline" size="sm" disabled={!valid || save.isPending} onClick={() => handleSave(true)}>Save & publish</Button>
+            <Button variant="outline" size="sm" disabled={!valid || save.isPending} onClick={() => handleSave(true)}>{t('admin.helpPage.savePublish')}</Button>
           )}
           <Button variant="primary" size="sm" disabled={!valid || save.isPending} onClick={() => handleSave()}>
-            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.save')}
           </Button>
         </div>
       </div>

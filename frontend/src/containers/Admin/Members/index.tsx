@@ -84,13 +84,13 @@ export const AdminMembersContainer = () => {
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={t('admin.members.search')}
             aria-label={t('admin.members.searchLabel')}
-            className="h-11 w-full rounded-lg border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="h-11 w-full rounded-lg border border-border bg-card ps-11 pe-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <div className="grid grid-cols-3 gap-3 md:w-[480px]">
@@ -176,9 +176,9 @@ export const AdminMembersContainer = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-8 py-4 text-right text-sm tabular-nums">{member.postCount}</td>
-                  <td className="px-8 py-4 text-right text-sm tabular-nums">{member.commentCount}</td>
-                  <td className="px-8 py-4 text-right text-sm text-muted-foreground whitespace-nowrap">
+                  <td className="px-8 py-4 text-end text-sm tabular-nums">{member.postCount}</td>
+                  <td className="px-8 py-4 text-end text-sm tabular-nums">{member.commentCount}</td>
+                  <td className="px-8 py-4 text-end text-sm text-muted-foreground whitespace-nowrap">
                     {new Date(member.createdAt).toLocaleDateString(activeIntl())}
                   </td>
                 </Table.Row>

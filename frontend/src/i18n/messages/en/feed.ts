@@ -14,7 +14,7 @@ export const feed = {
   emptyTitle: 'No posts here yet',
   emptyCanPost: 'Be the first to start the conversation in this space.',
   emptyTeam: 'The team will post updates here soon.',
-  caughtUp: 'You’re all caught up ✨',
+  caughtUp: 'You’re all caught up',
   post: {
     held: 'Held for the team.',
     heldBody: 'It contains a word the team checks first. Only you can see it for now.',

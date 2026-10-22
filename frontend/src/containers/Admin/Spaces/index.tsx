@@ -12,11 +12,13 @@ import { cn } from '@/lib/utils';
 import { useAdminSpaces, useArchiveSpace, useReorderSpaces, useSaveSpace, useTiers } from '../api/moderation';
 import { AccessEditor, summarizeAccess } from './AccessEditor';
 import { AdminSpace, SpaceInput } from '../types';
+import { useT } from '@/i18n/provider';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
 
 export const AdminSpacesContainer = () => {
+  const t = useT();
   const { data, isPending, error } = useAdminSpaces();
   const [editing, setEditing] = useState<AdminSpace | 'new' | null>(null);
 
@@ -24,11 +26,11 @@ export const AdminSpacesContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/admin/help/spaces"
-        title="Spaces"
-        description="The topics members post in. Archived spaces disappear from the feed filters and close to new posts; their posts stay."
+        title={t('admin.spaces.title')}
+        description={t('admin.spaces.description')}
         actions={
           <Button variant="primary" onClick={() => setEditing('new')}>
-            <Plus className="w-4 h-4" /> New space
+            <Plus className="w-4 h-4" /> {t('admin.spaces.newSpace')}
           </Button>
         }
       />
@@ -47,6 +49,7 @@ export const AdminSpacesContainer = () => {
 };
 
 const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: AdminSpace) => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const reorder = useReorderSpaces();
   const archive = useArchiveSpace();
@@ -63,11 +66,11 @@ const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: A
     });
 
   const toggleArchive = (space: AdminSpace, archivedNow: boolean) => {
-    if (archivedNow && !window.confirm(`Archive ${space.emoji} ${space.name}? Members won't be able to post in it anymore.`)) return;
+    if (archivedNow && !window.confirm(t('admin.spaces.archiveConfirm', { space: `${space.emoji} ${space.name}` }))) return;
     archive.mutate(
       { id: space.id, archived: archivedNow },
       {
-        onSuccess: () => showToast(archivedNow ? 'Space archived' : 'Space is back'),
+        onSuccess: () => showToast(archivedNow ? t('admin.spaces.archived') : t('admin.spaces.back')),
         onError: (error) => showToast(error.message, 'error'),
       },
     );
@@ -77,34 +80,34 @@ const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: A
     <div className="space-y-6">
       <Card padding="none">
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <h2 className="font-bold">Active spaces</h2>
+          <h2 className="font-bold">{t('admin.spaces.active')}</h2>
           <Button
             variant="primary"
             size="sm"
             disabled={!orderChanged || reorder.isPending}
             onClick={() =>
               reorder.mutate(active.map((space) => space.id), {
-                onSuccess: () => showToast('Order saved'),
+                onSuccess: () => showToast(t('admin.spaces.orderSaved')),
                 onError: (error) => showToast(error.message, 'error'),
               })
             }
           >
-            {reorder.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save order'}
+            {reorder.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.spaces.saveOrder')}
           </Button>
         </div>
         <ul className="divide-y divide-border/50">
           {active.map((space, index) => (
             <SpaceRow key={space.id} space={space}>
-              <button aria-label="Move up" disabled={index === 0} onClick={() => move(index, -1)} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
+              <button aria-label={t('admin.spaces.moveUp')} disabled={index === 0} onClick={() => move(index, -1)} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
                 <ArrowUp className="w-4 h-4" />
               </button>
-              <button aria-label="Move down" disabled={index === active.length - 1} onClick={() => move(index, 1)} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
+              <button aria-label={t('admin.spaces.moveDown')} disabled={index === active.length - 1} onClick={() => move(index, 1)} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
                 <ArrowDown className="w-4 h-4" />
               </button>
-              <button aria-label="Edit space" onClick={() => onEdit(space)} className="p-2 rounded-lg hover:bg-secondary/50">
+              <button aria-label={t('admin.spaces.edit')} onClick={() => onEdit(space)} className="p-2 rounded-lg hover:bg-secondary/50">
                 <Pencil className="w-4 h-4" />
               </button>
-              <button aria-label="Archive space" onClick={() => toggleArchive(space, true)} className="p-2 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground">
+              <button aria-label={t('admin.spaces.archive')} onClick={() => toggleArchive(space, true)} className="p-2 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground">
                 <Archive className="w-4 h-4" />
               </button>
             </SpaceRow>
@@ -114,12 +117,12 @@ const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: A
 
       {archived.length > 0 && (
         <Card padding="none">
-          <h2 className="border-b border-border px-5 py-3 font-bold">Archived</h2>
+          <h2 className="border-b border-border px-5 py-3 font-bold">{t('admin.spaces.archivedTitle')}</h2>
           <ul className="divide-y divide-border/50 opacity-70">
             {archived.map((space) => (
               <SpaceRow key={space.id} space={space}>
                 <Button variant="outline" size="sm" onClick={() => toggleArchive(space, false)}>
-                  <ArchiveRestore className="w-3.5 h-3.5" /> Bring back
+                  <ArchiveRestore className="w-3.5 h-3.5" /> {t('admin.spaces.bringBack')}
                 </Button>
               </SpaceRow>
             ))}
@@ -131,8 +134,9 @@ const SpaceList = ({ spaces, onEdit }: { spaces: AdminSpace[]; onEdit: (space: A
 };
 
 const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.ReactNode }) => {
+  const t = useT();
   const { data: tiers } = useTiers();
-  const access = summarizeAccess(space.access, tiers);
+  const access = summarizeAccess(space.access, tiers, t);
   return (
   <li className="flex items-center gap-3 px-5 py-3">
     <span className="text-2xl" aria-hidden>{space.emoji}</span>
@@ -141,7 +145,7 @@ const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.Reac
         {space.name}
         {space.adminOnly && (
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary/60 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-            <Lock className="w-3 h-3" /> Team only
+            <Lock className="w-3 h-3" /> {t('admin.spaces.teamOnly')}
           </span>
         )}
         {access && (
@@ -160,6 +164,7 @@ const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.Reac
 };
 
 const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const save = useSaveSpace();
   const [input, setInput] = useState<SpaceInput>({
@@ -177,7 +182,7 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
       { id: space?.id, input: { ...input, coverUrl: input.coverUrl?.trim() || '' } },
       {
         onSuccess: () => {
-          showToast(space ? 'Space updated' : 'Space created');
+          showToast(space ? t('admin.spaces.updated') : t('admin.spaces.created'));
           onDone();
         },
         onError: (error) => showToast(error.message, 'error'),
@@ -188,37 +193,37 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
   return (
     <Card>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="font-bold">{space ? `Edit ${space.name}` : 'New space'}</h2>
+        <h2 className="font-bold">{space ? t('admin.spaces.editTitle', { name: space.name }) : t('admin.spaces.newTitle')}</h2>
         <div className="grid gap-3 md:grid-cols-[90px_1fr]">
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold text-muted-foreground">Emoji</span>
+            <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.emoji')}</span>
             <input value={input.emoji} onChange={(e) => setInput({ ...input, emoji: e.target.value })} maxLength={8} className={cn(inputClass, 'text-center text-xl')} />
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold text-muted-foreground">Name</span>
-            <input value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value })} maxLength={40} placeholder="e.g. Brand Deals" className={inputClass} />
+            <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.name')}</span>
+            <input value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value })} maxLength={40} placeholder={t('admin.spaces.namePlaceholder')} className={inputClass} />
           </label>
         </div>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Description (shown when members open the space)</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.descriptionLabel')}</span>
           <input value={input.description} onChange={(e) => setInput({ ...input, description: e.target.value })} maxLength={200} className={inputClass} />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Cover image link (optional)</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.cover')}</span>
           <input value={input.coverUrl ?? ''} onChange={(e) => setInput({ ...input, coverUrl: e.target.value })} placeholder="https://…" className={inputClass} />
         </label>
         <label className="flex items-start gap-3 text-sm">
           <input type="checkbox" checked={input.adminOnly} onChange={(e) => setInput({ ...input, adminOnly: e.target.checked })} className="mt-0.5 accent-[var(--primary)]" />
           <span>
-            <span className="font-semibold">Only the team can post</span>
-            <span className="block text-xs text-muted-foreground">Members can read and comment, like Announcements.</span>
+            <span className="font-semibold">{t('admin.spaces.onlyTeam')}</span>
+            <span className="block text-xs text-muted-foreground">{t('admin.spaces.onlyTeamHint')}</span>
           </span>
         </label>
         {space && <AccessEditor space={space} />}
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onDone}>Cancel</Button>
+          <Button type="button" variant="ghost" onClick={onDone}>{t('common.cancel')}</Button>
           <Button type="submit" variant="primary" disabled={!valid || save.isPending}>
-            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : space ? 'Save' : 'Create space'}
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : space ? t('common.save') : t('admin.spaces.create')}
           </Button>
         </div>
       </form>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme, type Theme } from '@/providers/Theme';
-import { useState } from 'react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { useT } from '@/i18n/provider';
 
 export function ThemeToggle() {
@@ -19,12 +19,13 @@ export function ThemeToggle() {
             <button
               key={option}
               onClick={() => setTheme(option)}
-              className={`px-4 py-2 rounded-md font-medium transition-colors capitalize ${
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors ${
                 theme === option
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
               }`}
             >
+              {option === 'light' ? <Sun className='w-4 h-4' /> : option === 'dark' ? <Moon className='w-4 h-4' /> : <Monitor className='w-4 h-4' />}
               {t(`settings.${option}`)}
             </button>
           ))}

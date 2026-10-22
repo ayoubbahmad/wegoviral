@@ -15,6 +15,8 @@ import { MEMBERS_PAGE_SIZE, useAdminMembers } from '../api';
 import { RoleBadge, StatusBadge } from '../components/Badges';
 import { MembersFilters } from '../types';
 import { MemberPanel } from './MemberPanel';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -50,6 +52,7 @@ const useMembersFilters = () => {
 };
 
 export const AdminMembersContainer = () => {
+  const t = useT();
   const { filters, setFilters, selectedId, params, pathname, router } = useMembersFilters();
   const { data, isPending, isFetching, error } = useAdminMembers(filters);
   const [search, setSearch] = useState(filters.search ?? '');
@@ -75,8 +78,8 @@ export const AdminMembersContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/admin/help/member-panel"
-        title="Members"
-        description={data ? `${data.total} member${data.total === 1 ? '' : 's'}` : 'Everyone in the community'}
+        title={t('admin.members.title')}
+        description={data ? t('admin.members.count', { count: data.total }) : t('admin.members.everyone')}
       />
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
@@ -85,41 +88,41 @@ export const AdminMembersContainer = () => {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name, username or email"
-            aria-label="Search members"
+            placeholder={t('admin.members.search')}
+            aria-label={t('admin.members.searchLabel')}
             className="h-11 w-full rounded-lg border border-border bg-card pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <div className="grid grid-cols-3 gap-3 md:w-[480px]">
           <Select
-            aria-label="Filter by role"
+            aria-label={t('admin.members.roleFilter')}
             value={filters.role ?? ''}
             onChange={(event) => setFilters({ role: (event.target.value as UserRole) || undefined })}
             options={[
-              { value: '', label: 'All roles' },
-              ...(Object.keys(ROLE_LABELS) as UserRole[]).map((role) => ({ value: role, label: ROLE_LABELS[role] })),
+              { value: '', label: t('admin.members.allRoles') },
+              ...(Object.keys(ROLE_LABELS) as UserRole[]).map((role) => ({ value: role, label: t(`common.roles.${role}`) })),
             ]}
           />
           <Select
-            aria-label="Filter by status"
+            aria-label={t('admin.members.statusFilter')}
             value={filters.status ?? ''}
             onChange={(event) => setFilters({ status: (event.target.value as MemberStatus) || undefined })}
             options={[
-              { value: '', label: 'All statuses' },
+              { value: '', label: t('admin.members.allStatuses') },
               ...(Object.keys(STATUS_LABELS) as MemberStatus[]).map((status) => ({
                 value: status,
-                label: STATUS_LABELS[status],
+                label: t(`common.statuses.${status}`),
               })),
             ]}
           />
           <Select
-            aria-label="Sort members"
+            aria-label={t('admin.members.sort')}
             value={filters.sort}
             onChange={(event) => setFilters({ sort: event.target.value as MembersFilters['sort'] })}
             options={[
-              { value: 'newest', label: 'Newest first' },
-              { value: 'oldest', label: 'Oldest first' },
-              { value: 'name', label: 'Username A–Z' },
+              { value: 'newest', label: t('admin.members.newest') },
+              { value: 'oldest', label: t('admin.members.oldest') },
+              { value: 'name', label: t('admin.members.name') },
             ]}
           />
         </div>
@@ -134,17 +137,17 @@ export const AdminMembersContainer = () => {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : data.members.length === 0 ? (
-        <EmptyState icon={Users} title="No members found" description="Try another search or filter." />
+        <EmptyState icon={Users} title={t('admin.members.emptyTitle')} description={t('admin.members.emptyBody')} />
       ) : (
         <div className={isFetching ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
           <Table>
             <Table.Header>
-              <Table.Head>Member</Table.Head>
-              <Table.Head>Role</Table.Head>
-              <Table.Head>Status</Table.Head>
-              <Table.Head align="right">Posts</Table.Head>
-              <Table.Head align="right">Comments</Table.Head>
-              <Table.Head align="right">Joined</Table.Head>
+              <Table.Head>{t('admin.members.colMember')}</Table.Head>
+              <Table.Head>{t('admin.members.colRole')}</Table.Head>
+              <Table.Head>{t('admin.members.colStatus')}</Table.Head>
+              <Table.Head align="right">{t('admin.members.colPosts')}</Table.Head>
+              <Table.Head align="right">{t('admin.members.colComments')}</Table.Head>
+              <Table.Head align="right">{t('admin.members.colJoined')}</Table.Head>
             </Table.Header>
             <Table.Body>
               {data.members.map((member) => (
@@ -155,7 +158,7 @@ export const AdminMembersContainer = () => {
                       <div className="min-w-0">
                         <p className="flex items-center gap-1.5 text-sm font-semibold truncate">
                           {member.name || `@${member.username}`}
-                          {member.specialMember && <Star className="w-3.5 h-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label="Special member" />}
+                          {member.specialMember && <Star className="w-3.5 h-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label={t('admin.members.special')} />}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
                           @{member.username} · {member.email}
@@ -169,14 +172,14 @@ export const AdminMembersContainer = () => {
                       <StatusBadge status={member.status} />
                     ) : (
                       <span className="inline-flex rounded-full bg-secondary/60 px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground">
-                        {member.joinStatus === 'PENDING' ? 'Not approved yet' : 'Not approved'}
+                        {member.joinStatus === 'PENDING' ? t('admin.members.notApprovedYet') : t('admin.members.notApproved')}
                       </span>
                     )}
                   </td>
                   <td className="px-8 py-4 text-right text-sm tabular-nums">{member.postCount}</td>
                   <td className="px-8 py-4 text-right text-sm tabular-nums">{member.commentCount}</td>
                   <td className="px-8 py-4 text-right text-sm text-muted-foreground whitespace-nowrap">
-                    {new Date(member.createdAt).toLocaleDateString()}
+                    {new Date(member.createdAt).toLocaleDateString(activeIntl())}
                   </td>
                 </Table.Row>
               ))}
@@ -186,23 +189,23 @@ export const AdminMembersContainer = () => {
           {totalPages > 1 && (
             <div className="mt-4 flex items-center justify-end gap-3 text-sm">
               <span className="text-muted-foreground">
-                Page {filters.page} of {totalPages}
+                {t('admin.members.page', { page: filters.page, total: totalPages })}
               </span>
               <button
                 onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
                 disabled={filters.page <= 1}
-                aria-label="Previous page"
+                aria-label={t('admin.members.previousPage')}
                 className="p-2 rounded-lg border border-border hover:bg-secondary/50 disabled:opacity-40"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
               </button>
               <button
                 onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
                 disabled={filters.page >= totalPages}
-                aria-label="Next page"
+                aria-label={t('admin.members.nextPage')}
                 className="p-2 rounded-lg border border-border hover:bg-secondary/50 disabled:opacity-40"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 rtl:rotate-180" />
               </button>
             </div>
           )}

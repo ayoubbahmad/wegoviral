@@ -8,18 +8,21 @@ import { StatCard } from '@/components/StatCard';
 import { Card } from '@/components/Card';
 import { Skeleton } from '@/components/Skeleton';
 import { avatarFor } from '@/lib/utils';
-import { ROLE_LABELS, UserRole } from '@/lib/roles';
+import type { UserRole } from '@/lib/roles';
 import { useAdminOverview } from '../api';
 import { RoleBadge, StatusBadge } from '../components/Badges';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 const TEAM_ROLES: UserRole[] = ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'INSTRUCTOR'];
 
 export const AdminOverviewContainer = () => {
+  const t = useT();
   const { data, isPending, error, refetch } = useAdminOverview();
 
   return (
     <PageContainer>
-      <PageHeader title="Overview" description="How the community is doing this week." />
+      <PageHeader title={t('admin.overview.title')} description={t('admin.overview.description')} />
 
       {isPending ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -31,7 +34,7 @@ export const AdminOverviewContainer = () => {
         <Card className="text-center space-y-2">
           <p className="text-sm text-muted-foreground">{error.message}</p>
           <button onClick={() => refetch()} className="text-sm font-semibold text-primary hover:underline">
-            Try again
+            {t('admin.overview.tryAgain')}
           </button>
         </Card>
       ) : (
@@ -42,8 +45,8 @@ export const AdminOverviewContainer = () => {
               className="flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm font-semibold hover:bg-primary/10"
             >
               <UserCheck className="w-5 h-5 text-primary" />
-              {data.pendingApprovals} new member{data.pendingApprovals === 1 ? '' : 's'} waiting for approval
-              <span className="ml-auto text-primary">Review →</span>
+              {t('admin.overview.pendingApprovals', { count: data.pendingApprovals })}
+              <span className="ms-auto text-primary">{t('admin.overview.review')}</span>
             </Link>
           )}
 
@@ -54,12 +57,12 @@ export const AdminOverviewContainer = () => {
             >
               <Flag className="w-5 h-5 text-red-500" />
               {[
-                data.openReports && `${data.openReports} open report${data.openReports === 1 ? '' : 's'}`,
-                data.heldContent && `${data.heldContent} held by the word filter`,
+                data.openReports && t('admin.overview.openReports', { count: data.openReports }),
+                data.heldContent && t('admin.overview.held', { count: data.heldContent }),
               ]
                 .filter(Boolean)
                 .join(' · ')}
-              <span className="ml-auto text-red-500">Moderate →</span>
+              <span className="ms-auto text-red-500">{t('admin.overview.moderate')}</span>
             </Link>
           )}
 
@@ -69,31 +72,31 @@ export const AdminOverviewContainer = () => {
               className="flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm font-semibold hover:bg-primary/10"
             >
               <ClipboardCheck className="w-5 h-5 text-primary" />
-              {data.pendingReviews} new member post{data.pendingReviews === 1 ? '' : 's'} waiting for review
-              <span className="ml-auto text-primary">Review →</span>
+              {t('admin.overview.pendingReviews', { count: data.pendingReviews })}
+              <span className="ms-auto text-primary">{t('admin.overview.review')}</span>
             </Link>
           )}
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <StatCard label="Members" value={data.members.total} icon={Users} />
-            <StatCard label="New this week" value={data.members.newThisWeek} icon={UserPlus} />
+            <StatCard label={t('admin.overview.members')} value={data.members.total} icon={Users} />
+            <StatCard label={t('admin.overview.newThisWeek')} value={data.members.newThisWeek} icon={UserPlus} />
             <StatCard
-              label="Active this week"
+              label={t('admin.overview.activeThisWeek')}
               value={data.members.activeThisWeek}
               icon={Activity}
-              description="Posted, commented or liked"
+              description={t('admin.overview.activeHint')}
             />
-            <StatCard label="Posts this week" value={data.content.postsThisWeek} icon={MessageSquare} />
-            <StatCard label="Comments this week" value={data.content.commentsThisWeek} icon={MessageCircle} />
+            <StatCard label={t('admin.overview.postsThisWeek')} value={data.content.postsThisWeek} icon={MessageSquare} />
+            <StatCard label={t('admin.overview.commentsThisWeek')} value={data.content.commentsThisWeek} icon={MessageCircle} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="space-y-4">
-              <h2 className="font-bold">Team</h2>
+              <h2 className="font-bold">{t('admin.overview.team')}</h2>
               <ul className="space-y-2 text-sm">
                 {TEAM_ROLES.map((role) => (
                   <li key={role} className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{ROLE_LABELS[role]}s</span>
+                    <span className="text-muted-foreground">{t(`admin.overview.teamRoles.${role as 'ADMIN'}`)}</span>
                     <span className="font-semibold tabular-nums">{data.members.byRole[role] ?? 0}</span>
                   </li>
                 ))}
@@ -101,7 +104,7 @@ export const AdminOverviewContainer = () => {
             </Card>
 
             <Card className="space-y-4">
-              <h2 className="font-bold">Restricted members</h2>
+              <h2 className="font-bold">{t('admin.overview.restricted')}</h2>
               <ul className="space-y-2 text-sm">
                 {(['MUTED', 'SUSPENDED', 'BANNED'] as const).map((status) => (
                   <li key={status} className="flex items-center justify-between">
@@ -119,9 +122,9 @@ export const AdminOverviewContainer = () => {
 
             <Card className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold">Newest members</h2>
+                <h2 className="font-bold">{t('admin.overview.newest')}</h2>
                 <Link href="/admin/members" className="text-xs font-semibold text-muted-foreground hover:text-primary">
-                  See all
+                  {t('admin.overview.seeAll')}
                 </Link>
               </div>
               <ul className="space-y-3">
@@ -130,7 +133,7 @@ export const AdminOverviewContainer = () => {
                     <img src={avatarFor(member)} alt="" className="w-8 h-8 rounded-full border border-border" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold truncate">{member.name || `@${member.username}`}</p>
-                      <p className="text-xs text-muted-foreground">Joined {new Date(member.createdAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground">{t('admin.overview.joined', { date: new Date(member.createdAt).toLocaleDateString(activeIntl()) })}</p>
                     </div>
                     <RoleBadge role={member.role} />
                   </li>

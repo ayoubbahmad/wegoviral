@@ -80,4 +80,5 @@ export const common = {
     levelOption: 'Level {level} · {name} ({points} pts)',
     tiers: 'Tiers (none ticked = every tier)',
   },
+  statuses: { ACTIVE: 'Active', MUTED: 'Muted', SUSPENDED: 'Suspended', BANNED: 'Banned' },
 };

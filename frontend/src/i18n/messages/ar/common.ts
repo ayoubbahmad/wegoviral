@@ -96,4 +96,5 @@ export const common: Shape<typeof en> = {
     levelOption: 'المستوى {level} · {name} ({points} نقطة)',
     tiers: 'الباقات (عدم التحديد = جميع الباقات)',
   },
+  statuses: { ACTIVE: 'نشط', MUTED: 'مكتوم', SUSPENDED: 'موقوف', BANNED: 'محظور' },
 };

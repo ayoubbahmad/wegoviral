@@ -14,6 +14,8 @@ import { useCan } from '@/providers/Auth';
 import { cn } from '@/lib/utils';
 import { useCreateInvite, useInvites, useRevokeInvite } from '../api/joining';
 import { InviteLink } from '../types';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -21,21 +23,22 @@ const inputClass =
 const inviteUrl = (code: string) => `${window.location.origin}/join/${code}`;
 
 const inviteState = (invite: InviteLink) => {
-  if (invite.revokedAt) return { label: 'Turned off', active: false };
-  if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now()) return { label: 'Expired', active: false };
-  if (invite.maxUses !== null && invite.useCount >= invite.maxUses) return { label: 'Limit reached', active: false };
-  return { label: 'Active', active: true };
+  if (invite.revokedAt) return { key: 'off' as const, active: false };
+  if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now()) return { key: 'expired' as const, active: false };
+  if (invite.maxUses !== null && invite.useCount >= invite.maxUses) return { key: 'limit' as const, active: false };
+  return { key: 'active' as const, active: true };
 };
 
 export const AdminInvitesContainer = () => {
+  const t = useT();
   const { data, isPending, error } = useInvites();
 
   return (
     <PageContainer>
       <PageHeader
         helpHref="/admin/help/invite-links"
-        title="Invite links"
-        description="Links that let people join without waiting for approval, e.g. for a campaign or special guests."
+        title={t('admin.invites.title')}
+        description={t('admin.invites.description')}
       />
       <CreateInviteForm />
       {isPending ? (
@@ -43,7 +46,7 @@ export const AdminInvitesContainer = () => {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : data.length === 0 ? (
-        <EmptyState icon={Link2} title="No invite links yet" description="Create one above and share it." />
+        <EmptyState icon={Link2} title={t('admin.invites.emptyTitle')} description={t('admin.invites.emptyBody')} />
       ) : (
         <div className="space-y-3">
           {data.map((invite) => (
@@ -56,6 +59,7 @@ export const AdminInvitesContainer = () => {
 };
 
 const CreateInviteForm = () => {
+  const t = useT();
   const { showToast } = useToast();
   const can = useCan();
   const create = useCreateInvite();
@@ -80,9 +84,9 @@ const CreateInviteForm = () => {
           setMaxUses('');
           try {
             await navigator.clipboard.writeText(inviteUrl(invite.code));
-            showToast('Invite link created and copied');
+            showToast(t('admin.invites.createdCopied'));
           } catch {
-            showToast('Invite link created');
+            showToast(t('admin.invites.created'));
           }
         },
         onError: (error) => showToast(error.message, 'error'),
@@ -93,45 +97,40 @@ const CreateInviteForm = () => {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="font-bold">New invite link</h2>
+        <h2 className="font-bold">{t('admin.invites.newTitle')}</h2>
         <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr]">
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold text-muted-foreground">Name (only staff see it)</span>
-            <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Instagram followers October" maxLength={100} className={inputClass} />
+            <span className="text-xs font-semibold text-muted-foreground">{t('admin.invites.name')}</span>
+            <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t('admin.invites.namePlaceholder')} maxLength={100} className={inputClass} />
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold text-muted-foreground">Expires</span>
+            <span className="text-xs font-semibold text-muted-foreground">{t('admin.invites.expires')}</span>
             <Select
-              aria-label="Expires"
+              aria-label={t('admin.invites.expires')}
               value={expires}
               onChange={(e) => setExpires(e.target.value)}
               options={[
-                { value: '1', label: 'In 1 day' },
-                { value: '7', label: 'In 7 days' },
-                { value: '30', label: 'In 30 days' },
-                { value: '90', label: 'In 90 days' },
-                { value: 'never', label: 'Never' },
+                ...[1, 7, 30, 90].map((days) => ({ value: String(days), label: t('admin.invites.inDays', { count: days }) })),
+                { value: 'never', label: t('admin.invites.never') },
               ]}
             />
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold text-muted-foreground">Max uses</span>
-            <input type="number" min={1} value={maxUses} onChange={(e) => setMaxUses(e.target.value)} placeholder="No limit" className={inputClass} />
+            <span className="text-xs font-semibold text-muted-foreground">{t('admin.invites.maxUses')}</span>
+            <input type="number" min={1} value={maxUses} onChange={(e) => setMaxUses(e.target.value)} placeholder={t('admin.invites.noLimit')} className={inputClass} />
           </label>
         </div>
         {can('members.exempt') && (
           <label className="flex items-start gap-3 text-sm">
             <input type="checkbox" checked={specialMember} onChange={(e) => setSpecialMember(e.target.checked)} className="mt-0.5 accent-[var(--primary)]" />
             <span>
-              <span className="font-semibold">Special members</span>
-              <span className="block text-xs text-muted-foreground">
-                People who join with this link skip approval, the guide and the first-posts review. For instructors, guests and partners.
-              </span>
+              <span className="font-semibold">{t('admin.invites.special')}</span>
+              <span className="block text-xs text-muted-foreground">{t('admin.invites.specialHint')}</span>
             </span>
           </label>
         )}
         <Button type="submit" variant="primary" disabled={label.trim().length < 2 || create.isPending}>
-          {create.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create link'}
+          {create.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.invites.create')}
         </Button>
       </form>
     </Card>
@@ -139,6 +138,7 @@ const CreateInviteForm = () => {
 };
 
 const InviteRow = ({ invite }: { invite: InviteLink }) => {
+  const t = useT();
   const { showToast } = useToast();
   const revoke = useRevokeInvite();
   const state = inviteState(invite);
@@ -146,9 +146,9 @@ const InviteRow = ({ invite }: { invite: InviteLink }) => {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(inviteUrl(invite.code));
-      showToast('Link copied');
+      showToast(t('admin.invites.copied'));
     } catch {
-      showToast('Could not copy the link', 'error');
+      showToast(t('admin.invites.copyFailed'), 'error');
     }
   };
 
@@ -159,21 +159,22 @@ const InviteRow = ({ invite }: { invite: InviteLink }) => {
           {invite.label}
           {invite.specialMember && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-500">
-              <Star className="w-3 h-3" /> Special
+              <Star className="w-3 h-3" /> {t('admin.invites.specialTag')}
             </span>
           )}
         </p>
         <p className="text-xs text-muted-foreground">
-          {state.label} · {invite.useCount}
-          {invite.maxUses !== null ? ` / ${invite.maxUses}` : ''} used
-          {invite.expiresAt ? ` · expires ${new Date(invite.expiresAt).toLocaleDateString()}` : ''}
-          {invite.createdBy ? ` · by @${invite.createdBy.username}` : ''}
+          {invite.maxUses !== null
+            ? t('admin.invites.usedOf', { state: t(`admin.invites.states.${state.key}`), count: invite.useCount, max: invite.maxUses })
+            : t('admin.invites.used', { state: t(`admin.invites.states.${state.key}`), count: invite.useCount })}
+          {invite.expiresAt ? t('admin.invites.expiresOn', { date: new Date(invite.expiresAt).toLocaleDateString(activeIntl()) }) : ''}
+          {invite.createdBy ? t('admin.invites.by', { username: invite.createdBy.username }) : ''}
         </p>
       </div>
       <code className="truncate rounded-lg bg-secondary/40 px-3 py-1.5 text-xs">/join/{invite.code}</code>
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={copy} disabled={!state.active}>
-          <Copy className="w-3.5 h-3.5" /> Copy
+          <Copy className="w-3.5 h-3.5" /> {t('admin.invites.copy')}
         </Button>
         {!invite.revokedAt && (
           <Button
@@ -181,14 +182,14 @@ const InviteRow = ({ invite }: { invite: InviteLink }) => {
             size="sm"
             disabled={revoke.isPending}
             onClick={() => {
-              if (!window.confirm(`Turn off "${invite.label}"? The link will stop working.`)) return;
+              if (!window.confirm(t('admin.invites.offConfirm', { name: invite.label }))) return;
               revoke.mutate(invite.id, {
-                onSuccess: () => showToast('Invite link turned off'),
+                onSuccess: () => showToast(t('admin.invites.turnedOff')),
                 onError: (error) => showToast(error.message, 'error'),
               });
             }}
           >
-            Turn off
+            {t('admin.invites.turnOff')}
           </Button>
         )}
       </div>

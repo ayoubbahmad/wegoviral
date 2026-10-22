@@ -1,6 +1,8 @@
 import type { Paths, Shape } from '../types';
 import { common as enCommon } from './en/common';
 import { nav as enNav } from './en/nav';
+import { activity as enActivity } from './en/activity';
+import { admin as enAdmin } from './en/admin';
 import { auth as enAuth } from './en/auth';
 import { challenges as enChallenges } from './en/challenges';
 import { courses as enCourses } from './en/courses';
@@ -13,6 +15,8 @@ import { onboarding as enOnboarding } from './en/onboarding';
 import { settings as enSettings } from './en/settings';
 import { common as frCommon } from './fr/common';
 import { nav as frNav } from './fr/nav';
+import { activity as frActivity } from './fr/activity';
+import { admin as frAdmin } from './fr/admin';
 import { auth as frAuth } from './fr/auth';
 import { challenges as frChallenges } from './fr/challenges';
 import { courses as frCourses } from './fr/courses';
@@ -25,6 +29,8 @@ import { onboarding as frOnboarding } from './fr/onboarding';
 import { settings as frSettings } from './fr/settings';
 import { common as arCommon } from './ar/common';
 import { nav as arNav } from './ar/nav';
+import { activity as arActivity } from './ar/activity';
+import { admin as arAdmin } from './ar/admin';
 import { auth as arAuth } from './ar/auth';
 import { challenges as arChallenges } from './ar/challenges';
 import { courses as arCourses } from './ar/courses';
@@ -36,12 +42,12 @@ import { members as arMembers } from './ar/members';
 import { onboarding as arOnboarding } from './ar/onboarding';
 import { settings as arSettings } from './ar/settings';
 
-const en = { common: enCommon, nav: enNav, auth: enAuth, challenges: enChallenges, courses: enCourses, events: enEvents, feed: enFeed, help: enHelp, leaderboard: enLeaderboard, members: enMembers, onboarding: enOnboarding, settings: enSettings };
+const en = { common: enCommon, nav: enNav, activity: enActivity, admin: enAdmin, auth: enAuth, challenges: enChallenges, courses: enCourses, events: enEvents, feed: enFeed, help: enHelp, leaderboard: enLeaderboard, members: enMembers, onboarding: enOnboarding, settings: enSettings };
 
 export type Messages = Shape<typeof en>;
 export type MessageKey = Paths<typeof en>;
 
-const fr: Messages = { common: frCommon, nav: frNav, auth: frAuth, challenges: frChallenges, courses: frCourses, events: frEvents, feed: frFeed, help: frHelp, leaderboard: frLeaderboard, members: frMembers, onboarding: frOnboarding, settings: frSettings };
-const ar: Messages = { common: arCommon, nav: arNav, auth: arAuth, challenges: arChallenges, courses: arCourses, events: arEvents, feed: arFeed, help: arHelp, leaderboard: arLeaderboard, members: arMembers, onboarding: arOnboarding, settings: arSettings };
+const fr: Messages = { common: frCommon, nav: frNav, activity: frActivity, admin: frAdmin, auth: frAuth, challenges: frChallenges, courses: frCourses, events: frEvents, feed: frFeed, help: frHelp, leaderboard: frLeaderboard, members: frMembers, onboarding: frOnboarding, settings: frSettings };
+const ar: Messages = { common: arCommon, nav: arNav, activity: arActivity, admin: arAdmin, auth: arAuth, challenges: arChallenges, courses: arCourses, events: arEvents, feed: arFeed, help: arHelp, leaderboard: arLeaderboard, members: arMembers, onboarding: arOnboarding, settings: arSettings };
 
 export const messages = { en: en as Messages, fr, ar };

@@ -1,168 +1,95 @@
-import { ROLE_LABELS, UserRole } from '@/lib/roles';
+import type { UserRole } from '@/lib/roles';
+import { activeIntl } from '@/i18n/active';
+import type { MessageKey } from '@/i18n/messages';
+import type { Vars } from '@/i18n/types';
 import { ActivityEntry } from '../types';
 
-const formatUntil = (until: unknown) =>
-  typeof until === 'string' ? `until ${new Date(until).toLocaleDateString()}` : 'indefinitely';
+type Translate = (key: MessageKey, vars?: Vars) => string;
 
-/** One readable sentence per log entry, without the actor's name (shown separately). */
-export function describeActivity(entry: ActivityEntry): string {
-  const target = entry.targetLabel ?? 'a member';
+/** Actions whose sentence is a plain template ("member.warned" → activity.member_warned). */
+const SIMPLE = new Set([
+  'member.muted', 'member.suspended', 'member.banned', 'member.restriction_lifted', 'member.warned',
+  'post.deleted', 'post.pinned', 'post.unpinned', 'post.edited', 'post.restored', 'post.approved',
+  'comment.deleted', 'comment.edited', 'comment.restored', 'comment.released',
+  'member.special_granted', 'member.special_removed', 'guide.published', 'invite.revoked',
+  'member.vouched_post_removed', 'member.referral_restricted',
+  'space.created', 'space.updated', 'space.archived', 'space.unarchived', 'spaces.reordered',
+  'tier.created', 'tier.deleted',
+  'event.created', 'event.published', 'event.updated', 'event.cancelled', 'event.deleted',
+  'points.rules_updated',
+  'badge.created', 'badge.updated', 'badge.archived', 'badge.unarchived', 'badge.removed',
+  'course.created', 'course.published', 'course.unpublished', 'course.archived', 'course.updated', 'course.deleted',
+  'challenge.created', 'challenge.published', 'challenge.updated', 'challenge.cancelled', 'challenge.deleted',
+  'challenge.winners_cleared',
+  'help.created', 'help.updated', 'help.published', 'help.unpublished', 'help.deleted',
+]);
+
+const keyOf = (action: string) => `activity.${action.replace(/\./g, '_')}` as MessageKey;
+
+/** One readable sentence per log entry, without the actor's name (shown separately), in the app's language. */
+export function describeActivity(entry: ActivityEntry, t: Translate): string {
+  const target = entry.targetLabel ?? t('activity.aMember');
   const details = entry.details ?? {};
-  const reason = typeof details.reason === 'string' ? ` — “${details.reason}”` : '';
+  const quote = (text: unknown) => (typeof text === 'string' ? t('activity.quoted', { text }) : '');
+  const role = (value: unknown) => t(`common.roles.${value as UserRole}`);
+  const until = typeof details.until === 'string'
+    ? t('activity.until', { date: new Date(details.until).toLocaleDateString(activeIntl()) })
+    : t('activity.indefinitely');
+  const base = { target, reason: quote(details.reason), note: quote(details.note), until, badge: String(details.badge ?? '') };
+
+  if (SIMPLE.has(entry.action)) return t(keyOf(entry.action), base);
 
   switch (entry.action) {
     case 'member.role_changed':
-      return `changed ${target}'s role from ${ROLE_LABELS[details.from as UserRole] ?? details.from} to ${
-        ROLE_LABELS[details.to as UserRole] ?? details.to
-      }`;
-    case 'member.muted':
-      return `muted ${target} ${formatUntil(details.until)}${reason}`;
-    case 'member.suspended':
-      return `suspended ${target} ${formatUntil(details.until)}${reason}`;
-    case 'member.banned':
-      return `banned ${target}${reason}`;
-    case 'member.restriction_lifted':
-      return `lifted the restriction on ${target}`;
-    case 'post.deleted':
-      return `deleted a post: “${target}”`;
-    case 'post.pinned':
-      return `pinned a post: “${target}”`;
-    case 'post.unpinned':
-      return `unpinned a post: “${target}”`;
-    case 'comment.deleted':
-      return `deleted a comment: “${target}”`;
-    case 'member.approved': {
-      const via = details.via === 'invite' ? ` via the invite “${details.invite}”` : details.via === 'referral' ? ' through their referral link' : details.via === 'open_signup' ? ' (approval was off)' : '';
-      return `approved ${target}${via}`;
-    }
+      return t('activity.member_role_changed', { target, from: role(details.from), to: role(details.to) });
+    case 'member.approved':
+      return details.via === 'invite'
+        ? t('activity.member_approved_invite', { target, invite: String(details.invite ?? '') })
+        : details.via === 'referral'
+          ? t('activity.member_approved_referral', base)
+          : details.via === 'open_signup'
+            ? t('activity.member_approved_open', base)
+            : t('activity.member_approved', base);
     case 'member.rejected':
-      return `didn't approve ${target}${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
-    case 'member.special_granted':
-      return `made ${target} a special member`;
-    case 'member.special_removed':
-      return `removed special-member status from ${target}`;
-    case 'settings.updated':
-      return `changed the joining rules (${Object.keys(details).join(', ')})`;
-    case 'guide.published':
-      return `published ${target}`;
-    case 'quiz.updated':
-      return `updated the community quiz (${details.questions} questions)`;
-    case 'invite.created':
-      return `created the invite link “${target}”${details.specialMember ? ' for special members' : ''}`;
-    case 'invite.revoked':
-      return `turned off the invite link “${target}”`;
-    case 'post.approved':
-      return `approved a new member's post: “${target}”`;
+      return t('activity.member_rejected', base);
     case 'post.rejected':
-      return `didn't approve a new member's post: “${target}”${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
-    case 'member.vouched_post_removed':
-      return `removed a post this member had approved in review: “${target}”`;
-    case 'member.referral_restricted':
-      return `restricted ${target}, who joined through this member's referral link`;
+      return t('activity.post_rejected', base);
+    case 'settings.updated':
+      return t('activity.settings_updated', { fields: Object.keys(details).join(', ') });
+    case 'quiz.updated':
+      return t('activity.quiz_updated', { count: Number(details.questions ?? 0) });
+    case 'invite.created':
+      return t(details.specialMember ? 'activity.invite_created_special' : 'activity.invite_created', base);
     case 'reports.dismissed':
-      return `dismissed ${details.reports} report${details.reports === 1 ? '' : 's'} on: “${target}”`;
+      return t('activity.reports_dismissed', { target, count: Number(details.reports ?? 0) });
     case 'reports.resolved':
-      return `handled ${details.reports} report${details.reports === 1 ? '' : 's'} (${details.resolution}) on: “${target}”`;
-    case 'member.warned':
-      return `warned ${target}${reason}`;
-    case 'post.edited':
-      return `edited a post: “${target}”`;
-    case 'comment.edited':
-      return `edited a comment: “${target}”`;
-    case 'post.restored':
-      return `restored a post: “${target}”`;
-    case 'comment.restored':
-      return `restored a comment: “${target}”`;
-    case 'comment.released':
-      return `released a held comment: “${target}”`;
-    case 'space.created':
-      return `created the space ${target}`;
-    case 'space.updated':
-      return `edited the space ${target}`;
-    case 'space.archived':
-      return `archived the space ${target}`;
-    case 'space.unarchived':
-      return `brought back the space ${target}`;
-    case 'spaces.reordered':
-      return 'changed the order of the spaces';
-    case 'tier.created':
-      return `created the tier ${target}`;
+      return t('activity.reports_resolved', { target, count: Number(details.reports ?? 0), resolution: String(details.resolution ?? '') });
     case 'tier.updated':
-      return details.isDefault ? `made ${target} the default tier` : `edited the tier ${target}`;
-    case 'tier.deleted':
-      return `deleted the tier ${target}`;
+      return t(details.isDefault ? 'activity.tier_default' : 'activity.tier_updated', base);
     case 'member.tier_changed':
-      return `moved ${target} from the ${details.from ?? 'default'} tier to ${details.to ?? 'the default tier'}`;
-    case 'access.updated':
-      return details.open ? `opened the ${entry.targetType} ${target} to every member` : `changed who can open the ${entry.targetType} ${target}`;
-    case 'event.created':
-      return `created the event “${target}”`;
-    case 'event.published':
-      return `published the event “${target}”`;
-    case 'event.updated':
-      return `edited the event “${target}”`;
-    case 'event.cancelled':
-      return `cancelled the event “${target}”`;
-    case 'event.deleted':
-      return `deleted the event “${target}”`;
-    case 'points.rules_updated':
-      return 'changed the point rules';
+      return t('activity.member_tier_changed', {
+        target,
+        from: typeof details.from === 'string' ? details.from : t('activity.defaultTier'),
+        to: typeof details.to === 'string' ? details.to : t('activity.theDefaultTier'),
+      });
+    case 'access.updated': {
+      const type = ['space', 'event', 'course', 'challenge'].includes(entry.targetType)
+        ? t(`activity.types.${entry.targetType as 'space'}`)
+        : entry.targetType;
+      return t(details.open ? 'activity.access_opened' : 'activity.access_updated', { target, type });
+    }
     case 'points.levels_updated':
-      return `changed the levels (${details.levels} levels)`;
+      return t('activity.points_levels_updated', { count: Number(details.levels ?? 0) });
     case 'points.adjusted': {
       const points = Number(details.points);
-      return `${points > 0 ? 'gave' : 'took'} ${Math.abs(points)} point${Math.abs(points) === 1 ? '' : 's'} ${points > 0 ? 'to' : 'from'} ${target}${reason}`;
+      return t(points > 0 ? 'activity.points_given' : 'activity.points_taken', { ...base, count: Math.abs(points) });
     }
-    case 'badge.created':
-      return `created the badge ${target}`;
-    case 'badge.updated':
-      return `edited the badge ${target}`;
-    case 'badge.archived':
-      return `archived the badge ${target}`;
-    case 'badge.unarchived':
-      return `brought back the badge ${target}`;
     case 'badge.awarded':
-      return `gave ${target} the ${details.badge} badge${typeof details.note === 'string' ? ` — “${details.note}”` : ''}`;
-    case 'badge.removed':
-      return `removed the ${details.badge} badge from ${target}`;
-    case 'course.created':
-      return `created the course “${target}”`;
-    case 'course.published':
-      return `published the course “${target}”`;
-    case 'course.unpublished':
-      return `moved the course “${target}” back to draft`;
-    case 'course.archived':
-      return `archived the course “${target}”`;
-    case 'course.updated':
-      return `edited the course “${target}”`;
-    case 'course.deleted':
-      return `deleted the course “${target}”`;
-    case 'challenge.created':
-      return `created the challenge “${target}”`;
-    case 'challenge.published':
-      return `published the challenge “${target}”`;
-    case 'challenge.updated':
-      return `edited the challenge “${target}”`;
-    case 'challenge.cancelled':
-      return `cancelled the challenge “${target}”`;
-    case 'challenge.deleted':
-      return `deleted the challenge “${target}”`;
+      return t('activity.badge_awarded', base);
     case 'challenge.check_in_removed':
-      return `removed a check-in from “${target}”${typeof details.content === 'string' ? `: “${details.content}”` : ''}`;
+      return t('activity.challenge_check_in_removed', { target, content: typeof details.content === 'string' ? `: ${t('activity.quoted', { text: details.content }).replace(/^ — /, '')}` : '' });
     case 'challenge.winners_picked':
-      return `picked ${details.winners} winner${details.winners === 1 ? '' : 's'} for “${target}”${details.mode === 'top' ? ' (top of the board)' : ''}`;
-    case 'challenge.winners_cleared':
-      return `cleared the winners of “${target}”`;
-    case 'help.created':
-      return `wrote the help article “${target}”`;
-    case 'help.updated':
-      return `edited the help article “${target}”`;
-    case 'help.published':
-      return `published the help article “${target}”`;
-    case 'help.unpublished':
-      return `unpublished the help article “${target}”`;
-    case 'help.deleted':
-      return `deleted the help article “${target}”`;
+      return t('activity.challenge_winners_picked', { target, count: Number(details.winners ?? 0), top: details.mode === 'top' ? t('activity.topOfBoard') : '' });
     default:
       return `${entry.action.replace(/[._]/g, ' ')} ${target}`;
   }

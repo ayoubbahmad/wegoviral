@@ -17,6 +17,8 @@ import { MemberDetail, RestrictionInput } from '../types';
 import { JoiningSection } from './JoiningSection';
 import { PointsSection } from './PointsSection';
 import { useWarnMember } from '../api/moderation';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
 const DURATIONS = [1, 3, 7, 30, 90];
 
@@ -26,6 +28,7 @@ interface MemberPanelProps {
 }
 
 export const MemberPanel = ({ memberId, onClose }: MemberPanelProps) => {
+  const t = useT();
   const { data: member, isPending, error } = useAdminMember(memberId);
 
   useEffect(() => {
@@ -42,12 +45,12 @@ export const MemberPanel = ({ memberId, onClose }: MemberPanelProps) => {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Member details"
+        aria-label={t('admin.panel.label')}
         className="relative h-full w-full max-w-md overflow-y-auto border-l border-border bg-card shadow-2xl animate-in slide-in-from-right duration-200"
       >
         <button
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t('common.close')}
           className="absolute right-4 top-4 p-2 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
         >
           <X className="w-4 h-4" />
@@ -70,6 +73,7 @@ export const MemberPanel = ({ memberId, onClose }: MemberPanelProps) => {
 };
 
 const MemberDetails = ({ member }: { member: MemberDetail }) => {
+  const t = useT();
   const { user } = useAuth();
   const { allowedActions } = member;
   const isSelf = user?.id === member.id;
@@ -93,10 +97,10 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
 
       <dl className="grid grid-cols-2 gap-3 text-sm">
         {[
-          ['Posts', member.postCount],
-          ['Comments', member.commentCount],
-          ['Likes given', member.likesGiven],
-          ['Likes received', member.likesReceived],
+          [t('admin.panel.posts'), member.postCount],
+          [t('admin.panel.comments'), member.commentCount],
+          [t('admin.panel.likesGiven'), member.likesGiven],
+          [t('admin.panel.likesReceived'), member.likesReceived],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl bg-secondary/30 p-3">
             <dt className="text-xs text-muted-foreground">{label}</dt>
@@ -104,8 +108,8 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
           </div>
         ))}
         <div className="col-span-2 rounded-xl bg-secondary/30 p-3">
-          <dt className="text-xs text-muted-foreground">Joined</dt>
-          <dd className="font-semibold">{new Date(member.createdAt).toLocaleDateString()}</dd>
+          <dt className="text-xs text-muted-foreground">{t('admin.panel.joined')}</dt>
+          <dd className="font-semibold">{new Date(member.createdAt).toLocaleDateString(activeIntl())}</dd>
         </div>
       </dl>
 
@@ -119,8 +123,8 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
         <p className="flex items-start gap-2 rounded-xl border border-border p-3 text-sm text-muted-foreground">
           <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
           {isSelf
-            ? "This is you. Someone else on the team has to change your account."
-            : "You can't manage this member: their role is the same as or higher than yours."}
+            ? t('admin.panel.isYou')
+            : t('admin.panel.cantManage')}
         </p>
       )}
 
@@ -129,15 +133,15 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
       {allowedActions.restrict && member.status === 'ACTIVE' && <RestrictForm member={member} />}
 
       <section className="space-y-3">
-        <h3 className="text-sm font-bold">History</h3>
+        <h3 className="text-sm font-bold">{t('admin.panel.history')}</h3>
         {member.history.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No admin actions on this member yet.</p>
+          <p className="text-sm text-muted-foreground">{t('admin.panel.noHistory')}</p>
         ) : (
           <ul className="space-y-3">
             {member.history.map((entry) => (
               <li key={entry.id} className="text-sm">
-                <span className="font-semibold">{entry.actor ? `@${entry.actor.username}` : 'Someone'}</span>{' '}
-                {describeActivity(entry)}
+                <span className="font-semibold">{entry.actor ? `@${entry.actor.username}` : t('admin.panel.someone')}</span>{' '}
+                {describeActivity(entry, t)}
                 <span className="block text-xs text-muted-foreground">{formatRelativeDate(entry.createdAt)}</span>
               </li>
             ))}
@@ -149,6 +153,7 @@ const MemberDetails = ({ member }: { member: MemberDetail }) => {
 };
 
 const CurrentRestriction = ({ member }: { member: MemberDetail }) => {
+  const t = useT();
   const { showToast } = useToast();
   const lift = useLiftRestriction();
   const canLift = member.allowedActions.restrict && (member.status !== 'BANNED' || member.allowedActions.ban);
@@ -156,10 +161,10 @@ const CurrentRestriction = ({ member }: { member: MemberDetail }) => {
   return (
     <section className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
       <p className="font-semibold">
-        {STATUS_LABELS[member.status]}{' '}
-        {member.statusUntil ? `until ${new Date(member.statusUntil).toLocaleString()}` : 'until lifted'}
+        {t(`common.statuses.${member.status}`)}{' '}
+        {member.statusUntil ? t('admin.panel.until', { date: new Date(member.statusUntil).toLocaleString(activeIntl()) }) : t('admin.panel.untilLifted')}
       </p>
-      {member.statusReason && <p className="text-muted-foreground">Reason: {member.statusReason}</p>}
+      {member.statusReason && <p className="text-muted-foreground">{t('admin.panel.reason', { reason: member.statusReason })}</p>}
       {canLift && (
         <Button
           variant="outline"
@@ -167,12 +172,12 @@ const CurrentRestriction = ({ member }: { member: MemberDetail }) => {
           disabled={lift.isPending}
           onClick={() =>
             lift.mutate(member.id, {
-              onSuccess: () => showToast('Restriction lifted'),
+              onSuccess: () => showToast(t('admin.panel.lifted')),
               onError: (error) => showToast(error.message, 'error'),
             })
           }
         >
-          {lift.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Lift restriction'}
+          {lift.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.panel.lift')}
         </Button>
       )}
     </section>
@@ -180,19 +185,20 @@ const CurrentRestriction = ({ member }: { member: MemberDetail }) => {
 };
 
 const RoleForm = ({ member }: { member: MemberDetail }) => {
+  const t = useT();
   const { showToast } = useToast();
   const changeRole = useChangeRole();
   const [role, setRole] = useState<UserRole>(member.role);
 
   const handleSave = () => {
     const isPowerful = role === 'ADMIN' || role === 'SUPER_ADMIN';
-    if (isPowerful && !window.confirm(`Make @${member.username} ${ROLE_LABELS[role]}? They'll get access to admin tools.`)) {
+    if (isPowerful && !window.confirm(t('admin.panel.makeConfirm', { username: member.username, role: t(`common.roles.${role}`) }))) {
       return;
     }
     changeRole.mutate(
       { id: member.id, role },
       {
-        onSuccess: () => showToast(`@${member.username} is now ${ROLE_LABELS[role]}`),
+        onSuccess: () => showToast(t('admin.panel.roleChanged', { username: member.username, role: t(`common.roles.${role}`) })),
         onError: (error) => showToast(error.message, 'error'),
       },
     );
@@ -200,16 +206,16 @@ const RoleForm = ({ member }: { member: MemberDetail }) => {
 
   return (
     <section className="space-y-3">
-      <h3 className="text-sm font-bold">Role</h3>
+      <h3 className="text-sm font-bold">{t('admin.panel.role')}</h3>
       <div className="flex gap-2">
         <Select
-          aria-label="Role"
+          aria-label={t('admin.panel.role')}
           value={role}
           onChange={(event) => setRole(event.target.value as UserRole)}
-          options={member.allowedActions.assignableRoles.map((value) => ({ value, label: ROLE_LABELS[value] }))}
+          options={member.allowedActions.assignableRoles.map((value) => ({ value, label: t(`common.roles.${value}`) }))}
         />
         <Button variant="primary" onClick={handleSave} disabled={role === member.role || changeRole.isPending}>
-          {changeRole.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+          {changeRole.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.save')}
         </Button>
       </div>
     </section>
@@ -217,6 +223,7 @@ const RoleForm = ({ member }: { member: MemberDetail }) => {
 };
 
 const RestrictForm = ({ member }: { member: MemberDetail }) => {
+  const t = useT();
   const { showToast } = useToast();
   const restrict = useRestrictMember();
   const { allowedActions } = member;
@@ -226,16 +233,16 @@ const RestrictForm = ({ member }: { member: MemberDetail }) => {
 
   const durationOptions = [
     ...DURATIONS.filter((days) => allowedActions.maxRestrictionDays === null || days <= allowedActions.maxRestrictionDays).map(
-      (days) => ({ value: String(days), label: `${days} day${days === 1 ? '' : 's'}` }),
+      (days) => ({ value: String(days), label: t('admin.panel.days', { count: days }) }),
     ),
-    ...(allowedActions.indefinite ? [{ value: 'indefinite', label: 'Until lifted' }] : []),
+    ...(allowedActions.indefinite ? [{ value: 'indefinite', label: t('admin.panel.untilLiftedOption') }] : []),
   ];
   const isBan = status === 'BANNED';
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (reason.trim().length < 3) return;
-    if (isBan && !window.confirm(`Ban @${member.username}? They'll lose access to the community.`)) return;
+    if (isBan && !window.confirm(t('admin.panel.banConfirm', { username: member.username }))) return;
     restrict.mutate(
       {
         id: member.id,
@@ -248,7 +255,7 @@ const RestrictForm = ({ member }: { member: MemberDetail }) => {
       },
       {
         onSuccess: () => {
-          showToast(`@${member.username} is now ${STATUS_LABELS[status].toLowerCase()}`);
+          showToast(t('admin.panel.restricted', { username: member.username, status: t(`common.statuses.${status}`).toLowerCase() }));
           setReason('');
         },
         onError: (error) => showToast(error.message, 'error'),
@@ -258,30 +265,30 @@ const RestrictForm = ({ member }: { member: MemberDetail }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <h3 className="text-sm font-bold">Restrict</h3>
+      <h3 className="text-sm font-bold">{t('admin.panel.restrict')}</h3>
       <div className="grid grid-cols-2 gap-2">
         <Select
-          aria-label="Restriction"
+          aria-label={t('admin.panel.restriction')}
           value={status}
           onChange={(event) => setStatus(event.target.value as RestrictionInput['status'])}
           options={[
-            { value: 'MUTED', label: 'Mute (read only)' },
-            { value: 'SUSPENDED', label: 'Suspend' },
-            ...(allowedActions.ban ? [{ value: 'BANNED', label: 'Ban' }] : []),
+            { value: 'MUTED', label: t('admin.panel.mute') },
+            { value: 'SUSPENDED', label: t('admin.panel.suspend') },
+            ...(allowedActions.ban ? [{ value: 'BANNED', label: t('admin.panel.ban') }] : []),
           ]}
         />
         <Select
-          aria-label="Duration"
+          aria-label={t('admin.panel.duration')}
           value={isBan ? 'indefinite' : duration}
           disabled={isBan}
           onChange={(event) => setDuration(event.target.value)}
-          options={isBan ? [{ value: 'indefinite', label: 'Permanent' }] : durationOptions}
+          options={isBan ? [{ value: 'indefinite', label: t('admin.panel.permanent') }] : durationOptions}
         />
       </div>
       <Textarea
         value={reason}
         onChange={(event) => setReason(event.target.value)}
-        placeholder="Reason (the member will see this)"
+        placeholder={t('admin.panel.reasonPlaceholder')}
         maxLength={500}
         className="min-h-[80px]"
       />
@@ -291,13 +298,14 @@ const RestrictForm = ({ member }: { member: MemberDetail }) => {
         disabled={reason.trim().length < 3 || restrict.isPending}
         className={isBan ? 'bg-red-500 hover:bg-red-600' : undefined}
       >
-        {restrict.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : isBan ? 'Ban member' : `Apply`}
+        {restrict.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : isBan ? t('admin.panel.banMember') : t('admin.panel.apply')}
       </Button>
     </form>
   );
 };
 
 const WarnForm = ({ member }: { member: MemberDetail }) => {
+  const t = useT();
   const { showToast } = useToast();
   const warn = useWarnMember();
   const [isOpen, setIsOpen] = useState(false);
@@ -306,23 +314,23 @@ const WarnForm = ({ member }: { member: MemberDetail }) => {
   if (!isOpen) {
     return (
       <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
-        Send a warning
+        {t('admin.panel.sendWarning')}
       </Button>
     );
   }
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-bold">Warning</h3>
+      <h3 className="text-sm font-bold">{t('admin.panel.warning')}</h3>
       <Textarea
         value={reason}
         onChange={(event) => setReason(event.target.value)}
-        placeholder="What should they change? They'll see this next time they open the app."
+        placeholder={t('admin.panel.warningPlaceholder')}
         maxLength={500}
         className="min-h-[80px]"
       />
       <div className="flex justify-end gap-2">
-        <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>Cancel</Button>
+        <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>{t('common.cancel')}</Button>
         <Button
           variant="primary"
           size="sm"
@@ -332,7 +340,7 @@ const WarnForm = ({ member }: { member: MemberDetail }) => {
               { id: member.id, reason: reason.trim() },
               {
                 onSuccess: () => {
-                  showToast(`Warning sent to @${member.username}`);
+                  showToast(t('admin.panel.warningSent', { username: member.username }));
                   setReason('');
                   setIsOpen(false);
                 },
@@ -341,7 +349,7 @@ const WarnForm = ({ member }: { member: MemberDetail }) => {
             )
           }
         >
-          {warn.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
+          {warn.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.panel.send')}
         </Button>
       </div>
     </section>

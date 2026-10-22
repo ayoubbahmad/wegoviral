@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CalendarDays, CheckCircle2, Flame, Lock, Plus, Trophy, Users } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Flame, Gift, Lock, Plus, Trophy, Users } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
@@ -126,7 +126,14 @@ const ChallengeCard = ({ challenge }: { challenge: ChallengeSummary }) => {
               <Users className="w-3.5 h-3.5" /> {t('challenges.takingPart', { count: challenge.participantCount })}
             </span>
           </div>
-          {challenge.prizes && <p className="text-xs"><span className="font-semibold">🎁 {t('challenges.prize')}</span> {challenge.prizes}</p>}
+          {challenge.prizes && (
+            <p className="flex items-start gap-1.5 text-xs">
+              <Gift className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden />
+              <span>
+                <span className="font-semibold">{t('challenges.prize')}</span> {challenge.prizes}
+              </span>
+            </p>
+          )}
           {challenge.access.locked ? (
             <p className="text-xs text-amber-600 dark:text-amber-400">{challenge.access.reasons.map((reason) => describeLockReason(reason, t)).join(' · ')}</p>
           ) : me?.winnerRank ? (

@@ -10,19 +10,13 @@ import { EmptyState } from '@/components/EmptyState';
 import { avatarFor, cn } from '@/lib/utils';
 import { useAdminActivity } from '../api';
 import { describeActivity } from '../components/describeActivity';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
-const FILTERS = [
-  { id: undefined, label: 'All' },
-  { id: 'member', label: 'Members' },
-  { id: 'post', label: 'Posts' },
-  { id: 'comment', label: 'Comments' },
-  { id: 'badge', label: 'Badges' },
-  { id: 'course', label: 'Courses' },
-  { id: 'challenge', label: 'Challenges' },
-  { id: 'help', label: 'Help' },
-] as const;
+const FILTERS = [undefined, 'member', 'post', 'comment', 'badge', 'course', 'challenge', 'help'] as const;
 
 export const AdminActivityContainer = () => {
+  const t = useT();
   const [targetType, setTargetType] = useState<string | undefined>();
   const { data, isPending, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useAdminActivity(targetType);
@@ -31,23 +25,23 @@ export const AdminActivityContainer = () => {
   return (
     <PageContainer>
       <PageHeader
-        helpHref="/admin/help/activity-log" title="Activity log" description="Every action taken with the admin tools." />
+        helpHref="/admin/help/activity-log" title={t('admin.activityPage.title')} description={t('admin.activityPage.description')} />
 
-      <div className="flex gap-2" role="tablist" aria-label="Filter activity">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('admin.activityPage.filterLabel')}>
         {FILTERS.map((filter) => (
           <button
-            key={filter.label}
+            key={filter ?? 'all'}
             role="tab"
-            aria-selected={targetType === filter.id}
-            onClick={() => setTargetType(filter.id)}
+            aria-selected={targetType === filter}
+            onClick={() => setTargetType(filter)}
             className={cn(
               'rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors',
-              targetType === filter.id
+              targetType === filter
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border text-muted-foreground hover:text-foreground',
             )}
           >
-            {filter.label}
+            {t(`admin.activityPage.filters.${filter ?? 'all'}`)}
           </button>
         ))}
       </div>
@@ -61,7 +55,7 @@ export const AdminActivityContainer = () => {
       ) : error ? (
         <p className="text-sm text-muted-foreground">{error.message}</p>
       ) : entries.length === 0 ? (
-        <EmptyState icon={History} title="Nothing here yet" description="Admin actions will show up here." />
+        <EmptyState icon={History} title={t('admin.activityPage.emptyTitle')} description={t('admin.activityPage.emptyBody')} />
       ) : (
         <Card padding="none">
           <ul className="divide-y divide-border/50">
@@ -75,11 +69,11 @@ export const AdminActivityContainer = () => {
                 <div className="min-w-0 flex-1 text-sm">
                   <p>
                     <span className="font-semibold">
-                      {entry.actor ? `@${entry.actor.username}` : 'A removed account'}
+                      {entry.actor ? `@${entry.actor.username}` : t('admin.activityPage.removedAccount')}
                     </span>{' '}
-                    {describeActivity(entry)}
+                    {describeActivity(entry, t)}
                   </p>
-                  <p className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString(activeIntl())}</p>
                 </div>
               </li>
             ))}
@@ -94,7 +88,7 @@ export const AdminActivityContainer = () => {
             disabled={isFetchingNextPage}
             className="text-sm font-semibold text-primary hover:underline disabled:opacity-60"
           >
-            {isFetchingNextPage ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Load more'}
+            {isFetchingNextPage ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.loadMore')}
           </button>
         </div>
       )}

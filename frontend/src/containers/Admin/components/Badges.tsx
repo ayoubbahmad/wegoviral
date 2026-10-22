@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
-import { MemberStatus, ROLE_LABELS, STATUS_LABELS, UserRole } from '@/lib/roles';
+import { MemberStatus, UserRole } from '@/lib/roles';
+import { T } from '@/i18n/T';
 
 const ROLE_STYLES: Record<UserRole, string> = {
   MEMBER: 'bg-secondary/60 text-muted-foreground',
@@ -19,9 +20,9 @@ const STATUS_STYLES: Record<MemberStatus, string> = {
 const pill = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold whitespace-nowrap';
 
 export const RoleBadge = ({ role }: { role: UserRole }) => (
-  <span className={cn(pill, ROLE_STYLES[role])}>{ROLE_LABELS[role]}</span>
+  <span className={cn(pill, ROLE_STYLES[role])}><T k={`common.roles.${role}`} /></span>
 );
 
 export const StatusBadge = ({ status }: { status: MemberStatus }) => (
-  <span className={cn(pill, STATUS_STYLES[status])}>{STATUS_LABELS[status]}</span>
+  <span className={cn(pill, STATUS_STYLES[status])}><T k={`common.statuses.${status}`} /></span>
 );

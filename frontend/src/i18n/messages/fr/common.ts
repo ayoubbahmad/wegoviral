@@ -83,4 +83,5 @@ export const common: Shape<typeof en> = {
     levelOption: 'Niveau {level} · {name} ({points} pts)',
     tiers: 'Offres (aucune cochée = toutes)',
   },
+  statuses: { ACTIVE: 'Actif', MUTED: 'En sourdine', SUSPENDED: 'Suspendu', BANNED: 'Banni' },
 };

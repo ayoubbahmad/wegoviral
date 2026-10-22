@@ -10,12 +10,14 @@ import { Skeleton } from '@/components/Skeleton';
 import { useToast } from '@/providers/Toast';
 import { useDeleteTier, useSaveTier, useTiers } from '../api/moderation';
 import { Tier } from '../types';
+import { useT } from '@/i18n/provider';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
 
 /** Membership tiers (Super Admin). Spaces and later courses can be limited to some tiers. */
 export const AdminTiersContainer = () => {
+  const t = useT();
   const { data, isPending, error } = useTiers();
   const [editing, setEditing] = useState<Tier | 'new' | null>(null);
 
@@ -23,11 +25,11 @@ export const AdminTiersContainer = () => {
     <PageContainer>
       <PageHeader
         helpHref="/admin/help/tiers-and-access"
-        title="Tiers"
-        description="Membership levels like Free and Pro. Limit spaces to some tiers in Admin → Spaces. Until payments are connected, assign tiers by hand in the member panel."
+        title={t('admin.tiers.title')}
+        description={t('admin.tiers.description')}
         actions={
           <Button variant="primary" onClick={() => setEditing('new')}>
-            <Plus className="w-4 h-4" /> New tier
+            <Plus className="w-4 h-4" /> {t('admin.tiers.newTier')}
           </Button>
         }
       />
@@ -50,6 +52,7 @@ export const AdminTiersContainer = () => {
 };
 
 const TierRow = ({ tier, onEdit }: { tier: Tier; onEdit: () => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const save = useSaveTier();
   const remove = useDeleteTier();
@@ -60,12 +63,12 @@ const TierRow = ({ tier, onEdit }: { tier: Tier; onEdit: () => void }) => {
           {tier.name}
           {tier.isDefault && (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-              <Crown className="w-3 h-3" /> Default
+              <Crown className="w-3 h-3" /> {t('admin.tiers.default')}
             </span>
           )}
         </p>
         <p className="text-xs text-muted-foreground">
-          {tier.description || 'No description'} · {tier.memberCount} member{tier.memberCount === 1 ? '' : 's'}
+          {tier.description || t('admin.tiers.noDescription')} · {t('admin.tiers.members', { count: tier.memberCount })}
         </p>
       </div>
       {!tier.isDefault && (
@@ -74,22 +77,22 @@ const TierRow = ({ tier, onEdit }: { tier: Tier; onEdit: () => void }) => {
           size="sm"
           disabled={save.isPending}
           onClick={() =>
-            window.confirm(`Make ${tier.name} the default? Members without a tier will count as ${tier.name}.`) &&
-            save.mutate({ id: tier.id, input: { isDefault: true } }, { onSuccess: () => showToast(`${tier.name} is now the default`), onError: (e) => showToast(e.message, 'error') })
+            window.confirm(t('admin.tiers.makeDefaultConfirm', { name: tier.name })) &&
+            save.mutate({ id: tier.id, input: { isDefault: true } }, { onSuccess: () => showToast(t('admin.tiers.nowDefault', { name: tier.name })), onError: (e) => showToast(e.message, 'error') })
           }
         >
-          Make default
+          {t('admin.tiers.makeDefault')}
         </Button>
       )}
-      <button aria-label="Edit tier" onClick={onEdit} className="p-2 rounded-lg hover:bg-secondary/50">
+      <button aria-label={t('admin.tiers.edit')} onClick={onEdit} className="p-2 rounded-lg hover:bg-secondary/50">
         <Pencil className="w-4 h-4" />
       </button>
       {!tier.isDefault && (
         <button
-          aria-label="Delete tier"
+          aria-label={t('admin.tiers.delete')}
           onClick={() =>
-            window.confirm(`Delete ${tier.name}? Its ${tier.memberCount} members move to the default tier, and spaces limited to it open to other tiers.`) &&
-            remove.mutate(tier.id, { onSuccess: () => showToast('Tier deleted'), onError: (e) => showToast(e.message, 'error') })
+            window.confirm(t('admin.tiers.deleteConfirm', { name: tier.name, count: tier.memberCount })) &&
+            remove.mutate(tier.id, { onSuccess: () => showToast(t('admin.tiers.deleted')), onError: (e) => showToast(e.message, 'error') })
           }
           className="p-2 rounded-lg text-muted-foreground hover:bg-red-500/10 hover:text-red-500"
         >
@@ -101,6 +104,7 @@ const TierRow = ({ tier, onEdit }: { tier: Tier; onEdit: () => void }) => {
 };
 
 const TierForm = ({ tier, onDone }: { tier: Tier | null; onDone: () => void }) => {
+  const t = useT();
   const { showToast } = useToast();
   const save = useSaveTier();
   const [name, setName] = useState(tier?.name ?? '');
@@ -112,7 +116,7 @@ const TierForm = ({ tier, onDone }: { tier: Tier | null; onDone: () => void }) =
       { id: tier?.id, input: { name: name.trim(), description: description.trim() } },
       {
         onSuccess: () => {
-          showToast(tier ? 'Tier updated' : 'Tier created');
+          showToast(tier ? t('admin.tiers.updated') : t('admin.tiers.created'));
           onDone();
         },
         onError: (error) => showToast(error.message, 'error'),
@@ -123,13 +127,13 @@ const TierForm = ({ tier, onDone }: { tier: Tier | null; onDone: () => void }) =
   return (
     <Card>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <h2 className="font-bold">{tier ? `Edit ${tier.name}` : 'New tier'}</h2>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name, e.g. Pro" maxLength={40} className={inputClass} />
-        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Short description (optional)" maxLength={200} className={inputClass} />
+        <h2 className="font-bold">{tier ? t('admin.tiers.editTitle', { name: tier.name }) : t('admin.tiers.newTitle')}</h2>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('admin.tiers.namePlaceholder')} maxLength={40} className={inputClass} />
+        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t('admin.tiers.descriptionPlaceholder')} maxLength={200} className={inputClass} />
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onDone}>Cancel</Button>
+          <Button type="button" variant="ghost" onClick={onDone}>{t('common.cancel')}</Button>
           <Button type="submit" variant="primary" disabled={name.trim().length < 2 || save.isPending}>
-            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : tier ? 'Save' : 'Create tier'}
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : tier ? t('common.save') : t('admin.tiers.create')}
           </Button>
         </div>
       </form>

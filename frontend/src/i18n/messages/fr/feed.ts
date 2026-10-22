@@ -17,7 +17,7 @@ export const feed: Shape<typeof en> = {
   emptyTitle: 'Aucune publication ici pour l’instant',
   emptyCanPost: 'Lancez la première conversation dans cet espace.',
   emptyTeam: 'L’équipe publiera bientôt des nouvelles ici.',
-  caughtUp: 'Vous êtes à jour ✨',
+  caughtUp: 'Vous êtes à jour',
   post: {
     held: 'Retenue pour l’équipe.',
     heldBody: 'Elle contient un mot que l’équipe vérifie d’abord. Vous seul la voyez pour le moment.',

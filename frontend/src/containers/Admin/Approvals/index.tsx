@@ -12,38 +12,37 @@ import { useToast } from '@/providers/Toast';
 import { avatarFor, cn, formatRelativeDate } from '@/lib/utils';
 import { useApplications, useReviewApplication } from '../api/joining';
 import { ApplicationWithUser, JoinStatus } from '../types';
+import { useT } from '@/i18n/provider';
+import { activeIntl } from '@/i18n/active';
 
-const TABS: { id: JoinStatus; label: string }[] = [
-  { id: 'PENDING', label: 'Waiting' },
-  { id: 'APPROVED', label: 'Approved' },
-  { id: 'REJECTED', label: 'Not approved' },
-];
+const TABS: JoinStatus[] = ['PENDING', 'APPROVED', 'REJECTED'];
 
 export const AdminApprovalsContainer = () => {
+  const t = useT();
   const [status, setStatus] = useState<JoinStatus>('PENDING');
   const { data, isPending, error } = useApplications(status);
 
   return (
     <PageContainer>
       <PageHeader
-        helpHref="/admin/help/approving-members" title="Approvals" description="New members waiting to join the community." />
+        helpHref="/admin/help/approving-members" title={t('admin.approvals.title')} description={t('admin.approvals.description')} />
 
-      <div className="flex gap-2" role="tablist" aria-label="Application status">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('admin.approvals.statusLabel')}>
         {TABS.map((tab) => (
           <button
-            key={tab.id}
+            key={tab}
             role="tab"
-            aria-selected={status === tab.id}
-            onClick={() => setStatus(tab.id)}
+            aria-selected={status === tab}
+            onClick={() => setStatus(tab)}
             className={cn(
               'rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors',
-              status === tab.id
+              status === tab
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border text-muted-foreground hover:text-foreground',
             )}
           >
-            {tab.label}
-            {tab.id === 'PENDING' && status === 'PENDING' && data ? ` (${data.total})` : ''}
+            {t(`admin.approvals.tabs.${tab}`)}
+            {tab === 'PENDING' && status === 'PENDING' && data ? ` (${data.total})` : ''}
           </button>
         ))}
       </div>
@@ -59,8 +58,8 @@ export const AdminApprovalsContainer = () => {
       ) : data.applications.length === 0 ? (
         <EmptyState
           icon={status === 'PENDING' ? UserCheck : Users}
-          title={status === 'PENDING' ? 'Nobody waiting' : 'Nothing here yet'}
-          description={status === 'PENDING' ? 'New applications will show up here.' : undefined}
+          title={status === 'PENDING' ? t('admin.approvals.nobodyWaiting') : t('admin.approvals.nothing')}
+          description={status === 'PENDING' ? t('admin.approvals.newWillShow') : undefined}
         />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -74,6 +73,7 @@ export const AdminApprovalsContainer = () => {
 };
 
 const ApplicationCard = ({ application }: { application: ApplicationWithUser }) => {
+  const t = useT();
   const { showToast } = useToast();
   const review = useReviewApplication();
   const [rejecting, setRejecting] = useState(false);
@@ -86,7 +86,7 @@ const ApplicationCard = ({ application }: { application: ApplicationWithUser }) 
       { userId: user.id, decision, note: note.trim() || undefined },
       {
         onSuccess: () =>
-          showToast(decision === 'approve' ? `${application.fullName} can now join` : 'Application not approved'),
+          showToast(decision === 'approve' ? t('admin.approvals.canJoin', { name: application.fullName }) : t('admin.approvals.notApproved')),
         onError: (error) => showToast(error.message, 'error'),
       },
     );
@@ -110,11 +110,11 @@ const ApplicationCard = ({ application }: { application: ApplicationWithUser }) 
           <a href={`tel:${application.phone}`} className="hover:text-primary">{application.phone}</a>
         </div>
         <div>
-          <dt className="text-xs text-muted-foreground">Creates</dt>
+          <dt className="text-xs text-muted-foreground">{t('admin.joining.creates')}</dt>
           <dd>{application.niche}</dd>
         </div>
         <div>
-          <dt className="text-xs text-muted-foreground">Posts on</dt>
+          <dt className="text-xs text-muted-foreground">{t('admin.joining.postsOn')}</dt>
           <dd className="flex flex-wrap gap-1.5">
             {application.platforms.map((platform, index) => (
               <span key={index} className="rounded-full bg-secondary/50 px-2.5 py-0.5 text-xs">
@@ -125,20 +125,20 @@ const ApplicationCard = ({ application }: { application: ApplicationWithUser }) 
         </div>
         {application.followerRange && (
           <div>
-            <dt className="text-xs text-muted-foreground">Followers</dt>
+            <dt className="text-xs text-muted-foreground">{t('admin.joining.followers')}</dt>
             <dd>{application.followerRange}</dd>
           </div>
         )}
         {application.about && (
           <div>
-            <dt className="text-xs text-muted-foreground">About</dt>
+            <dt className="text-xs text-muted-foreground">{t('admin.joining.about')}</dt>
             <dd className="whitespace-pre-wrap">{application.about}</dd>
           </div>
         )}
         {(user.referredBy || application.invite) && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Ticket className="w-3.5 h-3.5" />
-            {user.referredBy ? `Referred by @${user.referredBy.username}` : `Invite: ${application.invite?.label}`}
+            {user.referredBy ? t('admin.approvals.referredBy', { username: user.referredBy.username }) : t('admin.approvals.invite', { label: application.invite?.label ?? '' })}
           </div>
         )}
       </dl>
@@ -149,34 +149,34 @@ const ApplicationCard = ({ application }: { application: ApplicationWithUser }) 
             <textarea
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              placeholder="Message for the applicant (optional)"
+              placeholder={t('admin.approvals.notePlaceholder')}
               maxLength={500}
               className="w-full min-h-[70px] rounded-xl border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <div className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setRejecting(false)}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button variant="outline" size="sm" onClick={() => decide('reject')} disabled={review.isPending}>
-                {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm'}
+                {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t('admin.approvals.confirm')}
               </Button>
             </div>
           </div>
         ) : (
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={() => setRejecting(true)}>
-              <X className="w-4 h-4" /> Don&apos;t approve
+              <X className="w-4 h-4" /> {t('admin.joining.dontApprove')}
             </Button>
             <Button variant="primary" size="sm" onClick={() => decide('approve')} disabled={review.isPending}>
-              {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> Approve</>}
+              {review.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {t('admin.approvals.approve')}</>}
             </Button>
           </div>
         )
       ) : (
         <p className="text-xs text-muted-foreground">
-          {user.joinStatus === 'APPROVED' ? 'Approved' : 'Not approved'}
+          {user.joinStatus === 'APPROVED' ? t('admin.approvals.approved') : t('admin.approvals.rejected')}
           {application.reviewedBy ? ` by @${application.reviewedBy.username}` : ' automatically'}
-          {application.reviewedAt ? ` · ${new Date(application.reviewedAt).toLocaleDateString()}` : ''}
+          {application.reviewedAt ? ` · ${new Date(application.reviewedAt).toLocaleDateString(activeIntl())}` : ''}
           {application.reviewNote ? ` — “${application.reviewNote}”` : ''}
         </p>
       )}

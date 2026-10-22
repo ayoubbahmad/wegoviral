@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CalendarDays, CheckCircle2, ExternalLink, Flame, ImagePlus, Link2, Loader2, Lock, Pencil, Trash2, Trophy, Users, X } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Check, CheckCircle2, Gift, ExternalLink, Flame, ImagePlus, Link2, Loader2, Lock, Pencil, Trash2, Trophy, Users, X } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -365,7 +365,9 @@ const AboutCard = ({ challenge }: { challenge: ChallengeDetail }) => {
     )}
     {challenge.prizes && (
       <div className="space-y-1">
-        <p className="font-bold">{t('challenges.page.prizes')}</p>
+        <p className="flex items-center gap-1.5 font-bold">
+          <Gift className="h-4 w-4 text-amber-500" aria-hidden /> {t('challenges.page.prizes')}
+        </p>
         <p className="text-muted-foreground">{challenge.prizes}</p>
       </div>
     )}
@@ -469,7 +471,7 @@ const Leaderboard = ({ challenge }: { challenge: ChallengeDetail }) => {
                 <Flame className="w-4 h-4" /> {entry.currentStreak}
               </span>
             )}
-            <span className="w-16 shrink-0 text-end text-sm font-bold">{entry.checkInCount} ✓</span>
+            <span className="flex w-16 shrink-0 items-center justify-end gap-1 text-sm font-bold">{entry.checkInCount} <Check className="h-3.5 w-3.5 text-emerald-500" aria-hidden /></span>
           </li>
         ))}
       </ol>
@@ -522,7 +524,7 @@ const WinnersPicker = ({ challenge }: { challenge: ChallengeDetail }) => {
                   >
                     <span className="w-6 text-center text-xs font-bold">{position >= 0 ? MEDALS[position] ?? `#${position + 1}` : ''}</span>
                     <span className="min-w-0 flex-1 truncate">{displayName(entry.member)}</span>
-                    <span className="text-xs text-muted-foreground">{entry.checkInCount} ✓</span>
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">{entry.checkInCount} <Check className="h-3 w-3" aria-hidden /></span>
                   </button>
                 </li>
               );

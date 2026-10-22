@@ -51,6 +51,7 @@ export async function createSpace(actor: Actor, input: SpaceInput) {
       description: input.description,
       coverUrl: input.coverUrl ?? null,
       adminOnly: input.adminOnly,
+      translations: input.translations ?? {},
       position: (last?.position ?? -1) + 1,
     },
   });
@@ -66,7 +67,7 @@ export async function updateSpace(actor: Actor, id: string, input: Partial<Space
     data: { ...input, ...(input.coverUrl === undefined ? {} : { coverUrl: input.coverUrl || null }) },
   });
   const changed = Object.keys(input).filter(
-    (key) => (before as Record<string, unknown>)[key] !== (space as Record<string, unknown>)[key],
+    (key) => JSON.stringify((before as Record<string, unknown>)[key]) !== JSON.stringify((space as Record<string, unknown>)[key]),
   );
   if (changed.length) {
     await logActivity({

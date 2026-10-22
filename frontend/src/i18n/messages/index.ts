@@ -5,6 +5,7 @@ import { activity as enActivity } from './en/activity';
 import { admin as enAdmin } from './en/admin';
 import { auth as enAuth } from './en/auth';
 import { challenges as enChallenges } from './en/challenges';
+import { contentLanguage as enContentLanguage } from './en/contentLanguage';
 import { courses as enCourses } from './en/courses';
 import { events as enEvents } from './en/events';
 import { feed as enFeed } from './en/feed';
@@ -20,6 +21,7 @@ import { activity as frActivity } from './fr/activity';
 import { admin as frAdmin } from './fr/admin';
 import { auth as frAuth } from './fr/auth';
 import { challenges as frChallenges } from './fr/challenges';
+import { contentLanguage as frContentLanguage } from './fr/contentLanguage';
 import { courses as frCourses } from './fr/courses';
 import { events as frEvents } from './fr/events';
 import { feed as frFeed } from './fr/feed';
@@ -35,6 +37,7 @@ import { activity as arActivity } from './ar/activity';
 import { admin as arAdmin } from './ar/admin';
 import { auth as arAuth } from './ar/auth';
 import { challenges as arChallenges } from './ar/challenges';
+import { contentLanguage as arContentLanguage } from './ar/contentLanguage';
 import { courses as arCourses } from './ar/courses';
 import { events as arEvents } from './ar/events';
 import { feed as arFeed } from './ar/feed';
@@ -45,12 +48,12 @@ import { onboarding as arOnboarding } from './ar/onboarding';
 import { points as arPoints } from './ar/points';
 import { settings as arSettings } from './ar/settings';
 
-const en = { common: enCommon, nav: enNav, activity: enActivity, admin: enAdmin, auth: enAuth, challenges: enChallenges, courses: enCourses, events: enEvents, feed: enFeed, help: enHelp, leaderboard: enLeaderboard, members: enMembers, onboarding: enOnboarding, points: enPoints, settings: enSettings };
+const en = { common: enCommon, nav: enNav, activity: enActivity, admin: enAdmin, auth: enAuth, challenges: enChallenges, contentLanguage: enContentLanguage, courses: enCourses, events: enEvents, feed: enFeed, help: enHelp, leaderboard: enLeaderboard, members: enMembers, onboarding: enOnboarding, points: enPoints, settings: enSettings };
 
 export type Messages = Shape<typeof en>;
 export type MessageKey = Paths<typeof en>;
 
-const fr: Messages = { common: frCommon, nav: frNav, activity: frActivity, admin: frAdmin, auth: frAuth, challenges: frChallenges, courses: frCourses, events: frEvents, feed: frFeed, help: frHelp, leaderboard: frLeaderboard, members: frMembers, onboarding: frOnboarding, points: frPoints, settings: frSettings };
-const ar: Messages = { common: arCommon, nav: arNav, activity: arActivity, admin: arAdmin, auth: arAuth, challenges: arChallenges, courses: arCourses, events: arEvents, feed: arFeed, help: arHelp, leaderboard: arLeaderboard, members: arMembers, onboarding: arOnboarding, points: arPoints, settings: arSettings };
+const fr: Messages = { common: frCommon, nav: frNav, activity: frActivity, admin: frAdmin, auth: frAuth, challenges: frChallenges, contentLanguage: frContentLanguage, courses: frCourses, events: frEvents, feed: frFeed, help: frHelp, leaderboard: frLeaderboard, members: frMembers, onboarding: frOnboarding, points: frPoints, settings: frSettings };
+const ar: Messages = { common: arCommon, nav: arNav, activity: arActivity, admin: arAdmin, auth: arAuth, challenges: arChallenges, contentLanguage: arContentLanguage, courses: arCourses, events: arEvents, feed: arFeed, help: arHelp, leaderboard: arLeaderboard, members: arMembers, onboarding: arOnboarding, points: arPoints, settings: arSettings };
 
 export const messages = { en: en as Messages, fr, ar };

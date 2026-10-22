@@ -233,6 +233,7 @@ export const admin: Shape<typeof en> = {
     filterSaved: 'تم حفظ مرشّح الكلمات',
   },
   spaces: {
+    postCount: { zero: 'لا منشورات', one: 'منشور واحد', two: 'منشوران', few: '{count} منشورات', many: '{count} منشورًا', other: '{count} منشور' },
     title: 'المساحات',
     description: 'المواضيع التي ينشر فيها الأعضاء. تختفي المساحات المؤرشفة من تصفية الصفحة الرئيسية وتُغلق أمام المنشورات الجديدة؛ وتبقى منشوراتها.',
     newSpace: 'مساحة جديدة',

@@ -13,6 +13,8 @@ import { useAdminSpaces, useArchiveSpace, useReorderSpaces, useSaveSpace, useTie
 import { AccessEditor, summarizeAccess } from './AccessEditor';
 import { AdminSpace, SpaceInput } from '../types';
 import { useT } from '@/i18n/provider';
+import { LanguageTabs } from '@/components/LanguageTabs';
+import { bindField, cleanTranslations, ContentLanguage, isTranslated } from '@/lib/translations';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -155,7 +157,7 @@ const SpaceRow = ({ space, children }: { space: AdminSpace; children: React.Reac
         )}
       </p>
       <p className="text-xs text-muted-foreground truncate">
-        {space.description} · {space.postCount} post{space.postCount === 1 ? '' : 's'}
+        {space.description} · {t('admin.spaces.postCount', { count: space.postCount })}
       </p>
     </div>
     <div className="flex items-center gap-1">{children}</div>
@@ -173,13 +175,16 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
     description: space?.description ?? '',
     coverUrl: space?.coverUrl ?? '',
     adminOnly: space?.adminOnly ?? false,
+    translations: space?.translations ?? {},
   });
+  const [language, setLanguage] = useState<ContentLanguage>('en');
+  const field = bindField(input, setInput, language);
   const valid = input.name.trim().length >= 2 && input.emoji.trim() && input.description.trim().length >= 3;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     save.mutate(
-      { id: space?.id, input: { ...input, coverUrl: input.coverUrl?.trim() || '' } },
+      { id: space?.id, input: { ...input, coverUrl: input.coverUrl?.trim() || '', translations: cleanTranslations(input.translations) } },
       {
         onSuccess: () => {
           showToast(space ? t('admin.spaces.updated') : t('admin.spaces.created'));
@@ -194,6 +199,7 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
     <Card>
       <form onSubmit={handleSubmit} className="space-y-4">
         <h2 className="font-bold">{space ? t('admin.spaces.editTitle', { name: space.name }) : t('admin.spaces.newTitle')}</h2>
+        <LanguageTabs value={language} onChange={setLanguage} isMissing={(lang) => !isTranslated(input, ['name', 'description'], lang)} />
         <div className="grid gap-3 md:grid-cols-[90px_1fr]">
           <label className="space-y-1.5">
             <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.emoji')}</span>
@@ -201,12 +207,12 @@ const SpaceForm = ({ space, onDone }: { space: AdminSpace | null; onDone: () => 
           </label>
           <label className="space-y-1.5">
             <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.name')}</span>
-            <input value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value })} maxLength={40} placeholder={t('admin.spaces.namePlaceholder')} className={inputClass} />
+            <input {...field('name', t('admin.spaces.namePlaceholder'))} maxLength={40} className={inputClass} />
           </label>
         </div>
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.descriptionLabel')}</span>
-          <input value={input.description} onChange={(e) => setInput({ ...input, description: e.target.value })} maxLength={200} className={inputClass} />
+          <input {...field('description')} maxLength={200} className={inputClass} />
         </label>
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.spaces.cover')}</span>

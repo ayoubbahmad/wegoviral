@@ -7,6 +7,8 @@
  */
 import { prisma } from '../src/lib/prisma';
 import { HELP_ARTICLES } from './help-articles';
+import { HELP_ARTICLES_FR } from './help-articles.fr';
+import { HELP_ARTICLES_AR } from './help-articles.ar';
 
 async function main() {
   const existing = new Set((await prisma.helpArticle.findMany({ select: { slug: true } })).map((article) => article.slug));
@@ -16,7 +18,8 @@ async function main() {
     const position = positions.get(article.space) ?? 0;
     positions.set(article.space, position + 1);
     if (existing.has(article.slug)) continue;
-    await prisma.helpArticle.create({ data: { ...article, audience: article.audience ?? 'MEMBER', published: true, position } });
+    const translations = { fr: HELP_ARTICLES_FR[article.slug], ar: HELP_ARTICLES_AR[article.slug] };
+    await prisma.helpArticle.create({ data: { ...article, audience: article.audience ?? 'MEMBER', published: true, position, translations } });
     added++;
   }
   console.log(`Added ${added} help articles (${HELP_ARTICLES.length - added} already there)`);

@@ -29,8 +29,8 @@ const flatten = <T extends { badges: { badge: unknown }[] }>(member: T) => ({ ..
 
 const challengeInclude = {
   createdBy: { select: personSelect },
-  completionBadge: { select: { id: true, name: true, emoji: true, color: true } },
-  winnerBadge: { select: { id: true, name: true, emoji: true, color: true } },
+  completionBadge: { select: { id: true, name: true, emoji: true, color: true, translations: true } },
+  winnerBadge: { select: { id: true, name: true, emoji: true, color: true, translations: true } },
   _count: { select: { participants: true } },
 } satisfies Prisma.ChallengeInclude;
 

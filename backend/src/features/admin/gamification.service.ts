@@ -53,7 +53,7 @@ export async function updateLevels(actor: Actor, input: LevelsInput) {
   }
   await prisma.$transaction([
     prisma.level.deleteMany(),
-    prisma.level.createMany({ data: sorted.map((level, index) => ({ level: index + 1, name: level.name, minPoints: level.minPoints })) }),
+    prisma.level.createMany({ data: sorted.map((level, index) => ({ level: index + 1, name: level.name, minPoints: level.minPoints, translations: level.translations })) }),
   ]);
   invalidateGamificationCache();
   await logActivity({ actorId: actor.id, action: 'points.levels_updated', targetType: 'settings', targetLabel: 'Levels', details: { levels: sorted.length } });
@@ -85,7 +85,7 @@ export async function createBadge(actor: Actor, input: BadgeInput) {
   let id = badgeIdFrom(input.name);
   for (let suffix = 2; await prisma.badge.findUnique({ where: { id } }); suffix++) id = `${badgeIdFrom(input.name)}-${suffix}`;
   const badge = await prisma.badge.create({
-    data: { id, name: input.name, emoji: input.emoji, color: input.color, description: input.description, autoRule: toAutoRule(input) },
+    data: { id, name: input.name, emoji: input.emoji, color: input.color, description: input.description, autoRule: toAutoRule(input), translations: input.translations ?? {} },
   });
   await backfillAutoBadge(input.autoRule);
   await logActivity({ actorId: actor.id, action: 'badge.created', targetType: 'badge', targetId: id, targetLabel: `${badge.emoji} ${badge.name}` });
@@ -101,6 +101,7 @@ export async function updateBadge(actor: Actor, id: string, input: Partial<Badge
       ...(input.emoji !== undefined ? { emoji: input.emoji } : {}),
       ...(input.color !== undefined ? { color: input.color } : {}),
       ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.translations !== undefined ? { translations: input.translations } : {}),
       ...(input.autoRule !== undefined ? { autoRule: input.autoRule ? (input.autoRule as Prisma.InputJsonValue) : Prisma.DbNull } : {}),
     },
   });

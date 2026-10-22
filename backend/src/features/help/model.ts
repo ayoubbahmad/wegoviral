@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translationsSchema } from '../../lib/localize';
 
 const ROLES = ['MEMBER', 'INSTRUCTOR', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'] as const;
 export const HELP_SPACES = ['COMMUNITY', 'CREATOR', 'ADMIN'] as const;
@@ -17,6 +18,12 @@ const ArticleFields = z.object({
   summary: z.string().trim().max(300),
   body: z.string().max(50_000),
   published: z.boolean(),
+  translations: translationsSchema({
+    category: z.string().trim().max(60),
+    title: z.string().trim().max(120),
+    summary: z.string().trim().max(300),
+    body: z.string().max(50_000),
+  }).optional(),
 });
 
 export const CreateArticleSchema = ArticleFields.extend({

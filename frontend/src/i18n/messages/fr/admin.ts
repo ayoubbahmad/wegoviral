@@ -233,6 +233,7 @@ export const admin: Shape<typeof en> = {
     filterSaved: 'Filtre de mots enregistré',
   },
   spaces: {
+    postCount: { one: '{count} publication', other: '{count} publications' },
     title: 'Espaces',
     description: 'Les sujets où publient les membres. Les espaces archivés disparaissent des filtres du fil et n’acceptent plus de nouvelles publications ; les anciennes restent.',
     newSpace: 'Nouvel espace',

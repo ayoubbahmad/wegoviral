@@ -11,6 +11,7 @@ import { awardPoints, badgesSelect, revokePoints } from '../../lib/gamification'
 import { AccessViewer, accessByResource, describeLock, evaluateRule, getRule, lockedResourceIds } from '../../lib/access';
 import type { AuthenticatedUser } from '../../middleware/auth.middleware';
 import { CreatePostInput, EditPostInput, FeedError, ReportInput } from './model';
+import { localizeRecord } from '../../lib/localize';
 
 /** The signed-in member performing an action. */
 export interface Actor {
@@ -206,11 +207,12 @@ export async function createPost(author: AccessViewer, input: CreatePostInput) {
   const authorId = author.id;
   const space = await prisma.communitySpace.findUnique({ where: { id: input.spaceId } });
   if (!space) throw new FeedError(400, 'This space does not exist');
-  if (space.archivedAt) throw new FeedError(400, `${space.name} is archived and closed to new posts`);
+  const spaceName = localizeRecord(space).name;
+  if (space.archivedAt) throw new FeedError(400, `${spaceName} is archived and closed to new posts`);
   const spaceAccess = await evaluateRule(await getRule('space', space.id), author);
-  if (spaceAccess.locked) throw new FeedError(403, `${space.name}: ${describeLock(spaceAccess)}`);
+  if (spaceAccess.locked) throw new FeedError(403, `${spaceName}: ${describeLock(spaceAccess)}`);
   if (space.adminOnly && !isModerator(author)) {
-    throw new FeedError(403, `Only the team can post in ${space.name}`);
+    throw new FeedError(403, `Only the team can post in ${spaceName}`);
   }
   const profile = await prisma.userProfile.findUniqueOrThrow({
     where: { id: authorId },

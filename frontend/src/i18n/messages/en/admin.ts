@@ -230,6 +230,7 @@ export const admin = {
     filterSaved: 'Word filter saved',
   },
   spaces: {
+    postCount: { one: '{count} post', other: '{count} posts' },
     title: 'Spaces',
     description: 'The topics members post in. Archived spaces disappear from the feed filters and close to new posts; their posts stay.',
     newSpace: 'New space',

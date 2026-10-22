@@ -26,6 +26,8 @@ import {
   useSaveArticle,
 } from '@/containers/Help/api';
 import { useT } from '@/i18n/provider';
+import { LanguageTabs } from '@/components/LanguageTabs';
+import { bindField, cleanTranslations, ContentLanguage, isTranslated, readField } from '@/lib/translations';
 
 const SPACES: { id: HelpSpaceId }[] = [{ id: 'community' }, { id: 'creator' }, { id: 'admin' }];
 
@@ -147,7 +149,7 @@ const ArticleList = ({ space, articles, selectedId, onSelect }: { space: HelpSpa
 
 const EditLoader = ({ space, summary, sections, onDone }: { space: HelpSpaceId; summary?: HelpArticleSummary; sections: string[]; onDone: (id: string | null) => void }) => {
   const t = useT();
-  const { data, isPending } = useHelpArticle(summary?.slug ?? null);
+  const { data, isPending } = useHelpArticle(summary?.slug ?? null, { forEditing: true });
   if (!summary) return <Card className="text-sm text-muted-foreground">{t('admin.helpPage.notInSpace')}</Card>;
   if (isPending || !data) return <Skeleton className="h-96 rounded-2xl" />;
   return <ArticleForm space={space} article={data} sections={sections} onDone={onDone} />;
@@ -166,7 +168,10 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
     summary: article?.summary ?? '',
     body: article?.body ?? '',
     published: article?.published ?? false,
+    translations: article?.translations ?? {},
   });
+  const [language, setLanguage] = useState<ContentLanguage>('en');
+  const field = bindField(form, setForm, language);
   const [slugTouched, setSlugTouched] = useState(Boolean(article));
   const [preview, setPreview] = useState(false);
   const update = (change: Partial<typeof form>) => setForm((current) => ({ ...current, ...change }));
@@ -181,6 +186,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
           title: form.title.trim(),
           category: form.category.trim(),
           summary: form.summary.trim(),
+          translations: cleanTranslations(form.translations),
           published,
           ...(article ? {} : { space: space.toUpperCase() as HelpArticle['space'] }),
         },
@@ -227,15 +233,21 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
         </div>
       </div>
 
+      <LanguageTabs value={language} onChange={setLanguage} isMissing={(lang) => !isTranslated(form, ['title', 'category', 'summary', 'body'], lang)} />
+
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5 sm:col-span-2">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.articleTitle')}</span>
-          <input
-            value={form.title}
-            maxLength={120}
-            onChange={(e) => update({ title: e.target.value, ...(slugTouched ? {} : { slug: slugify(e.target.value) }) })}
-            className={inputClass}
-          />
+          {language === 'en' ? (
+            <input
+              value={form.title}
+              maxLength={120}
+              onChange={(e) => update({ title: e.target.value, ...(slugTouched ? {} : { slug: slugify(e.target.value) }) })}
+              className={inputClass}
+            />
+          ) : (
+            <input {...field('title')} maxLength={120} className={inputClass} />
+          )}
         </label>
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.link')}</span>
@@ -252,7 +264,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
         </label>
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.section')}</span>
-          <input list="help-sections" value={form.category} maxLength={60} onChange={(e) => update({ category: e.target.value })} placeholder={t('admin.helpPage.sectionPlaceholder')} className={inputClass} />
+          <input list={language === 'en' ? 'help-sections' : undefined} {...field('category', t('admin.helpPage.sectionPlaceholder'))} maxLength={60} className={inputClass} />
           <datalist id="help-sections">
             {sections.map((section) => (
               <option key={section} value={section} />
@@ -265,7 +277,7 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
         </label>
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.helpPage.summary')}</span>
-          <input value={form.summary} maxLength={300} onChange={(e) => update({ summary: e.target.value })} placeholder={t('admin.helpPage.summaryPlaceholder')} className={inputClass} />
+          <input {...field('summary', t('admin.helpPage.summaryPlaceholder'))} maxLength={300} className={inputClass} />
         </label>
       </div>
 
@@ -286,11 +298,11 @@ const ArticleForm = ({ space, article, sections, onDone }: { space: HelpSpaceId;
           </div>
         </div>
         {preview ? (
-          <div className="min-h-[320px] rounded-lg border border-border p-4">
-            <LightMarkdown source={form.body || t('admin.helpPage.nothingYet')} />
+          <div className="min-h-[320px] rounded-lg border border-border p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <LightMarkdown source={readField(form, 'body', language) || form.body || t('admin.helpPage.nothingYet')} />
           </div>
         ) : (
-          <Textarea value={form.body} maxLength={50000} onChange={(e) => update({ body: e.target.value })} className="min-h-[320px] font-mono text-xs" />
+          <Textarea {...field('body')} maxLength={50000} className="min-h-[320px] font-mono text-xs" />
         )}
         <p className="text-xs text-muted-foreground">
           {t('admin.helpPage.formatting')} <code>## Heading</code>, lists with <code>-</code> or <code>1.</code>, <code>**bold**</code>, <code>[link](/community/help/…)</code>.

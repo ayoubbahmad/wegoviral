@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { AdminBadge, BadgeInput, GamificationConfig, PointRuleRow } from '../types';
+import { AdminBadge, BadgeInput, GamificationConfig, LevelRow, PointRuleRow } from '../types';
 import { adminKeys } from '.';
 
 export const gamificationKeys = {
@@ -36,7 +36,7 @@ export const useSavePointRules = () => {
 export const useSaveLevels = () => {
   const refresh = useRefreshGamification();
   return useMutation({
-    mutationFn: async (levels: { name: string; minPoints: number }[]) =>
+    mutationFn: async (levels: Omit<LevelRow, 'level'>[]) =>
       (await apiClient.put<GamificationConfig>('/admin/gamification/levels', { levels })).data,
     onSuccess: refresh,
   });

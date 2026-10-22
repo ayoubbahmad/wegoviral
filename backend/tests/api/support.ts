@@ -36,19 +36,20 @@ export interface TestUser {
   profileId: string;
   authUserId: string;
   role: UserRole;
-  call: <T = any>(method: string, path: string, body?: unknown) => Promise<ApiResponse<T>>;
+  call: <T = any>(method: string, path: string, body?: unknown, language?: string) => Promise<ApiResponse<T>>;
 }
 
 export async function callApi<T = any>(
   method: string,
   path: string,
-  { token, body }: { token?: string; body?: unknown } = {},
+  { token, body, language }: { token?: string; body?: unknown; language?: string } = {},
 ): Promise<ApiResponse<T>> {
   const response = await fetch(API_URL + path, {
     method,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(language ? { 'Accept-Language': language } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -124,7 +125,7 @@ export async function createTestUser(
     profileId: me.data.user.id,
     authUserId: data.user.id,
     role: profileRole,
-    call: (method, path, body) => callApi(method, path, { token, body }),
+    call: (method, path, body, language) => callApi(method, path, { token, body, language }),
   };
 }
 

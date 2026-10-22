@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { UserRole } from '@/lib/roles';
+import type { Translations } from '@/lib/translations';
 
 export type HelpSpaceId = 'community' | 'creator' | 'admin';
 export type HelpSpaceKey = 'COMMUNITY' | 'CREATOR' | 'ADMIN';
@@ -22,6 +23,8 @@ export interface HelpArticle extends HelpArticleSummary {
   body: string;
   published: boolean;
   updatedBy: { username: string; name: string | null } | null;
+  /** Only when loaded for editing */
+  translations?: Translations;
   related: { slug: string; title: string }[];
 }
 
@@ -34,6 +37,7 @@ export interface HelpArticleInput {
   summary?: string;
   body?: string;
   published?: boolean;
+  translations?: Translations;
 }
 
 export const helpKeys = {
@@ -50,10 +54,11 @@ export const useHelpArticles = (space: HelpSpaceId, q = '') =>
     placeholderData: keepPreviousData,
   });
 
-export const useHelpArticle = (slug: string | null) =>
+/** `forEditing` loads every language instead of the reader's one. */
+export const useHelpArticle = (slug: string | null, { forEditing = false } = {}) =>
   useQuery({
-    queryKey: helpKeys.article(slug ?? ''),
-    queryFn: async () => (await apiClient.get<HelpArticle>(`/help/articles/${slug}`)).data,
+    queryKey: forEditing ? [...helpKeys.article(slug ?? ''), 'edit'] : helpKeys.article(slug ?? ''),
+    queryFn: async () => (await apiClient.get<HelpArticle>(`/help/articles/${slug}`, { params: forEditing ? { raw: 1 } : undefined })).data,
     enabled: Boolean(slug),
   });
 

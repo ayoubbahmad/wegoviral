@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translationsSchema } from '../../lib/localize';
 
 export const ROLE_VALUES = ['MEMBER', 'INSTRUCTOR', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'] as const;
 export const STATUS_VALUES = ['ACTIVE', 'MUTED', 'SUSPENDED', 'BANNED'] as const;
@@ -77,6 +78,7 @@ export const GuideSectionsSchema = z.object({
         title: z.string().trim().min(1, 'Every section needs a title').max(120),
         body: z.string().trim().min(1, 'Every section needs some text').max(10000),
         mediaUrl: z.string().trim().url().max(500).optional().or(z.literal('').transform(() => undefined)),
+        translations: translationsSchema({ title: z.string().trim().max(120), body: z.string().trim().max(10000) }).default({}),
       }),
     )
     .max(30),
@@ -90,6 +92,7 @@ export const QuizSchema = z.object({
           question: z.string().trim().min(1, 'Every question needs text').max(300),
           options: z.array(z.string().trim().min(1, 'Options cannot be empty').max(200)).min(2).max(6),
           correctIndex: z.number().int().min(0),
+          translations: translationsSchema({ question: z.string().trim().max(300), options: z.array(z.string().trim().max(200)).max(6) }).default({}),
         })
         .refine((q) => q.correctIndex < q.options.length, 'Pick the correct answer for every question'),
     )
@@ -146,6 +149,7 @@ export const SpaceSchema = z.object({
   description: z.string().trim().min(3, 'Describe the space in a few words').max(200),
   coverUrl: optionalUrl,
   adminOnly: z.boolean(),
+  translations: translationsSchema({ name: z.string().trim().max(40), description: z.string().trim().max(200) }).optional(),
 });
 
 // Defaults only on create: on a partial update they would overwrite fields the admin didn't touch
@@ -194,7 +198,13 @@ export const PointRulesSchema = z.object({
 
 export const LevelsSchema = z.object({
   levels: z
-    .array(z.object({ name: z.string().trim().min(1, 'Every level needs a name').max(30), minPoints: z.number().int().min(0).max(10_000_000) }))
+    .array(
+      z.object({
+        name: z.string().trim().min(1, 'Every level needs a name').max(30),
+        minPoints: z.number().int().min(0).max(10_000_000),
+        translations: translationsSchema({ name: z.string().trim().max(30) }).default({}),
+      }),
+    )
     .min(1)
     .max(50),
 });
@@ -210,6 +220,7 @@ export const BadgeSchema = z.object({
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Use a color like #f59e0b'),
   description: z.string().trim().max(200),
   autoRule: AutoRuleSchema.nullable(),
+  translations: translationsSchema({ name: z.string().trim().max(40), description: z.string().trim().max(200) }).optional(),
 });
 export const UpdateBadgeSchema = BadgeSchema.partial();
 export const ArchiveBadgeSchema = z.object({ archived: z.boolean() });

@@ -500,7 +500,8 @@ You can also **adjust a member's points** from their panel, with a reason.`,
 - **Audience**: the lowest role that sees the article (e.g. Moderator = moderators, admins and Super Admins).
 - **Section**: the heading it's listed under.
 - The body supports simple formatting: \`## Heading\`, lists with \`-\` or \`1.\`, \`**bold**\` and \`[links](https://…)\`.
-- Drafts are only visible to admins. Use the arrows to change the order.`,
+- Drafts are only visible to admins. Use the arrows to change the order.
+- Pick the language at the top of the editor to write the French or Arabic version; a field left empty shows the English text.`,
   },
 
   // ─── Admin: Super Admins ───────────────────────────────────────────────────

@@ -61,7 +61,10 @@ export async function levelFor(points: number) {
     level: current.level,
     name: current.name,
     minPoints: current.minPoints,
-    next: next ? { level: next.level, name: next.name, minPoints: next.minPoints, pointsToGo: next.minPoints - points } : null,
+    translations: 'translations' in current ? current.translations : {},
+    next: next
+      ? { level: next.level, name: next.name, minPoints: next.minPoints, translations: next.translations, pointsToGo: next.minPoints - points }
+      : null,
   };
 }
 
@@ -190,6 +193,6 @@ export const badgesSelect = {
     orderBy: { awardedAt: 'desc' },
     take: 3,
     where: { badge: { archivedAt: null } },
-    select: { badge: { select: { id: true, name: true, emoji: true, color: true } } },
+    select: { badge: { select: { id: true, name: true, emoji: true, color: true, translations: true } } },
   },
 } satisfies Prisma.UserProfileSelect;

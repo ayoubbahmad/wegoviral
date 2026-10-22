@@ -144,12 +144,12 @@ export async function getGuide(userId: string) {
   ]);
   return {
     version: settings.guideVersion,
-    sections: sections.map(({ id, title, body, mediaUrl }) => ({ id, title, body, mediaUrl })),
+    sections: sections.map(({ id, title, body, mediaUrl, translations }) => ({ id, title, body, mediaUrl, translations })),
     // Correct answers stay on the server
     quiz: settings.requireQuiz
       ? {
           passPercent: settings.quizPassPercent,
-          questions: questions.map(({ id, question, options }) => ({ id, question, options })),
+          questions: questions.map(({ id, question, options, translations }) => ({ id, question, options, translations })),
         }
       : null,
     acceptedVersion: profile.rulesAcceptedVersion,

@@ -8,6 +8,7 @@ import { prisma } from '../../lib/prisma';
 import { logActivity } from '../../lib/activity';
 import { can, ROLE_RANK } from '../../lib/permissions';
 import { CreateArticleInput, HelpError, UpdateArticleInput } from './model';
+import { localizeRecord } from '../../lib/localize';
 
 interface Viewer {
   id: string;
@@ -19,18 +20,26 @@ const audiencesFor = (role: UserRole) => (Object.keys(ROLE_RANK) as UserRole[]).
 
 const visibleTo = (viewer: Viewer): Prisma.HelpArticleWhereInput => ({ published: true, audience: { in: audiencesFor(viewer.role) } });
 
-const listSelect = { id: true, slug: true, space: true, audience: true, category: true, title: true, summary: true, position: true, updatedAt: true } satisfies Prisma.HelpArticleSelect;
+const listSelect = { id: true, slug: true, space: true, audience: true, category: true, title: true, summary: true, position: true, updatedAt: true, translations: true } satisfies Prisma.HelpArticleSelect;
 
 /** The articles of one space, in order; with a search, only matching ones. */
 export async function listArticles(viewer: Viewer, space: HelpSpace, q?: string) {
-  const search: Prisma.HelpArticleWhereInput = q
-    ? { OR: ['title', 'summary', 'body', 'category'].map((field) => ({ [field]: { contains: q, mode: 'insensitive' } })) }
-    : {};
-  return prisma.helpArticle.findMany({
-    where: { space, ...visibleTo(viewer), ...search },
+  const articles = await prisma.helpArticle.findMany({
+    where: { space, ...visibleTo(viewer) },
     orderBy: [{ position: 'asc' }, { title: 'asc' }],
-    select: listSelect,
+    select: { ...listSelect, body: true },
   });
+  // Searched in the reader's language (and the main version), so it runs here rather than in SQL
+  const needle = q?.trim().toLocaleLowerCase();
+  const matches = needle
+    ? articles.filter((article) => {
+        const local = localizeRecord(article);
+        return [article, local].some((version) =>
+          [version.title, version.summary, version.body, version.category].some((text) => text.toLocaleLowerCase().includes(needle)),
+        );
+      })
+    : articles;
+  return matches.map(({ body: _body, ...article }) => article);
 }
 
 export async function getArticle(viewer: Viewer, slug: string) {
@@ -44,7 +53,7 @@ export async function getArticle(viewer: Viewer, slug: string) {
     where: { space: article.space, category: article.category, id: { not: article.id }, ...visibleTo(viewer) },
     orderBy: { position: 'asc' },
     take: 5,
-    select: { slug: true, title: true },
+    select: { slug: true, title: true, translations: true },
   });
   return { ...article, related };
 }

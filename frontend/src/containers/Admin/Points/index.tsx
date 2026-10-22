@@ -14,6 +14,8 @@ import { useArchiveBadge, useGamification, useSaveBadge, useSaveLevels, useSaveP
 import { AdminBadge, AutoBadgeType, BadgeInput, GamificationConfig, PointRuleRow } from '../types';
 import { useT } from '@/i18n/provider';
 import { howToEarn, isAutoType } from '@/lib/badges';
+import { LanguageTabs } from '@/components/LanguageTabs';
+import { bindField, cleanTranslations, ContentLanguage, isTranslated } from '@/lib/translations';
 
 const POINT_ACTION_KEYS = Object.fromEntries(
   ['POST_PUBLISHED', 'COMMENT_ADDED', 'LIKE_RECEIVED', 'EVENT_JOINED', 'POST_REVIEWED', 'GUIDE_ACCEPTED', 'LESSON_COMPLETED', 'COURSE_COMPLETED', 'CHALLENGE_CHECKIN', 'CHALLENGE_COMPLETED', 'CHALLENGE_WON', 'POST_REMOVED_BY_TEAM', 'VOUCHED_POST_REMOVED', 'WARNING_RECEIVED', 'MANUAL'].map((key) => [key, true]),
@@ -132,7 +134,8 @@ const LevelsCard = ({ levels: saved }: { levels: GamificationConfig['levels'] })
   const t = useT();
   const { showToast } = useToast();
   const save = useSaveLevels();
-  const [levels, setLevels] = useState(saved.map((level) => ({ name: level.name, minPoints: String(level.minPoints) })));
+  const [levels, setLevels] = useState(saved.map((level) => ({ name: level.name, minPoints: String(level.minPoints), translations: level.translations ?? {} })));
+  const [language, setLanguage] = useState<ContentLanguage>('en');
   const numbers = levels.map((level) => Number(level.minPoints));
   const valid =
     levels.length > 0 &&
@@ -145,7 +148,7 @@ const LevelsCard = ({ levels: saved }: { levels: GamificationConfig['levels'] })
 
   const handleSave = () =>
     save.mutate(
-      levels.map((level) => ({ name: level.name.trim(), minPoints: Number(level.minPoints) })),
+      levels.map((level) => ({ name: level.name.trim(), minPoints: Number(level.minPoints), translations: cleanTranslations(level.translations) })),
       { onSuccess: () => showToast(t('admin.pointsPage.levelsSaved')), onError: (e) => showToast(e.message, 'error') },
     );
 
@@ -156,12 +159,13 @@ const LevelsCard = ({ levels: saved }: { levels: GamificationConfig['levels'] })
         <p className="text-sm text-muted-foreground">
           {t('admin.pointsPage.levelsBody')}
         </p>
+        <LanguageTabs className="pt-3" value={language} onChange={setLanguage} isMissing={(lang) => levels.some((level) => !isTranslated(level, ['name'], lang))} />
       </div>
       <ul className="space-y-2 p-5">
         {levels.map((level, index) => (
           <li key={index} className="grid grid-cols-[40px_1fr_120px_36px] items-center gap-2">
             <span className="text-center text-sm font-bold text-muted-foreground">{index + 1}</span>
-            <input aria-label={t('admin.pointsPage.levelName', { number: index + 1 })} value={level.name} maxLength={30} onChange={(e) => update(index, { name: e.target.value })} className={inputClass} />
+            <input aria-label={t('admin.pointsPage.levelName', { number: index + 1 })} {...bindField(level, (next) => update(index, next), language)('name')} maxLength={30} className={inputClass} />
             <input
               type="number"
               min={0}
@@ -186,7 +190,7 @@ const LevelsCard = ({ levels: saved }: { levels: GamificationConfig['levels'] })
           variant="ghost"
           size="sm"
           disabled={levels.length >= 50}
-          onClick={() => setLevels((current) => [...current, { name: '', minPoints: String((Number(current.at(-1)?.minPoints) || 0) * 2 || 10) }])}
+          onClick={() => setLevels((current) => [...current, { name: '', minPoints: String((Number(current.at(-1)?.minPoints) || 0) * 2 || 10), translations: {} }])}
         >
           <Plus className="w-4 h-4" /> {t('admin.pointsPage.addLevel')}
         </Button>
@@ -274,22 +278,24 @@ const BadgeForm = ({ badge, config, onDone }: { badge: AdminBadge | null; config
   const t = useT();
   const { showToast } = useToast();
   const save = useSaveBadge();
-  const [name, setName] = useState(badge?.name ?? '');
+  const [text, setText] = useState({ name: badge?.name ?? '', description: badge?.description ?? '', translations: badge?.translations ?? {} });
+  const [language, setLanguage] = useState<ContentLanguage>('en');
+  const field = bindField(text, setText, language);
   const [emoji, setEmoji] = useState(badge?.emoji ?? '🏅');
   const [color, setColor] = useState(badge?.color ?? '#f59e0b');
-  const [description, setDescription] = useState(badge?.description ?? '');
   const [autoType, setAutoType] = useState<'' | AutoBadgeType>(badge?.autoRule?.type ?? '');
   const [threshold, setThreshold] = useState(badge?.autoRule ? String(badge.autoRule.threshold) : '');
   const thresholdValid = !autoType || (Number.isInteger(Number(threshold)) && Number(threshold) >= 1);
-  const valid = name.trim().length >= 2 && emoji.trim() && thresholdValid;
+  const valid = text.name.trim().length >= 2 && emoji.trim() && thresholdValid;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const input: BadgeInput = {
-      name: name.trim(),
+      name: text.name.trim(),
       emoji: emoji.trim(),
       color,
-      description: description.trim(),
+      description: text.description.trim(),
+      translations: cleanTranslations(text.translations),
       autoRule: autoType ? { type: autoType, threshold: Number(threshold) } : null,
     };
     save.mutate(
@@ -306,6 +312,7 @@ const BadgeForm = ({ badge, config, onDone }: { badge: AdminBadge | null; config
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border p-4">
+      <LanguageTabs value={language} onChange={setLanguage} isMissing={(lang) => !isTranslated(text, ['name', 'description'], lang)} />
       <div className="grid gap-3 sm:grid-cols-[80px_1fr_110px]">
         <label className="space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.pointsPage.emoji')}</span>
@@ -313,7 +320,7 @@ const BadgeForm = ({ badge, config, onDone }: { badge: AdminBadge | null; config
         </label>
         <label className="space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.pointsPage.name')}</span>
-          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={t('admin.pointsPage.namePlaceholder')} className={inputClass} />
+          <input {...field('name', t('admin.pointsPage.namePlaceholder'))} maxLength={40} className={inputClass} />
         </label>
         <label className="space-y-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t('admin.pointsPage.color')}</span>
@@ -322,7 +329,7 @@ const BadgeForm = ({ badge, config, onDone }: { badge: AdminBadge | null; config
       </div>
       <label className="block space-y-1.5">
         <span className="text-xs font-semibold text-muted-foreground">{t('admin.pointsPage.badgeDescription')}</span>
-        <input value={description} onChange={(e) => setDescription(e.target.value)} maxLength={200} placeholder={t('admin.pointsPage.descriptionPlaceholder')} className={inputClass} />
+        <input {...field('description', t('admin.pointsPage.descriptionPlaceholder'))} maxLength={200} className={inputClass} />
       </label>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="space-y-1.5">

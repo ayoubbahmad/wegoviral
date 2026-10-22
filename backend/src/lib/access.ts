@@ -7,6 +7,7 @@ import { AccessRule, MembershipTier, UserRole } from '@prisma/client';
 import { prisma } from './prisma';
 import { can, ROLE_RANK } from './permissions';
 import { getLevels, levelFor } from './gamification';
+import { localizeRecord } from './localize';
 
 const CACHE_MS = 30_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -107,7 +108,7 @@ export async function evaluateRule(
       reasons.push({
         type: 'level',
         minLevel: rule.minLevel,
-        levelName: target?.name ?? `Level ${rule.minLevel}`,
+        levelName: target ? localizeRecord(target).name : `Level ${rule.minLevel}`,
         pointsToGo: Math.max(0, (target?.minPoints ?? 0) - viewer.points),
       });
     }

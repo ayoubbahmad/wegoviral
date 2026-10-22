@@ -11,6 +11,7 @@ import {
   QuizQuestionDraft,
 } from '../types';
 import { adminKeys } from '.';
+import { cleanTranslations } from '@/lib/translations';
 
 export const joiningKeys = {
   applications: (status: JoinStatus) => ['admin', 'applications', status] as const,
@@ -89,7 +90,7 @@ export const useSaveGuideSections = () => {
     mutationFn: async (sections: GuideSectionDraft[]) =>
       (
         await apiClient.put('/admin/guide/sections', {
-          sections: sections.map(({ title, body, mediaUrl }) => ({ title, body, mediaUrl: mediaUrl || '' })),
+          sections: sections.map(({ title, body, mediaUrl, translations }) => ({ title, body, mediaUrl: mediaUrl || '', translations: cleanTranslations(translations) })),
         })
       ).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: joiningKeys.guide }),
@@ -102,7 +103,7 @@ export const useSaveQuiz = () => {
     mutationFn: async (questions: QuizQuestionDraft[]) =>
       (
         await apiClient.put('/admin/guide/quiz', {
-          questions: questions.map(({ question, options, correctIndex }) => ({ question, options, correctIndex })),
+          questions: questions.map(({ question, options, correctIndex, translations }) => ({ question, options, correctIndex, translations: cleanTranslations(translations) })),
         })
       ).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: joiningKeys.guide }),

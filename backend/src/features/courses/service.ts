@@ -31,7 +31,7 @@ const personSelect = { id: true, username: true, name: true, avatarUrl: true, ro
 
 const courseInclude = {
   owner: { select: personSelect },
-  completionBadge: { select: { id: true, name: true, emoji: true, color: true } },
+  completionBadge: { select: { id: true, name: true, emoji: true, color: true, translations: true } },
   modules: {
     orderBy: { position: 'asc' },
     include: {

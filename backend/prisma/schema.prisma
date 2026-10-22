@@ -364,16 +364,17 @@ model AdminActivity {
 }
 
 model CommunitySpace {
-  id          String          @id @default(uuid())
-  name        String
-  emoji       String
-  description String
-  adminOnly   Boolean         @default(false) // only moderators/admins can post
-  position    Int             @default(0)
-  coverUrl    String?
-  archivedAt  DateTime? // hidden from the space list and closed to new posts; old posts stay
-  createdAt   DateTime        @default(now())
-  posts       CommunityPost[]
+  id           String          @id @default(uuid())
+  name         String
+  emoji        String
+  description  String
+  adminOnly    Boolean         @default(false) // only moderators/admins can post
+  position     Int             @default(0)
+  coverUrl     String?
+  translations Json            @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
+  archivedAt   DateTime? // hidden from the space list and closed to new posts; old posts stay
+  createdAt    DateTime        @default(now())
+  posts        CommunityPost[]
 
   @@map("community_spaces")
 }
@@ -542,12 +543,13 @@ model MemberApplication {
 }
 
 model GuideSection {
-  id        String   @id @default(uuid())
-  position  Int
-  title     String
-  body      String // plain text with line breaks
-  mediaUrl  String?
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  position     Int
+  title        String
+  body         String // plain text with line breaks
+  mediaUrl     String?
+  translations Json     @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
+  updatedAt    DateTime @updatedAt
 
   @@map("guide_sections")
 }
@@ -558,6 +560,7 @@ model QuizQuestion {
   question     String
   options      String[]
   correctIndex Int
+  translations Json     @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
   updatedAt    DateTime @updatedAt
 
   @@map("quiz_questions")
@@ -778,9 +781,10 @@ model PointEvent {
 }
 
 model Level {
-  level     Int    @id
-  name      String
-  minPoints Int
+  level        Int    @id
+  name         String
+  minPoints    Int
+  translations Json   @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
 
   @@map("levels")
 }
@@ -791,6 +795,7 @@ model Badge {
   emoji               String
   color               String        @default("#f59e0b")
   description         String        @default("")
+  translations        Json          @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
   // Automatic award: { "type": "POSTS" | "COMMENTS" | "LIKES_RECEIVED" | "EVENTS_JOINED" | "COURSES_COMPLETED" | "CHALLENGES_COMPLETED" | "CHALLENGES_WON" | "POINTS", "threshold": n }
   autoRule            Json?
   archivedAt          DateTime?
@@ -1019,20 +1024,21 @@ enum HelpSpace {
  * One help article, shown in one space to one audience (that role and above).
  */
 model HelpArticle {
-  id          String       @id @default(uuid())
-  slug        String       @unique
-  space       HelpSpace
-  audience    UserRole     @default(MEMBER)
-  category    String // section heading in the help center, e.g. "Getting started"
-  title       String
-  summary     String       @default("")
-  body        String       @default("") // light Markdown: ## headings, lists, **bold**, [links](url)
-  position    Int          @default(0)
-  published   Boolean      @default(false)
-  updatedById String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  updatedBy   UserProfile? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  id           String       @id @default(uuid())
+  slug         String       @unique
+  space        HelpSpace
+  audience     UserRole     @default(MEMBER)
+  category     String // section heading in the help center, e.g. "Getting started"
+  title        String
+  summary      String       @default("")
+  body         String       @default("") // light Markdown: ## headings, lists, **bold**, [links](url)
+  translations Json         @default("{}") // { fr: { field: text }, ar: { ... } }; the main fields are the default (English) version
+  position     Int          @default(0)
+  published    Boolean      @default(false)
+  updatedById  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  updatedBy    UserProfile? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@index([space, published, position])
   @@map("help_articles")

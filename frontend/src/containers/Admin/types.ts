@@ -1,5 +1,6 @@
 import type { MemberStatus, UserRole } from '@/lib/roles';
 import type { BadgeChip, MemberLevel } from '@/types/communityFeed';
+import type { Translations } from '@/lib/translations';
 
 export interface AdminMember {
   id: string;
@@ -162,6 +163,7 @@ export interface GuideSectionDraft {
   title: string;
   body: string;
   mediaUrl?: string | null;
+  translations?: Translations;
 }
 
 export interface QuizQuestionDraft {
@@ -169,6 +171,7 @@ export interface QuizQuestionDraft {
   question: string;
   options: string[];
   correctIndex: number;
+  translations?: Translations;
 }
 
 export interface AdminGuide {
@@ -249,6 +252,7 @@ export interface AdminSpace {
   description: string;
   coverUrl: string | null;
   adminOnly: boolean;
+  translations?: Translations;
   position: number;
   archivedAt: string | null;
   postCount: number;
@@ -261,6 +265,7 @@ export interface SpaceInput {
   description: string;
   coverUrl?: string;
   adminOnly: boolean;
+  translations?: Translations;
 }
 
 // ─── Access rules & tiers (Phase 4) ──────────────────────────────────────────
@@ -295,6 +300,7 @@ export type AutoBadgeType = 'POSTS' | 'COMMENTS' | 'LIKES_RECEIVED' | 'EVENTS_JO
 
 export interface AdminBadge extends BadgeChip {
   description: string;
+  translations?: Translations;
   autoRule: { type: AutoBadgeType; threshold: number } | null;
   archivedAt: string | null;
   holderCount: number;
@@ -308,9 +314,16 @@ export interface PointRuleRow {
   enabled: boolean;
 }
 
+export interface LevelRow {
+  level: number;
+  name: string;
+  minPoints: number;
+  translations?: Translations;
+}
+
 export interface GamificationConfig {
   rules: PointRuleRow[];
-  levels: { level: number; name: string; minPoints: number }[];
+  levels: LevelRow[];
   badges: AdminBadge[];
   autoBadgeTypes: { type: AutoBadgeType; label: string }[];
 }
@@ -321,6 +334,7 @@ export interface BadgeInput {
   color: string;
   description: string;
   autoRule: { type: AutoBadgeType; threshold: number } | null;
+  translations?: Translations;
 }
 
 // ─── Stats (Phase 10) ────────────────────────────────────────────────────────

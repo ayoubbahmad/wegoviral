@@ -20,6 +20,8 @@ import {
 } from '../api/joining';
 import { AdminGuide, CommunitySettings, GuideSectionDraft, QuizQuestionDraft } from '../types';
 import { useT } from '@/i18n/provider';
+import { LanguageTabs } from '@/components/LanguageTabs';
+import { bindField, cleanTranslations, ContentLanguage, isTranslated, readListItem, removeListItem, writeListItem } from '@/lib/translations';
 
 const inputClass =
   'w-full h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -156,8 +158,10 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
   const saveSections = useSaveGuideSections();
   const publish = usePublishGuide();
   const [sections, setSections] = useState<GuideSectionDraft[]>(guide.sections);
-  const isDirty = JSON.stringify(sections.map(({ title, body, mediaUrl }) => ({ title, body, mediaUrl: mediaUrl || null }))) !==
-    JSON.stringify(guide.sections.map(({ title, body, mediaUrl }) => ({ title, body, mediaUrl: mediaUrl || null })));
+  const [language, setLanguage] = useState<ContentLanguage>('en');
+  const comparable = (list: GuideSectionDraft[]) =>
+    JSON.stringify(list.map(({ title, body, mediaUrl, translations }) => ({ title, body, mediaUrl: mediaUrl || null, translations: cleanTranslations(translations) })));
+  const isDirty = comparable(sections) !== comparable(guide.sections);
   const isValid = sections.every((section) => section.title.trim() && section.body.trim());
 
   const update = (index: number, change: Partial<GuideSectionDraft>) =>
@@ -202,18 +206,15 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
         </div>
       </div>
       {isDirty && <p className="text-xs text-amber-500">{t('admin.onboardingPage.unsaved')}</p>}
+      <LanguageTabs value={language} onChange={setLanguage} isMissing={(lang) => sections.some((section) => !isTranslated(section, ['title', 'body'], lang))} />
 
-      {sections.map((section, index) => (
+      {sections.map((section, index) => {
+        const field = bindField(section, (next) => update(index, next), language);
+        return (
         <div key={index} className="space-y-2 rounded-xl border border-border p-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-muted-foreground">{index + 1}.</span>
-            <input
-              value={section.title}
-              onChange={(e) => update(index, { title: e.target.value })}
-              placeholder={t('admin.onboardingPage.sectionTitle')}
-              maxLength={120}
-              className={inputClass}
-            />
+            <input {...field('title', t('admin.onboardingPage.sectionTitle'))} maxLength={120} className={inputClass} />
             <button type="button" aria-label={t('admin.onboardingPage.moveUp')} disabled={index === 0} onClick={() => setSections((s) => move(s, index, -1))} className="p-2 rounded-lg hover:bg-secondary/50 disabled:opacity-30">
               <ArrowUp className="w-4 h-4" />
             </button>
@@ -224,7 +225,7 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
-          <Textarea value={section.body} onChange={(e) => update(index, { body: e.target.value })} placeholder={t('admin.onboardingPage.sectionBody')} className="min-h-[100px]" />
+          <Textarea {...field('body', t('admin.onboardingPage.sectionBody'))} className="min-h-[100px]" />
           <input
             value={section.mediaUrl ?? ''}
             onChange={(e) => update(index, { mediaUrl: e.target.value })}
@@ -232,7 +233,8 @@ const GuideEditor = ({ guide }: { guide: AdminGuide }) => {
             className={inputClass}
           />
         </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         onClick={() => setSections((s) => [...s, { title: '', body: '', mediaUrl: '' }])}
@@ -251,6 +253,7 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
   const { showToast } = useToast();
   const saveQuiz = useSaveQuiz();
   const [questions, setQuestions] = useState<QuizQuestionDraft[]>(guide.questions);
+  const [language, setLanguage] = useState<ContentLanguage>('en');
   const isValid = questions.every(
     (q) => q.question.trim() && q.options.length >= 2 && q.options.every((option) => option.trim()) && q.correctIndex < q.options.length,
   );
@@ -278,11 +281,13 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
         </Button>
       </div>
 
+      <LanguageTabs value={language} onChange={setLanguage} isMissing={(lang) => questions.some((question) => !isTranslated(question, ['question', 'options'], lang))} />
+
       {questions.map((question, index) => (
         <div key={index} className="space-y-3 rounded-xl border border-border p-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-muted-foreground">{index + 1}.</span>
-            <input value={question.question} onChange={(e) => update(index, { question: e.target.value })} placeholder={t('admin.onboardingPage.question')} maxLength={300} className={inputClass} />
+            <input {...bindField(question, (next) => update(index, next), language)('question', t('admin.onboardingPage.question'))} maxLength={300} className={inputClass} />
             <button type="button" aria-label={t('admin.onboardingPage.removeQuestion')} onClick={() => setQuestions((q) => q.filter((_, i) => i !== index))} className="p-2 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
               <Trash2 className="w-4 h-4" />
             </button>
@@ -299,9 +304,10 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
                 className="accent-[var(--primary)]"
               />
               <input
-                value={option}
-                onChange={(e) => update(index, { options: question.options.map((o, i) => (i === optionIndex ? e.target.value : o)) })}
-                placeholder={t('admin.onboardingPage.option', { number: optionIndex + 1 })}
+                value={readListItem(question, 'options', optionIndex, language)}
+                onChange={(e) => update(index, writeListItem(question, 'options', optionIndex, language, e.target.value))}
+                placeholder={language === 'en' ? t('admin.onboardingPage.option', { number: optionIndex + 1 }) : option}
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
                 maxLength={200}
                 className={inputClass}
               />
@@ -311,7 +317,7 @@ const QuizEditor = ({ guide, settings }: { guide: AdminGuide; settings: Communit
                   aria-label={t('admin.onboardingPage.removeOption')}
                   onClick={() =>
                     update(index, {
-                      options: question.options.filter((_, i) => i !== optionIndex),
+                      ...removeListItem(question, 'options', optionIndex),
                       correctIndex: question.correctIndex === optionIndex ? 0 : question.correctIndex > optionIndex ? question.correctIndex - 1 : question.correctIndex,
                     })
                   }

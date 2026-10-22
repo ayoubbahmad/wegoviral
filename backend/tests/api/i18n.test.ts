@@ -1,16 +1,22 @@
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { callApi, cleanupTestData, createTestUser, TestUser } from './support';
+import { callApi, cleanupTestData, createTestUser, prisma, TestUser } from './support';
 import { pickLocale, translateMessage } from '../../src/lib/i18n';
+import { localizeTree } from '../../src/lib/localize';
 
 describe('languages', () => {
   let member: TestUser;
+  let admin: TestUser;
+  const spaceIds: string[] = [];
 
   before(async () => {
-    member = await createTestUser('i18n');
+    [member, admin] = await Promise.all([createTestUser('i18n'), createTestUser('i18nadmin', { role: 'SUPER_ADMIN' })]);
   });
 
-  after(cleanupTestData);
+  after(async () => {
+    await prisma.communitySpace.deleteMany({ where: { id: { in: spaceIds } } });
+    await cleanupTestData();
+  });
 
   describe('message translation', () => {
     it('picks a supported language from Accept-Language', () => {
@@ -57,6 +63,42 @@ describe('languages', () => {
       assert.equal(response.status, 401);
       const notFound = await member.call('GET', '/events/not-a-real-event');
       assert.equal(notFound.data.error, 'Event not found', 'the test client sends no language, so English');
+    });
+  });
+
+  describe('team content', () => {
+    it('puts translated fields in the reader’s language and falls back to the main text', () => {
+      const record = { id: 'x', name: 'Wins', description: 'Share wins', options: ['Yes', 'No'], translations: { fr: { name: 'Victoires', description: ' ', options: ['Oui', ''] } } };
+      assert.deepEqual(localizeTree([{ space: record, at: new Date(0) }], 'fr'), [
+        { space: { id: 'x', name: 'Victoires', description: 'Share wins', options: ['Oui', 'No'] }, at: new Date(0) },
+      ]);
+      assert.deepEqual(localizeTree(record, 'ar'), { id: 'x', name: 'Wins', description: 'Share wins', options: ['Yes', 'No'] });
+    });
+
+    it('serves a space in each language, and every language to the team', async () => {
+      const created = await admin.call('POST', '/admin/spaces', {
+        name: 'Lang test space',
+        emoji: '💬',
+        description: 'Main text',
+        translations: { fr: { name: 'Espace test', description: 'Texte principal' }, ar: { name: 'مساحة تجريبية' } },
+      });
+      assert.equal(created.status, 201, JSON.stringify(created.data));
+      spaceIds.push(created.data.id);
+      const spaceIn = async (language?: string) =>
+        (await member.call('GET', '/feed/spaces', undefined, language)).data.find((space: { id: string }) => space.id === created.data.id);
+
+      assert.deepEqual([(await spaceIn('fr')).name, (await spaceIn('fr')).description], ['Espace test', 'Texte principal']);
+      assert.deepEqual([(await spaceIn('ar')).name, (await spaceIn('ar')).description], ['مساحة تجريبية', 'Main text']);
+      const english = await spaceIn();
+      assert.equal(english.name, 'Lang test space');
+      assert.equal('translations' in english, false, 'members don’t get the other languages');
+
+      // A partial update leaves the translations alone; the admin list has them all
+      await admin.call('PATCH', `/admin/spaces/${created.data.id}`, { description: 'New main text' }, 'fr');
+      const managed = (await admin.call('GET', '/admin/spaces', undefined, 'fr')).data;
+      const row = (Array.isArray(managed) ? managed : managed.spaces).find((space: { id: string }) => space.id === created.data.id);
+      assert.equal(row.name, 'Lang test space');
+      assert.equal(row.translations.fr.name, 'Espace test');
     });
   });
 });

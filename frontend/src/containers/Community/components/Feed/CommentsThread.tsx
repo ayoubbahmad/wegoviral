@@ -10,6 +10,7 @@ import { CommunityComment, CommunityUser } from '@/types/communityFeed';
 import { useComments, useCreateComment, useDeleteComment, useEditComment } from '../../api';
 import { ReportDialog } from '../Moderation/ReportDialog';
 import { useT } from '@/i18n/provider';
+import { MemberLink } from '@/components/MemberLink';
 
 interface CommentsThreadProps {
   postId: string;
@@ -148,7 +149,7 @@ const CommentItem = ({ comment, postId, isOwn, isStaff, onDelete }: CommentItemP
       <img src={avatarFor(comment.author)} alt={comment.author.username} className="w-8 h-8 rounded-full border border-border shrink-0" />
       <div className="min-w-0 flex-1 rounded-xl bg-secondary/30 px-3 py-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold">@{comment.author.username}</span>
+          <MemberLink username={comment.author.username} className="text-xs font-semibold">@{comment.author.username}</MemberLink>
           <MemberBadges badges={comment.author.badges} />
           <span className="text-[11px] text-muted-foreground">
             {formatRelativeDate(comment.createdAt)}

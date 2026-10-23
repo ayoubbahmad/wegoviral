@@ -22,6 +22,8 @@ export const CreatePostSchema = z
 
 export const ListPostsQuerySchema = z.object({
   spaceId: z.string().optional(),
+  // One member's posts, for their profile
+  authorId: z.string().optional(),
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

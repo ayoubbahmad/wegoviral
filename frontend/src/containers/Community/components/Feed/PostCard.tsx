@@ -26,6 +26,7 @@ import { ReportDialog } from '../Moderation/ReportDialog';
 import { EditPostDialog } from '../Moderation/EditPostDialog';
 import { useT } from '@/i18n/provider';
 import { activeIntl } from '@/i18n/active';
+import { MemberLink } from '@/components/MemberLink';
 
 // Longer posts are clamped with a "See more" toggle
 const CLAMP_CHARACTERS = 280;
@@ -134,14 +135,16 @@ export const PostCard = ({
         )}
 
         <div className="flex items-center gap-3">
-          <img
-            src={avatarFor(post.author)}
-            alt={post.author.username}
-            className="w-10 h-10 rounded-full border border-border shrink-0"
-          />
+          <MemberLink username={post.author.username} className="shrink-0">
+            <img
+              src={avatarFor(post.author)}
+              alt={post.author.username}
+              className="w-10 h-10 rounded-full border border-border"
+            />
+          </MemberLink>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm truncate">@{post.author.username}</span>
+              <MemberLink username={post.author.username} className="font-semibold text-sm truncate">@{post.author.username}</MemberLink>
               <MemberBadges badges={post.author.badges} />
               {post.author.role && post.author.role !== 'MEMBER' && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">

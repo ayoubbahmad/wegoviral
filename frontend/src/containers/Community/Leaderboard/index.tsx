@@ -17,6 +17,7 @@ import { useHowPointsWork, useLeaderboard } from './api';
 import { useT } from '@/i18n/provider';
 import { T } from '@/i18n/T';
 import { howToEarn } from '@/lib/badges';
+import { MemberLink } from '@/components/MemberLink';
 
 const PERIODS: LeaderboardPeriod[] = ['7d', '30d', 'all'];
 
@@ -114,7 +115,7 @@ const MyLevelCard = ({ data }: { data: Leaderboard }) => {
         <img src={avatarFor(member)} alt="" className="h-12 w-12 rounded-full border border-border" />
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 font-semibold">
-            <span className="truncate">{displayName(member)}</span>
+            <MemberLink username={member.username} className="truncate">{displayName(member)}</MemberLink>
             <MemberBadges badges={member.badges} />
           </p>
           <p className="text-sm text-muted-foreground">{t('leaderboard.levelLine', { level: level.level, name: level.name })}</p>
@@ -177,7 +178,7 @@ const Podium = ({ entries }: { entries: LeaderboardEntry[] }) => {
         </span>
         <img src={avatarFor(entry.member)} alt="" className="h-14 w-14 rounded-full border border-border" />
         <div className="min-w-0 max-w-full">
-          <p className="truncate font-semibold">{displayName(entry.member)}</p>
+          <MemberLink username={entry.member.username} className="block truncate font-semibold">{displayName(entry.member)}</MemberLink>
           <MemberBadges badges={entry.member.badges} className="mt-1 justify-center" />
         </div>
         <LevelChip level={entry.level} />
@@ -194,7 +195,7 @@ const LeaderboardRow = ({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolea
     <img src={avatarFor(entry.member)} alt="" className="h-9 w-9 shrink-0 rounded-full border border-border" />
     <div className="min-w-0 flex-1">
       <p className="flex items-center gap-1.5 text-sm font-medium">
-        <span className="truncate">{displayName(entry.member)}</span>
+        <MemberLink username={entry.member.username} className="truncate">{displayName(entry.member)}</MemberLink>
         <MemberBadges badges={entry.member.badges} />
       </p>
       <p className="text-xs text-muted-foreground">

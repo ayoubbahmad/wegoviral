@@ -3,20 +3,11 @@
 import { useMemo } from 'react';
 import { useAuth, useCan } from '@/providers/Auth';
 import { useToast } from '@/providers/Toast';
-import { CommunityPost, CommunityUser, NewPostDraft } from '@/types/communityFeed';
+import { NewPostDraft } from '@/types/communityFeed';
 import { ALL_SPACES_ID, useCommunityStore } from '../../slice';
 import { useEvents } from '../../Events/api';
-import {
-  useBookmarkPost,
-  useCreatePost,
-  useDeletePost,
-  useFeedPosts,
-  useLikePost,
-  usePinPost,
-  useSpaces,
-  useTopPosts,
-  useVotePoll,
-} from '../../api';
+import { useCreatePost, useFeedPosts, useSpaces, useTopPosts } from '../../api';
+import { usePostActions } from './postActions';
 import { useT } from '@/i18n/provider';
 
 export const useFeedController = () => {
@@ -36,11 +27,6 @@ export const useFeedController = () => {
   const topPostsQuery = useTopPosts();
 
   const createPost = useCreatePost();
-  const deletePost = useDeletePost();
-  const pinPost = usePinPost();
-  const likePost = useLikePost();
-  const bookmarkPost = useBookmarkPost();
-  const votePoll = useVotePoll();
 
   const spaces = useMemo(() => spacesQuery.data ?? [], [spacesQuery.data]);
   const posts = useMemo(
@@ -65,12 +51,8 @@ export const useFeedController = () => {
   // Members who still have to accept the guide or pass the quiz can read but not post
   const canInteract = !isMuted && user?.onboarding.step === 'DONE';
 
-  const currentUser: CommunityUser | undefined = user
-    ? { id: user.id, username: user.username, avatarUrl: user.avatarUrl, role: user.role }
-    : undefined;
-
-  const reportError = (error: unknown, fallback: string) =>
-    showToast(error instanceof Error ? error.message : fallback, 'error');
+  const { currentUser, reportError, handleDeletePost, handlePinPost, handleLikePost, handleBookmarkPost, handleVotePoll, handleCopyPostLink } =
+    usePostActions();
 
   const handleCreatePost = async (draft: NewPostDraft) => {
     const post = await createPost.mutateAsync(draft);
@@ -80,55 +62,6 @@ export const useFeedController = () => {
         ? t('feed.toasts.sentForReview')
         : t('feed.toasts.published'),
     );
-  };
-
-  const handleDeletePost = (postId: string) => {
-    if (!window.confirm(t('feed.toasts.deleteConfirm'))) return;
-    deletePost.mutate(postId, {
-      onSuccess: () => showToast(t('feed.toasts.deleted'), 'info'),
-      onError: (error) => reportError(error, t('feed.toasts.deleteFailed')),
-    });
-  };
-
-  const handlePinPost = (post: CommunityPost) => {
-    pinPost.mutate(
-      { postId: post.id, pinned: !post.pinned },
-      {
-        onSuccess: () => showToast(post.pinned ? t('feed.toasts.unpinned') : t('feed.toasts.pinned')),
-        onError: (error) => reportError(error, t('feed.toasts.pinFailed')),
-      },
-    );
-  };
-
-  const handleLikePost = (post: CommunityPost) =>
-    likePost.mutate(
-      { postId: post.id, liked: !post.likedByMe },
-      { onError: (error) => reportError(error, t('feed.toasts.likeFailed')) },
-    );
-
-  const handleBookmarkPost = (post: CommunityPost) =>
-    bookmarkPost.mutate(
-      { postId: post.id, bookmarked: !post.bookmarkedByMe },
-      {
-        onSuccess: () => showToast(post.bookmarkedByMe ? t('feed.toasts.unbookmarked') : t('feed.toasts.bookmarked')),
-        onError: (error) => reportError(error, t('feed.toasts.bookmarkFailed')),
-      },
-    );
-
-  const handleVotePoll = (postId: string, optionId: string) =>
-    votePoll.mutate(
-      { postId, optionId },
-      { onError: (error) => reportError(error, t('feed.toasts.voteFailed')) },
-    );
-
-  const handleCopyPostLink = async (post: CommunityPost) => {
-    const url = `${window.location.origin}/community/feed#post-${post.id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast(t('feed.toasts.linkCopied'));
-    } catch {
-      showToast(t('feed.referral.copyFailed'), 'error');
-    }
   };
 
   return {

@@ -31,6 +31,7 @@ import { challengeDays, describeDates } from './utils';
 import { useT } from '@/i18n/provider';
 import { activeIntl } from '@/i18n/active';
 import { T } from '@/i18n/T';
+import { MemberLink } from '@/components/MemberLink';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const displayName = (member: { name?: string | null; username: string }) => member.name || `@${member.username}`;
@@ -170,7 +171,7 @@ const WinnersBanner = ({ challenge }: { challenge: ChallengeDetail }) => (
         <li key={winner.member.id} className="flex items-center gap-2">
           <span className="text-xl">{MEDALS[winner.rank - 1] ?? `#${winner.rank}`}</span>
           <img src={avatarFor(winner.member)} alt="" className="h-8 w-8 rounded-full border border-border" />
-          <span className="text-sm font-semibold">{displayName(winner.member)}</span>
+          <MemberLink username={winner.member.username} className="text-sm font-semibold">{displayName(winner.member)}</MemberLink>
         </li>
       ))}
     </ul>
@@ -405,7 +406,7 @@ const CheckInFeed = ({ challengeId }: { challengeId: string }) => {
             <img src={avatarFor(checkIn.author)} alt="" className="h-8 w-8 rounded-full border border-border" />
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 text-sm font-semibold">
-                <span className="truncate">{displayName(checkIn.author)}</span>
+                <MemberLink username={checkIn.author.username} className="truncate">{displayName(checkIn.author)}</MemberLink>
                 <MemberBadges badges={checkIn.author.badges} />
               </p>
               <p className="text-xs text-muted-foreground">{formatRelativeDate(checkIn.createdAt)}</p>
@@ -457,7 +458,7 @@ const Leaderboard = ({ challenge }: { challenge: ChallengeDetail }) => {
             <img src={avatarFor(entry.member)} alt="" className="h-9 w-9 shrink-0 rounded-full border border-border" />
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 text-sm font-medium">
-                <span className="truncate">{displayName(entry.member)}</span>
+                <MemberLink username={entry.member.username} className="truncate">{displayName(entry.member)}</MemberLink>
                 <MemberBadges badges={entry.member.badges} />
                 {entry.winnerRank && <Trophy className="w-3.5 h-3.5 shrink-0 text-amber-500" aria-label={t('challenges.page.winnerLabel')} />}
               </p>

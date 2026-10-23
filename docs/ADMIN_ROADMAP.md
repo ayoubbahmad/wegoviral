@@ -241,20 +241,22 @@ Requested 2026-10-22. Decisions: Settings with a **side menu and one panel per s
 - ✅ **13a · Settings** (shipped; **acceptance pending**, Ayoub; 5 automated tests): /settings/profile (photo upload, name, username with live availability check, bio, niche, up to 7 social links), /settings/account (email, sign-in methods, change or set a password, sign out of other devices, ask the team to delete the account; admins see the request in the member panel and the activity log), /settings/preferences (language, theme and reduced motion saved to the profile and applied on every device; the device time zone shown), /settings/membership (tier, level progress, badges, invite link, guide version, and privacy: appear on the leaderboard, show my badges, show my social links).
   - *Accept:* change your photo and bio and see them in the sidebar; turn "Appear on the leaderboard" off and check from another account that you're gone; set dark mode and reduced motion, sign in on another browser and see them applied.
   - *Not included:* a manual time zone (times follow the device), changing the email address, deleting the account directly (the team handles it).
-- ⬜ **13b · Member profiles and directory**: clicking a name opens the member's profile (photo, bio, niche, links if shown, level, badges, recent posts); the Members page becomes a searchable directory.
+- ✅ **13b · Member profiles and directory** (shipped; **acceptance pending**, Ayoub; 3 automated tests): Community → Members is a directory (search by name, username or niche; sort by newest, points or name; 24 per page) and /community/members/<username> is the profile (photo, name, role, niche, bio, social links unless hidden, level, points, posts and comments counts, join date, badges unless hidden, and their posts with likes, votes and comments working as on the timeline). Names and photos on posts, comments, the leaderboard and challenges open the profile. Banned members aren't listed.
+  - *Accept:* find a member by their niche, open their profile from a post, hide your social links in Settings and check they disappear for others.
 - ⬜ **13c · Notifications**: in-app bell for replies, mentions, likes, approvals, event and challenge reminders and warnings, with a Notifications section in Settings to choose what you get.
 
 ## Phase 14 — UI/UX consistency audit
 
-Requested 2026-10-21. Every page should feel like the same app, so members learn it once.
+Requested 2026-10-21, clarified 2026-10-22: pages look like they were designed by different people (buttons, cards and layouts change style from page to page). Every page should feel like the same app, so members learn it once. Phone layout is not part of this.
 
-- ⬜ **Phones first**: the app has no phone layout yet (the sidebar stays open and squeezes every page); add a collapsible menu and check every screen at phone width.
-- ⬜ **One set of building blocks**: buttons (one style per role, consistent shadows), cards, page headers, tabs, form fields, empty states, toggles (`components/Switch`) and modals used the same way on every page.
+- ⬜ **Inventory**: list every variant in use (buttons and their shadows, cards, page headers and widths, tabs and filter chips, inputs, toggles, empty states, modals, tables, badges) and pick one style per role.
+- ⬜ **One set of building blocks**: make the shared components match those choices (`Button`, `Card`, `PageHeader`, `Tabs`, `Input`, `Switch`, `EmptyState`, `Modal`, `Table`) and replace hand-made versions page by page.
+- ⬜ **Same layout for the same job**: list pages, detail pages, editors and settings follow one pattern each (header, actions placement, spacing, widths).
 - ⬜ **Icons instead of emojis**: medals, space and badge icons, defaults, the "All" chip, the composer's emoji picker; our own icon set where lucide has nothing suitable.
 
 ## Phase 15 — Performance audit
 
-Requested 2026-10-22: "the app feels slow, each screen takes time to load".
+Requested 2026-10-22: "the app feels slow, each screen takes time to load", felt in production (not only locally).
 
 - ⬜ **Measure first**: time each screen's load in production (server response times, number and size of requests, JavaScript size per page) to find what's actually slow.
 - ⬜ **Likely suspects to check**: distance between Railway and the Supabase database (eu-central-1), every page waiting for `/auth/me` before showing anything, pages built entirely in the browser, repeated requests with no caching between screens, large images and avatars, slow database queries without indexes.

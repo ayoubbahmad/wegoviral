@@ -139,7 +139,7 @@ export async function listSpaces(viewer: AccessViewer) {
 
 export async function listPosts(
   viewer: AccessViewer,
-  { spaceId, cursor, limit }: { spaceId?: string; cursor?: string; limit: number },
+  { spaceId, authorId, cursor, limit }: { spaceId?: string; authorId?: string; cursor?: string; limit: number },
 ) {
   const viewerId = viewer.id;
   if (spaceId) {
@@ -151,11 +151,12 @@ export async function listPosts(
     where: {
       deletedAt: null,
       ...(spaceId ? { spaceId } : locked.length ? { spaceId: { notIn: locked } } : {}),
+      ...(authorId ? { authorId } : {}),
       // Everyone sees published posts; authors also see their own posts waiting for (or refused at) review
       OR: [{ reviewStatus: 'PUBLISHED' }, { authorId: viewerId }],
     },
-    // Pinned posts first; id breaks ties so the cursor is stable
-    orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+    // Pinned posts first on the timeline (not on a profile); id breaks ties so the cursor is stable
+    orderBy: authorId ? [{ createdAt: 'desc' }, { id: 'desc' }] : [{ pinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     include: postInclude(viewerId),
